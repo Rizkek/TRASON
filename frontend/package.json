@@ -1,0 +1,41 @@
+{
+  "name": "trason-frontend",
+  "version": "1.0.0",
+  "description": "TRASON PWA Frontend - Next.js 14+ PWA",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint src/**/*.{js,ts,jsx,tsx} --fix",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "format": "prettier --write src/**/*.{js,ts,jsx,tsx,json,css,md}"
+  },
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zustand": "^4.4.0",
+    "axios": "^1.6.2",
+    "lucide-react": "^0.294.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.40",
+    "@types/react-dom": "^18.2.16",
+    "typescript": "^5.3.3",
+    "tailwindcss": "^3.3.0",
+    "postcss": "^8.4.31",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.55.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "prettier": "^3.1.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "@testing-library/react": "^14.1.0",
+    "@testing-library/jest-dom": "^6.1.5"
+  }
+}
