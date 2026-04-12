@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables for fonts and colors */
+:root {
+  --font-crimson: 'Crimson Text', serif;
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  /* TRASON New Color Palette */
+  --color-primary: #4E4FEB;
+  --color-secondary: #068FFF;
+  --color-warm-black: #0F0F0F;
+  --color-soft-cream: #F5F3F0;
+  --color-accent-purple: #7E30E1;
+  --color-accent-blue: #49117C;
+  
+  --gradient-primary: linear-gradient(135deg, #4E4FEB 0%, #068FFF 100%);
+  --gradient-dark: linear-gradient(180deg, rgba(26, 26, 26, 0.8) 0%, rgba(15, 15, 15, 1) 100%);
+}
+
+* {
+  @apply focus:outline-none;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-inter);
+}
+
+body {
+  @apply bg-warm-black text-soft-cream;
+  line-height: 1.6;
+}
+
+/* Base Typography */
+h1, .h1 {
+  @apply text-4xl font-serif font-semibold;
+  font-family: var(--font-crimson);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+h2, .h2 {
+  @apply text-3xl font-serif font-normal;
+  font-family: var(--font-crimson);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+h3, .h3 {
+  @apply text-2xl font-serif font-normal;
+  font-family: var(--font-crimson);
+  line-height: 1.4;
+}
+
+h4, .h4 {
+  @apply text-xl font-semibold;
+  font-family: var(--font-inter);
+}
+
+p, body {
+  @apply text-base font-normal;
+  font-family: var(--font-inter);
+  line-height: 1.6;
+}
+
+/* Custom animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-in-out;
+}
+
+.animate-subtle-pulse {
+  animation: subtle-pulse 2s ease-in-out infinite;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-warm-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* Link utilities */
+a {
+  @apply text-secondary hover:text-primary transition-all duration-300;
+}
+
+/* Card/Box utilities */
+.card {
+  @apply bg-gray-strong bg-opacity-40 backdrop-blur-md rounded-md;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  border-color: rgba(78, 79, 235, 0.3);
+  background-color: rgba(42, 42, 42, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(78, 79, 235, 0.1);
+}
+
+.glass {
+  @apply bg-white bg-opacity-[0.03] backdrop-blur-xl border border-white border-opacity-[0.05];
+}
+
+.bg-gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Text utilities */
+.text-display {
+  font-size: 40px;
+  @apply font-serif font-semibold;
+  letter-spacing: -0.02em;
+}
+
+.text-heading {
+  font-size: 24px;
+  @apply font-serif;
+}
+
+.text-subtext {
+  @apply text-caption text-gray-very-light opacity-80;
+}
+
+.text-micro {
+  font-size: 10px;
+  @apply font-sans font-medium uppercase tracking-wider;
+}
+
+/* Glow effects */
+.glow-primary {
+  box-shadow: 0 0 20px -5px var(--color-primary);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 20px -5px var(--color-secondary);
+}

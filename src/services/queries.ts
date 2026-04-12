@@ -1,0 +1,610 @@
+'use client';
+
+import {
+  supabase,
+  User,
+  Category,
+  Transaction,
+  Activity,
+  Reminder,
+  Insight,
+  UserPreferences,
+  getCurrentUser,
+} from './supabaseClient';
+
+/**
+ * ==================== USER QUERIES ====================
+ */
+
+export const userQueries = {
+  // Fetch user with preferences
+  // Uses maybeSingle() to safely return null (instead of throwing) when no row exists.
+  async getUserWithPreferences() {
+    const user = await getCurrentUser();
+    if (!user) return null;
+
+    const { data, error } = await supabase
+      .from('users')
+      .select(
+        `
+        id, email, first_name, last_name, avatar_url, email_verified, phone, bio,
+        created_at, updated_at,
+        user_preferences(theme, language, currency, timezone, notifications_enabled, 
+                        push_notifications_enabled, email_digest_enabled, digest_frequency)
+      `
+      )
+      .eq('id', user.id)
+      .is('deleted_at', null)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    // Auto-create user row if it doesn't exist yet (e.g. first login after sign-up)
+    if (!data) {
+      const { data: newUser, error: insertError } = await supabase
+        .from('users')
+        .insert([{
+          id: user.id,
+          email: user.email ?? '',
+          email_verified: !!user.email_confirmed_at,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }])
+        .select(
+          `
+          id, email, first_name, last_name, avatar_url, email_verified, phone, bio,
+          created_at, updated_at,
+          user_preferences(theme, language, currency, timezone, notifications_enabled, 
+                          push_notifications_enabled, email_digest_enabled, digest_frequency)
+        `
+        )
+        .maybeSingle();
+
+      if (insertError) throw insertError;
+      return newUser;
+    }
+
+    return data;
+  },
+
+  // Update user profile
+  async updateUserProfile(
+    updates: Partial<Omit<User, 'id' | 'created_at' | 'updated_at'>>
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('users')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Update user preferences
+  async updateUserPreferences(updates: Partial<UserPreferences>) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('user_id', user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+};
+
+/**
+ * ==================== CATEGORY QUERIES ====================
+ */
+
+export const categoryQueries = {
+  // Fetch all categories
+  async getCategories() {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Create category
+  async createCategory(
+    category: Omit<Category, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('categories')
+      .insert([{ ...category, user_id: user.id }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Update category
+  async updateCategory(
+    id: string,
+    updates: Partial<Omit<Category, 'id' | 'user_id' | 'created_at'>>
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('categories')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Delete category
+  async deleteCategory(id: string) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { error } = await supabase
+      .from('categories')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+  },
+};
+
+/**
+ * ==================== TRANSACTION QUERIES ====================
+ */
+
+export const transactionQueries = {
+  // Fetch transactions with filters
+  async getTransactions(
+    startDate?: Date,
+    endDate?: Date,
+    type?: 'income' | 'expense',
+    limit: number = 50,
+    offset: number = 0
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    let query = supabase
+      .from('transactions')
+      .select(
+        `
+        id, user_id, title, description, amount, type, date, time, 
+        payment_method, tags, created_at, updated_at,
+        categories:category_id(id, name, color, icon)
+      `
+      )
+      .eq('user_id', user.id)
+      .is('deleted_at', null);
+
+    if (startDate) {
+      query = query.gte('date', startDate.toISOString().split('T')[0]);
+    }
+
+    if (endDate) {
+      query = query.lte('date', endDate.toISOString().split('T')[0]);
+    }
+
+    if (type) {
+      query = query.eq('type', type);
+    }
+
+    const { data, error, count } = await query
+      .order('date', { ascending: false })
+      .order('time', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+    return { data, count };
+  },
+
+  // Create transaction
+  async createTransaction(
+    transaction: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .insert([{ ...transaction, user_id: user.id }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Update transaction
+  async updateTransaction(
+    id: string,
+    updates: Partial<Omit<Transaction, 'id' | 'user_id' | 'created_at'>>
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Delete transaction (soft delete)
+  async deleteTransaction(id: string) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { error } = await supabase
+      .from('transactions')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+  },
+
+  // Get transaction analytics
+  async getAnalytics(startDate: Date, endDate: Date) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .rpc('get_transaction_analytics', {
+        p_user_id: user.id,
+        p_start_date: startDate.toISOString().split('T')[0],
+        p_end_date: endDate.toISOString().split('T')[0],
+      });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Get transactions summary by category
+  async getSummaryByCategory(startDate: Date, endDate: Date) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .select(
+        `
+        type,
+        category_id,
+        amount,
+        categories:category_id(name, color, icon)
+      `
+      )
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .gte('date', startDate.toISOString().split('T')[0])
+      .lte('date', endDate.toISOString().split('T')[0]);
+
+    if (error) throw error;
+
+    // Group and aggregate on client side
+    const summary = data?.reduce(
+      (acc: any, trans: any) => {
+        const key = `${trans.type}-${trans.category_id}`;
+        if (!acc[key]) {
+          acc[key] = {
+            type: trans.type,
+            category: trans.categories,
+            total: 0,
+            count: 0,
+          };
+        }
+        acc[key].total += trans.amount;
+        acc[key].count += 1;
+        return acc;
+      },
+      {}
+    );
+
+    return Object.values(summary || {});
+  },
+};
+
+/**
+ * ==================== ACTIVITY QUERIES ====================
+ */
+
+export const activityQueries = {
+  // Fetch activities by date
+  async getActivitiesByDate(date: Date) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const dateStr = date.toISOString().split('T')[0];
+
+    const { data, error } = await supabase
+      .from('activities')
+      .select('*')
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .gte('start_time', `${dateStr}T00:00:00`)
+      .lt('start_time', `${dateStr}T23:59:59`)
+      .order('start_time', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Fetch activities by date range
+  async getActivities(startDate: Date, endDate: Date, limit: number = 50, offset: number = 0) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error, count } = await supabase
+      .from('activities')
+      .select('*')
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .gte('start_time', startDate.toISOString())
+      .lte('start_time', endDate.toISOString())
+      .order('start_time', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+    return { data, count };
+  },
+
+  // Create activity
+  async createActivity(
+    activity: Omit<Activity, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('activities')
+      .insert([{ ...activity, user_id: user.id }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Update activity
+  async updateActivity(
+    id: string,
+    updates: Partial<Omit<Activity, 'id' | 'user_id' | 'created_at'>>
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('activities')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Delete activity
+  async deleteActivity(id: string) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { error } = await supabase
+      .from('activities')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+  },
+};
+
+/**
+ * ==================== REMINDER QUERIES ====================
+ */
+
+export const reminderQueries = {
+  // Fetch pending reminders
+  async getPendingReminders() {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('reminders')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('status', 'pending')
+      .is('deleted_at', null)
+      .or('due_datetime.is.null,due_datetime.gte.now()')
+      .order('due_datetime', { ascending: true });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Fetch reminders by date range
+  async getReminders(startDate: Date, endDate: Date) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('reminders')
+      .select('*')
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .gte('due_date', startDate.toISOString().split('T')[0])
+      .lte('due_date', endDate.toISOString().split('T')[0])
+      .order('due_date', { ascending: true });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Create reminder
+  async createReminder(
+    reminder: Omit<Reminder, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('reminders')
+      .insert([{ ...reminder, user_id: user.id }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Update reminder
+  async updateReminder(
+    id: string,
+    updates: Partial<Omit<Reminder, 'id' | 'user_id' | 'created_at'>>
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('reminders')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Complete reminder
+  async completeReminder(id: string) {
+    return reminderQueries.updateReminder(id, { status: 'completed' });
+  },
+
+  // Delete reminder
+  async deleteReminder(id: string) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { error } = await supabase
+      .from('reminders')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+  },
+};
+
+/**
+ * ==================== INSIGHT QUERIES ====================
+ */
+
+export const insightQueries = {
+  // Fetch insights by date range
+  async getInsights(startDate: Date, endDate: Date, type?: string) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    let query = supabase
+      .from('insights')
+      .select('*')
+      .eq('user_id', user.id)
+      .gte('date', startDate.toISOString().split('T')[0])
+      .lte('date', endDate.toISOString().split('T')[0]);
+
+    if (type) {
+      query = query.eq('type', type);
+    }
+
+    const { data, error } = await query.order('date', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Create insight (typically done by backend service)
+  async createInsight(
+    insight: Omit<Insight, 'id' | 'created_at' | 'updated_at'>
+  ) {
+    const { data, error } = await supabase
+      .from('insights')
+      .insert([insight])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+};
+
+/**
+ * ==================== BATCH OPERATIONS ====================
+ */
+
+export const batchQueries = {
+  // Delete multiple transactions
+  async deleteTransactions(ids: string[]) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { error } = await supabase
+      .from('transactions')
+      .update({ deleted_at: new Date().toISOString() })
+      .in('id', ids)
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+  },
+
+  // Archive old transactions (soft delete)
+  async archiveOldTransactions(beforeDate: Date) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .lt('date', beforeDate.toISOString().split('T')[0]);
+
+    if (error) throw error;
+    return data;
+  },
+};
