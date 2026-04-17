@@ -1,17 +1,6 @@
-// Re-export types from supabaseClient for consistency
-export type {
-  User,
-  UserPreferences,
-  Category,
-  Transaction,
-  Activity,
-  Reminder,
-  Insight,
-  PushSubscription,
-  ActivityLog,
-} from '@/services/supabaseClient';
+import { Transaction, Activity, Reminder } from './database';
 
-import type { User, Activity } from '@/services/supabaseClient';
+export * from './database';
 
 export interface DashboardSummary {
   balance: number;
@@ -24,25 +13,9 @@ export interface DashboardSummary {
 export interface AuthResponse {
   success: boolean;
   data?: {
-    user: User;
+    user: any;
     accessToken: string;
     refreshToken: string;
   };
   error?: string;
-}
-
-export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-  timestamp: string;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  pages: number;
 }

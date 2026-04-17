@@ -36,6 +36,7 @@ export interface User {
   email: string;
   first_name?: string;
   last_name?: string;
+  name?: string; // For compatibility
   avatar_url?: string;
   email_verified: boolean;
   phone?: string;
@@ -92,6 +93,7 @@ export interface Transaction {
   created_at: string;
   updated_at: string;
   deleted_at?: string;
+  categories?: any; // To handle Supabase join output
 }
 
 export interface Activity {

@@ -13,17 +13,22 @@ export const useTransaction = () => {
   const fetchTransactions = useCallback(
     async (startDate?: Date, endDate?: Date, type?: 'income' | 'expense') => {
       try {
+        store.setLoading(true);
         const result = await transactionQueries.getTransactions(
           startDate,
           endDate,
           type
         );
+        store.setTransactions(result.data || []);
         return result.data;
       } catch (error) {
+        store.setError(error instanceof Error ? error.message : 'Failed to fetch');
         throw error;
+      } finally {
+        store.setLoading(false);
       }
     },
-    []
+    [store]
   );
 
   const createTransaction = useCallback(

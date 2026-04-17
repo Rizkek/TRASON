@@ -1,19 +1,13 @@
-'use client';
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Layout, Card, Badge, Button, Loading } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
 import { useTransaction } from '@/hooks/useTransaction';
 import { useActivity } from '@/hooks/useActivity';
 import { useReminder } from '@/hooks/useReminder';
-import { formatCurrency, formatDate } from '@/libs/format';
 import { getDateRange } from '@/libs/date';
 
 import { 
-  TrendingUp, 
-  TrendingDown, 
-  Wallet, 
   Calendar as CalendarIcon, 
   Bell, 
   Lightbulb, 
@@ -21,19 +15,28 @@ import {
   ArrowRight
 } from 'lucide-react';
 
+// Extracted Components
+import { DashboardHeader } from './components/DashboardHeader';
+import { FinancialSummary } from './components/FinancialSummary';
+import { ActivitiesList } from './components/ActivitiesList';
+import { TransactionsList } from './components/TransactionsList';
+import { RemindersSidebar } from './components/RemindersSidebar';
+
 export default function DashboardPage() {
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
+  
   const { transactions, fetchTransactions } = useTransaction();
   const { activities, fetchActivities } = useActivity();
   const { reminders, fetchReminders } = useReminder();
-  const [isLoading, setIsLoading] = React.useState(true);
+
+  const isInitialLoading = React.useRef(true);
+  const [dataLoaded, setDataLoaded] = React.useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) return;
 
     const loadData = async () => {
-      setIsLoading(true);
       const now = new Date();
       const { start, end } = getDateRange(now.getMonth(), now.getFullYear());
 
@@ -43,19 +46,35 @@ export default function DashboardPage() {
           fetchActivities(now),
           fetchReminders(),
         ]);
+        setDataLoaded(true);
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
       } finally {
-        setIsLoading(false);
+        isInitialLoading.current = false;
       }
     };
 
-    loadData();
-  }, [isAuthenticated]);
+    if (!dataLoaded) {
+      loadData();
+    }
+  }, [isAuthenticated, dataLoaded, fetchTransactions, fetchActivities, fetchReminders]);
+
+  const greeting = useMemo(() => {
+    const hours = new Date().getHours();
+    return hours < 12 ? 'Good Morning' : hours < 18 ? 'Good Afternoon' : 'Good Evening';
+  }, []);
+
+  const todayDate = useMemo(() => {
+    return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  }, []);
+
+  const todayTime = useMemo(() => {
+    return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  }, []);
 
   if (!isAuthenticated) return null;
 
-  if (isLoading) {
+  if (isInitialLoading.current && !dataLoaded && transactions.length === 0) {
     return (
       <Layout>
         <div className="flex items-center justify-center h-[60vh]">
@@ -65,23 +84,6 @@ export default function DashboardPage() {
     );
   }
 
-  const totalExpenses = transactions
-    .filter((t) => t.type === 'expense')
-    .reduce((acc, t) => acc + t.amount, 0);
-
-  const totalIncome = transactions
-    .filter((t) => t.type === 'income')
-    .reduce((acc, t) => acc + t.amount, 0);
-
-  const upcomingReminders = reminders
-    .filter((r) => r.status !== 'completed')
-    .slice(0, 5);
-
-  const recentActivities = activities.slice(0, 5);
-
-  const hours = new Date().getHours();
-  const greeting = hours < 12 ? 'Good Morning' : hours < 18 ? 'Good Afternoon' : 'Good Evening';
-
   return (
     <Layout>
       <div className="space-y-xl animate-fade-in">
@@ -90,18 +92,14 @@ export default function DashboardPage() {
           <div className="space-y-sm">
             <h1 className="text-display font-serif text-white flex items-center gap-md">
               <span className="text-gradient">{greeting}</span>, 
-              <span>{user?.name?.split(' ')[0] || 'User'}</span>
+              <span>{user?.first_name || user?.name?.split(' ')[0] || 'User'}</span>
             </h1>
             <div className="flex items-center gap-md text-gray-very-light opacity-60">
               <CalendarIcon size={14} className="text-secondary" />
-              <p className="text-micro">
-                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-              </p>
+              <p className="text-micro">{todayDate}</p>
               <div className="w-1 h-1 rounded-full bg-gray-light" />
               <Clock size={14} className="text-secondary" />
-              <p className="text-micro">
-                {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-              </p>
+              <p className="text-micro">{todayTime}</p>
             </div>
           </div>
           <Button variant="primary" size="md" className="group shadow-lg shadow-primary/20">
@@ -111,56 +109,12 @@ export default function DashboardPage() {
         </div>
 
         {/* Narrative Summary Card */}
-        <Card className="relative overflow-hidden border-none glass p-xl">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary opacity-[0.05] blur-3xl rounded-full" />
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-xl">
-            <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center glow-primary flex-shrink-0">
-              <TrendingUp size={32} className="text-white" />
-            </div>
-            <div className="space-y-sm">
-              <p className="text-lg leading-relaxed text-soft-cream font-serif italic opacity-90">
-                "You've tracked <span className="text-primary font-bold">{recentActivities.length} activities</span> today and 
-                invested <span className="text-secondary font-bold">{formatCurrency(totalExpenses)}</span> in yourself. 
-                {totalIncome > 0 ? ` Your positive momentum shows with an income of ${formatCurrency(totalIncome)}.` : ' Keep focus on your goals.'}"
-              </p>
-            </div>
-          </div>
-        </Card>
+        <DashboardHeader user={user} activities={activities} transactions={transactions} />
 
-        {/* Financial Flow - Modern 3-col */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
-          <Card className="p-xl border-l-[4px] border-l-success group hover:border-l-primary transition-all">
-            <div className="flex justify-between items-start mb-md">
-              <p className="text-micro text-gray-light">INCOME</p>
-              <TrendingUp size={16} className="text-success" />
-            </div>
-            <p className="text-3xl font-bold text-white group-hover:text-success transition-colors">
-              {formatCurrency(totalIncome)}
-            </p>
-          </Card>
+        {/* Financial Flow */}
+        <FinancialSummary transactions={transactions} />
 
-          <Card className="p-xl border-l-[4px] border-l-danger group hover:border-l-primary transition-all">
-            <div className="flex justify-between items-start mb-md">
-              <p className="text-micro text-gray-light">EXPENSES</p>
-              <TrendingDown size={16} className="text-danger" />
-            </div>
-            <p className="text-3xl font-bold text-white group-hover:text-danger transition-colors">
-              {formatCurrency(totalExpenses)}
-            </p>
-          </Card>
-
-          <Card className="p-xl border-l-[4px] border-l-secondary group hover:border-l-primary transition-all">
-            <div className="flex justify-between items-start mb-md">
-              <p className="text-micro text-gray-light">BALANCE</p>
-              <Wallet size={16} className="text-secondary" />
-            </div>
-            <p className={`text-3xl font-bold text-white ${totalIncome - totalExpenses >= 0 ? 'group-hover:text-success' : 'group-hover:text-danger'} transition-colors`}>
-              {formatCurrency(totalIncome - totalExpenses)}
-            </p>
-          </Card>
-        </div>
-
-        {/* Dynamic Insight Card */}
+        {/* Dynamic Insight Card & Lists */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-xl">
           <div className="lg:col-span-2 space-y-xl">
             {/* Quick Action Input */}
@@ -180,95 +134,15 @@ export default function DashboardPage() {
               </div>
             </Card>
 
-            {/* Activities & Transactions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
-              <Card className="overflow-hidden">
-                <div className="px-lg py-md border-b border-white border-opacity-[0.05] flex justify-between items-center bg-white bg-opacity-[0.01]">
-                  <div className="flex items-center gap-sm">
-                    <Clock size={16} className="text-primary" />
-                    <h3 className="text-sm font-bold tracking-tight">RECENT ACTIVITIES</h3>
-                  </div>
-                  <Button variant="ghost" size="sm" className="text-[10px] h-auto py-xs px-sm">VIEW ALL</Button>
-                </div>
-                <div className="p-sm">
-                  {recentActivities.length > 0 ? (
-                    recentActivities.map((activity) => (
-                      <div key={activity.id} className="group flex items-center gap-md p-md rounded-md hover:bg-white hover:bg-opacity-[0.02] transition-colors">
-                        <div className="w-1 h-8 bg-primary/20 rounded-full group-hover:bg-primary transition-colors" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold truncate">{activity.title}</p>
-                          <p className="text-[10px] text-gray-light uppercase tracking-wider mt-0.5">{activity.category || 'Lifestyle'}</p>
-                        </div>
-                        <Badge variant="activity" size="sm">✓</Badge>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="py-2xl text-center text-gray-light text-xs italic">No activities recorded yet.</div>
-                  )}
-                </div>
-              </Card>
-
-              <Card className="overflow-hidden">
-                <div className="px-lg py-md border-b border-white border-opacity-[0.05] flex justify-between items-center bg-white bg-opacity-[0.01]">
-                  <div className="flex items-center gap-sm">
-                    <Wallet size={16} className="text-secondary" />
-                    <h3 className="text-sm font-bold tracking-tight">CASH FLOW</h3>
-                  </div>
-                  <Button variant="ghost" size="sm" className="text-[10px] h-auto py-xs px-sm">LOG NEW</Button>
-                </div>
-                <div className="p-sm">
-                  {transactions.slice(0, 5).map((t) => (
-                    <div key={t.id} className="group flex items-center gap-md p-md rounded-md hover:bg-white hover:bg-opacity-[0.02] transition-colors">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${t.type === 'income' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'}`}>
-                        {t.type === 'income' ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate">{t.category?.name || t.title}</p>
-                        <p className="text-[10px] text-gray-light uppercase tracking-wider mt-0.5">{formatDate(t.date)}</p>
-                      </div>
-                      <p className={`text-sm font-bold ${t.type === 'income' ? 'text-success' : 'text-white'}`}>
-                        {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
-                      </p>
-                    </div>
-                  ))}
-                  {transactions.length === 0 && (
-                    <div className="py-2xl text-center text-gray-light text-xs italic">No transactions found.</div>
-                  )}
-                </div>
-              </Card>
+              <ActivitiesList activities={activities} />
+              <TransactionsList transactions={transactions} />
             </div>
           </div>
 
-          {/* Right Sidebar - Reminders & Insights */}
+          {/* Right Sidebar */}
           <div className="space-y-xl">
-            <Card className="overflow-hidden relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="px-lg py-md border-b border-white border-opacity-[0.05] flex justify-between items-center bg-white bg-opacity-[0.01]">
-                <div className="flex items-center gap-sm">
-                  <Bell size={16} className="text-secondary" />
-                  <h3 className="text-sm font-bold tracking-tight">REMINDERS</h3>
-                </div>
-                <div className="w-5 h-5 bg-danger text-[10px] font-bold text-white rounded-full flex items-center justify-center">
-                  {upcomingReminders.length}
-                </div>
-              </div>
-              <div className="p-md space-y-md relative z-10">
-                {upcomingReminders.map((r) => (
-                  <div key={r.id} className="flex gap-md p-sm rounded-md bg-white bg-opacity-[0.02] border border-white border-opacity-[0.03]">
-                    <div className="text-xs font-serif italic text-secondary min-w-[40px] pt-0.5">
-                      {new Date(r.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold truncate">{r.title}</p>
-                      {r.description && <p className="text-[10px] text-gray-light truncate mt-0.5">{r.description}</p>}
-                    </div>
-                  </div>
-                ))}
-                {upcomingReminders.length === 0 && (
-                  <div className="py-lg text-center text-gray-light text-xs italic">All clear!</div>
-                )}
-              </div>
-            </Card>
+            <RemindersSidebar reminders={reminders} />
 
             <Card className="p-xl bg-gradient-to-br from-gray-strong to-black relative overflow-hidden group">
               <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-secondary opacity-10 blur-3xl rounded-full" />
@@ -295,3 +169,4 @@ export default function DashboardPage() {
     </Layout>
   );
 }
+

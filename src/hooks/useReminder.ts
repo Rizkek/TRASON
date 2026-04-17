@@ -1,51 +1,48 @@
-'use client';
-
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { reminderQueries } from '@/services/queries';
 import { Reminder } from '@/services/supabaseClient';
+import { useReminderStore } from '@/store/reminderStore';
 
 export const useReminder = () => {
-  const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const store = useReminderStore();
 
   const fetchReminders = useCallback(async (startDate?: Date, endDate?: Date) => {
-    setIsLoading(true);
-    setError(null);
+    store.setLoading(true);
+    store.setError(null);
     try {
       const data =
         startDate && endDate
           ? await reminderQueries.getReminders(startDate, endDate)
           : await reminderQueries.getPendingReminders();
-      setReminders(data || []);
+      store.setReminders(data || []);
       return data;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to fetch reminders';
-      setError(errorMessage);
+      store.setError(errorMessage);
       throw err;
     } finally {
-      setIsLoading(false);
+      store.setLoading(false);
     }
-  }, []);
+  }, [store]);
 
   const createReminder = useCallback(
     async (
       data: Omit<Reminder, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>
     ) => {
-      setError(null);
+      store.setError(null);
       try {
         const newReminder = await reminderQueries.createReminder(data);
-        setReminders((prev) => [...prev, newReminder]);
+        store.addReminder(newReminder);
         return newReminder;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to create reminder';
-        setError(errorMessage);
+        store.setError(errorMessage);
         throw err;
       }
     },
-    []
+    [store]
   );
 
   const updateReminder = useCallback(
@@ -53,62 +50,54 @@ export const useReminder = () => {
       id: string,
       data: Partial<Omit<Reminder, 'id' | 'created_at' | 'updated_at'>>
     ) => {
-      setError(null);
+      store.setError(null);
       try {
         const updatedReminder = await reminderQueries.updateReminder(id, data);
-        setReminders((prev) =>
-          prev.map((reminder) =>
-            reminder.id === id ? updatedReminder : reminder
-          )
-        );
+        store.updateReminder(id, updatedReminder);
         return updatedReminder;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to update reminder';
-        setError(errorMessage);
+        store.setError(errorMessage);
         throw err;
       }
     },
-    []
+    [store]
   );
 
   const deleteReminder = useCallback(async (id: string) => {
-    setError(null);
+    store.setError(null);
     try {
       await reminderQueries.deleteReminder(id);
-      setReminders((prev) => prev.filter((reminder) => reminder.id !== id));
+      store.deleteReminder(id);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to delete reminder';
-      setError(errorMessage);
+      store.setError(errorMessage);
       throw err;
     }
-  }, []);
+  }, [store]);
 
   const markReminderDone = useCallback(async (id: string) => {
-    setError(null);
+    store.setError(null);
     try {
       const updatedReminder = await reminderQueries.completeReminder(id);
-      setReminders((prev) =>
-        prev.map((reminder) =>
-          reminder.id === id ? updatedReminder : reminder
-        )
-      );
+      store.updateReminder(id, updatedReminder);
       return updatedReminder;
     } catch (err) {
       const errorMessage =
         err instanceof Error
           ? err.message
           : 'Failed to mark reminder as done';
-      setError(errorMessage);
+      store.setError(errorMessage);
       throw err;
     }
-  }, []);
+  }, [store]);
 
   return {
-    reminders,
-    isLoading,
-    error,
+    reminders: store.reminders,
+    isLoading: store.isLoading,
+    error: store.error,
     fetchReminders,
     createReminder,
     updateReminder,

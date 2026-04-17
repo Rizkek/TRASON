@@ -196,7 +196,7 @@ export const transactionQueries = {
       .from('transactions')
       .select(
         `
-        id, user_id, title, description, amount, type, date, time, 
+        id, user_id, category_id, title, description, amount, type, date, time, 
         payment_method, tags, created_at, updated_at,
         categories:category_id(id, name, color, icon)
       `
