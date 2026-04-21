@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Layout, Card, Badge, Button, Loading } from '@/components';
@@ -24,7 +26,7 @@ import { RemindersSidebar } from './components/RemindersSidebar';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   
   const { transactions, fetchTransactions } = useTransaction();
   const { activities, fetchActivities } = useActivity();
@@ -72,13 +74,29 @@ export default function DashboardPage() {
     return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   }, []);
 
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-[60vh]">
+          <Loading text="Checking your session..." />
+        </div>
+      </Layout>
+    );
+  }
+
   if (!isAuthenticated) return null;
 
   if (isInitialLoading.current && !dataLoaded && transactions.length === 0) {
     return (
       <Layout>
         <div className="flex items-center justify-center h-[60vh]">
-          <Loading />
+          <Loading text="Preparing your dashboard..." />
         </div>
       </Layout>
     );

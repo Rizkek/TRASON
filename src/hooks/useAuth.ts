@@ -37,12 +37,19 @@ export const useAuth = () => {
               if (userProfile && isMounted) {
                 setUser(userProfile);
               }
+            } else {
+              // Important: clear any persisted stale auth state when there is no session.
+              if (isMounted) {
+                storeLogout();
+              }
             }
           } catch (err) {
             console.error('Auth init error:', err);
             // Fallback: use session user data if DB fetch fails
             if (session?.user && isMounted) {
               setUser(session.user as any);
+            } else if (isMounted) {
+              storeLogout();
             }
           } finally {
             if (isMounted) setLoading(false);

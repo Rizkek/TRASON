@@ -6,6 +6,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
+  loadingText?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   fullWidth?: boolean;
@@ -18,6 +19,7 @@ export const Button = memo(
         variant = 'primary',
         size = 'md',
         isLoading = false,
+        loadingText,
         leftIcon,
         rightIcon,
         fullWidth = false,
@@ -28,18 +30,18 @@ export const Button = memo(
       },
       ref
     ) => {
-      const baseStyles = 'inline-flex items-center justify-center font-bold transition-all duration-400 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none tracking-tight overflow-hidden relative';
+      const baseStyles = 'inline-flex items-center justify-center font-semibold transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none tracking-tight overflow-hidden relative focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-warm-black';
       
       const variants = {
-        primary: 'bg-gradient-primary text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5',
-        secondary: 'bg-white bg-opacity-10 text-white backdrop-blur-md hover:bg-opacity-20 border border-white border-opacity-10',
-        outline: 'bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white',
-        ghost: 'bg-transparent text-gray-light hover:text-soft-cream hover:bg-white hover:bg-opacity-[0.05]',
-        danger: 'bg-danger bg-opacity-10 text-danger hover:bg-opacity-20 border border-danger border-opacity-20',
+        primary: 'bg-primary text-white shadow-lg shadow-primary/25 hover:bg-indigo-500 hover:-translate-y-0.5',
+        secondary: 'bg-gray-medium text-soft-cream border border-gray-light/30 hover:bg-gray-strong',
+        outline: 'bg-transparent border-2 border-primary text-soft-cream hover:bg-primary hover:text-white',
+        ghost: 'bg-transparent text-soft-cream hover:bg-white/10',
+        danger: 'bg-danger text-white hover:bg-red-500',
       };
 
       const sizes = {
-        sm: 'px-md py-sm text-[10px] rounded-sm uppercase tracking-widest',
+        sm: 'px-md py-sm text-xs rounded-sm uppercase tracking-wide',
         md: 'px-lg py-md text-sm rounded-sm',
         lg: 'px-xl py-lg text-base rounded-md',
       };
@@ -50,7 +52,8 @@ export const Button = memo(
         <button
           ref={ref}
           disabled={disabled || isLoading}
-          className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${widthStyle} ${className}`}
+          className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${widthStyle} ${isLoading ? 'cursor-wait' : ''} ${className}`}
+          aria-busy={isLoading}
           {...props}
         >
           {isLoading ? (
@@ -59,7 +62,7 @@ export const Button = memo(
             <span className="mr-md">{leftIcon}</span>
           ) : null}
           
-          <span className="relative z-10">{children}</span>
+          <span className="relative z-10">{isLoading && loadingText ? loadingText : children}</span>
           
           {!isLoading && rightIcon && <span className="ml-md">{rightIcon}</span>}
           

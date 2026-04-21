@@ -1,36 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { Button, Loading } from '@/components';
-import { supabase } from '@/services/supabaseClient';
 
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
-  const [sessionLoading, setSessionLoading] = useState(true);
-
-  useEffect(() => {
-    // Double-check for authenticated session
-    const checkAuth = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        console.log('Home page - session check:', { hasSession: !!data.session });
-        if (data.session) {
-          console.log('Redirecting to dashboard (session found)');
-          router.push('/dashboard');
-        }
-      } catch (err) {
-        console.error('Session check error:', err);
-      } finally {
-        setSessionLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [router]);
 
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
@@ -39,7 +17,7 @@ export default function Home() {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  if (isLoading || sessionLoading) {
+  if (isLoading) {
     return <Loading />;
   }
 

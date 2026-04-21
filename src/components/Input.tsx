@@ -12,9 +12,9 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, helpText, icon, className = '', ...props }, ref) => {
     return (
-      <div className="w-full space-y-md">
+      <div className="w-full space-y-sm">
         {label && (
-          <label className="block text-[10px] font-bold text-gray-light tracking-widest uppercase">
+          <label className="block text-xs font-semibold text-gray-very-light tracking-wide">
             {label}
             {props.required && <span className="text-danger ml-1">*</span>}
           </label>
@@ -27,17 +27,17 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
           <input
             ref={ref}
-            className={`w-full h-12 px-lg bg-gray-strong bg-opacity-40 border transition-all duration-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 text-soft-cream placeholder-gray-light/30 disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`w-full h-12 px-lg bg-gray-strong/70 border transition-all duration-300 rounded-md focus:ring-2 focus:ring-secondary/40 text-soft-cream placeholder:text-gray-light/70 disabled:opacity-50 disabled:cursor-not-allowed ${
               icon ? 'pl-2xl' : ''
-            } ${error ? 'border-danger focus:border-danger' : 'border-white border-opacity-[0.05] focus:border-primary'} ${className}`}
+            } ${error ? 'border-danger focus:border-danger' : 'border-gray-light/25 focus:border-secondary'} ${className}`}
             {...props}
           />
           {/* Bottom highlight beam on focus */}
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-primary group-focus-within:w-full transition-all duration-500 rounded-full" />
         </div>
-        {error && <p className="text-[10px] font-bold text-danger uppercase tracking-wider">{error}</p>}
+        {error && <p className="text-xs font-medium text-danger">{error}</p>}
         {helpText && !error && (
-          <p className="text-[10px] text-gray-light uppercase tracking-widest opacity-60">{helpText}</p>
+          <p className="text-xs text-gray-light">{helpText}</p>
         )}
       </div>
     );

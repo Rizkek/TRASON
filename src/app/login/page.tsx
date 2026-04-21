@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Alert, Card, Loading } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/services/supabaseClient';
+import { getAuthErrorMessage } from '@/libs/authErrors';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,29 +14,13 @@ export default function LoginPage() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sessionLoading, setSessionLoading] = useState(true);
-
-  // Check if user is already authenticated
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        console.log('Login page - session check:', { hasSession: !!data.session });
-        if (data.session) {
-          console.log('Already authenticated, redirecting to dashboard');
-          router.push('/dashboard');
-        }
-      } catch (err) {
-        console.error('Session check error:', err);
-      } finally {
-        setSessionLoading(false);
-      }
-    };
+    if (!authLoading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [authLoading, isAuthenticated, router]);
 
-    checkAuth();
-  }, [router]);
-
-  if (sessionLoading || authLoading) {
+  if (authLoading) {
     return <Loading />;
   }
 
@@ -105,9 +89,7 @@ export default function LoginPage() {
         throw new Error('No session created after login');
       }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to sign in. Please check your email and password.';
-      setError(errorMessage);
+      setError(getAuthErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -152,8 +134,8 @@ export default function LoginPage() {
             required
           />
 
-          <Button type="submit" variant="primary" fullWidth isLoading={isLoading}>
-            {isLoading ? 'Signing in...' : 'Sign In'}
+          <Button type="submit" variant="primary" fullWidth isLoading={isLoading} loadingText="Signing in...">
+            Sign In
           </Button>
         </form>
 

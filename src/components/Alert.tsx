@@ -26,31 +26,31 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
 
     const typeStyles = {
       success: {
-        bg: 'bg-muted-green bg-opacity-10',
-        border: 'border-muted-green border-opacity-30',
-        text: 'text-muted-green',
-        title: 'text-muted-green font-semibold',
+        bg: 'bg-success/12',
+        border: 'border-success/40',
+        text: 'text-soft-cream',
+        title: 'text-soft-cream font-semibold',
         icon: '✓',
       },
       error: {
-        bg: 'bg-warm-brown bg-opacity-10',
-        border: 'border-warm-brown border-opacity-30',
-        text: 'text-warm-brown',
-        title: 'text-warm-brown font-semibold',
+        bg: 'bg-danger/12',
+        border: 'border-danger/45',
+        text: 'text-soft-cream',
+        title: 'text-soft-cream font-semibold',
         icon: '✕',
       },
       warning: {
-        bg: 'bg-peachy bg-opacity-10',
-        border: 'border-peachy border-opacity-30',
-        text: 'text-peachy',
-        title: 'text-peachy font-semibold',
+        bg: 'bg-warning/14',
+        border: 'border-warning/45',
+        text: 'text-soft-cream',
+        title: 'text-soft-cream font-semibold',
         icon: '!',
       },
       info: {
-        bg: 'bg-deep-sage bg-opacity-10',
-        border: 'border-deep-sage border-opacity-30',
-        text: 'text-deep-sage',
-        title: 'text-deep-sage font-semibold',
+        bg: 'bg-info/14',
+        border: 'border-info/45',
+        text: 'text-soft-cream',
+        title: 'text-soft-cream font-semibold',
         icon: 'ℹ',
       },
     };
@@ -71,15 +71,16 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         {...props}
       >
         <div className="flex gap-lg">
-          <div className={`flex-shrink-0 text-lg font-bold ${style.text}`}>{style.icon}</div>
+          <div className={`flex-shrink-0 text-lg font-bold ${style.text}`} aria-hidden="true">{style.icon}</div>
           <div className="flex-1">
-            {title && <h3 className={style.title}>{title}</h3>}
+            {title && <h3 className={`${style.title} text-sm`}>{title}</h3>}
             <div className={`${style.text} text-base`}>{children}</div>
           </div>
           {dismissible && (
             <button
               onClick={handleDismiss}
-              className={`flex-shrink-0 ${style.text} hover:opacity-75 transition`}
+              aria-label="Dismiss alert"
+              className={`flex-shrink-0 ${style.text} hover:opacity-80 transition focus-visible:ring-2 focus-visible:ring-secondary rounded-sm`}
             >
               ✕
             </button>

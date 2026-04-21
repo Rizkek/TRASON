@@ -37,7 +37,7 @@ export default function FinancePage() {
     type: 'expense' as 'income' | 'expense',
     category_id: '',
     date: new Date().toISOString().split('T')[0],
-    notes: ''
+    description: ''
   });
 
   useEffect(() => {
@@ -61,8 +61,9 @@ export default function FinancePage() {
       title: form.title,
       amount: parseFloat(form.amount),
       type: form.type,
-      date: new Date(form.date).toISOString(),
-      notes: form.notes
+      date: form.date,
+      category_id: form.category_id || undefined,
+      description: form.description
     };
 
     try {
@@ -89,7 +90,7 @@ export default function FinancePage() {
       type: 'expense',
       category_id: '',
       date: new Date().toISOString().split('T')[0],
-      notes: ''
+      description: ''
     });
     setIsModalOpen(true);
   };
@@ -102,7 +103,7 @@ export default function FinancePage() {
       type: t.type,
       category_id: t.category_id || '',
       date: new Date(t.date).toISOString().split('T')[0],
-      notes: t.notes || ''
+      description: t.description || ''
     });
     setIsModalOpen(true);
   };
@@ -234,7 +235,7 @@ export default function FinancePage() {
                           </div>
                           <div>
                             <p className="text-sm font-bold text-soft-cream group-hover:text-primary transition-colors underline-offset-4 decoration-primary">{t.title}</p>
-                            {t.notes && <p className="text-[10px] text-gray-light truncate max-w-[200px] mt-1">{t.notes}</p>}
+                            {t.description && <p className="text-[10px] text-gray-light truncate max-w-[200px] mt-1">{t.description}</p>}
                           </div>
                         </div>
                       </td>
@@ -246,7 +247,7 @@ export default function FinancePage() {
                       </td>
                       <td className="px-xl py-xl">
                         <Badge variant={t.type === 'income' ? 'success' : 'danger'} size="sm">
-                          {t.category?.name || 'Uncategorized'}
+                          {t.categories?.name || 'Uncategorized'}
                         </Badge>
                       </td>
                       <td className="px-xl py-xl text-right">
@@ -336,8 +337,8 @@ export default function FinancePage() {
             <textarea
               placeholder="Context or tags..."
               rows={4}
-              value={form.notes}
-              onChange={(e) => setForm(f => ({ ...f, notes: e.target.value }))}
+              value={form.description}
+              onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
               className="w-full bg-gray-strong bg-opacity-40 border border-white border-opacity-[0.05] rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
           </div>

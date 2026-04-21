@@ -1,8 +1,10 @@
-const CACHE_NAME = 'trason-v1';
+const CACHE_NAME = 'trason-v2';
 const urlsToCache = [
   '/',
   '/favicon.ico',
   '/manifest.json',
+  '/favicon.svg',
+  '/icon-192x192.svg',
 ];
 
 // Install event - cache resources
@@ -40,16 +42,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Skip API calls (let them go to network)
-  if (event.request.url.includes('/api/')) {
-    event.respondWith(
-      fetch(event.request).catch(() => {
-        return new Response('Offline', { status: 503 });
-      })
-    );
+  const requestUrl = new URL(event.request.url);
+  const isSameOrigin = requestUrl.origin === self.location.origin;
+  const isStaticAsset = isSameOrigin && (
+    requestUrl.pathname.startsWith('/_next/static/') ||
+    requestUrl.pathname.startsWith('/icons/') ||
+    requestUrl.pathname.endsWith('.css') ||
+    requestUrl.pathname.endsWith('.js') ||
+    requestUrl.pathname.endsWith('.svg') ||
+    requestUrl.pathname.endsWith('.png') ||
+    requestUrl.pathname.endsWith('.woff2')
+  );
+  const isApiRequest = requestUrl.pathname.startsWith('/api/');
+  const isSupabaseRequest = requestUrl.hostname.includes('supabase.co');
+
+  // Never cache APIs or Supabase traffic
+  if (isApiRequest || isSupabaseRequest || !isStaticAsset) {
     return;
   }
 
+  // Cache-first for static assets only
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) {
@@ -68,9 +80,6 @@ self.addEventListener('fetch', (event) => {
 
         return response;
       });
-    }).catch(() => {
-      // Return offline page or empty response
-      return new Response('Offline', { status: 503 });
     })
   );
 });
@@ -83,8 +92,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: event.data.text(),
-    icon: '/icon-192x192.png',
-    badge: '/icon-192x192.png',
+    icon: '/icon-192x192.svg',
+    badge: '/favicon.svg',
     vibrate: [100, 50, 100],
     tag: 'notification',
     requireInteraction: true,
@@ -115,64 +124,8 @@ self.addEventListener('notificationclick', (event) => {
 // Background sync for offline transactions
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-transactions') {
-    event.waitUntil(syncTransactions());
+    // No backend sync endpoint implemented yet.
+    // Avoid repeated failing sync tasks until endpoint is available.
+    event.waitUntil(Promise.resolve());
   }
 });
-
-async function syncTransactions() {
-  try {
-    const db = await openIndexedDB();
-    const transactions = await getOfflineTransactions(db);
-    
-    // Send transactions to server
-    for (const transaction of transactions) {
-      await fetch('/api/v1/transactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(transaction),
-      });
-    }
-
-    // Clear offline transactions
-    await clearOfflineTransactions(db);
-  } catch (error) {
-    console.error('Sync failed:', error);
-    throw error;
-  }
-}
-
-function openIndexedDB() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('TRASON', 1);
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains('offlineTransactions')) {
-        db.createObjectStore('offlineTransactions', { keyPath: 'id' });
-      }
-    };
-  });
-}
-
-function getOfflineTransactions(db) {
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(['offlineTransactions'], 'readonly');
-    const store = transaction.objectStore('offlineTransactions');
-    const request = store.getAll();
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-  });
-}
-
-function clearOfflineTransactions(db) {
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(['offlineTransactions'], 'readwrite');
-    const store = transaction.objectStore('offlineTransactions');
-    const request = store.clear();
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve();
-  });
-}

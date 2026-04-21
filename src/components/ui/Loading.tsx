@@ -1,52 +1,44 @@
 'use client';
 
 import React from 'react';
+import { Loader2, Sparkles } from 'lucide-react';
 
 interface LoadingProps {
   size?: 'sm' | 'md' | 'lg';
   text?: string;
   fullPage?: boolean;
+  showTip?: boolean;
 }
 
 export const Loading: React.FC<LoadingProps> = ({
   size = 'md',
-  text = 'Loading...',
+  text = 'Loading your experience...',
   fullPage = false,
+  showTip = true,
 }) => {
   const sizeClasses = {
     sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
+    md: 'w-7 h-7',
+    lg: 'w-10 h-10',
   };
 
   const spinner = (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <svg
-        className={`${sizeClasses[size]} animate-spin text-primary`}
-        viewBox="0 0 24 24"
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="none"
-        />
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-        />
-      </svg>
-      {text && <p className="text-gray-light text-[10px] uppercase tracking-widest">{text}</p>}
+    <div className="flex flex-col items-center justify-center gap-md" role="status" aria-live="polite">
+      <div className="relative">
+        <div className="absolute inset-0 rounded-full bg-primary/20 blur-md" />
+        <div className="relative flex items-center justify-center rounded-full border border-primary/30 bg-gray-strong/80 p-md">
+          <Loader2 className={`${sizeClasses[size]} animate-spin text-primary`} />
+        </div>
+      </div>
+      {text && <p className="text-gray-very-light text-sm font-medium">{text}</p>}
+      {showTip && <p className="text-gray-light text-xs">This usually takes a few seconds.</p>}
+      <Sparkles size={14} className="text-secondary/80 animate-pulse" aria-hidden="true" />
     </div>
   );
 
   if (fullPage) {
     return (
-      <div className="fixed inset-0 bg-warm-black bg-opacity-80 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-warm-black/85 backdrop-blur-sm flex items-center justify-center z-50">
         {spinner}
       </div>
     );

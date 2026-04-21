@@ -57,7 +57,9 @@ export default function RemindersPage() {
     const payload = {
       title: form.title,
       description: form.description,
-      dueDate: dueDate.toISOString(),
+      due_date: form.dueDate,
+      due_time: form.dueTime,
+      due_datetime: dueDate.toISOString(),
       priority: form.priority,
       status: editingReminder ? editingReminder.status : 'pending'
     };
@@ -94,7 +96,8 @@ export default function RemindersPage() {
   };
 
   const openEditModal = (r: any) => {
-    const date = new Date(r.dueDate);
+    const dueAt = r.due_datetime || r.due_date;
+    const date = dueAt ? new Date(dueAt) : new Date();
     setEditingReminder(r);
     setForm({
       title: r.title,
@@ -112,7 +115,9 @@ export default function RemindersPage() {
   });
 
   const sortedReminders = [...filteredReminders].sort((a, b) => {
-    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    const aDue = a.due_datetime || a.due_date;
+    const bDue = b.due_datetime || b.due_date;
+    return new Date(aDue || 0).getTime() - new Date(bDue || 0).getTime();
   });
 
   if (!isAuthenticated) return null;
@@ -210,14 +215,24 @@ export default function RemindersPage() {
                   )}
                   
                   <div className="flex items-center gap-xl mt-md">
+                    {(() => {
+                      const dueAt = reminder.due_datetime || reminder.due_date;
+                      return (
                     <div className="flex items-center gap-sm text-[10px] font-bold text-gray-light uppercase tracking-widest">
                       <Calendar size={12} className="text-primary" />
-                      {formatDate(reminder.dueDate)}
+                      {dueAt ? formatDate(dueAt) : 'No due date'}
                     </div>
+                      );
+                    })()}
+                    {(() => {
+                      const dueAt = reminder.due_datetime || reminder.due_date;
+                      return (
                     <div className="flex items-center gap-sm text-[10px] font-bold text-gray-light uppercase tracking-widest">
                       <Clock size={12} className="text-secondary" />
-                      {new Date(reminder.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {dueAt ? new Date(dueAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
                     </div>
+                      );
+                    })()}
                   </div>
                 </div>
 

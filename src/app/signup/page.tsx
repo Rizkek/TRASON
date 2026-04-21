@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button, Input, Alert, Card } from '@/components';
 import { supabase } from '@/services/supabaseClient';
 import { validatePassword } from '@/libs/helpers';
+import { getAuthErrorMessage } from '@/libs/authErrors';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -144,10 +145,8 @@ export default function SignupPage() {
         }
       }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to create account. Please try again.';
       console.error('Signup error:', err);
-      setError(errorMessage);
+      setError(getAuthErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -222,8 +221,8 @@ export default function SignupPage() {
             required
           />
 
-          <Button type="submit" variant="primary" fullWidth isLoading={isLoading}>
-            {isLoading ? 'Creating Account...' : 'Create Account'}
+          <Button type="submit" variant="primary" fullWidth isLoading={isLoading} loadingText="Creating account...">
+            Create Account
           </Button>
         </form>
 
