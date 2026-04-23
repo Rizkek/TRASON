@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTransaction } from '@/hooks/useTransaction';
 import { useActivity } from '@/hooks/useActivity';
 import { useReminder } from '@/hooks/useReminder';
+import { useInvestment } from '@/hooks/useInvestment';
 import { getDateRange } from '@/libs/date';
 
 import { 
@@ -23,6 +24,7 @@ import { FinancialSummary } from './components/FinancialSummary';
 import { ActivitiesList } from './components/ActivitiesList';
 import { TransactionsList } from './components/TransactionsList';
 import { RemindersSidebar } from './components/RemindersSidebar';
+import { InvestmentSummary } from './components/InvestmentSummary';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -31,6 +33,7 @@ export default function DashboardPage() {
   const { transactions, fetchTransactions } = useTransaction();
   const { activities, fetchActivities } = useActivity();
   const { reminders, fetchReminders } = useReminder();
+  const { summary: investmentSummary, insights: investmentInsights, fetchPositions } = useInvestment();
 
   const isInitialLoading = React.useRef(true);
   const [dataLoaded, setDataLoaded] = React.useState(false);
@@ -47,6 +50,7 @@ export default function DashboardPage() {
           fetchTransactions(start, end),
           fetchActivities(now),
           fetchReminders(),
+          fetchPositions(),
         ]);
         setDataLoaded(true);
       } catch (error) {
@@ -59,7 +63,7 @@ export default function DashboardPage() {
     if (!dataLoaded) {
       loadData();
     }
-  }, [isAuthenticated, dataLoaded, fetchTransactions, fetchActivities, fetchReminders]);
+  }, [isAuthenticated, dataLoaded, fetchTransactions, fetchActivities, fetchReminders, fetchPositions]);
 
   const greeting = useMemo(() => {
     const hours = new Date().getHours();
@@ -132,6 +136,8 @@ export default function DashboardPage() {
         {/* Financial Flow */}
         <FinancialSummary transactions={transactions} />
 
+        <InvestmentSummary summary={investmentSummary} />
+
         {/* Dynamic Insight Card & Lists */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-xl">
           <div className="lg:col-span-2 space-y-xl">
@@ -172,7 +178,7 @@ export default function DashboardPage() {
                   <h3 className="font-serif italic text-lg text-white">Daily Insight</h3>
                 </div>
                 <p className="text-caption leading-relaxed tracking-wide text-gray-very-light italic">
-                  "Pattern detected: You tend to spend more on Tuesdays. Consider setting a daily limit to stay on track."
+                  "{investmentInsights?.headline || 'Pattern detected: You tend to spend more on Tuesdays. Consider setting a daily limit to stay on track.'}"
                 </p>
                 <div className="pt-md">
                   <Button variant="ghost" size="sm" className="w-full border-white/10 hover:bg-white/5 h-10">
@@ -187,4 +193,3 @@ export default function DashboardPage() {
     </Layout>
   );
 }
-

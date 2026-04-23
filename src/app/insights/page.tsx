@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Layout, Card, Badge, Loading } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
 import { insightQueries } from '@/services/queries';
+import { useInvestment } from '@/hooks/useInvestment';
 import { 
   Lightbulb, 
   TrendingUp, 
@@ -19,12 +20,13 @@ import { formatDate } from '@/libs/format';
 
 export default function InsightsPage() {
   const { isAuthenticated } = useAuth();
-  const [insights, setInsights] = useState<any[]>([]);
+  const [dbInsights, setDbInsights] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { calculatedPositions, insights: investmentInsight, fetchPositions } = useInvestment();
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    
+
     const fetchInsights = async () => {
       setIsLoading(true);
       try {
@@ -32,16 +34,33 @@ export default function InsightsPage() {
         const start = new Date(now.getFullYear(), now.getMonth(), 1);
         const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         const data = await insightQueries.getInsights(start, end);
-        setInsights(data || []);
+        setDbInsights(data || []);
       } catch (err) {
         console.error('Failed to fetch insights:', err);
       } finally {
         setIsLoading(false);
       }
     };
-    
+
+    fetchPositions();
     fetchInsights();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchPositions]);
+
+  const insights = [
+    ...(investmentInsight && calculatedPositions.length > 0
+      ? [
+          {
+            id: 'live-investment-insight',
+            type: 'investment',
+            title: 'Investment Analyst',
+            description: investmentInsight.headline,
+            content: investmentInsight.observations.join(' '),
+            date: new Date().toISOString(),
+          },
+        ]
+      : []),
+    ...dbInsights,
+  ];
 
   if (!isAuthenticated) return null;
 
@@ -70,18 +89,18 @@ export default function InsightsPage() {
                   
                   <div className="flex items-start gap-xl relative z-10">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      insight.type === 'finance' ? 'bg-success/10 text-success' : 
+                      insight.type === 'finance' || insight.type === 'investment' ? 'bg-success/10 text-success' : 
                       insight.type === 'productivity' ? 'bg-secondary/10 text-secondary' : 
                       'bg-primary/10 text-primary'
                     }`}>
-                      {insight.type === 'finance' ? <BarChart3 size={24} /> : 
+                      {insight.type === 'finance' || insight.type === 'investment' ? <BarChart3 size={24} /> : 
                        insight.type === 'productivity' ? <Zap size={24} /> : 
                        <Lightbulb size={24} />}
                     </div>
                     
                     <div className="space-y-md">
                       <div className="flex items-center gap-md">
-                        <Badge variant={insight.type === 'finance' ? 'success' : insight.type === 'productivity' ? 'insight' : 'activity'} size="sm">
+                        <Badge variant={insight.type === 'finance' || insight.type === 'investment' ? 'success' : insight.type === 'productivity' ? 'insight' : 'activity'} size="sm">
                           {insight.type.toUpperCase()}
                         </Badge>
                         <span className="text-[10px] font-bold text-gray-light uppercase tracking-widest flex items-center gap-sm">

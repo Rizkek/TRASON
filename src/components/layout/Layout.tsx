@@ -10,6 +10,7 @@ import {
   Calendar, 
   Bell, 
   Lightbulb, 
+  BriefcaseBusiness,
   Settings,
   LogOut,
   Menu,
@@ -28,6 +29,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const menuItems = [
     { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { label: 'Finance', href: '/finance', icon: Wallet },
+    { label: 'Investments', href: '/investments', icon: BriefcaseBusiness },
     { label: 'Timeline', href: '/timeline', icon: Calendar },
     { label: 'Reminders', href: '/reminders', icon: Bell },
     { label: 'Insights', href: '/insights', icon: Lightbulb },

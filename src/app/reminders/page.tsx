@@ -21,7 +21,7 @@ import { formatDate } from '@/libs/format';
 
 export default function RemindersPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { reminders, fetchReminders, createReminder, updateReminder, deleteReminder } = useReminder();
   
   const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +38,7 @@ export default function RemindersPage() {
   });
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (authLoading || !isAuthenticated) return;
     
     const loadData = async () => {
       setIsLoading(true);
@@ -47,7 +47,13 @@ export default function RemindersPage() {
     };
     
     loadData();
-  }, [isAuthenticated]);
+  }, [authLoading, isAuthenticated, fetchReminders]);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const handleSave = async () => {
     if (!form.title) return;
@@ -61,7 +67,8 @@ export default function RemindersPage() {
       due_time: form.dueTime,
       due_datetime: dueDate.toISOString(),
       priority: form.priority,
-      status: editingReminder ? editingReminder.status : 'pending'
+      status: editingReminder ? editingReminder.status : 'pending',
+      is_recurring: editingReminder?.is_recurring ?? false,
     };
 
     try {
@@ -119,6 +126,14 @@ export default function RemindersPage() {
     const bDue = b.due_datetime || b.due_date;
     return new Date(aDue || 0).getTime() - new Date(bDue || 0).getTime();
   });
+
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="flex justify-center py-2xl"><Loading text="Checking your session..." /></div>
+      </Layout>
+    );
+  }
 
   if (!isAuthenticated) return null;
 

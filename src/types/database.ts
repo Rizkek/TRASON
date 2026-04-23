@@ -109,3 +109,38 @@ export interface Reminder {
   updated_at: string;
   deleted_at?: string;
 }
+
+export interface InvestmentPosition {
+  id: string;
+  user_id: string;
+  asset_type: 'stock' | 'crypto' | 'gold';
+  symbol: string;
+  display_name?: string | null;
+  amount: number;
+  buy_price: number;
+  buy_date: string;
+  quote_currency: string;
+  price_source: string;
+  external_id?: string | null;
+  manual_current_price?: number | null;
+  last_price?: number | null;
+  last_price_change_pct?: number | null;
+  last_valued_at?: string | null;
+  notes?: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+}
+
+export interface InvestmentPriceSnapshot {
+  id: string;
+  user_id: string;
+  position_id: string;
+  snapshot_date: string;
+  price: number;
+  change_percent?: number | null;
+  source: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+}

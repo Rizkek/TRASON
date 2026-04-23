@@ -12,11 +12,44 @@ import {
   getCurrentUser,
 } from './supabaseClient';
 
+type AuthUserLike = Awaited<ReturnType<typeof getCurrentUser>>;
+
+const buildUserProfilePayload = (user: NonNullable<AuthUserLike>) => ({
+  id: user.id,
+  email: user.email ?? '',
+  first_name: user.user_metadata?.first_name ?? undefined,
+  last_name: user.user_metadata?.last_name ?? undefined,
+  email_verified: !!user.email_confirmed_at,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+});
+
 /**
  * ==================== USER QUERIES ====================
  */
 
 export const userQueries = {
+  async ensureUserProfile() {
+    const user = await getCurrentUser();
+    if (!user) return null;
+
+    const { data, error } = await supabase
+      .from('users')
+      .upsert([buildUserProfilePayload(user)], { onConflict: 'id' })
+      .select(
+        `
+        id, email, first_name, last_name, avatar_url, email_verified, phone, bio,
+        created_at, updated_at,
+        user_preferences(theme, language, currency, timezone, notifications_enabled, 
+                        push_notifications_enabled, email_digest_enabled, digest_frequency)
+      `
+      )
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  },
+
   // Fetch user with preferences
   // Uses maybeSingle() to safely return null (instead of throwing) when no row exists.
   async getUserWithPreferences() {
@@ -41,27 +74,7 @@ export const userQueries = {
 
     // Auto-create user row if it doesn't exist yet (e.g. first login after sign-up)
     if (!data) {
-      const { data: newUser, error: insertError } = await supabase
-        .from('users')
-        .insert([{
-          id: user.id,
-          email: user.email ?? '',
-          email_verified: !!user.email_confirmed_at,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }])
-        .select(
-          `
-          id, email, first_name, last_name, avatar_url, email_verified, phone, bio,
-          created_at, updated_at,
-          user_preferences(theme, language, currency, timezone, notifications_enabled, 
-                          push_notifications_enabled, email_digest_enabled, digest_frequency)
-        `
-        )
-        .maybeSingle();
-
-      if (insertError) throw insertError;
-      return newUser;
+      return userQueries.ensureUserProfile();
     }
 
     return data;
@@ -92,8 +105,10 @@ export const userQueries = {
 
     const { data, error } = await supabase
       .from('user_preferences')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('user_id', user.id)
+      .upsert(
+        [{ user_id: user.id, ...updates, updated_at: new Date().toISOString() }],
+        { onConflict: 'user_id' }
+      )
       .select()
       .single();
 

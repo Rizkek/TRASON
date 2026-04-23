@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "trason-frontend",
   "version": "1.0.0",
   "description": "TRASON PWA Frontend - Next.js 14+ PWA",

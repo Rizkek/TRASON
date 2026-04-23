@@ -22,7 +22,7 @@ import { getDateRange } from '@/libs/date';
 
 export default function FinancePage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { transactions, fetchTransactions, createTransaction, updateTransaction, deleteTransaction } = useTransaction();
   
   const [isLoading, setIsLoading] = useState(true);
@@ -41,7 +41,7 @@ export default function FinancePage() {
   });
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (authLoading || !isAuthenticated) return;
     
     const loadData = async () => {
       setIsLoading(true);
@@ -52,7 +52,13 @@ export default function FinancePage() {
     };
     
     loadData();
-  }, [isAuthenticated]);
+  }, [authLoading, isAuthenticated, fetchTransactions]);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const handleSave = async () => {
     if (!form.title || !form.amount) return;
@@ -62,7 +68,7 @@ export default function FinancePage() {
       amount: parseFloat(form.amount),
       type: form.type,
       date: form.date,
-      category_id: form.category_id || undefined,
+      category_id: form.category_id,
       description: form.description
     };
 
@@ -121,6 +127,14 @@ export default function FinancePage() {
     const matchesType = filterType === 'all' || t.type === filterType;
     return matchesSearch && matchesType;
   });
+
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="flex justify-center py-2xl"><Loading text="Checking your session..." /></div>
+      </Layout>
+    );
+  }
 
   if (!isAuthenticated) return null;
 
@@ -188,6 +202,7 @@ export default function FinancePage() {
             {(['all', 'income', 'expense'] as const).map((type) => (
               <button
                 key={type}
+                type="button"
                 onClick={() => setFilterType(type)}
                 className={`px-xl py-sm text-[10px] font-bold rounded-sm transition-all uppercase tracking-widest ${
                   filterType === type 
@@ -256,7 +271,7 @@ export default function FinancePage() {
                         </p>
                       </td>
                       <td className="px-xl py-xl text-right">
-                        <button className="p-sm text-gray-light hover:text-soft-cream rounded-md hover:bg-white/5 transition-all">
+                        <button type="button" className="p-sm text-gray-light hover:text-soft-cream rounded-md hover:bg-white/5 transition-all">
                           <MoreVertical size={16} />
                         </button>
                       </td>
@@ -294,6 +309,7 @@ export default function FinancePage() {
             {(['income', 'expense'] as const).map((type) => (
               <button
                 key={type}
+                type="button"
                 onClick={() => setForm(f => ({ ...f, type }))}
                 className={`flex-1 py-md text-[10px] font-bold rounded-sm transition-all uppercase tracking-widest ${
                   form.type === type 
@@ -345,6 +361,7 @@ export default function FinancePage() {
 
           {editingTransaction && (
             <button 
+              type="button"
               onClick={async () => {
                 if(confirm('Delete this entry forever?')) {
                   await deleteTransaction(editingTransaction.id);

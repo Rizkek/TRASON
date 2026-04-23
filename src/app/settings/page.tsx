@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Layout, Card, Button, Input, Loading, Alert } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/services/supabaseClient';
+import { userQueries } from '@/services/queries';
 import { 
   User as UserIcon, 
   Paintbrush, 
@@ -32,7 +34,7 @@ const LANGUAGE_OPTIONS = [
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { isAuthenticated, user, setUser } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user, setUser } = useAuth();
 
   const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [isSaving, setIsSaving] = useState(false);
@@ -66,6 +68,10 @@ export default function SettingsPage() {
   });
 
   useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+
     if (!isAuthenticated) {
       router.push('/login');
       return;
@@ -93,7 +99,7 @@ export default function SettingsPage() {
         });
       }
     }
-  }, [isAuthenticated, user]);
+  }, [authLoading, isAuthenticated, router, user]);
 
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
@@ -155,6 +161,16 @@ export default function SettingsPage() {
     showMessage('error', 'Account deletion requires server-side support. Contact support@trason.app');
   };
 
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-[60vh]">
+          <Loading text="Loading your settings..." />
+        </div>
+      </Layout>
+    );
+  }
+
   if (!isAuthenticated) return null;
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
@@ -186,6 +202,7 @@ export default function SettingsPage() {
             return (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-md px-xl py-md text-[10px] font-bold whitespace-nowrap rounded-md border transition-all ${
                   activeTab === tab.id
@@ -214,7 +231,7 @@ export default function SettingsPage() {
                       <div className="absolute inset-0 bg-primary opacity-5 group-hover:opacity-20 transition-opacity" />
                     </div>
                   </div>
-                  <button className="absolute -bottom-2 -right-2 p-sm bg-secondary text-white rounded-md shadow-lg border border-white border-opacity-20 hover:scale-110 transition-transform">
+                  <button type="button" className="absolute -bottom-2 -right-2 p-sm bg-secondary text-white rounded-md shadow-lg border border-white border-opacity-20 hover:scale-110 transition-transform">
                     <Camera size={14} />
                   </button>
                 </div>
@@ -286,6 +303,7 @@ export default function SettingsPage() {
                       {['light', 'dark', 'auto'].map((t) => (
                         <button
                           key={t}
+                          type="button"
                           onClick={() => setPrefs((p) => ({ ...p, theme: t }))}
                           className={`flex-1 py-md rounded-md border text-xs font-bold uppercase tracking-widest transition-all ${
                             prefs.theme === t
@@ -368,6 +386,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <button
+                      type="button"
                       onClick={() => setPrefs((p) => ({ ...p, [key]: !(p as any)[key] }))}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                         (prefs as any)[key] ? 'bg-primary' : 'bg-gray-strong border border-white border-opacity-[0.1]'
@@ -389,6 +408,7 @@ export default function SettingsPage() {
                       {['daily', 'weekly', 'monthly'].map((freq) => (
                         <button
                           key={freq}
+                          type="button"
                           onClick={() => setPrefs((p) => ({ ...p, digest_frequency: freq }))}
                           className={`flex-1 py-md rounded-md border text-[10px] font-bold uppercase tracking-widest transition-all ${
                             prefs.digest_frequency === freq

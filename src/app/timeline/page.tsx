@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Layout, Card, Button, Badge, Loading, Modal, Input } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
 import { useActivity } from '@/hooks/useActivity';
+import { Activity } from '@/services/supabaseClient';
 import { 
   Calendar as CalendarIcon, 
   ChevronLeft, 
@@ -79,7 +80,7 @@ const CATEGORY_OPTIONS = ['Work', 'Study', 'Exercise', 'Meals', 'Social', 'Rest'
 
 export default function TimelinePage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { activities, isLoading, fetchActivities, createActivity, updateActivity, deleteActivity } = useActivity();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -90,9 +91,15 @@ export default function TimelinePage() {
   const [currentHour] = useState(new Date().getHours());
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (authLoading || !isAuthenticated) return;
     fetchActivities(selectedDate);
-  }, [isAuthenticated, selectedDate]);
+  }, [authLoading, isAuthenticated, selectedDate, fetchActivities]);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const openAddModal = useCallback((hour?: number) => {
     setEditingActivity(null);
@@ -180,6 +187,14 @@ export default function TimelinePage() {
   const totalHours = Math.floor(totalMinutes / 60);
   const remMinutes = totalMinutes % 60;
 
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="flex justify-center py-2xl"><Loading text="Checking your session..." /></div>
+      </Layout>
+    );
+  }
+
   if (!isAuthenticated) return null;
 
   return (
@@ -202,6 +217,7 @@ export default function TimelinePage() {
         {/* Date Navigator */}
         <div className="flex items-center justify-between glass rounded-md px-xl py-lg">
           <button
+            type="button"
             onClick={() => changeDate(-1)}
             className="p-md text-primary hover:text-secondary hover:bg-white/5 rounded-md transition-all"
           >
@@ -217,6 +233,7 @@ export default function TimelinePage() {
             </p>
           </div>
           <button
+            type="button"
             onClick={() => changeDate(1)}
             className="p-md text-primary hover:text-secondary hover:bg-white/5 rounded-md transition-all"
           >
@@ -310,6 +327,7 @@ export default function TimelinePage() {
                               </div>
                             </div>
                             <button
+                              type="button"
                               onClick={(e) => { e.stopPropagation(); handleDelete(activity.id); }}
                               className="p-sm text-gray-light hover:text-danger opacity-0 group-hover/card:opacity-100 transition-all"
                             >
@@ -401,6 +419,7 @@ export default function TimelinePage() {
               {[1, 2, 3, 4, 5].map(s => (
                 <button 
                   key={s} 
+                  type="button"
                   onClick={() => setForm(f => ({ ...f, rating: f.rating === s ? 0 : s }))}
                   className={`text-2xl transition-all ${s <= form.rating ? 'text-primary scale-125' : 'text-gray-light opacity-20 hover:opacity-100 hover:text-primary'}`}
                 >

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button, Input, Alert, Card, Loading } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
 import { getAuthErrorMessage } from '@/libs/authErrors';
+import { supabase } from '@/services/supabaseClient';
 
 export default function LoginPage() {
   const router = useRouter();

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Alert, Card } from '@/components';
 import { supabase } from '@/services/supabaseClient';
+import { userQueries } from '@/services/queries';
 import { validatePassword } from '@/libs/helpers';
 import { getAuthErrorMessage } from '@/libs/authErrors';
 
@@ -19,6 +20,9 @@ export default function SignupPage() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [firstName, ...lastNameParts] = formData.name.trim().split(/\s+/);
+  const lastName = lastNameParts.join(' ');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -76,8 +80,8 @@ export default function SignupPage() {
         password: formData.password,
         options: {
           data: {
-            first_name: formData.name.split(' ')[0],
-            last_name: formData.name.split(' ').slice(1).join(' ') || '',
+            first_name: firstName,
+            last_name: lastName,
           },
         },
       });
@@ -89,41 +93,22 @@ export default function SignupPage() {
       if (data.user) {
         // Create user profile in public database
         // Use upsert to avoid conflicts if profile already exists
-        try {
-          const { error: insertError, status } = await supabase
-            .from('users')
-            .upsert(
-              [
-                {
-                  id: data.user.id,
-                  email: formData.email,
-                  first_name: formData.name.split(' ')[0],
-                  last_name: formData.name.split(' ').slice(1).join(' ') || '',
-                  email_verified: false,
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString(),
-                },
-              ],
-              { onConflict: 'id' }
-            );
-
-          if (insertError) {
-            console.error('User profile creation error:', {
-              error: insertError,
-              message: insertError.message,
-              status: status,
-              code: insertError.code,
-              details: insertError.details,
-            });
-            // Profile creation failed but auth user exists - that's OK
-            // User can still login, profile will be created on first login
-            console.warn('Profile creation failed but signup successful. User can still login.');
-          } else {
+        if (data.session) {
+          try {
+            await userQueries.ensureUserProfile();
             console.log('User profile created successfully');
+          } catch (profileError: any) {
+            console.error('User profile creation error:', {
+              error: profileError,
+              message: profileError?.message,
+              status: profileError?.status,
+              code: profileError?.code,
+              details: profileError?.details,
+            });
+            console.warn('Profile creation failed but signup successful. User can still login.');
           }
-        } catch (profileError) {
-          console.error('Unexpected error during profile creation:', profileError);
-          // Not a fatal error - user auth still exists
+        } else {
+          console.log('Signup completed without a session. Profile creation will be handled by the database trigger or on first login.');
         }
 
         // Check if email confirmation is required
