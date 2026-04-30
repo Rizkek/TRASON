@@ -330,8 +330,14 @@ export const transactionQueries = {
     if (error) throw error;
 
     // Group and aggregate on client side
+    interface TransactionSummaryRow {
+      type: string;
+      category: unknown;
+      total: number;
+      count: number;
+    }
     const summary = data?.reduce(
-      (acc: any, trans: any) => {
+      (acc: Record<string, TransactionSummaryRow>, trans) => {
         const key = `${trans.type}-${trans.category_id}`;
         if (!acc[key]) {
           acc[key] = {

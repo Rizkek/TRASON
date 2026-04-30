@@ -21,13 +21,9 @@ export const useAuth = () => {
   useEffect(() => {
     let isMounted = true;
 
-    // Use onAuthStateChange with INITIAL_SESSION to avoid duplicate lock acquisition.
-    // This fires once on mount (replacing the old initAuth pattern) and on every
-    // subsequent auth event, preventing NavigatorLockAcquireTimeoutError.
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!isMounted) return;
-        console.log('Auth state changed:', event, { userId: session?.user?.id });
 
         if (event === 'INITIAL_SESSION') {
           setLoading(true);
@@ -38,14 +34,12 @@ export const useAuth = () => {
                 setUser(userProfile);
               }
             } else {
-              // Important: clear any persisted stale auth state when there is no session.
               if (isMounted) {
                 storeLogout();
               }
             }
           } catch (err) {
             console.error('Auth init error:', err);
-            // Fallback: use session user data if DB fetch fails
             if (session?.user && isMounted) {
               setUser(session.user as any);
             } else if (isMounted) {

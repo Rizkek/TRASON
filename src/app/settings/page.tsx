@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Input, Loading, Alert } from '@/components';
-import { useAuth } from '@/hooks/useAuth';
+import { Layout, Card, Button, Input, Loading, Alert, ErrorAlert } from '@/components';
+import { useAuthStore } from '@/store/authStore';
 import { supabase } from '@/services/supabaseClient';
 import { userQueries } from '@/services/queries';
+import { sanitizeError } from '@/libs/validation';
 import { 
   User as UserIcon, 
   Paintbrush, 
@@ -16,7 +17,8 @@ import {
   ChevronRight,
   Save,
   Trash2,
-  Lock
+  Lock,
+  type LucideIcon
 } from 'lucide-react';
 
 type Tab = 'profile' | 'preferences' | 'security' | 'notifications';
@@ -34,11 +36,16 @@ const LANGUAGE_OPTIONS = [
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, user, setUser } = useAuth();
+  const setUser = useAuthStore((s) => s.setUser);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const authLoading = useAuthStore((s) => s.isLoading);
+  const user = useAuthStore((s) => s.user);
 
   const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // Profile form
   const [profile, setProfile] = useState({
@@ -134,22 +141,29 @@ export default function SettingsPage() {
   };
 
   const handleChangePassword = async () => {
-    if (security.new_password !== security.confirm_password) {
-      showMessage('error', 'New passwords do not match');
+    setError(null);
+    setFormErrors({});
+
+    const errors: Record<string, string> = {};
+    if (!security.new_password) errors.new_password = 'New password is required';
+    if (security.new_password.length < 8) errors.new_password = 'Password must be at least 8 characters';
+    if (security.new_password !== security.confirm_password) errors.confirm_password = 'Passwords do not match';
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
-    if (security.new_password.length < 8) {
-      showMessage('error', 'Password must be at least 8 characters');
-      return;
-    }
+
     setIsSaving(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password: security.new_password });
-      if (error) throw error;
+      const { error: pwError } = await supabase.auth.updateUser({ password: security.new_password });
+      if (pwError) throw pwError;
       setSecurity({ current_password: '', new_password: '', confirm_password: '' });
       showMessage('success', 'Password changed successfully!');
     } catch (err) {
-      showMessage('error', err instanceof Error ? err.message : 'Failed to change password');
+      const errorMessage = sanitizeError(err);
+      setError(errorMessage);
+      console.error('Failed to change password:', err);
     } finally {
       setIsSaving(false);
     }
@@ -173,7 +187,7 @@ export default function SettingsPage() {
 
   if (!isAuthenticated) return null;
 
-  const tabs: { id: Tab; label: string; icon: any }[] = [
+  const tabs: { id: Tab; label: string; icon: LucideIcon }[] = [
     { id: 'profile', label: 'PROFILE', icon: UserIcon },
     { id: 'preferences', label: 'INTERFACE', icon: Paintbrush },
     { id: 'notifications', label: 'ALERTS', icon: BellRing },

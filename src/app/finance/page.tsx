@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input } from '@/components';
-import { useAuth } from '@/hooks/useAuth';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert } from '@/components';
+import { useAuthStore } from '@/store/authStore';
 import { useTransaction } from '@/hooks/useTransaction';
+import { validateTransaction, sanitizeError } from '@/libs/validation';
+import { Transaction } from '@/types/database';
 import { 
   Plus, 
   TrendingUp, 
@@ -22,14 +24,19 @@ import { getDateRange } from '@/libs/date';
 
 export default function FinancePage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { transactions, fetchTransactions, createTransaction, updateTransaction, deleteTransaction } = useTransaction();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const authLoading = useAuthStore((s) => s.isLoading);
+  const now = new Date();
+  const { start, end } = getDateRange(now.getMonth(), now.getFullYear());
   
-  const [isLoading, setIsLoading] = useState(true);
+  const { transactions, isLoading: isTransactionsLoading, createTransaction, updateTransaction, deleteTransaction } = useTransaction(start, end);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<any>(null);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
+  const [error, setError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   
   const [form, setForm] = useState({
     title: '',
@@ -40,19 +47,8 @@ export default function FinancePage() {
     description: ''
   });
 
-  useEffect(() => {
-    if (authLoading || !isAuthenticated) return;
-    
-    const loadData = async () => {
-      setIsLoading(true);
-      const now = new Date();
-      const { start, end } = getDateRange(now.getMonth(), now.getFullYear());
-      await fetchTransactions(start, end);
-      setIsLoading(false);
-    };
-    
-    loadData();
-  }, [authLoading, isAuthenticated, fetchTransactions]);
+  // SWR automatically handles fetching! No more manual useEffect logic 
+  // or fetchStartedRef guard rails needed.
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -61,7 +57,15 @@ export default function FinancePage() {
   }, [authLoading, isAuthenticated, router]);
 
   const handleSave = async () => {
-    if (!form.title || !form.amount) return;
+    // Validate form
+    const validation = validateTransaction(form);
+    if (!validation.isValid) {
+      setFormErrors(validation.errors);
+      return;
+    }
+
+    setFormErrors({});
+    setError(null);
     
     const payload = {
       title: form.title,
@@ -79,11 +83,10 @@ export default function FinancePage() {
         await createTransaction(payload);
       }
       setIsModalOpen(false);
-      // Refresh
-      const now = new Date();
-      const { start, end } = getDateRange(now.getMonth(), now.getFullYear());
-      fetchTransactions(start, end);
+      // SWR's mutate() inside hook ensures it auto re-fetches!
     } catch (err) {
+      const errorMessage = sanitizeError(err);
+      setError(errorMessage);
       console.error('Failed to save transaction:', err);
     }
   };
@@ -101,7 +104,7 @@ export default function FinancePage() {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (t: any) => {
+  const openEditModal = (t: Transaction) => {
     setEditingTransaction(t);
     setForm({
       title: t.title,
@@ -139,7 +142,9 @@ export default function FinancePage() {
   if (!isAuthenticated) return null;
 
   return (
-    <Layout>
+    <>
+      <ErrorAlert error={error} onDismiss={() => setError(null)} />
+      <Layout>
       <div className="space-y-xl animate-fade-in">
         {/* Header */}
         <div className="flex items-start justify-between flex-wrap gap-md">
@@ -230,7 +235,7 @@ export default function FinancePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white divide-opacity-[0.03]">
-                {isLoading ? (
+                {isTransactionsLoading ? (
                   <tr>
                     <td colSpan={5} className="py-2xl text-center"><Loading /></td>
                   </tr>
@@ -262,7 +267,7 @@ export default function FinancePage() {
                       </td>
                       <td className="px-xl py-xl">
                         <Badge variant={t.type === 'income' ? 'success' : 'danger'} size="sm">
-                          {t.categories?.name || 'Uncategorized'}
+                          {(t.categories?.[0])?.name || 'Uncategorized'}
                         </Badge>
                       </td>
                       <td className="px-xl py-xl text-right">
@@ -326,7 +331,17 @@ export default function FinancePage() {
             label="TITLE"
             placeholder="Coffee, Subscription, Freelance..."
             value={form.title}
-            onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
+            onChange={(e) => {
+              setForm(f => ({ ...f, title: e.target.value }));
+              if (formErrors.title) {
+                setFormErrors(prev => {
+                  const copy = { ...prev };
+                  delete copy.title;
+                  return copy;
+                });
+              }
+            }}
+            error={formErrors.title}
           />
 
           <div className="grid grid-cols-2 gap-md">
@@ -335,16 +350,36 @@ export default function FinancePage() {
               type="number"
               placeholder="0.00"
               value={form.amount}
-              onChange={(e) => setForm(f => ({ ...f, amount: e.target.value }))}
+              onChange={(e) => {
+                setForm(f => ({ ...f, amount: e.target.value }));
+                if (formErrors.amount) {
+                  setFormErrors(prev => {
+                    const copy = { ...prev };
+                    delete copy.amount;
+                    return copy;
+                  });
+                }
+              }}
+              error={formErrors.amount}
             />
             <div className="space-y-sm">
               <label className="text-[10px] font-bold text-gray-light tracking-widest block">DATE</label>
               <input 
                 type="date" 
                 value={form.date}
-                onChange={(e) => setForm(f => ({ ...f, date: e.target.value }))}
+                onChange={(e) => {
+                  setForm(f => ({ ...f, date: e.target.value }));
+                  if (formErrors.date) {
+                    setFormErrors(prev => {
+                      const copy = { ...prev };
+                      delete copy.date;
+                      return copy;
+                    });
+                  }
+                }}
                 className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm px-md text-sm text-soft-cream focus:border-primary focus:outline-none"
               />
+              {formErrors.date && <p className="text-xs text-danger">{formErrors.date}</p>}
             </div>
           </div>
 
@@ -366,9 +401,7 @@ export default function FinancePage() {
                 if(confirm('Delete this entry forever?')) {
                   await deleteTransaction(editingTransaction.id);
                   setIsModalOpen(false);
-                  const now = new Date();
-                  const { start, end } = getDateRange(now.getMonth(), now.getFullYear());
-                  fetchTransactions(start, end);
+                  // SWR automatically re-fetches!
                 }
               }}
               className="w-full py-md text-danger text-[10px] font-bold uppercase tracking-widest border border-danger border-opacity-20 hover:bg-danger hover:bg-opacity-5 rounded-md transition-all"
@@ -378,6 +411,7 @@ export default function FinancePage() {
           )}
         </div>
       </Modal>
-    </Layout>
+      </Layout>
+    </>
   );
 }

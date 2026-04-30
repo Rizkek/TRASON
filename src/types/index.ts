@@ -1,4 +1,4 @@
-import { Transaction, Activity, Reminder } from './database';
+import { Transaction, Activity, Reminder, User } from './database';
 
 export * from './database';
 
@@ -13,7 +13,7 @@ export interface DashboardSummary {
 export interface AuthResponse {
   success: boolean;
   data?: {
-    user: any;
+    user: User;
     accessToken: string;
     refreshToken: string;
   };

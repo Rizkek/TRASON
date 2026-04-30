@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Layout, Card, Badge, Loading } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/authStore';
 import { insightQueries } from '@/services/queries';
 import { useInvestment } from '@/hooks/useInvestment';
 import { 
@@ -19,16 +20,24 @@ import {
 import { formatDate } from '@/libs/format';
 
 export default function InsightsPage() {
-  const { isAuthenticated } = useAuth();
+  // Read auth state from store directly — no new Supabase subscription
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isLoading: boolean = useAuthStore((s) => s.isLoading);
+  const authLoading = isLoading;
+
   const [dbInsights, setDbInsights] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { calculatedPositions, insights: investmentInsight, fetchPositions } = useInvestment();
+  const [isFetching, setIsFetching] = useState(false);
+  const { calculatedPositions, insights: investmentInsight } = useInvestment();
+
+  const fetchStarted = useRef(false);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (authLoading || !isAuthenticated) return;
+    // SWR automatically handles fetching
+    fetchStarted.current = true;
 
     const fetchInsights = async () => {
-      setIsLoading(true);
+      setIsFetching(true);
       try {
         const now = new Date();
         const start = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -38,13 +47,12 @@ export default function InsightsPage() {
       } catch (err) {
         console.error('Failed to fetch insights:', err);
       } finally {
-        setIsLoading(false);
+        setIsFetching(false);
       }
     };
 
-    fetchPositions();
     fetchInsights();
-  }, [isAuthenticated, fetchPositions]);
+  }, [authLoading, isAuthenticated]);
 
   const insights = [
     ...(investmentInsight && calculatedPositions.length > 0
@@ -62,6 +70,16 @@ export default function InsightsPage() {
     ...dbInsights,
   ];
 
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-[60vh]">
+          <Loading text="Checking your session..." />
+        </div>
+      </Layout>
+    );
+  }
+
   if (!isAuthenticated) return null;
 
   return (
@@ -75,7 +93,7 @@ export default function InsightsPage() {
           </p>
         </div>
 
-        {isLoading ? (
+        {isFetching ? (
           <div className="flex justify-center py-2xl"><Loading /></div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">

@@ -8,8 +8,8 @@ interface UseFetchState<T> {
   error: string | null;
 }
 
-interface UseFetchOptions {
-  onSuccess?: (data: any) => void;
+interface UseFetchOptions<T = unknown> {
+  onSuccess?: (data: T) => void;
   onError?: (error: string) => void;
 }
 

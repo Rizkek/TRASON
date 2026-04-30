@@ -2,10 +2,10 @@ import React from 'react';
 import { Card } from '@/components';
 import { TrendingUp } from 'lucide-react';
 import { formatCurrency } from '@/libs/format';
-import { Transaction, Activity } from '@/services/supabaseClient';
+import { User, Transaction, Activity } from '@/types/database';
 
 interface Props {
-  user: any;
+  user: User | null;
   activities: Activity[];
   transactions: Transaction[];
 }

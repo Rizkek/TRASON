@@ -89,22 +89,24 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           })}
         </nav>
 
-        <div className="p-lg mt-auto border-t border-white border-opacity-[0.03]">
-          <div className="flex items-center gap-md mb-lg p-sm rounded-md bg-white bg-opacity-[0.02]">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-sm font-bold text-white">
+        <div className="p-md mt-auto mb-md space-y-2">
+          {/* User Profile */}
+          <div className="flex items-center gap-md px-lg py-md rounded-md bg-white bg-opacity-[0.02] border border-white border-opacity-[0.05]">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-bold text-white shadow-lg">
               {user?.first_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-bold text-sm text-soft-cream truncate">{user?.first_name || user?.name || 'User'}</p>
-              <p className="text-[10px] text-gray-light truncate">{user?.email}</p>
+              <p className="text-[10px] text-gray-light truncate opacity-80">{user?.email}</p>
             </div>
           </div>
+          {/* Logout */}
           <button
             onClick={() => logout()}
-            className="w-full flex items-center justify-center gap-sm px-md py-lg bg-danger bg-opacity-10 hover:bg-opacity-20 text-danger border border-danger border-opacity-20 rounded-md text-xs font-bold transition-all duration-300 group"
+            className="w-full flex items-center gap-md px-lg py-md rounded-md text-gray-light hover:text-danger hover:bg-danger hover:bg-opacity-10 transition-all duration-300 group"
           >
-            <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
-            LOG OUT
+            <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm font-semibold tracking-wide">Logout</span>
           </button>
         </div>
       </aside>

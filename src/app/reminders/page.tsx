@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input } from '@/components';
-import { useAuth } from '@/hooks/useAuth';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert } from '@/components';
+import { useAuthStore } from '@/store/authStore';
 import { useReminder } from '@/hooks/useReminder';
+import { validateReminder, sanitizeError } from '@/libs/validation';
+import { Reminder } from '@/types/database';
 import { 
   Plus, 
   Bell, 
@@ -21,13 +23,15 @@ import { formatDate } from '@/libs/format';
 
 export default function RemindersPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { reminders, fetchReminders, createReminder, updateReminder, deleteReminder } = useReminder();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const authLoading = useAuthStore((s) => s.isLoading);
+  const { reminders, isLoading: isRemindersLoading, createReminder, updateReminder, deleteReminder } = useReminder();
   
-  const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingReminder, setEditingReminder] = useState<any>(null);
+  const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('pending');
+  const [error, setError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const [form, setForm] = useState({
     title: '',
@@ -37,17 +41,7 @@ export default function RemindersPage() {
     priority: 'medium' as 'low' | 'medium' | 'high',
   });
 
-  useEffect(() => {
-    if (authLoading || !isAuthenticated) return;
-    
-    const loadData = async () => {
-      setIsLoading(true);
-      await fetchReminders();
-      setIsLoading(false);
-    };
-    
-    loadData();
-  }, [authLoading, isAuthenticated, fetchReminders]);
+  // SWR automatically handles fetching and background tracking! No manual loadData needed.
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -71,6 +65,20 @@ export default function RemindersPage() {
       is_recurring: editingReminder?.is_recurring ?? false,
     };
 
+    // Validate
+    const validation = validateReminder({
+      ...form,
+      due_datetime: form.dueDate && form.dueTime ? `${form.dueDate}T${form.dueTime}` : undefined,
+      status: editingReminder?.status || 'pending',
+    });
+    if (!validation.isValid) {
+      setFormErrors(validation.errors);
+      return;
+    }
+
+    setFormErrors({});
+    setError(null);
+
     try {
       if (editingReminder) {
         await updateReminder(editingReminder.id, payload);
@@ -78,16 +86,18 @@ export default function RemindersPage() {
         await createReminder(payload);
       }
       setIsModalOpen(false);
-      fetchReminders();
+      // SWR automatically mutates data via hook
     } catch (err) {
+      const errorMessage = sanitizeError(err);
+      setError(errorMessage);
       console.error('Failed to save reminder:', err);
     }
   };
 
-  const toggleStatus = async (reminder: any) => {
+  const toggleStatus = async (reminder: Reminder) => {
     const newStatus = reminder.status === 'completed' ? 'pending' : 'completed';
     await updateReminder(reminder.id, { status: newStatus });
-    fetchReminders();
+    // SWR re-fetches or uses memoized data directly
   };
 
   const openAddModal = () => {
@@ -102,7 +112,7 @@ export default function RemindersPage() {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (r: any) => {
+  const openEditModal = (r: Reminder) => {
     const dueAt = r.due_datetime || r.due_date;
     const date = dueAt ? new Date(dueAt) : new Date();
     setEditingReminder(r);
@@ -138,7 +148,9 @@ export default function RemindersPage() {
   if (!isAuthenticated) return null;
 
   return (
-    <Layout>
+    <>
+      <ErrorAlert error={error} onDismiss={() => setError(null)} />
+      <Layout>
       <div className="space-y-xl animate-fade-in">
         {/* Header */}
         <div className="flex items-start justify-between flex-wrap gap-md">
@@ -188,7 +200,7 @@ export default function RemindersPage() {
 
         {/* Reminders List */}
         <div className="grid grid-cols-1 gap-md">
-          {isLoading ? (
+          {isRemindersLoading ? (
             <div className="flex justify-center py-2xl"><Loading /></div>
           ) : sortedReminders.length > 0 ? (
             sortedReminders.map((reminder) => (
@@ -263,7 +275,7 @@ export default function RemindersPage() {
                       e.stopPropagation(); 
                       if(confirm('Delete this milestone?')) {
                         await deleteReminder(reminder.id);
-                        fetchReminders();
+                        // SWR mutates automatically
                       }
                     }}
                     className="p-sm hover:bg-danger/10 rounded-md text-gray-light hover:text-danger"
@@ -368,6 +380,7 @@ export default function RemindersPage() {
           </div>
         </div>
       </Modal>
-    </Layout>
+      </Layout>
+    </>
   );
 }

@@ -2,9 +2,11 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, Alert } from '@/components';
-import { useAuth } from '@/hooks/useAuth';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, Alert, ErrorAlert } from '@/components';
+import { useAuthStore } from '@/store/authStore';
 import { useInvestment } from '@/hooks/useInvestment';
+import { validateTransaction, sanitizeError } from '@/libs/validation';
+import { InvestmentPosition } from '@/types/database';
 import {
   BriefcaseBusiness,
   Coins,
@@ -14,6 +16,9 @@ import {
   Shield,
   Trash2,
   TrendingUp,
+  TrendingDown,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
 import { formatCurrency, formatNumber } from '@/libs/format';
 import { formatSignedCurrency, formatSignedPercent } from '@/services/investmentService';
@@ -52,7 +57,8 @@ const getAssetBadgeVariant = (type: AssetType) => {
 
 export default function InvestmentsPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const authLoading = useAuthStore((s) => s.isLoading);
   const {
     calculatedPositions,
     summary,
@@ -60,7 +66,6 @@ export default function InvestmentsPage() {
     isLoading,
     isRefreshing,
     error,
-    fetchPositions,
     refreshPortfolio,
     createPosition,
     updatePosition,
@@ -68,14 +73,15 @@ export default function InvestmentsPage() {
   } = useInvestment();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPosition, setEditingPosition] = useState<any>(null);
+  const [editingPosition, setEditingPosition] = useState<InvestmentPosition | null>(null);
   const [form, setForm] = useState<InvestmentFormState>(defaultForm);
   const [isSaving, setIsSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    if (authLoading || !isAuthenticated) return;
-    fetchPositions();
-  }, [authLoading, isAuthenticated, fetchPositions]);
+  // SWR automatically handles portfolio fetching on mount
+
+
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -89,7 +95,7 @@ export default function InvestmentsPage() {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (position: any) => {
+  const openEditModal = (position: InvestmentPosition) => {
     setEditingPosition(position);
     setForm({
       asset_type: position.asset_type,
@@ -106,7 +112,19 @@ export default function InvestmentsPage() {
   };
 
   const handleSave = async () => {
-    if (!form.symbol.trim() || !form.amount || !form.buy_price) return;
+    // Basic validation
+    setFormError(null);
+    setFormErrors({});
+
+    const errors: Record<string, string> = {};
+    if (!form.symbol.trim()) errors.symbol = 'Symbol is required';
+    if (!form.amount) errors.amount = 'Amount is required';
+    if (!form.buy_price) errors.buy_price = 'Buy price is required';
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -133,13 +151,17 @@ export default function InvestmentsPage() {
       };
 
       if (editingPosition) {
-        await updatePosition(editingPosition.id, payload as any);
+        await updatePosition(editingPosition.id, payload);
       } else {
-        await createPosition(payload as any);
+        await createPosition(payload);
       }
 
       setIsModalOpen(false);
       setForm(defaultForm);
+    } catch (err) {
+      const errorMessage = sanitizeError(err);
+      setFormError(errorMessage);
+      console.error('Failed to save investment:', err);
     } finally {
       setIsSaving(false);
     }
@@ -164,9 +186,11 @@ export default function InvestmentsPage() {
   if (!isAuthenticated) return null;
 
   return (
-    <Layout>
-      <div className="space-y-xl animate-fade-in">
-        <div className="flex items-start justify-between gap-md flex-wrap">
+    <>
+      {formError && <ErrorAlert error={formError} onDismiss={() => setFormError(null)} />}
+      <Layout>
+        <div className="space-y-xl animate-fade-in">
+          <div className="flex items-start justify-between gap-md flex-wrap">
           <div className="space-y-sm max-w-2xl">
             <h1 className="text-display font-serif text-gradient">Investment Analyst</h1>
             <p className="text-subtext flex items-center gap-sm">
@@ -188,7 +212,7 @@ export default function InvestmentsPage() {
 
         {error && (
           <Alert type="error" title="Investment Analyst">
-            {error}
+            {error?.message || String(error)}
           </Alert>
         )}
 
@@ -258,14 +282,20 @@ export default function InvestmentsPage() {
                     <th className="px-lg py-md">Asset</th>
                     <th className="px-lg py-md">Amount</th>
                     <th className="px-lg py-md">Avg Cost</th>
-                    <th className="px-lg py-md">Current</th>
+                    <th className="px-lg py-md">Current Price</th>
+                    <th className="px-lg py-md">Day Chg</th>
                     <th className="px-lg py-md">Value</th>
                     <th className="px-lg py-md">P/L</th>
                     <th className="px-lg py-md text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {calculatedPositions.map((position) => (
+                  {calculatedPositions.map((position) => {
+                    const isLive = !!position.last_valued_at;
+                    const lastUpdated = position.last_valued_at
+                      ? new Date(position.last_valued_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                      : null;
+                    return (
                     <tr key={position.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                       <td className="px-lg py-lg">
                         <div className="space-y-1">
@@ -274,13 +304,39 @@ export default function InvestmentsPage() {
                             <Badge variant={getAssetBadgeVariant(position.asset_type)} size="sm">
                               {position.asset_type}
                             </Badge>
+                            {isLive ? (
+                              <span title={`Harga live, update ${lastUpdated}`}>
+                                <Wifi size={10} className="text-success" />
+                              </span>
+                            ) : (
+                              <span title="Harga belum direfresh">
+                                <WifiOff size={10} className="text-gray-light" />
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs text-gray-light">{position.display_name || 'Tracked position'}</p>
                         </div>
                       </td>
                       <td className="px-lg py-lg text-sm text-soft-cream">{formatNumber(position.amount, 4)}</td>
                       <td className="px-lg py-lg text-sm text-soft-cream">{formatCurrency(position.buy_price)}</td>
-                      <td className="px-lg py-lg text-sm text-soft-cream">{formatCurrency(position.current_price)}</td>
+                      <td className="px-lg py-lg">
+                        <p className="text-sm text-soft-cream">{formatCurrency(position.current_price)}</p>
+                        {lastUpdated && (
+                          <p className="text-[10px] text-gray-light mt-1">update {lastUpdated}</p>
+                        )}
+                      </td>
+                      <td className="px-lg py-lg">
+                        <div className={`flex items-center gap-1 text-sm font-semibold ${
+                          position.day_change_percent >= 0 ? 'text-success' : 'text-danger'
+                        }`}>
+                          {position.day_change_percent >= 0
+                            ? <TrendingUp size={12} />
+                            : <TrendingDown size={12} />
+                          }
+                          {formatSignedPercent(position.day_change_percent)}
+                        </div>
+                        <div className="text-xs text-gray-light">{formatSignedCurrency(position.day_change_value)}</div>
+                      </td>
                       <td className="px-lg py-lg text-sm font-semibold text-white">{formatCurrency(position.current_value)}</td>
                       <td className="px-lg py-lg">
                         <div className={`${position.profit_loss >= 0 ? 'text-success' : 'text-danger'} text-sm font-semibold`}>
@@ -304,7 +360,8 @@ export default function InvestmentsPage() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -452,6 +509,7 @@ export default function InvestmentsPage() {
           </div>
         </div>
       </Modal>
-    </Layout>
+      </Layout>
+    </>
   );
 }

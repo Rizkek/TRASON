@@ -1,14 +1,19 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Badge, Button, Loading } from '@/components';
-import { useAuth } from '@/hooks/useAuth';
+import { Layout, Card, Badge, Button, Loading, ErrorAlert } from '@/components';
+import { useAuthStore } from '@/store/authStore';
 import { useTransaction } from '@/hooks/useTransaction';
 import { useActivity } from '@/hooks/useActivity';
 import { useReminder } from '@/hooks/useReminder';
 import { useInvestment } from '@/hooks/useInvestment';
 import { getDateRange } from '@/libs/date';
+import { sanitizeError } from '@/libs/validation';
+
+// Setup SWR Dates
+const CURRENT_DATE = new Date();
+const { start: CURRENT_START, end: CURRENT_END } = getDateRange(CURRENT_DATE.getMonth(), CURRENT_DATE.getFullYear());
 
 import { 
   Calendar as CalendarIcon, 
@@ -28,42 +33,57 @@ import { InvestmentSummary } from './components/InvestmentSummary';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const authLoading = useAuthStore((s) => s.isLoading);
+  const user = useAuthStore((s) => s.user);
   
-  const { transactions, fetchTransactions } = useTransaction();
-  const { activities, fetchActivities } = useActivity();
-  const { reminders, fetchReminders } = useReminder();
-  const { summary: investmentSummary, insights: investmentInsights, fetchPositions } = useInvestment();
+  const [error, setError] = useState<string | null>(null);
+  
+  // SWR automatically handles transactions fetching in background
+  const { transactions } = useTransaction(CURRENT_START, CURRENT_END);
+  
+  // SWR fetches this based on CURRENT_DATE gracefully!
+  const { activities } = useActivity(CURRENT_DATE);
+  
+  const { reminders } = useReminder();
+  const { summary: investmentSummary, insights: investmentInsights } = useInvestment();
 
   const isInitialLoading = React.useRef(true);
   const [dataLoaded, setDataLoaded] = React.useState(false);
+  const [isDataLoading, setIsDataLoading] = React.useState(false);
+  const fetchStarted = React.useRef(false);
 
   useEffect(() => {
     if (!isAuthenticated) return;
+    if (fetchStarted.current || dataLoaded) return;
 
     const loadData = async () => {
+      fetchStarted.current = true;
+      setIsDataLoading(true);
       const now = new Date();
       const { start, end } = getDateRange(now.getMonth(), now.getFullYear());
 
       try {
         await Promise.all([
-          fetchTransactions(start, end),
-          fetchActivities(now),
-          fetchReminders(),
-          fetchPositions(),
+          // transactions fetches itself via SWR
+          // activities fetches itself via SWR
+          // reminders fetches itself via SWR
+          // investments fetches itself via SWR
         ]);
         setDataLoaded(true);
-      } catch (error) {
-        console.error('Failed to load dashboard data:', error);
+      } catch (err) {
+        const errorMessage = sanitizeError(err);
+        setError(errorMessage);
+        console.error('Failed to load dashboard data:', err);
+        fetchStarted.current = false;
       } finally {
+        setIsDataLoading(false);
         isInitialLoading.current = false;
       }
     };
 
-    if (!dataLoaded) {
-      loadData();
-    }
-  }, [isAuthenticated, dataLoaded, fetchTransactions, fetchActivities, fetchReminders, fetchPositions]);
+    loadData();
+  }, [isAuthenticated, dataLoaded]);
 
   const greeting = useMemo(() => {
     const hours = new Date().getHours();
@@ -71,11 +91,11 @@ export default function DashboardPage() {
   }, []);
 
   const todayDate = useMemo(() => {
-    return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    return new Date().toLocaleDateString('id-ID', { weekday: 'long', month: 'long', day: 'numeric' });
   }, []);
 
   const todayTime = useMemo(() => {
-    return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
   }, []);
 
   useEffect(() => {
@@ -96,19 +116,11 @@ export default function DashboardPage() {
 
   if (!isAuthenticated) return null;
 
-  if (isInitialLoading.current && !dataLoaded && transactions.length === 0) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center h-[60vh]">
-          <Loading text="Preparing your dashboard..." />
-        </div>
-      </Layout>
-    );
-  }
-
   return (
-    <Layout>
-      <div className="space-y-xl animate-fade-in">
+    <>
+      <ErrorAlert error={error} onDismiss={() => setError(null)} />
+      <Layout>
+        <div className="space-y-xl animate-fade-in">
         {/* Hero Greeting */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
           <div className="space-y-sm">
@@ -134,7 +146,15 @@ export default function DashboardPage() {
         <DashboardHeader user={user} activities={activities} transactions={transactions} />
 
         {/* Financial Flow */}
-        <FinancialSummary transactions={transactions} />
+        {isDataLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-lg animate-pulse">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-28 bg-white/5 rounded-lg" />
+            ))}
+          </div>
+        ) : (
+          <FinancialSummary transactions={transactions} />
+        )}
 
         <InvestmentSummary summary={investmentSummary} />
 
@@ -190,6 +210,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </Layout>
+      </Layout>
+    </>
   );
 }

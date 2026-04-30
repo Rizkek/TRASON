@@ -14,7 +14,7 @@ export const Loading: React.FC<LoadingProps> = ({
   size = 'md',
   text = 'Loading your experience...',
   fullPage = false,
-  showTip = true,
+  showTip = false,
 }) => {
   const sizeClasses = {
     sm: 'w-4 h-4',

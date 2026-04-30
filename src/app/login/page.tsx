@@ -3,23 +3,34 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button, Input, Alert, Card, Loading } from '@/components';
-import { useAuth } from '@/hooks/useAuth';
+import { Button, Input, Alert, Card, Loading, ErrorAlert } from '@/components';
+import { useAuthStore } from '@/store/authStore';
 import { getAuthErrorMessage } from '@/libs/authErrors';
+import { validateEmail, sanitizeError } from '@/libs/validation';
 import { supabase } from '@/services/supabaseClient';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const authLoading = useAuthStore((s) => s.isLoading);
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isMounted && !authLoading && isAuthenticated) {
       router.push('/dashboard');
     }
   }, [authLoading, isAuthenticated, router]);
+
+  // Prevent returning alternative UIs (like Loading or null) before client hydration is fully complete
+  if (!isMounted) return null;
 
   if (authLoading) {
     return <Loading />;
@@ -45,10 +56,9 @@ export default function LoginPage() {
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
 
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Invalid email format';
+    const emailValidation = validateEmail(formData.email);
+    if (!emailValidation.isValid) {
+      errors.email = emailValidation.errors.email || 'Invalid email';
     }
 
     if (!formData.password) {
@@ -81,16 +91,15 @@ export default function LoginPage() {
       }
 
       if (data.session) {
-        // Redirect to dashboard after successful login
-        console.log('Login successful, redirecting to dashboard');
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 500);
+        // Success — useEffect above will handle the redirect via isAuthenticated state change
+        console.log('Login successful, waiting for auth state redirect...');
       } else {
         throw new Error('No session created after login');
       }
     } catch (err) {
-      setError(getAuthErrorMessage(err));
+      const errorMessage = sanitizeError(err);
+      setError(errorMessage);
+      console.error('Login failed:', err);
     } finally {
       setIsLoading(false);
     }

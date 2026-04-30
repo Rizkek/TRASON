@@ -1,107 +1,67 @@
 import { useCallback } from 'react';
+import useSWR from 'swr';
 import { reminderQueries } from '@/services/queries';
 import { Reminder } from '@/services/supabaseClient';
-import { useReminderStore } from '@/store/reminderStore';
 
-export const useReminder = () => {
-  const store = useReminderStore();
+export const useReminder = (startDate?: Date, endDate?: Date) => {
+  const key = startDate && endDate 
+    ? ['reminders', startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0]]
+    : ['reminders', 'pending'];
 
-  const fetchReminders = useCallback(async (startDate?: Date, endDate?: Date) => {
-    store.setLoading(true);
-    store.setError(null);
-    try {
-      const data =
-        startDate && endDate
-          ? await reminderQueries.getReminders(startDate, endDate)
-          : await reminderQueries.getPendingReminders();
-      store.setReminders(data || []);
-      return data;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to fetch reminders';
-      store.setError(errorMessage);
-      throw err;
-    } finally {
-      store.setLoading(false);
+  const { data, error, isLoading, mutate } = useSWR(
+    key,
+    async ([, startStr, endStr]) => {
+      if (startStr === 'pending') {
+        const res = await reminderQueries.getPendingReminders();
+        return res || [];
+      }
+      const res = await reminderQueries.getReminders(new Date(startStr), new Date(endStr as string));
+      return res || [];
+    },
+    {
+      revalidateOnFocus: true,
+      dedupingInterval: 5000,
+      keepPreviousData: true,
     }
-  }, [store]);
+  );
 
   const createReminder = useCallback(
-    async (
-      data: Omit<Reminder, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>
-    ) => {
-      store.setError(null);
-      try {
-        const newReminder = await reminderQueries.createReminder(data);
-        store.addReminder(newReminder);
-        return newReminder;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to create reminder';
-        store.setError(errorMessage);
-        throw err;
-      }
+    async (dataToCreate: Omit<Reminder, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
+      const newReminder = await reminderQueries.createReminder(dataToCreate);
+      await mutate();
+      return newReminder;
     },
-    [store]
+    [mutate]
   );
 
   const updateReminder = useCallback(
-    async (
-      id: string,
-      data: Partial<Omit<Reminder, 'id' | 'created_at' | 'updated_at'>>
-    ) => {
-      store.setError(null);
-      try {
-        const updatedReminder = await reminderQueries.updateReminder(id, data);
-        store.updateReminder(id, updatedReminder);
-        return updatedReminder;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to update reminder';
-        store.setError(errorMessage);
-        throw err;
-      }
+    async (id: string, dataToUpdate: Partial<Omit<Reminder, 'id' | 'created_at' | 'updated_at'>>) => {
+      const updatedReminder = await reminderQueries.updateReminder(id, dataToUpdate);
+      await mutate();
+      return updatedReminder;
     },
-    [store]
+    [mutate]
   );
 
   const deleteReminder = useCallback(async (id: string) => {
-    store.setError(null);
-    try {
-      await reminderQueries.deleteReminder(id);
-      store.deleteReminder(id);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to delete reminder';
-      store.setError(errorMessage);
-      throw err;
-    }
-  }, [store]);
+    await reminderQueries.deleteReminder(id);
+    await mutate();
+  }, [mutate]);
 
   const markReminderDone = useCallback(async (id: string) => {
-    store.setError(null);
-    try {
-      const updatedReminder = await reminderQueries.completeReminder(id);
-      store.updateReminder(id, updatedReminder);
-      return updatedReminder;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : 'Failed to mark reminder as done';
-      store.setError(errorMessage);
-      throw err;
-    }
-  }, [store]);
+    const updatedReminder = await reminderQueries.completeReminder(id);
+    await mutate();
+    return updatedReminder;
+  }, [mutate]);
 
   return {
-    reminders: store.reminders,
-    isLoading: store.isLoading,
-    error: store.error,
-    fetchReminders,
+    reminders: data || [],
+    isLoading,
+    error,
     createReminder,
     updateReminder,
     deleteReminder,
     markReminderDone,
+    mutate
   };
 };

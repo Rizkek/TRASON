@@ -43,6 +43,14 @@ export interface Category {
   deleted_at?: string;
 }
 
+/** Minimal shape returned when Supabase joins categories via a foreign key */
+export interface CategoryJoin {
+  id: string;
+  name: string;
+  color?: string | null;
+  icon?: string | null;
+}
+
 export interface Transaction {
   id: string;
   user_id: string;
@@ -56,11 +64,12 @@ export interface Transaction {
   payment_method?: string;
   receipt_image_url?: string;
   tags?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
   deleted_at?: string;
-  categories?: any;
+  /** Populated by Supabase join when selecting categories:category_id(...) — Supabase returns an array even for single-row joins */
+  categories?: CategoryJoin[] | null;
 }
 
 export interface Activity {
@@ -141,6 +150,20 @@ export interface InvestmentPriceSnapshot {
   price: number;
   change_percent?: number | null;
   source: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: string;
+}
+
+export interface Insight {
+  id: string;
+  user_id: string;
+  date: string;
+  type: string;
+  category?: string;
+  insight_text: string;
+  data?: Record<string, unknown>;
+  confidence_score?: number;
+  is_actionable: boolean;
+  created_at: string;
+  updated_at: string;
 }

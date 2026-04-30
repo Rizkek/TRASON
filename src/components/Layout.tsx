@@ -3,18 +3,18 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
-import { 
-  LayoutDashboard, 
-  Wallet, 
-  Calendar, 
-  Bell, 
-  Lightbulb, 
+import { useAuthStore } from '@/store/authStore';
+import {
+  LayoutDashboard,
+  Wallet,
+  Calendar,
+  Bell,
+  Lightbulb,
   BriefcaseBusiness,
   Settings,
   LogOut,
   Menu,
-  X
+  X,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -22,7 +22,9 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const signOut = useAuthStore((s) => s.signOut);
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
@@ -35,10 +37,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     { label: 'Insights', href: '/insights', icon: Lightbulb },
     { label: 'Settings', href: '/settings', icon: Settings },
   ];
-
-  const handleLogout = () => {
-    logout();
-  };
 
   if (!isAuthenticated) {
     return <>{children}</>;
@@ -84,10 +82,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {isActive(item.href) && (
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r shadow-[0_0_10px_rgba(78,79,235,0.8)]" />
                 )}
-                
                 <Icon size={20} className={`${isActive(item.href) ? 'text-primary' : 'group-hover:text-secondary'} transition-colors`} />
                 <span className="text-sm font-semibold tracking-wide">{item.label}</span>
-                
                 {isActive(item.href) && (
                   <div className="absolute right-[-20%] top-[-50%] w-24 h-24 bg-primary bg-opacity-5 blur-3xl rounded-full" />
                 )}
@@ -100,15 +96,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="p-lg mt-auto border-t border-white border-opacity-[0.03]">
           <div className="flex items-center gap-md mb-lg p-sm rounded-md bg-white bg-opacity-[0.02]">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-sm font-bold text-white">
-              {user?.name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
+              {(user as any)?.first_name?.[0]?.toUpperCase() || user?.name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-sm text-soft-cream truncate">{user?.name || 'User'}</p>
+              <p className="font-bold text-sm text-soft-cream truncate">
+                {(user as any)?.first_name || user?.name || 'User'}
+              </p>
               <p className="text-[10px] text-gray-light truncate">{user?.email}</p>
             </div>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={() => signOut()}
             className="w-full flex items-center justify-center gap-sm px-md py-lg bg-danger bg-opacity-10 hover:bg-opacity-20 text-danger border border-danger border-opacity-20 rounded-md text-xs font-bold transition-all duration-300 group"
           >
             <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />

@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button, Input, Alert, Card } from '@/components';
+import { Button, Input, Alert, Card, ErrorAlert } from '@/components';
 import { supabase } from '@/services/supabaseClient';
 import { userQueries } from '@/services/queries';
-import { validatePassword } from '@/libs/helpers';
+import { validateEmail, validatePassword, sanitizeError } from '@/libs/validation';
 import { getAuthErrorMessage } from '@/libs/authErrors';
 
 export default function SignupPage() {
@@ -44,15 +44,14 @@ export default function SignupPage() {
       errors.name = 'Name is required';
     }
 
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Invalid email format';
+    const emailValidation = validateEmail(formData.email);
+    if (!emailValidation.isValid) {
+      errors.email = emailValidation.errors.email || 'Invalid email';
     }
 
     const passwordValidation = validatePassword(formData.password);
     if (!passwordValidation.isValid) {
-      errors.password = passwordValidation.errors[0];
+      errors.password = Object.values(passwordValidation.errors)[0];
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -97,13 +96,11 @@ export default function SignupPage() {
           try {
             await userQueries.ensureUserProfile();
             console.log('User profile created successfully');
-          } catch (profileError: any) {
+          } catch (profileError: unknown) {
+            const pe = profileError instanceof Error ? profileError : null;
             console.error('User profile creation error:', {
               error: profileError,
-              message: profileError?.message,
-              status: profileError?.status,
-              code: profileError?.code,
-              details: profileError?.details,
+              message: pe?.message,
             });
             console.warn('Profile creation failed but signup successful. User can still login.');
           }
@@ -131,7 +128,8 @@ export default function SignupPage() {
       }
     } catch (err) {
       console.error('Signup error:', err);
-      setError(getAuthErrorMessage(err));
+      const errorMessage = sanitizeError(err);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -5,4 +5,6 @@ export * from './ui/Card';
 export * from './ui/Loading';
 export * from './Modal';
 export * from './Alert';
+export * from './ErrorAlert';
+export * from './ErrorBoundary';
 export * from './layout/Layout';

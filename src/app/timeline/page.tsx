@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input } from '@/components';
-import { useAuth } from '@/hooks/useAuth';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert } from '@/components';
+import { useAuthStore } from '@/store/authStore';
 import { useActivity } from '@/hooks/useActivity';
+import { validateActivity, sanitizeError } from '@/libs/validation';
 import { Activity } from '@/services/supabaseClient';
 import { 
   Calendar as CalendarIcon, 
@@ -80,20 +81,23 @@ const CATEGORY_OPTIONS = ['Work', 'Study', 'Exercise', 'Meals', 'Social', 'Rest'
 
 export default function TimelinePage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { activities, isLoading, fetchActivities, createActivity, updateActivity, deleteActivity } = useActivity();
-
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const authLoading = useAuthStore((s) => s.isLoading);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  
+  // SWR automatically handles caching & auto-fetching based on selectedDate
+  const { activities, isLoading, createActivity, updateActivity, deleteActivity } = useActivity(selectedDate);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingActivity, setEditingActivity] = useState<any>(null);
+  const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [form, setForm] = useState<ActivityFormData>(defaultForm);
   const [isSaving, setIsSaving] = useState(false);
   const [currentHour] = useState(new Date().getHours());
+  const [error, setError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    if (authLoading || !isAuthenticated) return;
-    fetchActivities(selectedDate);
-  }, [authLoading, isAuthenticated, selectedDate, fetchActivities]);
+  // Manual fetchActivities is no longer needed since SWR handles it automatically
+  // Reactively fetches data when `selectedDate` changes.
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -107,7 +111,7 @@ export default function TimelinePage() {
     setIsModalOpen(true);
   }, []);
 
-  const openEditModal = useCallback((activity: any) => {
+  const openEditModal = useCallback((activity: Activity) => {
     const start = new Date(activity.start_time);
     const end = activity.end_time ? new Date(activity.end_time) : null;
     const durationMins = end
@@ -149,6 +153,16 @@ export default function TimelinePage() {
       rating: form.rating || undefined,
     };
 
+    // Validate before save
+    const validation = validateActivity(payload);
+    if (!validation.isValid) {
+      setFormErrors(validation.errors);
+      return;
+    }
+
+    setFormErrors({});
+    setError(null);
+
     try {
       if (editingActivity) {
         await updateActivity(editingActivity.id, payload);
@@ -156,8 +170,10 @@ export default function TimelinePage() {
         await createActivity(payload);
       }
       setIsModalOpen(false);
-      fetchActivities(selectedDate);
+      // SWR auto-mutates the data so you don't call fetchActivities()
     } catch (err) {
+      const errorMessage = sanitizeError(err);
+      setError(errorMessage);
       console.error('Failed to save:', err);
     } finally {
       setIsSaving(false);
@@ -167,7 +183,7 @@ export default function TimelinePage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this?')) return;
     await deleteActivity(id);
-    fetchActivities(selectedDate);
+    // SWR auto-mutates
   };
 
   const changeDate = (days: number) => {
@@ -178,12 +194,12 @@ export default function TimelinePage() {
 
   const isToday = selectedDate.toDateString() === new Date().toDateString();
 
-  const activitiesByHour = HOURS.reduce<Record<number, any[]>>((acc, h) => {
-    acc[h] = activities.filter((a: any) => new Date(a.start_time).getHours() === h);
+  const activitiesByHour = HOURS.reduce<Record<number, Activity[]>>((acc, h) => {
+    acc[h] = activities.filter((a: Activity) => new Date(a.start_time).getHours() === h);
     return acc;
   }, {});
 
-  const totalMinutes = activities.reduce((acc, a: any) => acc + (a.duration_minutes || 0), 0);
+  const totalMinutes = activities.reduce((acc, a: Activity) => acc + (a.duration_minutes || 0), 0);
   const totalHours = Math.floor(totalMinutes / 60);
   const remMinutes = totalMinutes % 60;
 
@@ -198,7 +214,9 @@ export default function TimelinePage() {
   if (!isAuthenticated) return null;
 
   return (
-    <Layout>
+    <>
+      <ErrorAlert error={error} onDismiss={() => setError(null)} />
+      <Layout>
       <div className="space-y-xl animate-fade-in">
         {/* Header */}
         <div className="flex items-start justify-between flex-wrap gap-md">
@@ -262,9 +280,9 @@ export default function TimelinePage() {
               <p className="text-micro text-gray-light mb-1">TOP FOCUS</p>
               <p className="text-xl font-bold text-white truncate">
                 {(() => {
-                  const freq: any = {};
-                  activities.forEach((a: any) => { if (a.category) freq[a.category] = (freq[a.category] || 0) + 1; });
-                  const top = Object.entries(freq).sort((a: any, b: any) => b[1] - a[1])[0];
+                  const freq: Record<string, number> = {};
+                  activities.forEach((a: Activity) => { if (a.category) freq[a.category] = (freq[a.category] || 0) + 1; });
+                  const top = Object.entries(freq).sort((a, b) => b[1] - a[1])[0];
                   return top ? top[0].toUpperCase() : 'NONE';
                 })()}
               </p>
@@ -448,6 +466,7 @@ export default function TimelinePage() {
           />
         </div>
       </Modal>
-    </Layout>
+      </Layout>
+    </>
   );
 }

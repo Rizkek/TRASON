@@ -1,12 +1,15 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Crimson_Text } from 'next/font/google';
 import './globals.css';
+import { AuthProvider } from '@/providers/AuthProvider';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const crimson = Crimson_Text({ 
   subsets: ['latin'],
   weight: ['400', '600', '700'],
-  variable: '--font-crimson'
+  variable: '--font-crimson',
+  display: 'swap'
 });
 
 export const metadata: Metadata = {
@@ -43,7 +46,11 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className={`${inter.variable} ${crimson.variable} ${inter.className}`} suppressHydrationWarning>
-        {children}
+        <ErrorBoundary>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

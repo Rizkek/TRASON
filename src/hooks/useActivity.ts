@@ -1,88 +1,57 @@
 import { useCallback } from 'react';
+import useSWR from 'swr';
 import { activityQueries } from '@/services/queries';
 import { Activity } from '@/services/supabaseClient';
-import { useActivityStore } from '@/store/activityStore';
 
-export const useActivity = () => {
-  const store = useActivityStore();
+export const useActivity = (date?: Date) => {
+  // Buat key SWR yg berubah tiap kali harinya berubah (cache berbasis hari)
+  const key = date 
+    ? ['activities', date.toISOString().split('T')[0]]
+    : ['activities', new Date().toISOString().split('T')[0]];
 
-  const fetchActivities = useCallback(
-    async (date?: Date) => {
-      store.setLoading(true);
-      store.setError(null);
-      try {
-        const data = await activityQueries.getActivitiesByDate(date || new Date());
-        store.setActivities(data || []);
-        return data;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to fetch activities';
-        store.setError(errorMessage);
-        throw err;
-      } finally {
-        store.setLoading(false);
-      }
-    },
-    [store]
+  const { data, error, isLoading, mutate } = useSWR(
+    key,
+    () => activityQueries.getActivitiesByDate(date || new Date()).then(res => res || []),
+    {
+      revalidateOnFocus: true,
+      dedupingInterval: 5000,
+      keepPreviousData: true,
+    }
   );
 
   const createActivity = useCallback(
-    async (data: Omit<Activity, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
-      store.setError(null);
-      try {
-        const newActivity = await activityQueries.createActivity(data);
-        store.addActivity(newActivity);
-        return newActivity;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to create activity';
-        store.setError(errorMessage);
-        throw err;
-      }
+    async (dataToCreate: Omit<Activity, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
+      const newActivity = await activityQueries.createActivity(dataToCreate);
+      await mutate();
+      return newActivity;
     },
-    [store]
+    [mutate]
   );
 
   const updateActivity = useCallback(
     async (
       id: string,
-      data: Partial<Omit<Activity, 'id' | 'created_at' | 'updated_at'>>
+      dataToUpdate: Partial<Omit<Activity, 'id' | 'created_at' | 'updated_at'>>
     ) => {
-      store.setError(null);
-      try {
-        const updatedActivity = await activityQueries.updateActivity(id, data);
-        store.updateActivity(id, updatedActivity);
-        return updatedActivity;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to update activity';
-        store.setError(errorMessage);
-        throw err;
-      }
+      const updatedActivity = await activityQueries.updateActivity(id, dataToUpdate);
+      await mutate();
+      return updatedActivity;
     },
-    [store]
+    [mutate]
   );
 
   const deleteActivity = useCallback(async (id: string) => {
-    store.setError(null);
-    try {
-      await activityQueries.deleteActivity(id);
-      store.deleteActivity(id);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to delete activity';
-      store.setError(errorMessage);
-      throw err;
-    }
-  }, [store]);
+    await activityQueries.deleteActivity(id);
+    await mutate();
+  }, [mutate]);
 
   return {
-    activities: store.activities,
-    isLoading: store.isLoading,
-    error: store.error,
-    fetchActivities,
+    activities: data || [],
+    isLoading,
+    error,
     createActivity,
     updateActivity,
     deleteActivity,
+    mutate
   };
 };

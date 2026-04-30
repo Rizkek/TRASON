@@ -1,27 +1,98 @@
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* CSS Variables for fonts and colors */
-:root {
-  --font-crimson: 'Crimson Text', serif;
-  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  
-  /* TRASON New Color Palette */
+/* ============================================================
+   TAILWIND v4 THEME — Single source of truth for design tokens
+   All custom colors, fonts, spacing, etc. go here in @theme
+   ============================================================ */
+@theme {
+  /* --- Fonts --- */
+  --font-serif: var(--font-crimson), serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* --- Custom Color Palette (mapped to tw utilities like text-primary, bg-warm-black, etc.) --- */
   --color-primary: #4F46E5;
   --color-secondary: #0EA5E9;
   --color-warm-black: #0B0F14;
   --color-soft-cream: #F8FAFC;
   --color-accent-purple: #7C3AED;
   --color-accent-blue: #1D4ED8;
-  
+  --color-warm-gold: #F4C95D;
+  --color-pale-blush: #FDE7EF;
+  --color-deep-sage: #6B8F71;
+  --color-insight-taupe: #8B7D6B;
+
+  /* --- Semantic Colors --- */
+  --color-success: #22C55E;
+  --color-danger: #EF4444;
+  --color-warning: #F59E0B;
+  --color-info: #60A5FA;
+
+  /* --- Neutral Grays --- */
+  --color-gray-strong: #111827;
+  --color-gray-medium: #1F2937;
+  --color-gray-light: #CBD5E1;
+  --color-gray-very-light: #E2E8F0;
+
+  /* --- Custom Font Sizes --- */
+  --text-display: 40px;
+  --text-h1: 32px;
+  --text-h2: 24px;
+  --text-h3: 20px;
+  --text-body: 16px;
+  --text-caption: 14px;
+  --text-micro: 12px;
+
+  /* --- Custom Spacing (8px grid) --- */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* --- Border Radius --- */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+
+  /* --- Animations --- */
+  --animate-fade-in: fadeIn 0.3s ease-in-out;
+  --animate-slide-up: slideUp 0.3s ease-out;
+  --animate-subtle-pulse: subtlePulse 2s ease-in-out infinite;
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes subtlePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+}
+
+/* ============================================================
+   CSS VARIABLES — Runtime tokens for non-Tailwind usage
+   ============================================================ */
+:root {
+  --font-crimson: 'Crimson Text', serif;
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
   --gradient-primary: linear-gradient(135deg, #4E4FEB 0%, #068FFF 100%);
   --gradient-dark: linear-gradient(180deg, rgba(26, 26, 26, 0.8) 0%, rgba(15, 15, 15, 1) 100%);
 }
 
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
 html {
   scroll-behavior: smooth;
   font-family: var(--font-inter);
@@ -32,13 +103,14 @@ body {
   line-height: 1.6;
 }
 
-/* Keep keyboard navigation visible across the app */
 :focus-visible {
   outline: 2px solid var(--color-secondary);
   outline-offset: 2px;
 }
 
-/* Base Typography */
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
 h1, .h1 {
   @apply text-4xl font-serif font-semibold;
   font-family: var(--font-crimson);
@@ -70,49 +142,9 @@ p, body {
   line-height: 1.6;
 }
 
-/* Custom animations */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slide-up {
-  from {
-    transform: translateY(10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes subtle-pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.3s ease-in-out;
-}
-
-.animate-slide-up {
-  animation: slide-up 0.3s ease-in-out;
-}
-
-.animate-subtle-pulse {
-  animation: subtle-pulse 2s ease-in-out infinite;
-}
-
-/* Custom scrollbar */
+/* ============================================================
+   CUSTOM SCROLLBAR
+   ============================================================ */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -131,65 +163,73 @@ p, body {
   background: var(--color-primary);
 }
 
-/* Link utilities */
+/* ============================================================
+   LINK UTILITIES
+   ============================================================ */
 a {
   @apply text-secondary hover:text-primary transition-all duration-300;
 }
 
-/* Card/Box utilities */
-.card {
-  @apply bg-gray-strong bg-opacity-40 backdrop-blur-md rounded-md;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* ============================================================
+   COMPONENT UTILITIES
+   In v4, use @layer components for reusable component classes
+   ============================================================ */
+@layer components {
+  .card {
+    @apply bg-gray-strong/40 backdrop-blur-md rounded-md;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-.card:hover {
-  border-color: rgba(78, 79, 235, 0.3);
-  background-color: rgba(42, 42, 42, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(78, 79, 235, 0.1);
-}
+  .card:hover {
+    border-color: rgba(78, 79, 235, 0.3);
+    background-color: rgba(42, 42, 42, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(78, 79, 235, 0.1);
+  }
 
-.glass {
-  @apply bg-white bg-opacity-[0.03] backdrop-blur-xl border border-white border-opacity-[0.05];
-}
+  .glass {
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.05];
+  }
 
-.bg-gradient-primary {
-  background: var(--gradient-primary);
-}
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
 
-.text-gradient {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-/* Text utilities */
-.text-display {
-  font-size: 40px;
-  @apply font-serif font-semibold;
-  letter-spacing: -0.02em;
-}
+  /* Text utilities */
+  .text-display {
+    font-size: 40px;
+    @apply font-serif font-semibold;
+    letter-spacing: -0.02em;
+  }
 
-.text-heading {
-  font-size: 24px;
-  @apply font-serif;
-}
+  .text-heading {
+    font-size: 24px;
+    @apply font-serif;
+  }
 
-.text-subtext {
-  @apply text-caption text-gray-very-light opacity-80;
-}
+  .text-subtext {
+    @apply text-caption text-gray-very-light opacity-80;
+  }
 
-.text-micro {
-  font-size: 12px;
-  @apply font-sans font-medium uppercase tracking-wider;
-}
+  .text-micro {
+    font-size: 12px;
+    @apply font-sans font-medium uppercase tracking-wider;
+  }
 
-/* Glow effects */
-.glow-primary {
-  box-shadow: 0 0 20px -5px var(--color-primary);
-}
+  /* Glow effects */
+  .glow-primary {
+    box-shadow: 0 0 20px -5px var(--color-primary);
+  }
 
-.glow-secondary {
-  box-shadow: 0 0 20px -5px var(--color-secondary);
+  .glow-secondary {
+    box-shadow: 0 0 20px -5px var(--color-secondary);
+  }
 }
