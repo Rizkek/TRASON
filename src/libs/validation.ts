@@ -257,6 +257,10 @@ export const sanitizeError = (error: unknown): string => {
     if (error.message.includes('FATAL')) {
       return 'Database error. Please try again later.';
     }
+    // In development or if it's an ApiError with details, show more info
+    if (process.env.NODE_ENV === 'development' || (error as any).code) {
+      return `${error.message} ${(error as any).details || ''} ${(error as any).hint || ''}`;
+    }
     // Safe errors to show
     return error.message;
   }

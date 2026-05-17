@@ -119,11 +119,26 @@ export default function InvestmentsPage() {
     const errors: Record<string, string> = {};
     if (!form.symbol.trim()) errors.symbol = 'Symbol is required';
     if (!form.amount) errors.amount = 'Amount is required';
+    else if (isNaN(Number(form.amount.replace(/,/g, '')))) errors.amount = 'Amount must be a valid number';
+    
     if (!form.buy_price) errors.buy_price = 'Buy price is required';
+    else if (isNaN(Number(form.buy_price.replace(/,/g, '')))) errors.buy_price = 'Buy price must be a valid number';
+
+    if (form.manual_current_price && isNaN(Number(form.manual_current_price.replace(/,/g, '')))) {
+      errors.manual_current_price = 'Must be a valid number';
+    }
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
+    }
+
+    // Custom Validation: Asset Type vs Display Name consistency
+    const assetPrefix = form.asset_type.charAt(0).toUpperCase() + form.asset_type.slice(1);
+    if (form.display_name && !form.display_name.startsWith(assetPrefix)) {
+      if (!confirm(`Your display name doesn't start with "${assetPrefix}". Do you want to continue anyway?`)) {
+        return;
+      }
     }
 
     setIsSaving(true);
@@ -132,8 +147,8 @@ export default function InvestmentsPage() {
         asset_type: form.asset_type,
         symbol: form.symbol.trim().toUpperCase(),
         display_name: form.display_name.trim() || null,
-        amount: Number(form.amount),
-        buy_price: Number(form.buy_price),
+        amount: Number(form.amount.replace(/,/g, '')),
+        buy_price: Number(form.buy_price.replace(/,/g, '')),
         buy_date: form.buy_date,
         quote_currency: 'USD',
         price_source:
@@ -145,7 +160,7 @@ export default function InvestmentsPage() {
                 ? 'manual'
                 : 'alphavantage',
         external_id: form.asset_type === 'crypto' ? form.external_id.trim().toLowerCase() || null : null,
-        manual_current_price: form.manual_current_price ? Number(form.manual_current_price) : null,
+        manual_current_price: form.manual_current_price ? Number(form.manual_current_price.replace(/,/g, '')) : null,
         notes: form.notes.trim() || null,
         is_active: true,
       };
@@ -412,12 +427,13 @@ export default function InvestmentsPage() {
         title={editingPosition ? 'EDIT POSITION' : 'ADD POSITION'}
         footer={
           <div className="flex justify-end gap-md">
-            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)}>CANCEL</Button>
-            <Button variant="primary" size="md" onClick={handleSave} disabled={isSaving}>
+            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)} disabled={isSaving}>CANCEL</Button>
+            <Button variant="primary" size="md" onClick={handleSave} isLoading={isSaving} disabled={isSaving}>
               {isSaving ? 'SAVING...' : editingPosition ? 'UPDATE POSITION' : 'SAVE POSITION'}
             </Button>
           </div>
         }
+
       >
         <div className="space-y-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">

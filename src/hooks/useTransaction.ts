@@ -1,41 +1,79 @@
 'use client';
 
 import { useCallback } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate as globalMutate } from 'swr';
 import { transactionQueries } from '@/services/queries';
 import { Transaction } from '@/services/supabaseClient';
+import { SWR_CONFIG } from '@/config/swr';
+import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
+import { handleQueryError, getUserErrorMessage, logError } from '@/libs/apiErrors';
 
-export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income' | 'expense') => {
-  // SWR menggunakan key unik (array) untuk mendeteksi caching. 
-  // Jika startDate/endDate berubah, SWR otomatis mengambil data baru & melakukan caching memori.
-  const key = startDate && endDate 
-    ? ['transactions', startDate.toISOString(), endDate.toISOString(), type || 'all']
-    : ['transactions', 'all'];
+export interface UseTransactionReturn {
+  transactions: Transaction[];
+  isLoading: boolean;
+  error: Error | null;
+  userErrorMessage: string | null;
+  createTransaction: (data: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => Promise<Transaction | null>;
+  updateTransaction: (id: string, data: Partial<Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>>) => Promise<Transaction | null>;
+  deleteTransaction: (id: string) => Promise<boolean>;
+  getAnalytics: (start: Date, end: Date) => Promise<unknown>;
+  mutate: () => Promise<Transaction[] | undefined>;
+  refresh: () => Promise<Transaction[] | undefined>;
+}
+
+export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income' | 'expense'): UseTransactionReturn => {
+  // Generate stable cache key using CACHE_KEYS helper
+  const key = startDate && endDate
+    ? CACHE_KEYS.transactions.list(startDate.toISOString(), endDate.toISOString())
+    : CACHE_KEYS.transactions.all();
+
+  // Append type filter to key if specified
+  const swrKey = type && Array.isArray(key) ? [...key, type] : key;
 
   const { data, error, isLoading, mutate } = useSWR(
-    key,
-    async ([, start, end, t]) => {
-      const res = await transactionQueries.getTransactions(
-        start === 'all' ? undefined : new Date(start), 
-        end ? new Date(end) : undefined, 
-        t === 'all' ? undefined : (t as 'income' | 'expense')
-      );
-      return res.data || [];
+    swrKey,
+    async () => {
+      try {
+        const res = await transactionQueries.getTransactions(
+          startDate,
+          endDate,
+          type,
+        );
+        return res.data || [];
+      } catch (err) {
+        logError(err, 'useTransaction.fetch');
+        throw handleQueryError(err);
+      }
     },
-    {
-      revalidateOnFocus: true, // Auto-update jika user kembali ke tab ini
-      dedupingInterval: 5000,  // Tahan api call ganda dalam 5 detik
-    }
+    SWR_CONFIG
   );
 
   const createTransaction = useCallback(
     async (data: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
-      const result = await transactionQueries.createTransaction(data);
-      // Memerintahkan SWR untuk me-refresh data transaksi global di semua halaman
-      await mutate();
-      return result;
+      try {
+        const result = await transactionQueries.createTransaction(data);
+
+        // Cascade invalidation: invalidate all related caches
+        const keysToInvalidate = INVALIDATION_PATTERNS.onTransactionChange();
+        await Promise.all(keysToInvalidate.map(k => {
+          if (typeof k === 'string') {
+            return globalMutate(k);
+          }
+          // Invalidate wildcard patterns
+          return globalMutate(
+            (key) => Array.isArray(key) && key[0] === 'transactions',
+            undefined,
+            { revalidate: true }
+          );
+        }));
+
+        return result;
+      } catch (err) {
+        logError(err, 'useTransaction.create');
+        throw handleQueryError(err);
+      }
     },
-    [mutate]
+    []
   );
 
   const updateTransaction = useCallback(
@@ -43,33 +81,80 @@ export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income'
       id: string,
       data: Partial<Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
     ) => {
-      const result = await transactionQueries.updateTransaction(id, data);
-      await mutate();
-      return result;
-    },
-    [mutate]
-  );
+      try {
+        const result = await transactionQueries.updateTransaction(id, data);
 
-  const deleteTransaction = useCallback(async (id: string) => {
-    await transactionQueries.deleteTransaction(id);
-    await mutate();
-  }, [mutate]);
+        // Cascade invalidation
+        const keysToInvalidate = INVALIDATION_PATTERNS.onTransactionChange();
+        await Promise.all(keysToInvalidate.map(k => {
+          if (typeof k === 'string') {
+            return globalMutate(k);
+          }
+          return globalMutate(
+            (key) => Array.isArray(key) && key[0] === 'transactions',
+            undefined,
+            { revalidate: true }
+          );
+        }));
 
-  const getAnalytics = useCallback(
-    async (start: Date, end: Date) => {
-      return await transactionQueries.getSummaryByCategory(start, end);
+        return result;
+      } catch (err) {
+        logError(err, 'useTransaction.update');
+        throw handleQueryError(err);
+      }
     },
     []
   );
 
+  const deleteTransaction = useCallback(async (id: string) => {
+    try {
+      await transactionQueries.deleteTransaction(id);
+
+      // Cascade invalidation
+      const keysToInvalidate = INVALIDATION_PATTERNS.onTransactionChange();
+      await Promise.all(keysToInvalidate.map(k => {
+        if (typeof k === 'string') {
+          return globalMutate(k);
+        }
+        return globalMutate(
+          (key) => Array.isArray(key) && key[0] === 'transactions',
+          undefined,
+          { revalidate: true }
+        );
+      }));
+
+      return true;
+    } catch (err) {
+      logError(err, 'useTransaction.delete');
+      throw handleQueryError(err);
+    }
+  }, []);
+
+  const getAnalytics = useCallback(
+    async (start: Date, end: Date) => {
+      try {
+        return await transactionQueries.getSummaryByCategory(start, end);
+      } catch (err) {
+        logError(err, 'useTransaction.analytics');
+        throw handleQueryError(err);
+      }
+    },
+    []
+  );
+
+  // User-friendly error message
+  const userErrorMessage = error ? getUserErrorMessage(error) : null;
+
   return {
     transactions: data || [],
     isLoading,
-    error,
+    error: error as Error | null,
+    userErrorMessage,
     createTransaction,
     updateTransaction,
     deleteTransaction,
     getAnalytics,
-    mutate // Diekspor buat jaga-jaga kalau ada yang mau refresh manual
+    mutate,
+    refresh: mutate
   };
 };

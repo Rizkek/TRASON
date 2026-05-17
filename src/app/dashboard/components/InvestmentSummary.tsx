@@ -18,17 +18,19 @@ export const InvestmentSummary = ({ summary }: Props) => {
   if (!summary || summary.positionsCount === 0) {
     return (
       <Card className="p-xl border border-dashed border-white/10 bg-transparent">
-        <div className="flex items-center justify-between gap-lg">
-          <div className="space-y-sm">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-lg">
+          <div className="space-y-sm w-full sm:w-auto flex-1 min-w-0">
             <p className="text-micro text-gray-light">INVESTMENT ANALYST</p>
             <h3 className="text-xl font-bold text-soft-cream">No tracked positions yet</h3>
-            <p className="text-xs text-gray-light max-w-md">
+            <p className="text-xs text-gray-light opacity-80 mt-2">
               Add stocks, crypto, or gold positions to surface portfolio value, risk signals, and daily market movement inside your Personal OS.
             </p>
           </div>
-          <Link href="/investments">
-            <Button variant="primary" size="md">Open Module</Button>
-          </Link>
+          <div className="shrink-0 mt-4 sm:mt-0">
+            <Link href="/investments">
+              <Button variant="primary" size="md">Open Module</Button>
+            </Link>
+          </div>
         </div>
       </Card>
     );

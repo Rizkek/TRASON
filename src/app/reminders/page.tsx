@@ -32,6 +32,7 @@ export default function RemindersPage() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('pending');
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isSaving, setIsSaving] = useState(false);
 
   const [form, setForm] = useState({
     title: '',
@@ -52,6 +53,7 @@ export default function RemindersPage() {
   const handleSave = async () => {
     if (!form.title) return;
     
+    setIsSaving(true);
     const dueDate = new Date(`${form.dueDate}T${form.dueTime}:00`);
     
     const payload = {
@@ -73,6 +75,7 @@ export default function RemindersPage() {
     });
     if (!validation.isValid) {
       setFormErrors(validation.errors);
+      setIsSaving(false);
       return;
     }
 
@@ -91,13 +94,21 @@ export default function RemindersPage() {
       const errorMessage = sanitizeError(err);
       setError(errorMessage);
       console.error('Failed to save reminder:', err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const toggleStatus = async (reminder: Reminder) => {
-    const newStatus = reminder.status === 'completed' ? 'pending' : 'completed';
-    await updateReminder(reminder.id, { status: newStatus });
-    // SWR re-fetches or uses memoized data directly
+    try {
+      setIsSaving(true);
+      const newStatus = reminder.status === 'completed' ? 'pending' : 'completed';
+      await updateReminder(reminder.id, { status: newStatus });
+    } catch (err) {
+      setError(sanitizeError(err));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const openAddModal = () => {
@@ -176,7 +187,7 @@ export default function RemindersPage() {
                 className={`flex items-center gap-md px-xl py-md text-[10px] font-bold rounded-md border transition-all uppercase tracking-[0.2em] ${
                   filter === f
                     ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
-                    : 'bg-white bg-opacity-[0.02] text-gray-light border-white border-opacity-[0.05] hover:text-soft-cream'
+                    : 'bg-white/[0.02] text-gray-light border-white/[0.05] hover:text-soft-cream'
                 }`}
               >
                 {filter === f && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
@@ -219,9 +230,10 @@ export default function RemindersPage() {
 
                 <button 
                   onClick={() => toggleStatus(reminder)}
-                  className={`mt-1 flex-shrink-0 transition-all ${
+                  disabled={isSaving}
+                  className={`mt-1 shrink-0 transition-all ${
                     reminder.status === 'completed' ? 'text-success scale-110' : 'text-gray-light hover:text-primary'
-                  }`}
+                  } ${isSaving ? 'opacity-50 cursor-wait' : ''}`}
                 >
                   {reminder.status === 'completed' ? <CheckCircle2 size={24} /> : <Circle size={24} />}
                 </button>
@@ -304,8 +316,8 @@ export default function RemindersPage() {
         title={editingReminder ? 'RECONFIGURE ALERT' : 'INITIATE NEW ALERT'}
         footer={
           <div className="flex gap-md justify-end">
-            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)}>HALT</Button>
-            <Button variant="primary" size="md" onClick={handleSave}>
+            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)} disabled={isSaving}>HALT</Button>
+            <Button variant="primary" size="md" onClick={handleSave} isLoading={isSaving} disabled={isSaving}>
               {editingReminder ? 'SYNCHRONIZE' : 'DEPLOY ALERT'}
             </Button>
           </div>
@@ -375,7 +387,7 @@ export default function RemindersPage() {
               rows={4}
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-              className="w-full bg-gray-strong bg-opacity-40 border border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-gray-strong/40 border border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
           </div>
         </div>

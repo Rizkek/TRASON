@@ -141,16 +141,23 @@ export function getUserErrorMessage(error: any): string {
   }
 }
 
+import { logger } from '@/services/logger';
+
 /**
- * Log error for debugging (only in development)
+ * Log error for debugging (always in development, to DB in production if critical)
  */
 export function logError(error: any, context?: string): void {
+  const apiError = error instanceof ApiError ? error : handleQueryError(error);
+  
   if (process.env.NODE_ENV === 'development') {
-    const apiError = error instanceof ApiError ? error : handleQueryError(error);
     console.error(
       `[${context || 'Error'}] ${apiError.code} (${apiError.statusCode}):`,
       apiError.message,
       apiError.originalError,
     );
   }
+
+  // Fire and forget: push to database log without awaiting
+  // This prevents blocking the main thread if the logging itself is slow or failing
+  logger.logError(context || 'unspecified_context', error);
 }

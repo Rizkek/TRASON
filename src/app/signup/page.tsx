@@ -44,14 +44,14 @@ export default function SignupPage() {
       errors.name = 'Name is required';
     }
 
-    const emailValidation = validateEmail(formData.email);
-    if (!emailValidation.isValid) {
-      errors.email = emailValidation.errors.email || 'Invalid email';
+    const emailError = validateEmail(formData.email);
+    if (emailError) {
+      errors.email = emailError;
     }
 
-    const passwordValidation = validatePassword(formData.password);
-    if (!passwordValidation.isValid) {
-      errors.password = Object.values(passwordValidation.errors)[0];
+    const passwordErrors = validatePassword(formData.password);
+    if (passwordErrors.length > 0) {
+      errors.password = passwordErrors[0];
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -137,7 +137,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-warm-black flex items-center justify-center p-md">
-      <Card className="w-full max-w-sm border-warm-gold border-opacity-20 hover:border-opacity-40">
+      <Card className="w-full max-w-sm border-warm-gold/20 hover:border-warm-gold/40">
         <div className="text-center mb-2xl">
           <h1 className="text-display font-serif text-warm-gold mb-md">
             TRASON

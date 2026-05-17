@@ -3,6 +3,7 @@ import { Inter, Crimson_Text } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { SmartInput } from '@/components/SmartInput';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const crimson = Crimson_Text({ 
@@ -49,6 +50,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <AuthProvider>
             {children}
+            <SmartInput />
           </AuthProvider>
         </ErrorBoundary>
       </body>

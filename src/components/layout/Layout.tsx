@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/authStore';
 import { 
   LayoutDashboard, 
   Wallet, 
@@ -22,7 +22,9 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const logout = useAuthStore((s) => s.logout);
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
@@ -46,7 +48,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="flex h-screen bg-warm-black text-soft-cream font-sans">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-72 bg-gray-strong border-r border-white border-opacity-[0.03] transition-all duration-500 ease-in-out md:relative md:translate-x-0 flex flex-col glass ${
+        className={`fixed inset-y-0 left-0 z-40 w-72 shrink-0 bg-gray-strong border-r border-white/[0.03] transition-all duration-500 ease-in-out md:relative md:translate-x-0 flex flex-col glass ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -69,8 +71,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 href={item.href}
                 className={`flex items-center gap-md px-lg py-md rounded-md transition-all duration-300 relative group overflow-hidden ${
                   isActive(item.href)
-                    ? 'bg-primary bg-opacity-10 text-primary'
-                    : 'text-gray-light hover:text-soft-cream hover:bg-white hover:bg-opacity-[0.02]'
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-gray-light hover:text-soft-cream hover:bg-white/[0.02]'
                 }`}
                 onClick={() => setIsSidebarOpen(false)}
               >
@@ -82,7 +84,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <span className="text-sm font-semibold tracking-wide">{item.label}</span>
                 
                 {isActive(item.href) && (
-                  <div className="absolute right-[-20%] top-[-50%] w-24 h-24 bg-primary bg-opacity-5 blur-3xl rounded-full" />
+                  <div className="absolute right-[-20%] top-[-50%] w-24 h-24 bg-primary/5 blur-3xl rounded-full" />
                 )}
               </Link>
             );
@@ -91,7 +93,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         <div className="p-md mt-auto mb-md space-y-2">
           {/* User Profile */}
-          <div className="flex items-center gap-md px-lg py-md rounded-md bg-white bg-opacity-[0.02] border border-white border-opacity-[0.05]">
+          <div className="flex items-center gap-md px-lg py-md rounded-md bg-white/[0.02] border border-white/[0.05]">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-bold text-white shadow-lg">
               {user?.first_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
             </div>
@@ -103,7 +105,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* Logout */}
           <button
             onClick={() => logout()}
-            className="w-full flex items-center gap-md px-lg py-md rounded-md text-gray-light hover:text-danger hover:bg-danger hover:bg-opacity-10 transition-all duration-300 group"
+            className="w-full flex items-center gap-md px-lg py-md rounded-md text-gray-light hover:text-danger hover:bg-danger/10 transition-all duration-300 group"
           >
             <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-semibold tracking-wide">Logout</span>
@@ -115,7 +117,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary opacity-[0.03] blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-[-5%] left-[-5%] w-[400px] h-[400px] bg-secondary opacity-[0.02] blur-[100px] rounded-full pointer-events-none" />
 
-        <header className="bg-warm-black border-b border-white border-opacity-[0.03] px-lg py-md flex items-center justify-between md:hidden relative z-10 transition-colors">
+        <header className="bg-warm-black border-b border-white/[0.03] px-lg py-md flex items-center justify-between md:hidden relative z-10 transition-colors">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-md text-primary hover:text-secondary transition-colors"
@@ -137,7 +139,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-warm-black bg-opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-warm-black/50 z-30 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}

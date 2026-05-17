@@ -32,10 +32,10 @@ export const Button = memo(
       
       const variants = {
         primary: 'bg-gradient-primary text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5',
-        secondary: 'bg-white bg-opacity-10 text-white backdrop-blur-md hover:bg-opacity-20 border border-white border-opacity-10',
+        secondary: 'bg-white/10 text-white backdrop-blur-md hover:bg-white/20 border border-white/10',
         outline: 'bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white',
-        ghost: 'bg-transparent text-gray-light hover:text-soft-cream hover:bg-white hover:bg-opacity-[0.05]',
-        danger: 'bg-danger bg-opacity-10 text-danger hover:bg-opacity-20 border border-danger border-opacity-20',
+        ghost: 'bg-transparent text-gray-light hover:text-soft-cream hover:bg-white/[0.05]',
+        danger: 'bg-danger/10 text-danger hover:bg-white/20 border border-danger/20',
       };
 
       const sizes = {

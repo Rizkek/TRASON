@@ -27,6 +27,7 @@ export default function InsightsPage() {
 
   const [dbInsights, setDbInsights] = useState<any[]>([]);
   const [isFetching, setIsFetching] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const { calculatedPositions, insights: investmentInsight } = useInvestment();
 
   const fetchStarted = useRef(false);
@@ -34,6 +35,7 @@ export default function InsightsPage() {
   useEffect(() => {
     if (authLoading || !isAuthenticated) return;
     // SWR automatically handles fetching
+    if (fetchStarted.current) return;
     fetchStarted.current = true;
 
     const fetchInsights = async () => {
@@ -53,6 +55,34 @@ export default function InsightsPage() {
 
     fetchInsights();
   }, [authLoading, isAuthenticated]);
+
+  const handleGenerateAI = async () => {
+    try {
+      setIsGenerating(true);
+      const res = await fetch('/api/insights/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: '00000000-0000-0000-0000-000000000000' }), // Mock user ID for now
+      });
+      const data = await res.json();
+      
+      if (data.insights) {
+        const newInsights = data.insights.map((i: any, idx: number) => ({
+          id: `ai-${Date.now()}-${idx}`,
+          title: i.title,
+          description: i.description,
+          type: i.type,
+          content: i.actionable_advice,
+          date: new Date().toISOString(),
+        }));
+        setDbInsights(prev => [...newInsights, ...prev]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const insights = [
     ...(investmentInsight && calculatedPositions.length > 0
@@ -85,12 +115,21 @@ export default function InsightsPage() {
   return (
     <Layout>
       <div className="space-y-xl animate-fade-in">
-        <div className="space-y-sm">
-          <h1 className="text-display font-serif text-gradient">Strategic Insights</h1>
-          <p className="text-subtext flex items-center gap-sm">
-            <Sparkles size={14} className="text-primary" />
-            Deciphering patterns from your operational history
-          </p>
+        <div className="flex items-start justify-between">
+          <div className="space-y-sm">
+            <h1 className="text-display font-serif text-gradient">Strategic Insights</h1>
+            <p className="text-subtext flex items-center gap-sm">
+              <Sparkles size={14} className="text-primary" />
+              Deciphering patterns from your operational history
+            </p>
+          </div>
+          <button 
+            onClick={handleGenerateAI}
+            disabled={isGenerating}
+            className="px-lg py-md bg-primary text-black font-bold rounded-lg flex items-center gap-sm hover:opacity-90 disabled:opacity-50"
+          >
+            {isGenerating ? <Loading text="Thinking..." /> : <><Sparkles size={16} /> Ask AI</>}
+          </button>
         </div>
 
         {isFetching ? (
@@ -106,7 +145,7 @@ export default function InsightsPage() {
                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full" />
                   
                   <div className="flex items-start gap-xl relative z-10">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
                       insight.type === 'finance' || insight.type === 'investment' ? 'bg-success/10 text-success' : 
                       insight.type === 'productivity' ? 'bg-secondary/10 text-secondary' : 
                       'bg-primary/10 text-primary'
@@ -116,7 +155,7 @@ export default function InsightsPage() {
                        <Lightbulb size={24} />}
                     </div>
                     
-                    <div className="space-y-md">
+                    <div className="space-y-md flex-1 min-w-0">
                       <div className="flex items-center gap-md">
                         <Badge variant={insight.type === 'finance' || insight.type === 'investment' ? 'success' : insight.type === 'productivity' ? 'insight' : 'activity'} size="sm">
                           {insight.type.toUpperCase()}
@@ -126,18 +165,18 @@ export default function InsightsPage() {
                         </span>
                       </div>
                       
-                      <h3 className="text-xl font-bold text-soft-cream leading-tight">
+                      <h3 className="text-xl font-bold text-soft-cream leading-tight truncate">
                         {insight.title}
                       </h3>
                       
-                      <p className="text-sm text-gray-light leading-relaxed">
+                      <p className="text-sm text-gray-light leading-relaxed whitespace-pre-wrap break-words">
                         {insight.description}
                       </p>
                       
                       {insight.content && (
-                         <div className="p-lg bg-white bg-opacity-[0.02] border border-white border-opacity-[0.05] rounded-md mt-md">
-                            <p className="text-xs text-soft-cream opacity-90 group-hover:opacity-100 transition-opacity">
-                               " {insight.content} "
+                         <div className="p-lg bg-white/[0.02] border border-white/[0.05] rounded-md mt-md">
+                            <p className="text-xs text-soft-cream opacity-90 group-hover:opacity-100 transition-opacity whitespace-pre-wrap break-words">
+                               {insight.content}
                             </p>
                          </div>
                       )}
@@ -152,9 +191,9 @@ export default function InsightsPage() {
                   <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center text-gray-light">
                     <Layers size={32} />
                   </div>
-                  <h3 className="text-lg font-bold">Awaiting Data Synthesis</h3>
+                  <h3 className="text-lg font-bold">No Insights Available Yet</h3>
                   <p className="text-xs text-gray-light max-w-xs">
-                    Our analysis engine requires at least 7 days of operational data to generate meaningful strategic insights.
+                    Our analysis engine requires at least a few days of operational data to generate meaningful strategic insights. Please use the timeline or financial tracker.
                   </p>
                 </Card>
                 

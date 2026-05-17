@@ -8,6 +8,7 @@ import { useTransaction } from '@/hooks/useTransaction';
 import { useActivity } from '@/hooks/useActivity';
 import { useReminder } from '@/hooks/useReminder';
 import { useInvestment } from '@/hooks/useInvestment';
+import { InvestmentInsightResponse } from '@/services/investmentService';
 import { getDateRange } from '@/libs/date';
 import { sanitizeError } from '@/libs/validation';
 
@@ -47,6 +48,8 @@ export default function DashboardPage() {
   
   const { reminders } = useReminder();
   const { summary: investmentSummary, insights: investmentInsights } = useInvestment();
+  // Type assertion to help TypeScript understand the type
+  const typedInsights = investmentInsights as InvestmentInsightResponse | null;
 
   const isInitialLoading = React.useRef(true);
   const [dataLoaded, setDataLoaded] = React.useState(false);
@@ -162,7 +165,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-xl">
           <div className="lg:col-span-2 space-y-xl">
             {/* Quick Action Input */}
-            <Card className="p-lg bg-white bg-opacity-[0.02] border-white border-opacity-[0.05]">
+            <Card className="p-lg bg-white/[0.02] border-white/[0.05]">
               <div className="flex flex-col md:flex-row gap-md">
                 <div className="flex-1 relative group">
                   <div className="absolute left-md top-1/2 -translate-y-1/2 text-primary">
@@ -171,7 +174,7 @@ export default function DashboardPage() {
                   <input
                     type="text"
                     placeholder="Log an activity, expense, or thought..."
-                    className="w-full pl-xl pr-lg py-md bg-gray-strong bg-opacity-40 border border-white border-opacity-[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
+                    className="w-full pl-xl pr-lg py-md bg-gray-strong/40 border border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
                   />
                 </div>
                 <Button variant="primary" size="md">LOG NOW</Button>
@@ -198,7 +201,7 @@ export default function DashboardPage() {
                   <h3 className="font-serif italic text-lg text-white">Daily Insight</h3>
                 </div>
                 <p className="text-caption leading-relaxed tracking-wide text-gray-very-light italic">
-                  "{investmentInsights?.headline || 'Pattern detected: You tend to spend more on Tuesdays. Consider setting a daily limit to stay on track.'}"
+                  "{typedInsights?.headline || 'Pattern detected: You tend to spend more on Tuesdays. Consider setting a daily limit to stay on track.'}"
                 </p>
                 <div className="pt-md">
                   <Button variant="ghost" size="sm" className="w-full border-white/10 hover:bg-white/5 h-10">

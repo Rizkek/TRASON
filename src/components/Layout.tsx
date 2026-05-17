@@ -48,7 +48,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="flex h-screen bg-warm-black text-soft-cream font-sans">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-72 bg-gray-strong border-r border-white border-opacity-[0.03] transition-all duration-500 ease-in-out md:relative md:translate-x-0 flex flex-col glass ${
+        className={`fixed inset-y-0 left-0 z-40 w-72 bg-gray-strong border-r border-white/[0.03] transition-all duration-500 ease-in-out md:relative md:translate-x-0 flex flex-col glass ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -73,8 +73,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 href={item.href}
                 className={`flex items-center gap-md px-lg py-md rounded-md transition-all duration-300 relative group overflow-hidden ${
                   isActive(item.href)
-                    ? 'bg-primary bg-opacity-10 text-primary'
-                    : 'text-gray-light hover:text-soft-cream hover:bg-white hover:bg-opacity-[0.02]'
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-gray-light hover:text-soft-cream hover:bg-white/[0.02]'
                 }`}
                 onClick={() => setIsSidebarOpen(false)}
               >
@@ -85,7 +85,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Icon size={20} className={`${isActive(item.href) ? 'text-primary' : 'group-hover:text-secondary'} transition-colors`} />
                 <span className="text-sm font-semibold tracking-wide">{item.label}</span>
                 {isActive(item.href) && (
-                  <div className="absolute right-[-20%] top-[-50%] w-24 h-24 bg-primary bg-opacity-5 blur-3xl rounded-full" />
+                  <div className="absolute right-[-20%] top-[-50%] w-24 h-24 bg-primary/5 blur-3xl rounded-full" />
                 )}
               </Link>
             );
@@ -93,8 +93,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         </nav>
 
         {/* User Info & Logout */}
-        <div className="p-lg mt-auto border-t border-white border-opacity-[0.03]">
-          <div className="flex items-center gap-md mb-lg p-sm rounded-md bg-white bg-opacity-[0.02]">
+        <div className="p-lg mt-auto border-t border-white/[0.03]">
+          <div className="flex items-center gap-md mb-lg p-sm rounded-md bg-white/[0.02]">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-sm font-bold text-white">
               {(user as any)?.first_name?.[0]?.toUpperCase() || user?.name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
             </div>
@@ -107,7 +107,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
           <button
             onClick={() => signOut()}
-            className="w-full flex items-center justify-center gap-sm px-md py-lg bg-danger bg-opacity-10 hover:bg-opacity-20 text-danger border border-danger border-opacity-20 rounded-md text-xs font-bold transition-all duration-300 group"
+            className="w-full flex items-center justify-center gap-sm px-md py-lg bg-danger/10 hover:bg-danger/20 text-danger border border-danger/20 rounded-md text-xs font-bold transition-all duration-300 group"
           >
             <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
             LOG OUT
@@ -122,7 +122,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="absolute bottom-[-5%] left-[-5%] w-[400px] h-[400px] bg-secondary opacity-[0.02] blur-[100px] rounded-full pointer-events-none" />
 
         {/* Header - Mobile Toggle */}
-        <header className="bg-warm-black border-b border-white border-opacity-[0.03] px-lg py-md flex items-center justify-between md:hidden relative z-10 transition-colors">
+        <header className="bg-warm-black border-b border-white/[0.03] px-lg py-md flex items-center justify-between md:hidden relative z-10 transition-colors">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-md text-primary hover:text-secondary transition-colors"
@@ -146,7 +146,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Backdrop for mobile sidebar */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-warm-black bg-opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-warm-black/50 z-30 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}

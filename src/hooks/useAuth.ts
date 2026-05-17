@@ -2,8 +2,9 @@
 
 import { useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import { supabase } from '@/services/supabaseClient';
+import { supabase, User } from '@/services/supabaseClient';
 import { userQueries } from '@/services/queries';
+import { logError, handleQueryError, getUserErrorMessage } from '@/libs/apiErrors';
 
 export const useAuth = () => {
   const {
@@ -31,7 +32,7 @@ export const useAuth = () => {
             if (session?.user) {
               const userProfile = await userQueries.getUserWithPreferences();
               if (userProfile && isMounted) {
-                setUser(userProfile);
+                setUser(userProfile as User);
               }
             } else {
               if (isMounted) {
@@ -39,9 +40,20 @@ export const useAuth = () => {
               }
             }
           } catch (err) {
-            console.error('Auth init error:', err);
+            logError(err, 'useAuth.initSession');
             if (session?.user && isMounted) {
-              setUser(session.user as any);
+              // Fallback to basic session user if profile fetch fails
+              const basicUser: User = {
+                id: session.user.id,
+                email: session.user.email || '',
+                first_name: session.user.user_metadata?.first_name,
+                last_name: session.user.user_metadata?.last_name,
+                avatar_url: session.user.user_metadata?.avatar_url,
+                email_verified: !!session.user.email_confirmed_at,
+                created_at: session.user.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              };
+              setUser(basicUser);
             } else if (isMounted) {
               storeLogout();
             }
@@ -55,11 +67,24 @@ export const useAuth = () => {
           try {
             const userProfile = await userQueries.getUserWithPreferences();
             if (userProfile && isMounted) {
-              setUser(userProfile);
+              setUser(userProfile as User);
             }
           } catch (err) {
-            console.warn('Failed to load user profile:', err);
-            if (isMounted) setUser(session.user as any);
+            logError(err, 'useAuth.authStateChange');
+            if (isMounted) {
+              // Fallback to basic session user
+              const basicUser: User = {
+                id: session.user.id,
+                email: session.user.email || '',
+                first_name: session.user.user_metadata?.first_name,
+                last_name: session.user.user_metadata?.last_name,
+                avatar_url: session.user.user_metadata?.avatar_url,
+                email_verified: !!session.user.email_confirmed_at,
+                created_at: session.user.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              };
+              setUser(basicUser);
+            }
           }
         } else if (event === 'SIGNED_OUT') {
           storeLogout();
@@ -78,7 +103,9 @@ export const useAuth = () => {
       await supabase.auth.signOut();
       storeLogout();
     } catch (err) {
-      console.error('Logout error:', err);
+      logError(err, 'useAuth.logout');
+      // Still clear local state even if server logout fails
+      storeLogout();
     }
   }, [storeLogout]);
 

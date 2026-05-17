@@ -24,6 +24,7 @@ export const CACHE_KEYS = {
 
   // Activities (Daily Timeline)
   activities: {
+    list: (start: string, end: string) => ['activities', start, end],
     byDate: (date: string) => ['activities', date],
     byMonth: (month: string) => ['activities', 'month', month],
     all: () => ['activities', '*'],

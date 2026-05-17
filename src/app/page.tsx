@@ -29,7 +29,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-warm-black flex flex-col">
       {/* Navigation */}
-      <nav className="px-2xl py-lg border-b border-deep-sage border-opacity-20">
+      <nav className="px-2xl py-lg border-b border-deep-sage/20">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-serif font-bold text-warm-gold">
             TRASON
@@ -60,25 +60,25 @@ export default function Home() {
 
           {/* Features Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-lg py-lg">
-            <div className="bg-gray-strong bg-opacity-50 border border-deep-sage border-opacity-20 rounded-md p-lg hover:border-warm-gold hover:border-opacity-40 transition-all duration-300">
+            <div className="bg-gray-strong/50 border border-deep-sage/20 rounded-md p-lg hover:border-warm-gold/40 transition-all duration-300">
               <div className="text-4xl mb-md">💰</div>
               <h3 className="font-serif text-lg text-warm-gold mb-md">Finance Tracking</h3>
               <p className="text-sm text-gray-light">Track income, expenses, and build smarter financial habits</p>
             </div>
 
-            <div className="bg-gray-strong bg-opacity-50 border border-deep-sage border-opacity-20 rounded-md p-lg hover:border-warm-gold hover:border-opacity-40 transition-all duration-300">
+            <div className="bg-gray-strong/50 border border-deep-sage/20 rounded-md p-lg hover:border-warm-gold/40 transition-all duration-300">
               <div className="text-4xl mb-md">📅</div>
               <h3 className="font-serif text-lg text-warm-gold mb-md">Daily Timeline</h3>
               <p className="text-sm text-gray-light">Log activities hour by hour and see your day visualized</p>
             </div>
 
-            <div className="bg-gray-strong bg-opacity-50 border border-deep-sage border-opacity-20 rounded-md p-lg hover:border-warm-gold hover:border-opacity-40 transition-all duration-300">
+            <div className="bg-gray-strong/50 border border-deep-sage/20 rounded-md p-lg hover:border-warm-gold/40 transition-all duration-300">
               <div className="text-4xl mb-md">🔔</div>
               <h3 className="font-serif text-lg text-warm-gold mb-md">Smart Reminders</h3>
               <p className="text-sm text-gray-light">Set reminders with priorities and recurring patterns</p>
             </div>
 
-            <div className="bg-gray-strong bg-opacity-50 border border-deep-sage border-opacity-20 rounded-md p-lg hover:border-warm-gold hover:border-opacity-40 transition-all duration-300">
+            <div className="bg-gray-strong/50 border border-deep-sage/20 rounded-md p-lg hover:border-warm-gold/40 transition-all duration-300">
               <div className="text-4xl mb-md">💡</div>
               <h3 className="font-serif text-lg text-warm-gold mb-md">Personal Insights</h3>
               <p className="text-sm text-gray-light">Discover patterns and get narrative insights about yourself</p>
@@ -86,7 +86,7 @@ export default function Home() {
           </div>
 
           {/* Value Proposition */}
-          <div className="bg-gradient-to-r from-insight-taupe from-opacity-10 to-transparent border border-deep-sage border-opacity-20 rounded-md p-2xl my-lg">
+          <div className="bg-gradient-to-r from-insight-taupe/10 to-transparent border border-deep-sage/20 rounded-md p-2xl my-lg">
             <p className="text-base text-soft-cream leading-relaxed">
               Unlike other self-improvement tools, TRASON treats your data as part of your personal story. 
               We don't overwhelm you with charts—we help you understand yourself through narrative insights and meaningful patterns.
@@ -98,15 +98,12 @@ export default function Home() {
             <Link href="/signup">
               <Button variant="primary" size="lg">Start Free • No Credit Card</Button>
             </Link>
-            <Link href="#features">
-              <Button variant="ghost" size="lg">Learn More</Button>
-            </Link>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-deep-sage border-opacity-20 px-2xl py-xl">
+      <footer className="border-t border-deep-sage/20 px-2xl py-xl">
         <div className="max-w-6xl mx-auto text-center">
           <p className="text-micro text-gray-light">
             © 2026 TRASON. Built for your self-improvement journey. Privacy-first. No ads. No tracking.

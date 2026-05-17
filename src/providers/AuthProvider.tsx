@@ -9,12 +9,30 @@
  * - This eliminates the "multiple subscription" bug that caused repeated isLoading:true flashes.
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/authStore';
 
 function AuthInitializer({ children }: { children: React.ReactNode }) {
   // This call sets up the single onAuthStateChange subscription for the whole app.
-  useAuth();
+  const { user } = useAuth();
+  
+  // Handle Global Theme Application
+  useEffect(() => {
+    const theme = (user as any)?.user_preferences?.[0]?.theme || 'dark';
+    const root = window.document.documentElement;
+    
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else if (theme === 'light') {
+      root.classList.remove('dark');
+    } else {
+      // Auto
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.classList.toggle('dark', isDark);
+    }
+  }, [user]);
+
   return <>{children}</>;
 }
 

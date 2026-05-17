@@ -37,6 +37,7 @@ export default function FinancePage() {
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isSaving, setIsSaving] = useState(false);
   
   const [form, setForm] = useState({
     title: '',
@@ -66,14 +67,15 @@ export default function FinancePage() {
 
     setFormErrors({});
     setError(null);
+    setIsSaving(true);
     
     const payload = {
       title: form.title,
       amount: parseFloat(form.amount),
       type: form.type,
       date: form.date,
-      category_id: form.category_id,
-      description: form.description
+      category_id: form.category_id || null,
+      description: form.description || undefined,
     };
 
     try {
@@ -88,6 +90,8 @@ export default function FinancePage() {
       const errorMessage = sanitizeError(err);
       setError(errorMessage);
       console.error('Failed to save transaction:', err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -199,11 +203,11 @@ export default function FinancePage() {
               placeholder="Search transactions..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-xl pr-md py-md bg-gray-strong bg-opacity-40 border border-white border-opacity-[0.05] rounded-md text-sm focus:border-primary focus:outline-none transition-all"
+              className="w-full pl-xl pr-md py-md bg-gray-strong/40 border border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none transition-all"
             />
           </div>
           
-          <div className="flex bg-gray-strong bg-opacity-40 p-1 rounded-md border border-white border-opacity-[0.05]">
+          <div className="flex bg-gray-strong/40 p-1 rounded-md border border-white/[0.05]">
             {(['all', 'income', 'expense'] as const).map((type) => (
               <button
                 key={type}
@@ -226,7 +230,7 @@ export default function FinancePage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-white bg-opacity-[0.02] border-b border-white border-opacity-[0.05]">
+                <tr className="bg-white/[0.02] border-b border-white/[0.05]">
                   <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">Transaction</th>
                   <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">Date</th>
                   <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">Category</th>
@@ -243,7 +247,7 @@ export default function FinancePage() {
                   filteredTransactions.map((t) => (
                     <tr 
                       key={t.id} 
-                      className="group hover:bg-white hover:bg-opacity-[0.02] transition-colors cursor-pointer"
+                      className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
                       onClick={() => openEditModal(t)}
                     >
                       <td className="px-xl py-xl">
@@ -276,7 +280,7 @@ export default function FinancePage() {
                         </p>
                       </td>
                       <td className="px-xl py-xl text-right">
-                        <button type="button" className="p-sm text-gray-light hover:text-soft-cream rounded-md hover:bg-white/5 transition-all">
+                        <button type="button" title="More options" aria-label="More options" className="p-sm text-gray-light hover:text-soft-cream rounded-md hover:bg-white/5 transition-all">
                           <MoreVertical size={16} />
                         </button>
                       </td>
@@ -302,15 +306,15 @@ export default function FinancePage() {
         title={editingTransaction ? 'EDIT TRANSACTION' : 'RECORD NEW FLOW'}
         footer={
           <div className="flex gap-md justify-end">
-            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)}>CANCEL</Button>
-            <Button variant="primary" size="md" onClick={handleSave}>
+            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)} disabled={isSaving}>CANCEL</Button>
+            <Button variant="primary" size="md" onClick={handleSave} isLoading={isSaving} disabled={isSaving}>
               {editingTransaction ? 'UPDATE LOG' : 'PERSIST TRANSACTION'}
             </Button>
           </div>
         }
       >
         <div className="space-y-xl">
-          <div className="flex bg-gray-strong p-1 rounded-md border border-white border-opacity-[0.05]">
+          <div className="flex bg-gray-strong p-1 rounded-md border border-white/[0.05]">
             {(['income', 'expense'] as const).map((type) => (
               <button
                 key={type}
@@ -366,6 +370,7 @@ export default function FinancePage() {
               <label className="text-[10px] font-bold text-gray-light tracking-widest block">DATE</label>
               <input 
                 type="date" 
+                title="Select date"
                 value={form.date}
                 onChange={(e) => {
                   setForm(f => ({ ...f, date: e.target.value }));
@@ -390,7 +395,7 @@ export default function FinancePage() {
               rows={4}
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-              className="w-full bg-gray-strong bg-opacity-40 border border-white border-opacity-[0.05] rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-gray-strong/40 border border-white/[0.05] rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
           </div>
 
@@ -404,7 +409,7 @@ export default function FinancePage() {
                   // SWR automatically re-fetches!
                 }
               }}
-              className="w-full py-md text-danger text-[10px] font-bold uppercase tracking-widest border border-danger border-opacity-20 hover:bg-danger hover:bg-opacity-5 rounded-md transition-all"
+              className="w-full py-md text-danger text-[10px] font-bold uppercase tracking-widest border border-danger/20 hover:bg-danger/5 rounded-md transition-all"
             >
               DELETE THIS TRANSACTION
             </button>

@@ -57,6 +57,7 @@ interface ActivityFormData {
   description: string;
   category: string;
   mood: string;
+  date: string;
   start_hour: number;
   start_minute: number;
   duration_minutes: number;
@@ -69,6 +70,7 @@ const defaultForm: ActivityFormData = {
   description: '',
   category: '',
   mood: '',
+  date: new Date().toISOString().split('T')[0],
   start_hour: new Date().getHours(),
   start_minute: 0,
   duration_minutes: 30,
@@ -76,23 +78,43 @@ const defaultForm: ActivityFormData = {
   rating: 0,
 };
 
-const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const CATEGORY_OPTIONS = ['Work', 'Study', 'Exercise', 'Meals', 'Social', 'Rest', 'Personal', 'Other'];
+
+const getWeekRange = (date: Date) => {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const start = new Date(d.setDate(diff));
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
+  return { start, end };
+};
+
+const getDaysOfWeek = (startDate: Date) => {
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+};
 
 export default function TimelinePage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const { start: weekStart, end: weekEnd } = getWeekRange(currentDate);
+  const daysOfWeek = getDaysOfWeek(weekStart);
   
-  // SWR automatically handles caching & auto-fetching based on selectedDate
-  const { activities, isLoading, createActivity, updateActivity, deleteActivity } = useActivity(selectedDate);
+  // SWR automatically handles caching & auto-fetching based on date range
+  const { activities, isLoading, createActivity, updateActivity, deleteActivity } = useActivity(weekStart, weekEnd);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [form, setForm] = useState<ActivityFormData>(defaultForm);
   const [isSaving, setIsSaving] = useState(false);
-  const [currentHour] = useState(new Date().getHours());
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -105,9 +127,13 @@ export default function TimelinePage() {
     }
   }, [authLoading, isAuthenticated, router]);
 
-  const openAddModal = useCallback((hour?: number) => {
+  const openAddModal = useCallback((date?: Date) => {
     setEditingActivity(null);
-    setForm({ ...defaultForm, start_hour: hour ?? new Date().getHours() });
+    setForm({ 
+      ...defaultForm, 
+      date: (date || new Date()).toISOString().split('T')[0],
+      start_hour: new Date().getHours() 
+    });
     setIsModalOpen(true);
   }, []);
 
@@ -124,6 +150,7 @@ export default function TimelinePage() {
       description: activity.description || '',
       category: activity.category || '',
       mood: activity.mood || '',
+      date: start.toISOString().split('T')[0],
       start_hour: start.getHours(),
       start_minute: start.getMinutes(),
       duration_minutes: durationMins,
@@ -135,9 +162,8 @@ export default function TimelinePage() {
 
   const handleSave = async () => {
     if (!form.title.trim()) return;
-    setIsSaving(true);
 
-    const startDate = new Date(selectedDate);
+    const startDate = new Date(form.date);
     startDate.setHours(form.start_hour, form.start_minute, 0, 0);
     const endDate = new Date(startDate.getTime() + form.duration_minutes * 60000);
 
@@ -160,6 +186,7 @@ export default function TimelinePage() {
       return;
     }
 
+    setIsSaving(true);
     setFormErrors({});
     setError(null);
 
@@ -186,18 +213,13 @@ export default function TimelinePage() {
     // SWR auto-mutates
   };
 
-  const changeDate = (days: number) => {
-    const d = new Date(selectedDate);
-    d.setDate(d.getDate() + days);
-    setSelectedDate(d);
+  const changeWeek = (weeks: number) => {
+    const d = new Date(currentDate);
+    d.setDate(d.getDate() + weeks * 7);
+    setCurrentDate(d);
   };
 
-  const isToday = selectedDate.toDateString() === new Date().toDateString();
-
-  const activitiesByHour = HOURS.reduce<Record<number, Activity[]>>((acc, h) => {
-    acc[h] = activities.filter((a: Activity) => new Date(a.start_time).getHours() === h);
-    return acc;
-  }, {});
+  const isCurrentWeek = new Date() >= weekStart && new Date() <= weekEnd;
 
   const totalMinutes = activities.reduce((acc, a: Activity) => acc + (a.duration_minutes || 0), 0);
   const totalHours = Math.floor(totalMinutes / 60);
@@ -221,10 +243,10 @@ export default function TimelinePage() {
         {/* Header */}
         <div className="flex items-start justify-between flex-wrap gap-md">
           <div className="space-y-sm">
-            <h1 className="text-display font-serif text-gradient">Daily Timeline</h1>
+            <h1 className="text-display font-serif text-gradient">Weekly Schedule</h1>
             <p className="text-subtext flex items-center gap-sm">
-              <Clock size={14} className="text-primary" />
-              Visualize your day, one hour at a time
+              <CalendarIcon size={14} className="text-primary" />
+              Manage your daily activities across the week
             </p>
           </div>
           <Button variant="primary" size="md" onClick={() => openAddModal()} leftIcon={<Plus size={18} />}>
@@ -232,27 +254,27 @@ export default function TimelinePage() {
           </Button>
         </div>
 
-        {/* Date Navigator */}
+        {/* Week Navigator */}
         <div className="flex items-center justify-between glass rounded-md px-xl py-lg">
           <button
             type="button"
-            onClick={() => changeDate(-1)}
+            onClick={() => changeWeek(-1)}
             className="p-md text-primary hover:text-secondary hover:bg-white/5 rounded-md transition-all"
           >
             <ChevronLeft size={24} />
           </button>
           <div className="text-center group cursor-pointer">
             <p className="text-lg font-bold text-white group-hover:text-primary transition-colors">
-              {isToday ? 'TODAY' : selectedDate.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()}
+              {isCurrentWeek ? 'THIS WEEK' : `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
             </p>
             <p className="text-micro text-gray-light mt-1 flex items-center justify-center gap-sm">
               <CalendarIcon size={12} />
-              {selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              Week View
             </p>
           </div>
           <button
             type="button"
-            onClick={() => changeDate(1)}
+            onClick={() => changeWeek(1)}
             className="p-md text-primary hover:text-secondary hover:bg-white/5 rounded-md transition-all"
           >
             <ChevronRight size={24} />
@@ -290,78 +312,72 @@ export default function TimelinePage() {
           </div>
         )}
 
-        {/* Timeline */}
+        {/* Schedule Grid */}
         {isLoading ? (
           <div className="flex justify-center py-2xl"><Loading /></div>
         ) : (
-          <div className="space-y-2 relative">
-            {/* Timeline Line Vertical */}
-            <div className="absolute left-[72px] top-0 bottom-0 w-px bg-white/5 hidden sm:block" />
-
-            {HOURS.map((hour) => {
-              const hourActivities = activitiesByHour[hour];
-              const isCurrent = isToday && hour === currentHour;
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-md">
+            {daysOfWeek.map((day, idx) => {
+              const isToday = day.toDateString() === new Date().toDateString();
+              const dayActivities = activities
+                .filter(a => new Date(a.start_time).toDateString() === day.toDateString())
+                .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
               return (
-                <div key={hour} className="flex gap-lg group min-h-[64px]">
-                  {/* Hour Marker */}
-                  <div className={`w-16 flex-shrink-0 text-right py-md pr-md text-[10px] font-bold tracking-tighter ${
-                    isCurrent ? 'text-primary' : 'text-gray-light opacity-60'
-                  }`}>
-                    {formatHour(hour)}
+                <div key={idx} className={`flex flex-col gap-sm p-md rounded-lg ${isToday ? 'bg-primary/5 border border-primary/20' : 'bg-white/[0.02] border border-white/5'}`}>
+                  <div className="text-center pb-sm border-b border-white/10 mb-sm relative">
+                    {isToday && <div className="absolute top-0 right-1/4 w-2 h-2 rounded-full bg-primary animate-pulse" />}
+                    <p className={`text-xs font-bold uppercase tracking-widest ${isToday ? 'text-primary' : 'text-gray-light'}`}>
+                      {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                    </p>
+                    <p className={`text-xl font-bold mt-1 ${isToday ? 'text-white' : 'text-soft-cream'}`}>
+                      {day.getDate()}
+                    </p>
                   </div>
-
-                  {/* Activity List for this hour */}
-                  <div className="flex-1 space-y-md pb-md">
-                    {hourActivities.length > 0 ? (
-                      hourActivities.map((activity) => (
-                        <Card 
-                          key={activity.id} 
-                          className="p-md cursor-pointer hover:border-primary/40 group/card relative overflow-hidden"
-                          onClick={() => openEditModal(activity)}
-                        >
-                          {isCurrent && <div className="absolute top-0 left-0 w-1 h-full bg-primary" />}
-                          <div className="flex items-start justify-between">
-                            <div className="space-y-1 min-w-0">
-                              <h4 className="text-sm font-bold text-soft-cream truncate group-hover/card:text-primary transition-colors">
-                                {activity.title}
-                              </h4>
-                              <div className="flex items-center gap-md flex-wrap">
-                                {activity.category && (
-                                  <span className="flex items-center gap-1 text-[10px] text-secondary font-bold uppercase tracking-widest">
-                                    <Tag size={10} /> {activity.category}
-                                  </span>
-                                )}
-                                {activity.mood && (
-                                  <span className="flex items-center gap-1 text-[10px] text-gray-light uppercase">
-                                    <Smile size={10} /> {activity.mood}
-                                  </span>
-                                )}
-                                {getDurationLabel(activity) && (
-                                  <span className="text-[10px] text-gray-light opacity-60 flex items-center gap-1">
-                                    <Clock size={10} /> {getDurationLabel(activity)}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={(e) => { e.stopPropagation(); handleDelete(activity.id); }}
-                              className="p-sm text-gray-light hover:text-danger opacity-0 group-hover/card:opacity-100 transition-all"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        </Card>
-                      ))
-                    ) : (
-                      <div 
-                        onClick={() => openAddModal(hour)}
-                        className="h-12 border border-dashed border-white/5 rounded-md flex items-center px-lg text-micro text-gray-light opacity-30 hover:opacity-100 hover:border-primary/20 hover:text-primary transition-all cursor-pointer"
+                  
+                  <div className="flex-1 space-y-sm overflow-y-auto max-h-[60vh] pr-1 scrollbar-hide">
+                    {dayActivities.map(activity => (
+                      <Card 
+                        key={activity.id}
+                        onClick={() => openEditModal(activity)}
+                        className="p-sm cursor-pointer hover:border-primary/40 group/card relative overflow-hidden transition-all bg-gray-strong/50 shadow-sm"
                       >
-                        + Add activity at {formatHour(hour)}
-                      </div>
-                    )}
+                        <div className="flex items-start justify-between mb-1">
+                          <p className="text-[10px] font-bold text-gray-light font-mono">
+                            {formatHour(new Date(activity.start_time).getHours())}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleDelete(activity.id); }}
+                            className="text-gray-light hover:text-danger opacity-0 group-hover/card:opacity-100 transition-all"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                        <h4 className="text-xs font-bold text-soft-cream leading-tight mb-1 group-hover/card:text-primary transition-colors line-clamp-2">
+                          {activity.title}
+                        </h4>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {activity.category && (
+                            <Badge variant="activity" size="sm" className="text-[8px] px-1.5 py-0.5">
+                              {activity.category}
+                            </Badge>
+                          )}
+                          {getDurationLabel(activity) && (
+                            <span className="text-[9px] text-gray-light opacity-60 flex items-center gap-0.5">
+                              <Clock size={8} /> {getDurationLabel(activity)}
+                            </span>
+                          )}
+                        </div>
+                      </Card>
+                    ))}
+                    
+                    <button 
+                      onClick={() => openAddModal(day)}
+                      className="w-full py-md border border-dashed border-white/10 rounded-md text-[10px] font-bold text-gray-light uppercase tracking-widest hover:border-primary/30 hover:text-primary transition-colors mt-2"
+                    >
+                      + ADD
+                    </button>
                   </div>
                 </div>
               );
@@ -391,13 +407,23 @@ export default function TimelinePage() {
             value={form.title}
             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
             className="text-lg font-serif"
+            error={formErrors.title}
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-md">
             <div>
-              <label className="text-[10px] font-bold text-gray-light mb-1 block">START</label>
+              <label className="text-[10px] font-bold text-gray-light mb-1 block">DATE</label>
+              <input 
+                type="date" 
+                value={form.date} 
+                onChange={(e) => setForm(f => ({ ...f, date: e.target.value }))} 
+                className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-gray-light mb-1 block">START HOUR</label>
               <select value={form.start_hour} onChange={(e) => setForm(f => ({ ...f, start_hour: +e.target.value }))} className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary">
-                {HOURS.map(h => <option key={h} value={h}>{formatHour(h)}</option>)}
+                {Array.from({ length: 24 }, (_, i) => i).map(h => <option key={h} value={h}>{formatHour(h)}</option>)}
               </select>
             </div>
             <div>
@@ -453,7 +479,7 @@ export default function TimelinePage() {
               placeholder="LOCATION"
               value={form.location}
               onChange={(e) => setForm(f => ({ ...f, location: e.target.value }))}
-              className="w-full pl-xl pr-md py-md bg-gray-strong bg-opacity-40 border border-white/5 rounded-md text-xs font-bold focus:border-primary focus:outline-none transition-all"
+              className="w-full pl-xl pr-md py-md bg-gray-strong/40 border border-white/5 rounded-md text-xs font-bold focus:border-primary focus:outline-none transition-all"
             />
           </div>
 

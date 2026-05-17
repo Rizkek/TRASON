@@ -46,7 +46,7 @@ export const Loading: React.FC<LoadingProps> = ({
 
   if (fullPage) {
     return (
-      <div className="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-white/80 flex items-center justify-center z-50">
         {spinner}
       </div>
     );

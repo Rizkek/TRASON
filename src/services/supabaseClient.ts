@@ -110,13 +110,32 @@ export const isAuthenticated = async () => {
  *   - Security: session JWT is already validated server-side by RLS policies.
  *     The AuthProvider's onAuthStateChange keeps the local session fresh.
  */
+// Cache the promise to prevent rapid concurrent getSession() calls from breaking the Supabase auth lock
+let sessionPromise: Promise<any> | null = null;
+
 export const getCurrentUser = async () => {
-  const { data } = await supabase.auth.getSession();
-  return data.session?.user ?? null;
+  if (!sessionPromise) {
+    sessionPromise = supabase.auth.getSession().then(({ data }) => {
+      sessionPromise = null;
+      return data.session;
+    }).catch((err) => {
+      sessionPromise = null;
+      throw err;
+    });
+  }
+  const session = await sessionPromise;
+  return session?.user ?? null;
 };
 
-// Helper function to get current session
 export const getCurrentSession = async () => {
-  const { data } = await supabase.auth.getSession();
-  return data.session;
+  if (!sessionPromise) {
+    sessionPromise = supabase.auth.getSession().then(({ data }) => {
+      sessionPromise = null;
+      return data.session;
+    }).catch((err) => {
+      sessionPromise = null;
+      throw err;
+    });
+  }
+  return await sessionPromise;
 };
