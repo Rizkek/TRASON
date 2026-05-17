@@ -42,6 +42,7 @@ export async function updateSession(request: NextRequest) {
     '/dashboard',
     '/finance',
     '/investments',
+    '/schedule',
     '/timeline',
     '/reminders',
     '/insights',

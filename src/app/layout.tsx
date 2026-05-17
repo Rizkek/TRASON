@@ -1,21 +1,21 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Crimson_Text } from 'next/font/google';
+import { Instrument_Sans, Cormorant_Garamond } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { SmartInput } from '@/components/SmartInput';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const crimson = Crimson_Text({ 
+const sans = Instrument_Sans({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
+const serif = Cormorant_Garamond({ 
   subsets: ['latin'],
-  weight: ['400', '600', '700'],
-  variable: '--font-crimson',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-serif',
   display: 'swap'
 });
 
 export const metadata: Metadata = {
   title: 'TRASON - Self-Improvement Platform',
-  description: 'Personal finance tracker, daily timeline, reminders, and AI insights',
+  description: 'Personal finance tracker, daily schedule, reminders, and AI insights',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -46,7 +46,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon-192x192.svg" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
-      <body className={`${inter.variable} ${crimson.variable} ${inter.className}`} suppressHydrationWarning>
+      <body className={`${sans.variable} ${serif.variable} ${sans.className}`} suppressHydrationWarning>
         <ErrorBoundary>
           <AuthProvider>
             {children}

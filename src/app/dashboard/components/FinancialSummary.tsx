@@ -3,12 +3,14 @@ import { Card } from '@/components';
 import { TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import { formatCurrency } from '@/libs/format';
 import { Transaction } from '@/services/supabaseClient';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface Props {
   transactions: Transaction[];
 }
 
 export const FinancialSummary = ({ transactions }: Props) => {
+  const { currency, locale } = useUserPreferences();
   const totalExpenses = transactions
     .filter((t) => t.type === 'expense')
     .reduce((acc, t) => acc + t.amount, 0);
@@ -27,7 +29,7 @@ export const FinancialSummary = ({ transactions }: Props) => {
           <TrendingUp size={16} className="text-success" />
         </div>
         <p className="text-3xl font-bold text-white group-hover:text-success transition-colors">
-          {formatCurrency(totalIncome)}
+          {formatCurrency(totalIncome, currency, locale)}
         </p>
       </Card>
 
@@ -37,7 +39,7 @@ export const FinancialSummary = ({ transactions }: Props) => {
           <TrendingDown size={16} className="text-danger" />
         </div>
         <p className="text-3xl font-bold text-white group-hover:text-danger transition-colors">
-          {formatCurrency(totalExpenses)}
+          {formatCurrency(totalExpenses, currency, locale)}
         </p>
       </Card>
 
@@ -47,7 +49,7 @@ export const FinancialSummary = ({ transactions }: Props) => {
           <Wallet size={16} className="text-secondary" />
         </div>
         <p className={`text-3xl font-bold text-white ${balance >= 0 ? 'group-hover:text-success' : 'group-hover:text-danger'} transition-colors`}>
-          {formatCurrency(balance)}
+          {formatCurrency(balance, currency, locale)}
         </p>
       </Card>
     </div>

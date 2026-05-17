@@ -8,6 +8,7 @@ import { supabase } from '@/services/supabaseClient';
 import { userQueries } from '@/services/queries';
 import { sanitizeError, validateEmail } from '@/libs/validation';
 import { useAllModuleStatus, useModuleStatus } from '@/hooks/useModuleStatus';
+import { usePushNotification } from '@/hooks/usePushNotification';
 import { ModuleId } from '@/modules/types';
 import {
   User as UserIcon,
@@ -211,6 +212,7 @@ export default function SettingsPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const push = usePushNotification();
 
   // Profile form
   const [profile, setProfile] = useState<ProfileData>({
@@ -317,6 +319,16 @@ export default function SettingsPage() {
   const handleSavePreferences = async () => {
     setIsSavingPrefs(true);
     try {
+      if (prefs.notifications_enabled && prefs.push_notifications_enabled) {
+        await push.subscribe();
+      } else {
+        try {
+          await push.unsubscribe();
+        } catch {
+          // Ignore
+        }
+      }
+
       await userQueries.updateUserPreferences(prefs);
       const updated = await userQueries.getUserWithPreferences();
       if (updated) setUser(updated as any);
@@ -510,7 +522,7 @@ export default function SettingsPage() {
                         <button
                           key={t}
                           type="button"
-                          onClick={() => setPrefs((p) => ({ ...p, theme: t }))}
+                          onClick={() => setPrefs((p) => ({ ...p, theme: t as 'light' | 'dark' | 'auto' }))}
                           className={`flex-1 py-md rounded-md border text-xs font-bold uppercase tracking-widest transition-all ${
                             prefs.theme === t
                               ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105'
@@ -609,6 +621,12 @@ export default function SettingsPage() {
                     </button>
                   </div>
                 ))}
+
+                {prefs.push_notifications_enabled && (
+                  <p className="text-xs text-gray-light px-lg">
+                    Browser permission: {push.isSupported ? Notification.permission : 'unsupported'}
+                  </p>
+                )}
 
                 {prefs.email_digest_enabled && (
                   <div className="p-xl bg-white/[0.01] rounded-md border border-white/[0.03]">

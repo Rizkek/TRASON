@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button, Input, Alert, Card, Loading, ErrorAlert } from '@/components';
+import { Button, Input, Alert, Loading } from '@/components';
 import { useAuthStore } from '@/store/authStore';
-import { getAuthErrorMessage } from '@/libs/authErrors';
-import { validateEmail, sanitizeError } from '@/libs/validation';
+import { sanitizeError } from '@/libs/validation';
 import { supabase } from '@/services/supabaseClient';
+import { Compass, ArrowLeft, Quote } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,27 +17,20 @@ export default function LoginPage() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (isMounted && !authLoading && isAuthenticated) {
+    // Redirect if already authenticated (skip if still loading)
+    if (!authLoading && isAuthenticated) {
       router.push('/dashboard');
     }
   }, [authLoading, isAuthenticated, router]);
 
-  // Prevent returning alternative UIs (like Loading or null) before client hydration is fully complete
-  if (!isMounted) return null;
-
   if (authLoading) {
-    return <Loading />;
-  }
-
-  if (isAuthenticated) {
-    return null;
+    return (
+      <div className="min-h-screen bg-warm-black flex items-center justify-center">
+        <Loading text="Authenticating..." />
+      </div>
+    );
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,91 +64,116 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
     setIsLoading(true);
     setError(null);
 
     try {
-      // Sign in with Supabase
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
 
-      if (signInError) {
-        throw new Error(signInError.message);
-      }
-
-      if (data.session) {
-        // Success — useEffect above will handle the redirect via isAuthenticated state change
-        console.log('Login successful, waiting for auth state redirect...');
-      } else {
-        throw new Error('No session created after login');
-      }
+      if (signInError) throw new Error(signInError.message);
+      if (!data.session) throw new Error('No session created');
     } catch (err) {
-      const errorMessage = sanitizeError(err);
-      setError(errorMessage);
-      console.error('Login failed:', err);
+      setError(sanitizeError(err));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-warm-black flex items-center justify-center p-md">
-      <Card className="w-full max-w-sm border-warm-gold/20 hover:border-warm-gold/40">
-        <div className="text-center mb-2xl">
-          <h1 className="text-display font-serif text-warm-gold mb-md">
-            TRASON
-          </h1>
-          <p className="text-subtext">Your personal self-improvement journey begins here</p>
+    <div className="min-h-screen bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
+      {/* Left Side: Aesthetic/Quote (Hidden on mobile) */}
+      <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-4xl overflow-hidden border-r border-white/[0.05]">
+         {/* Decorative elements */}
+         <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-deep-sage/10 blur-[100px] rounded-full" />
+         <div className="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-warm-gold/5 blur-[80px] rounded-full" />
+         
+         <div className="relative z-10 max-w-md space-y-xl animate-fade-in">
+            <Quote size={48} className="text-warm-gold opacity-40 mb-lg" />
+            <h2 className="text-4xl lg:text-5xl font-serif italic leading-tight text-soft-cream/90">
+              "The only journey is the one within."
+            </h2>
+            <div className="space-y-sm">
+              <p className="text-lg font-medium text-warm-gold">— Rainer Maria Rilke</p>
+              <p className="text-sm text-gray-light font-light leading-relaxed">
+                Continue your path to clarity and growth. Your digital living space is ready for your return.
+              </p>
+            </div>
+         </div>
+
+         {/* Bottom Brand Label */}
+         <div className="absolute bottom-12 left-12 flex items-center gap-sm opacity-40">
+            <Compass size={20} />
+            <span className="font-serif text-lg tracking-tight">TRASON</span>
+         </div>
+      </div>
+
+      {/* Right Side: Login Form */}
+      <div className="flex-1 flex flex-col justify-center items-center p-lg md:p-4xl relative">
+        <Link href="/" className="absolute top-12 left-12 flex items-center gap-sm text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
+          <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+          <span>Back to Home</span>
+        </Link>
+
+        <div className="w-full max-w-sm space-y-2xl animate-slide-up">
+          <div className="space-y-sm text-center md:text-left">
+            <h1 className="text-3xl font-serif">Welcome Back</h1>
+            <p className="text-sm text-gray-light font-light">Enter your credentials to access your sanctuary.</p>
+          </div>
+
+          {error && (
+            <Alert type="error" title="Sign In Error" className="bg-expense/10 border-expense/20 text-expense">
+              {error}
+            </Alert>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-xl">
+            <div className="space-y-lg">
+              <Input
+                label="Email Address"
+                name="email"
+                type="email"
+                placeholder="email@example.com"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold transition-all"
+                required
+              />
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleInputChange}
+                className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold transition-all"
+                required
+              />
+            </div>
+
+            <Button 
+              type="submit" 
+              variant="primary" 
+              fullWidth 
+              isLoading={isLoading}
+              className="py-lg rounded-full font-bold shadow-xl shadow-warm-gold/10"
+            >
+              Enter TRASON
+            </Button>
+          </form>
+
+          <div className="text-center md:text-left">
+            <p className="text-sm text-gray-light font-light">
+              New to the journey?{' '}
+              <Link href="/signup" className="text-warm-gold hover:underline font-medium underline-offset-4 decoration-warm-gold/30">
+                Begin here
+              </Link>
+            </p>
+          </div>
         </div>
-
-        {error && (
-          <Alert type="error" title="Unable to Sign In" dismissible className="mb-lg">
-            {error}
-          </Alert>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-lg">
-          <Input
-            label="Email Address"
-            name="email"
-            type="email"
-            placeholder="your@email.com"
-            value={formData.email}
-            onChange={handleInputChange}
-            error={validationErrors.email}
-            required
-          />
-
-          <Input
-            label="Password"
-            name="password"
-            type="password"
-            placeholder="••••••••"
-            value={formData.password}
-            onChange={handleInputChange}
-            error={validationErrors.password}
-            required
-          />
-
-          <Button type="submit" variant="primary" fullWidth isLoading={isLoading} loadingText="Signing in...">
-            Sign In
-          </Button>
-        </form>
-
-        <div className="mt-2xl text-center text-micro text-gray-light">
-          Don't have an account?{' '}
-          <Link href="/signup" className="text-warm-gold hover:text-pale-blush font-semibold transition-colors">
-            Create one
-          </Link>
-        </div>
-      </Card>
+      </div>
     </div>
   );
 }

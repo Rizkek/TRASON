@@ -1,10 +1,13 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { supabase, User } from '@/services/supabaseClient';
 import { userQueries } from '@/services/queries';
 import { logError, handleQueryError, getUserErrorMessage } from '@/libs/apiErrors';
+
+let authInitialized = false;
+let authInitPromise: Promise<void> | null = null;
 
 export const useAuth = () => {
   const {
@@ -18,60 +21,104 @@ export const useAuth = () => {
     setLoading,
   } = useAuthStore();
 
-  // Initialize auth state on mount
+  const isMountedRef = useRef(true);
+
+  // Initialize auth state on mount (singleton pattern)
   useEffect(() => {
-    let isMounted = true;
+    isMountedRef.current = true;
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!isMounted) return;
+    const initAuth = async () => {
+      // Prevent multiple initializations
+      if (authInitialized) {
+        return;
+      }
 
-        if (event === 'INITIAL_SESSION') {
-          setLoading(true);
-          try {
-            if (session?.user) {
-              const userProfile = await userQueries.getUserWithPreferences();
-              if (userProfile && isMounted) {
+      if (authInitPromise) {
+        return authInitPromise;
+      }
+
+      authInitPromise = (async () => {
+        try {
+          // Get initial session without triggering multiple listeners
+          const { data: { session } } = await supabase.auth.getSession();
+
+          if (!isMountedRef.current) return;
+
+          if (session?.user) {
+            try {
+              // Load user profile with timeout to prevent lock hang
+              const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Profile load timeout')), 3000)
+              );
+              const userProfile = await Promise.race([
+                userQueries.getUserWithPreferences(),
+                timeoutPromise,
+              ]);
+
+              if (userProfile && isMountedRef.current) {
                 setUser(userProfile as User);
               }
-            } else {
-              if (isMounted) {
-                storeLogout();
+            } catch (err) {
+              logError(err, 'useAuth.initSession');
+              if (isMountedRef.current) {
+                // Fallback to basic session user if profile fetch fails
+                const basicUser: User = {
+                  id: session.user.id,
+                  email: session.user.email || '',
+                  first_name: session.user.user_metadata?.first_name,
+                  last_name: session.user.user_metadata?.last_name,
+                  avatar_url: session.user.user_metadata?.avatar_url,
+                  email_verified: !!session.user.email_confirmed_at,
+                  created_at: session.user.created_at || new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                };
+                setUser(basicUser);
               }
             }
-          } catch (err) {
-            logError(err, 'useAuth.initSession');
-            if (session?.user && isMounted) {
-              // Fallback to basic session user if profile fetch fails
-              const basicUser: User = {
-                id: session.user.id,
-                email: session.user.email || '',
-                first_name: session.user.user_metadata?.first_name,
-                last_name: session.user.user_metadata?.last_name,
-                avatar_url: session.user.user_metadata?.avatar_url,
-                email_verified: !!session.user.email_confirmed_at,
-                created_at: session.user.created_at || new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              };
-              setUser(basicUser);
-            } else if (isMounted) {
+          } else {
+            if (isMountedRef.current) {
               storeLogout();
             }
-          } finally {
-            if (isMounted) setLoading(false);
           }
+        } finally {
+          authInitialized = true;
+          authInitPromise = null;
+          if (isMountedRef.current) {
+            setLoading(false);
+          }
+        }
+      })();
+
+      return authInitPromise;
+    };
+
+    // Setup listener for subsequent auth changes (after init)
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!isMountedRef.current) return;
+
+        // Skip INITIAL_SESSION, handle it separately
+        if (event === 'INITIAL_SESSION') {
           return;
         }
 
-        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') && session?.user) {
+        // Handle sign in and updates - batch state updates
+        if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user) {
           try {
-            const userProfile = await userQueries.getUserWithPreferences();
-            if (userProfile && isMounted) {
+            const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Profile load timeout')), 3000)
+            );
+            const userProfile = await Promise.race([
+              userQueries.getUserWithPreferences(),
+              timeoutPromise,
+            ]);
+
+            if (userProfile && isMountedRef.current) {
               setUser(userProfile as User);
             }
           } catch (err) {
             logError(err, 'useAuth.authStateChange');
-            if (isMounted) {
+            if (isMountedRef.current) {
               // Fallback to basic session user
               const basicUser: User = {
                 id: session.user.id,
@@ -89,11 +136,14 @@ export const useAuth = () => {
         } else if (event === 'SIGNED_OUT') {
           storeLogout();
         }
+        // Skip TOKEN_REFRESHED to avoid unnecessary updates
       }
     );
 
+    initAuth();
+
     return () => {
-      isMounted = false;
+      isMountedRef.current = false;
       authListener?.subscription.unsubscribe();
     };
   }, [setUser, setLoading, storeLogout]);
@@ -101,7 +151,9 @@ export const useAuth = () => {
   const logout = useCallback(async () => {
     try {
       await supabase.auth.signOut();
-      storeLogout();
+      if (isMountedRef.current) {
+        storeLogout();
+      }
     } catch (err) {
       logError(err, 'useAuth.logout');
       // Still clear local state even if server logout fails

@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Button } from '@/components';
 import { Wallet, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/libs/format';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Transaction } from '@/services/supabaseClient';
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export const TransactionsList = ({ transactions }: Props) => {
+  const { currency, locale } = useUserPreferences();
   const recentTransactions = transactions.slice(0, 5);
 
   return (
@@ -31,7 +33,7 @@ export const TransactionsList = ({ transactions }: Props) => {
               <p className="text-[10px] text-gray-light uppercase tracking-wider mt-0.5">{formatDate(t.date)}</p>
             </div>
             <p className={`text-sm font-bold ${t.type === 'income' ? 'text-success' : 'text-white'}`}>
-              {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+              {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount, currency, locale)}
             </p>
           </div>
         ))}

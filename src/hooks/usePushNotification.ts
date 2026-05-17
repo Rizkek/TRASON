@@ -10,6 +10,13 @@ interface PushNotificationState {
   error: string | null;
 }
 
+const urlBase64ToUint8Array = (base64String: string) => {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+};
+
 export const usePushNotification = () => {
   const [state, setState] = useState<PushNotificationState>({
     isSupported: false,
@@ -21,6 +28,7 @@ export const usePushNotification = () => {
   // Check if push notifications are supported
   useEffect(() => {
     const isSupported =
+      typeof window !== 'undefined' &&
       'serviceWorker' in navigator &&
       'PushManager' in window &&
       'Notification' in window;
@@ -48,6 +56,15 @@ export const usePushNotification = () => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
+      if (!state.isSupported) {
+        throw new Error('Push notifications are not supported in this browser');
+      }
+
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      if (!vapidPublicKey) {
+        throw new Error('Push notifications are not configured');
+      }
+
       // Check notification permission
       if (Notification.permission === 'denied') {
         throw new Error('Notification permission denied');
@@ -72,21 +89,22 @@ export const usePushNotification = () => {
       // Subscribe to push manager
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       });
 
       // Get current user
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) {
+      const { data } = await supabase.auth.getSession();
+      const user = data.session?.user;
+      if (!user) {
         throw new Error('Not authenticated');
       }
 
       // Save subscription to Supabase
       const { error } = await supabase
         .from('push_subscriptions')
-        .insert([
+        .upsert([
           {
-            user_id: data.user.id,
+            user_id: user.id,
             endpoint: subscription.endpoint,
             p256dh: btoa(
               String.fromCharCode.apply(
@@ -101,8 +119,10 @@ export const usePushNotification = () => {
               )
             ),
             user_agent: navigator.userAgent,
+            is_active: true,
+            last_used_at: new Date().toISOString(),
           },
-        ]);
+        ], { onConflict: 'endpoint' });
 
       if (error) throw error;
 
@@ -125,7 +145,7 @@ export const usePushNotification = () => {
       }));
       throw error;
     }
-  }, [registerServiceWorker]);
+  }, [registerServiceWorker, state.isSupported]);
 
   // Unsubscribe from push notifications
   const unsubscribe = useCallback(async () => {
@@ -145,14 +165,15 @@ export const usePushNotification = () => {
       await subscription.unsubscribe();
 
       // Get current user
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
+      const { data } = await supabase.auth.getSession();
+      const user = data.session?.user;
+      if (user) {
         // Update subscription in Supabase
         await supabase
           .from('push_subscriptions')
           .update({ is_active: false })
           .eq('endpoint', subscription.endpoint)
-          .eq('user_id', data.user.id);
+          .eq('user_id', user.id);
       }
 
       setState((prev) => ({

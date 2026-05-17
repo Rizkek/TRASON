@@ -209,5 +209,5 @@ export const buildInvestmentTimelineText = (position: InvestmentPosition, action
 export const formatSignedPercent = (value: number) =>
   `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
 
-export const formatSignedCurrency = (value: number) =>
-  `${value >= 0 ? '+' : '-'}${formatCurrency(Math.abs(value))}`;
+export const formatSignedCurrency = (value: number, currency = 'USD', locale = 'en-US') =>
+  `${value >= 0 ? '+' : '-'}${formatCurrency(Math.abs(value), currency, locale)}`;

@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency, formatNumber } from '@/libs/format';
 import { formatSignedCurrency, formatSignedPercent } from '@/services/investmentService';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 type AssetType = 'stock' | 'crypto' | 'gold';
 
@@ -59,6 +60,7 @@ export default function InvestmentsPage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
+  const { currency, locale, timezone } = useUserPreferences();
   const {
     calculatedPositions,
     summary,
@@ -185,8 +187,8 @@ export default function InvestmentsPage() {
   const headerInsight = useMemo(() => {
     if (insights?.headline) return insights.headline;
     if (!summary) return 'Track long-term positions with simple signals instead of trading-screen noise.';
-    return `Your portfolio is currently worth ${formatCurrency(summary.totalValue)} across ${summary.positionsCount} tracked positions.`;
-  }, [insights, summary]);
+    return `Your portfolio is currently worth ${formatCurrency(summary.totalValue, currency, locale)} across ${summary.positionsCount} tracked positions.`;
+  }, [currency, insights, locale, summary]);
 
   if (authLoading) {
     return (
@@ -248,27 +250,27 @@ export default function InvestmentsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-lg">
           <Card className="p-xl">
             <p className="text-micro text-gray-light mb-sm">PORTFOLIO VALUE</p>
-            <p className="text-2xl font-bold text-white">{formatCurrency(summary?.totalValue || 0)}</p>
+            <p className="text-2xl font-bold text-white">{formatCurrency(summary?.totalValue || 0, currency, locale)}</p>
           </Card>
           <Card className="p-xl">
             <p className="text-micro text-gray-light mb-sm">UNREALIZED P/L</p>
             <p className={`text-2xl font-bold ${(summary?.totalProfitLoss || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
-              {formatSignedCurrency(summary?.totalProfitLoss || 0)}
+              {formatSignedCurrency(summary?.totalProfitLoss || 0, currency, locale)}
             </p>
           </Card>
           <Card className="p-xl">
             <p className="text-micro text-gray-light mb-sm">TODAY</p>
             <p className={`text-2xl font-bold ${(summary?.dailyChangeValue || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
-              {formatSignedCurrency(summary?.dailyChangeValue || 0)}
+              {formatSignedCurrency(summary?.dailyChangeValue || 0, currency, locale)}
             </p>
             <p className="text-xs text-gray-light mt-1">{formatSignedPercent(summary?.dailyChangePercent || 0)}</p>
           </Card>
           <Card className="p-xl">
             <p className="text-micro text-gray-light mb-sm">ALLOCATION MIX</p>
             <div className="space-y-2 text-xs text-gray-light">
-              <div className="flex justify-between"><span>Stocks</span><span>{formatCurrency(summary?.allocationByType.stock || 0)}</span></div>
-              <div className="flex justify-between"><span>Crypto</span><span>{formatCurrency(summary?.allocationByType.crypto || 0)}</span></div>
-              <div className="flex justify-between"><span>Gold</span><span>{formatCurrency(summary?.allocationByType.gold || 0)}</span></div>
+              <div className="flex justify-between"><span>Stocks</span><span>{formatCurrency(summary?.allocationByType.stock || 0, currency, locale)}</span></div>
+              <div className="flex justify-between"><span>Crypto</span><span>{formatCurrency(summary?.allocationByType.crypto || 0, currency, locale)}</span></div>
+              <div className="flex justify-between"><span>Gold</span><span>{formatCurrency(summary?.allocationByType.gold || 0, currency, locale)}</span></div>
             </div>
           </Card>
         </div>
@@ -308,7 +310,7 @@ export default function InvestmentsPage() {
                   {calculatedPositions.map((position) => {
                     const isLive = !!position.last_valued_at;
                     const lastUpdated = position.last_valued_at
-                      ? new Date(position.last_valued_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                      ? new Date(position.last_valued_at).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone })
                       : null;
                     return (
                     <tr key={position.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
@@ -333,9 +335,9 @@ export default function InvestmentsPage() {
                         </div>
                       </td>
                       <td className="px-lg py-lg text-sm text-soft-cream">{formatNumber(position.amount, 4)}</td>
-                      <td className="px-lg py-lg text-sm text-soft-cream">{formatCurrency(position.buy_price)}</td>
+                      <td className="px-lg py-lg text-sm text-soft-cream">{formatCurrency(position.buy_price, currency, locale)}</td>
                       <td className="px-lg py-lg">
-                        <p className="text-sm text-soft-cream">{formatCurrency(position.current_price)}</p>
+                        <p className="text-sm text-soft-cream">{formatCurrency(position.current_price, currency, locale)}</p>
                         {lastUpdated && (
                           <p className="text-[10px] text-gray-light mt-1">update {lastUpdated}</p>
                         )}
@@ -350,12 +352,12 @@ export default function InvestmentsPage() {
                           }
                           {formatSignedPercent(position.day_change_percent)}
                         </div>
-                        <div className="text-xs text-gray-light">{formatSignedCurrency(position.day_change_value)}</div>
+                        <div className="text-xs text-gray-light">{formatSignedCurrency(position.day_change_value, currency, locale)}</div>
                       </td>
-                      <td className="px-lg py-lg text-sm font-semibold text-white">{formatCurrency(position.current_value)}</td>
+                      <td className="px-lg py-lg text-sm font-semibold text-white">{formatCurrency(position.current_value, currency, locale)}</td>
                       <td className="px-lg py-lg">
                         <div className={`${position.profit_loss >= 0 ? 'text-success' : 'text-danger'} text-sm font-semibold`}>
-                          {formatSignedCurrency(position.profit_loss)}
+                          {formatSignedCurrency(position.profit_loss, currency, locale)}
                         </div>
                         <div className="text-xs text-gray-light">{formatSignedPercent(position.percentage_change)}</div>
                       </td>
@@ -401,21 +403,21 @@ export default function InvestmentsPage() {
                 <Landmark size={16} />
                 <p className="text-micro">STOCKS</p>
               </div>
-              <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.stock || 0)}</p>
+              <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.stock || 0, currency, locale)}</p>
             </Card>
             <Card className="p-xl">
               <div className="flex items-center gap-sm mb-md text-primary">
                 <Coins size={16} />
                 <p className="text-micro">CRYPTO</p>
               </div>
-              <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.crypto || 0)}</p>
+              <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.crypto || 0, currency, locale)}</p>
             </Card>
             <Card className="p-xl">
               <div className="flex items-center gap-sm mb-md text-warning">
                 <Shield size={16} />
                 <p className="text-micro">GOLD</p>
               </div>
-              <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.gold || 0)}</p>
+              <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.gold || 0, currency, locale)}</p>
             </Card>
           </div>
         )}

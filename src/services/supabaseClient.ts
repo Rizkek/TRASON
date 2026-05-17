@@ -8,6 +8,7 @@ export type {
   CategoryJoin,
   Transaction,
   Activity,
+  SportLog,
   Reminder,
   Insight,
   InvestmentPosition,

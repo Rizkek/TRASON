@@ -3,6 +3,7 @@ import { Card } from '@/components';
 import { TrendingUp } from 'lucide-react';
 import { formatCurrency } from '@/libs/format';
 import { User, Transaction, Activity } from '@/types/database';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface Props {
   user: User | null;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export const DashboardHeader = ({ user, activities, transactions }: Props) => {
+  const { currency, locale } = useUserPreferences();
   const totalExpenses = transactions
     .filter((t) => t.type === 'expense')
     .reduce((acc, t) => acc + t.amount, 0);
@@ -39,8 +41,8 @@ export const DashboardHeader = ({ user, activities, transactions }: Props) => {
           </div>
           <p className="text-lg leading-relaxed text-soft-cream font-serif italic opacity-90">
             "You've tracked <span className="text-primary font-bold">{activities.length} activities</span> today and 
-            invested <span className="text-secondary font-bold">{formatCurrency(totalExpenses)}</span> in yourself. 
-            {totalIncome > 0 ? ` Your positive momentum shows with an income of ${formatCurrency(totalIncome)}.` : ' Keep focus on your goals.'}"
+            invested <span className="text-secondary font-bold">{formatCurrency(totalExpenses, currency, locale)}</span> in yourself. 
+            {totalIncome > 0 ? ` Your positive momentum shows with an income of ${formatCurrency(totalIncome, currency, locale)}.` : ' Keep focus on your goals.'}"
           </p>
           {user?.bio && (
             <p className="md:hidden text-xs text-gray-light italic mt-md opacity-70">

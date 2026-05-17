@@ -6,6 +6,7 @@ import {
   Category,
   Transaction,
   Activity,
+  Habit,
   Reminder,
   Insight,
   UserPreferences,
@@ -14,6 +15,32 @@ import {
 import { handleQueryError, logError } from '@/libs/apiErrors';
 
 type AuthUserLike = Awaited<ReturnType<typeof getCurrentUser>>;
+
+type QueryError = {
+  code?: string;
+  message?: string;
+  details?: string;
+  hint?: string;
+};
+
+const OPTIONAL_TABLE_ERROR_CODES = new Set(['42P01', 'PGRST205', 'PGRST204']);
+
+const formatQueryError = (error: unknown) => {
+  const err = error as QueryError;
+  return [err.code, err.message, err.details, err.hint].filter(Boolean).join(' - ') || 'Unknown database error';
+};
+
+const isOptionalTableMissingError = (error: unknown, tableName: string) => {
+  const err = error as QueryError;
+  const text = formatQueryError(error).toLowerCase();
+
+  return (
+    (err.code ? OPTIONAL_TABLE_ERROR_CODES.has(err.code) : false) ||
+    text.includes(tableName.toLowerCase()) ||
+    text.includes('schema cache') ||
+    text.includes('does not exist')
+  );
+};
 
 const buildUserProfilePayload = (user: NonNullable<AuthUserLike>) => ({
   id: user.id,
@@ -670,7 +697,10 @@ export const insightQueries = {
 
       const { data, error } = await query.order('date', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        if (isOptionalTableMissingError(error, 'insights')) return [];
+        throw error;
+      }
       return data;
     } catch (err) {
       logError(err, 'insightQueries.getInsights');
@@ -695,6 +725,79 @@ export const insightQueries = {
       logError(err, 'insightQueries.createInsight');
       throw handleQueryError(err);
     }
+  },
+};
+
+/**
+ * ==================== HABIT QUERIES ====================
+ */
+
+export const habitQueries = {
+  // Fetch all habits
+  async getHabits() {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('habits')
+      .select('*')
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .order('preferred_hour', { ascending: true });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Create habit
+  async createHabit(
+    habit: Omit<Habit, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('habits')
+      .insert([{ ...habit, user_id: user.id }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Update habit
+  async updateHabit(
+    id: string,
+    updates: Partial<Omit<Habit, 'id' | 'user_id' | 'created_at'>>
+  ) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('habits')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Delete habit
+  async deleteHabit(id: string) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { error } = await supabase
+      .from('habits')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) throw error;
   },
 };
 

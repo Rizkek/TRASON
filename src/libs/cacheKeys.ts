@@ -22,7 +22,7 @@ export const CACHE_KEYS = {
     all: () => ['transactions', '*'],
   },
 
-  // Activities (Daily Timeline)
+  // Activities (Daily Schedule)
   activities: {
     list: (start: string, end: string) => ['activities', start, end],
     byDate: (date: string) => ['activities', date],

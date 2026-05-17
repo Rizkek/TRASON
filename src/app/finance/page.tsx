@@ -21,11 +21,13 @@ import {
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/libs/format';
 import { getDateRange } from '@/libs/date';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 export default function FinancePage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
+  const { currency, locale } = useUserPreferences();
   const now = new Date();
   const { start, end } = getDateRange(now.getMonth(), now.getFullYear());
   
@@ -170,7 +172,7 @@ export default function FinancePage() {
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-all" />
             <p className="text-micro text-gray-light mb-md tracking-widest">TOTAL INCOME</p>
             <div className="flex items-end justify-between">
-              <p className="text-3xl font-bold text-success">{formatCurrency(totalIncome)}</p>
+              <p className="text-3xl font-bold text-success">{formatCurrency(totalIncome, currency, locale)}</p>
               <div className="p-sm bg-success/10 rounded-md text-success"><ArrowUpRight size={20} /></div>
             </div>
           </Card>
@@ -179,7 +181,7 @@ export default function FinancePage() {
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-danger/5 rounded-full blur-2xl group-hover:bg-danger/10 transition-all" />
             <p className="text-micro text-gray-light mb-md tracking-widest">TOTAL EXPENSES</p>
             <div className="flex items-end justify-between">
-              <p className="text-3xl font-bold text-danger">{formatCurrency(totalExpense)}</p>
+              <p className="text-3xl font-bold text-danger">{formatCurrency(totalExpense, currency, locale)}</p>
               <div className="p-sm bg-danger/10 rounded-md text-danger"><ArrowDownLeft size={20} /></div>
             </div>
           </Card>
@@ -188,7 +190,7 @@ export default function FinancePage() {
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
             <p className="text-micro text-gray-light mb-md tracking-widest">NET BALANCE</p>
             <div className="flex items-end justify-between">
-              <p className="text-3xl font-bold text-white">{formatCurrency(totalIncome - totalExpense)}</p>
+              <p className="text-3xl font-bold text-white">{formatCurrency(totalIncome - totalExpense, currency, locale)}</p>
               <div className="p-sm bg-primary/10 rounded-md text-primary"><TrendingUp size={20} /></div>
             </div>
           </Card>
@@ -276,7 +278,7 @@ export default function FinancePage() {
                       </td>
                       <td className="px-xl py-xl text-right">
                         <p className={`text-sm font-bold ${t.type === 'income' ? 'text-success' : 'text-soft-cream'}`}>
-                          {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                          {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount, currency, locale)}
                         </p>
                       </td>
                       <td className="px-xl py-xl text-right">

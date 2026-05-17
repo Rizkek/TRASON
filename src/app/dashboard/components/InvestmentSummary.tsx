@@ -9,12 +9,14 @@ import {
   formatSignedPercent,
 } from '@/services/investmentService';
 import { formatCurrency } from '@/libs/format';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface Props {
   summary: InvestmentPortfolioSummary | null;
 }
 
 export const InvestmentSummary = ({ summary }: Props) => {
+  const { currency, locale } = useUserPreferences();
   if (!summary || summary.positionsCount === 0) {
     return (
       <Card className="p-xl border border-dashed border-white/10 bg-transparent">
@@ -43,7 +45,7 @@ export const InvestmentSummary = ({ summary }: Props) => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-md">
           <div>
             <p className="text-micro text-gray-light">INVESTMENT ANALYST</p>
-            <h3 className="text-2xl font-bold text-white">{formatCurrency(summary.totalValue)}</h3>
+            <h3 className="text-2xl font-bold text-white">{formatCurrency(summary.totalValue, currency, locale)}</h3>
             <p className="text-xs text-gray-light mt-1">
               {summary.positionsCount} active positions tracked across your portfolio
             </p>
@@ -60,7 +62,7 @@ export const InvestmentSummary = ({ summary }: Props) => {
           <div className="p-lg rounded-md bg-white/5 border border-white/5">
             <p className="text-[10px] text-gray-light uppercase tracking-widest mb-2">Unrealized P/L</p>
             <p className={`text-lg font-bold ${summary.totalProfitLoss >= 0 ? 'text-success' : 'text-danger'}`}>
-              {formatSignedCurrency(summary.totalProfitLoss)}
+              {formatSignedCurrency(summary.totalProfitLoss, currency, locale)}
             </p>
             <p className="text-xs text-gray-light mt-1">{formatSignedPercent(summary.totalChangePercent)} vs buy price</p>
           </div>
@@ -68,7 +70,7 @@ export const InvestmentSummary = ({ summary }: Props) => {
           <div className="p-lg rounded-md bg-white/5 border border-white/5">
             <p className="text-[10px] text-gray-light uppercase tracking-widest mb-2">Today</p>
             <p className={`text-lg font-bold ${summary.dailyChangeValue >= 0 ? 'text-success' : 'text-danger'}`}>
-              {formatSignedCurrency(summary.dailyChangeValue)}
+              {formatSignedCurrency(summary.dailyChangeValue, currency, locale)}
             </p>
             <p className="text-xs text-gray-light mt-1">{formatSignedPercent(summary.dailyChangePercent)} session move</p>
           </div>

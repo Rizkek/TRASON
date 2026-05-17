@@ -93,6 +93,21 @@ export interface Activity {
   deleted_at?: string;
 }
 
+export interface SportLog {
+  id: string;
+  user_id: string;
+  activity_id: string;
+  type: string;
+  duration_seconds?: number;
+  reps?: number;
+  sets?: number;
+  weight_kg?: number;
+  distance_meters?: number;
+  metadata?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Reminder {
   id: string;
   user_id: string;
@@ -113,10 +128,154 @@ export interface Reminder {
   notify_hours_before?: number;
   notify_times?: number[];
   tags?: string[];
+  linked_template_activity_id?: string;
+  is_recurring_weekly?: boolean;
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
   deleted_at?: string;
+}
+
+/** Weekly Template - Setup sekali untuk semua minggu */
+export interface WeeklyTemplate {
+  id: string;
+  user_id: string;
+  
+  // Template info
+  name: string;
+  description?: string;
+  
+  // Status
+  is_active: boolean;
+  is_default: boolean;
+  
+  // Validity
+  start_date?: string;
+  end_date?: string;
+  
+  // Metadata
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+}
+
+/** Activity dalam weekly template */
+export interface TemplateActivity {
+  id: string;
+  weekly_template_id: string;
+  
+  // Day info (0=Sunday, 1=Monday, ..., 6=Saturday)
+  day_of_week: number;
+  
+  // Timing
+  start_time: string;
+  duration_minutes: number;
+  
+  // Activity info
+  title: string;
+  description?: string;
+  category?: string;
+  mood?: string;
+  location?: string;
+  rating?: number;
+  
+  // Options
+  allow_override?: boolean;
+  
+  // Metadata
+  metadata?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Override untuk minggu tertentu */
+export interface TemplateOverride {
+  id: string;
+  user_id: string;
+  weekly_template_id: string;
+  
+  // Week info
+  week_start_date: string;
+  
+  // Changes
+  removed_activity_ids?: string[];
+  added_activities?: TemplateActivity[];
+  modified_activities?: Record<string, Partial<TemplateActivity>>;
+  
+  // Info
+  reason?: string;
+  notes?: string;
+  
+  // Metadata
+  created_at: string;
+  updated_at: string;
+}
+
+/** Unified schedule block (Template Activity or Reminder) */
+export interface ScheduleBlock {
+  id: string;
+  user_id: string;
+  
+  // Basic info
+  type: 'template_activity' | 'reminder';
+  title: string;
+  description?: string;
+  
+  // Timing
+  day_of_week?: number;
+  start_time: string;
+  duration_minutes?: number;
+  
+  // Categorization
+  category?: string;
+  tags?: string[];
+  
+  // Template activity specific
+  mood?: string;
+  rating?: number;
+  location?: string;
+  from_template?: boolean;
+  is_override?: boolean;
+  
+  // Reminder specific
+  priority?: 'low' | 'medium' | 'high';
+  status?: 'pending' | 'completed' | 'cancelled';
+  linked_template_activity_id?: string;
+  
+  // Metadata
+  source_id: string;
+  color?: string;
+  icon?: string;
+  
+  created_at: string;
+  updated_at: string;
+}
+
+/** Schedule conflict detected */
+export interface ScheduleConflict {
+  id?: string;
+  conflict_type: 'overlap' | 'no_buffer' | 'back_to_back';
+  block1: ScheduleBlock;
+  block2: ScheduleBlock;
+  conflict_time: string;
+  duration_minutes: number;
+  severity: 'warning' | 'error';
+  suggestion?: string;
+  created_at?: string;
+}
+
+/** Weekly schedule snapshot */
+export interface WeeklyScheduleSnapshot {
+  week_start_date: string;
+  template_id: string;
+  has_overrides: boolean;
+  blocks: ScheduleBlock[];
+  conflicts: ScheduleConflict[];
+  stats: {
+    total_activities: number;
+    total_reminders: number;
+    adherence_percentage: number;
+  };
 }
 
 export interface InvestmentPosition {
