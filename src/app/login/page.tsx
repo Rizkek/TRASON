@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Alert, Loading } from '@/components';
 import { useAuthStore } from '@/store/authStore';
-import { sanitizeError } from '@/libs/validation';
+import { sanitizeError, validateEmail } from '@/libs/validation';
 import { supabase } from '@/services/supabaseClient';
 import { Compass, ArrowLeft, Quote } from 'lucide-react';
 
@@ -17,6 +17,9 @@ export default function LoginPage() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const [loginProgress, setLoginProgress] = useState(0);
+  const [showProgress, setShowProgress] = useState(false);
 
   useEffect(() => {
     // Redirect if already authenticated (skip if still loading)
@@ -65,7 +68,13 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setShowProgress(true);
+    setLoginProgress(0);
     setError(null);
+
+    const interval = setInterval(() => {
+      setLoginProgress(p => p >= 90 ? 90 : p + Math.floor(Math.random() * 15) + 5);
+    }, 100);
 
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -75,12 +84,46 @@ export default function LoginPage() {
 
       if (signInError) throw new Error(signInError.message);
       if (!data.session) throw new Error('No session created');
+      
+      clearInterval(interval);
+      setLoginProgress(100);
+      
+      // Delay slightly so user sees 100% before redirect
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 500);
+      
     } catch (err) {
+      clearInterval(interval);
+      setShowProgress(false);
       setError(sanitizeError(err));
-    } finally {
       setIsLoading(false);
     }
   };
+
+  if (showProgress) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-warm-black flex flex-col items-center justify-center font-sans overflow-hidden transition-opacity duration-700">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 border border-warm-gold/10 rounded-full animate-[spin_10s_linear_infinite]" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 border border-warm-gold/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
+        
+        <div className="relative w-24 h-24 mb-2xl">
+          <div className="absolute inset-0 bg-warm-gold/20 rotate-45 blur-xl animate-pulse" />
+          <div className="absolute inset-0 border border-warm-gold rotate-45 flex items-center justify-center bg-warm-black/50 backdrop-blur-sm">
+            <span className="text-3xl font-serif text-warm-gold -rotate-45">T</span>
+          </div>
+        </div>
+
+        <div className="text-center space-y-md z-10">
+          <div className="text-display font-light text-soft-cream font-serif tracking-tighter">
+            {loginProgress}%
+          </div>
+          <p className="text-micro tracking-[0.4em] uppercase text-warm-gold">Authenticating</p>
+        </div>
+        <div className="absolute bottom-0 left-0 h-1 bg-warm-gold transition-all duration-100 ease-out" style={{ width: `${loginProgress}%` }} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">

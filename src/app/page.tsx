@@ -1,16 +1,15 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { Button, Loading } from '@/components';
-import { 
-  ArrowUpRight, 
-  Sparkles, 
-  Wallet, 
-  History, 
-  BellRing, 
+import {
+  ArrowUpRight,
+  Wallet,
+  History,
+  BellRing,
   BrainCircuit,
   Compass
 } from 'lucide-react';
@@ -20,18 +19,51 @@ export default function Home() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isLoading = useAuthStore((s) => s.isLoading);
 
+  const [showSplash, setShowSplash] = useState(true);
+  const [motionStep, setMotionStep] = useState(0);
+
+  const motionTexts = [
+    "Feeling overwhelmed by scattered apps?",
+    "Losing track of your true progress?",
+    "It's time to build your sanctuary.",
+    "Welcome to TRASON."
+  ];
+
+  // Splash screen motion logic (commercial style)
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
+    let timeout: NodeJS.Timeout;
+    if (showSplash && !isLoading) {
+      if (motionStep < motionTexts.length - 1) {
+        timeout = setTimeout(() => setMotionStep(prev => prev + 1), 1200);
+      } else {
+        timeout = setTimeout(() => setShowSplash(false), 1500);
+      }
+    }
+    return () => clearTimeout(timeout);
+  }, [isLoading, showSplash, motionStep, motionTexts.length]);
+
+  useEffect(() => {
+    if (isAuthenticated && !isLoading && !showSplash) {
       router.push('/dashboard');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, showSplash, router]);
 
-  if (isLoading) {
+  // If splash is showing, render the marketing splash screen
+  if (showSplash) {
     return (
-      <div className="min-h-screen bg-warm-black flex items-center justify-center">
-        <div className="flex flex-col items-center gap-md animate-pulse">
-          <div className="w-12 h-12 rounded-full border-2 border-warm-gold/20 border-t-warm-gold animate-spin" />
-          <p className="text-micro font-sans tracking-[0.3em] uppercase text-warm-gold/60">Preparing your space</p>
+      <div className="fixed inset-0 z-[100] bg-warm-black flex flex-col items-center justify-center font-sans overflow-hidden transition-opacity duration-700">
+        {/* Abstract shapes */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 border border-warm-gold/10 rounded-full animate-[spin_10s_linear_infinite]" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 border border-warm-gold/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
+        
+        {/* Text Motion Commercial Style */}
+        <div className="text-center space-y-md z-10 px-lg max-w-2xl">
+          <h2 
+            key={motionStep}
+            className="text-2xl md:text-4xl font-serif text-warm-gold animate-fade-in"
+          >
+            {motionTexts[motionStep]}
+          </h2>
         </div>
       </div>
     );
@@ -54,7 +86,7 @@ export default function Home() {
             </div>
             <span className="text-xl font-serif font-medium tracking-tight">TRASON</span>
           </div>
-          
+
           <div className="flex items-center gap-lg">
             <Link href="/login" className="text-sm font-medium hover:text-warm-gold transition-colors hidden md:block">
               Log in
@@ -75,19 +107,18 @@ export default function Home() {
             {/* Hero Text */}
             <div className="lg:col-span-7 space-y-xl animate-slide-up">
               <div className="inline-flex items-center gap-sm px-md py-xs rounded-full bg-white/[0.03] border border-white/[0.08] text-micro uppercase tracking-widest text-warm-gold">
-                <Sparkles size={12} />
                 <span>Your Digital Living Space</span>
               </div>
-              
+
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif leading-[1.1] tracking-tight">
                 Self-Improvement, <br />
                 <span className="italic text-warm-gold">Redefined.</span>
               </h1>
-              
+
               <p className="text-lg md:text-xl text-gray-very-light/70 max-w-xl leading-relaxed font-light">
                 TRASON isn't just a tracker. It's a sanctuary for your growth—where numbers become narratives and habits become self-discovery.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-md pt-md">
                 <Link href="/signup">
                   <button className="w-full sm:w-auto bg-warm-gold text-warm-black px-2xl py-md rounded-full font-bold flex items-center justify-center gap-sm group hover:scale-105 transition-transform shadow-xl shadow-warm-gold/20">
@@ -106,14 +137,14 @@ export default function Home() {
             {/* Hero Visual - Floating Cards */}
             <div className="lg:col-span-5 relative hidden lg:block h-[500px]">
               <div className="absolute top-0 right-0 w-64 h-80 bg-deep-sage/20 backdrop-blur-3xl rounded-lg border border-white/[0.1] rotate-6 transform animate-float shadow-2xl overflow-hidden p-xl">
-                 <div className="w-8 h-8 bg-soft-cream/10 rounded-full mb-md" />
-                 <div className="h-4 w-3/4 bg-soft-cream/10 rounded-full mb-sm" />
-                 <div className="h-4 w-1/2 bg-soft-cream/10 rounded-full mb-xl" />
-                 <div className="space-y-sm">
-                   {[1,2,3].map(i => <div key={i} className="h-12 w-full bg-white/5 rounded-md" />)}
-                 </div>
+                <div className="w-8 h-8 bg-soft-cream/10 rounded-full mb-md" />
+                <div className="h-4 w-3/4 bg-soft-cream/10 rounded-full mb-sm" />
+                <div className="h-4 w-1/2 bg-soft-cream/10 rounded-full mb-xl" />
+                <div className="space-y-sm">
+                  {[1, 2, 3].map(i => <div key={i} className="h-12 w-full bg-white/5 rounded-md" />)}
+                </div>
               </div>
-              
+
               <div className="absolute bottom-10 left-0 w-72 h-48 bg-warm-gold/10 backdrop-blur-2xl rounded-lg border border-white/[0.1] -rotate-12 transform animate-float shadow-2xl p-xl [animation-delay:1.5s]">
                 <div className="flex justify-between items-start mb-lg">
                   <Wallet size={24} className="text-warm-gold" />
@@ -141,37 +172,37 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-xl">
             {[
-              { 
-                title: 'Finance Tracker', 
+              {
+                title: 'Finance Tracker',
                 desc: 'Beyond accounting. Understand the relationship between your spending and your happiness.',
                 icon: Wallet,
                 color: 'text-income',
                 delay: '0s'
               },
-              { 
-                title: 'Daily Schedule', 
+              {
+                title: 'Daily Schedule',
                 desc: 'Plan your day, log what happened, and spot your strongest energy windows.',
                 icon: History,
                 color: 'text-energy',
                 delay: '0.1s'
               },
-              { 
-                title: 'Mindful Reminders', 
+              {
+                title: 'Mindful Reminders',
                 desc: 'Gentle nudges for the things that matter, without the anxiety of traditional alerts.',
                 icon: BellRing,
                 color: 'text-deep-sage',
                 delay: '0.2s'
               },
-              { 
-                title: 'Narrative Insights', 
+              {
+                title: 'Narrative Insights',
                 desc: 'Our analyzer connects the dots between your activities and your financial health.',
                 icon: BrainCircuit,
                 color: 'text-warm-gold',
                 delay: '0.3s'
               }
             ].map((f, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className="group p-xl rounded-lg bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.15] transition-all duration-500 hover:-translate-y-2"
                 style={{ transitionDelay: f.delay }}
               >
@@ -209,8 +240,8 @@ export default function Home() {
             © 2026 Crafted with intention. Privacy is a right, not a feature.
           </p>
           <div className="flex gap-lg">
-             <Link href="#" className="text-micro uppercase tracking-widest hover:text-warm-gold transition-colors">Privacy</Link>
-             <Link href="#" className="text-micro uppercase tracking-widest hover:text-warm-gold transition-colors">Terms</Link>
+            <Link href="/privacy" className="text-micro uppercase tracking-widest hover:text-warm-gold transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-micro uppercase tracking-widest hover:text-warm-gold transition-colors">Terms</Link>
           </div>
         </div>
       </footer>

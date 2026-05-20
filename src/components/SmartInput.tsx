@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Loader2, Send } from 'lucide-react';
 import { transactionQueries } from '@/services/queries';
+import { getLocalISODate } from '@/libs/format';
 
 export function SmartInput() {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,7 +68,7 @@ export function SmartInput() {
         title: result.data.title || 'Untitled',
         amount: result.data.amount || 0,
         type: result.data.transactionType || 'expense',
-        date: result.data.date || new Date().toISOString().split('T')[0],
+        date: result.data.date || getLocalISODate(),
         category_id: null as any, // Nullable category allowed
         time: '00:00:00',
         description: '',

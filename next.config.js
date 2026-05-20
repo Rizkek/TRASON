@@ -10,8 +10,14 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
+        // Supabase Storage CDN
         protocol: 'https',
-        hostname: '**',
+        hostname: '*.supabase.co',
+      },
+      {
+        // Supabase Storage (custom domain)
+        protocol: 'https',
+        hostname: '*.supabase.in',
       },
     ],
   },

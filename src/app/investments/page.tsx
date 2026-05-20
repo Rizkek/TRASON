@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, Alert, ErrorAlert } from '@/components';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, Alert, ErrorAlert, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useInvestment } from '@/hooks/useInvestment';
 import { validateTransaction, sanitizeError } from '@/libs/validation';
@@ -20,7 +20,7 @@ import {
   Wifi,
   WifiOff,
 } from 'lucide-react';
-import { formatCurrency, formatNumber } from '@/libs/format';
+import { formatCurrency, formatNumber, getLocalISODate } from '@/libs/format';
 import { formatSignedCurrency, formatSignedPercent } from '@/services/investmentService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 
@@ -44,7 +44,7 @@ const defaultForm: InvestmentFormState = {
   display_name: '',
   amount: '',
   buy_price: '',
-  buy_date: new Date().toISOString().split('T')[0],
+  buy_date: getLocalISODate(),
   external_id: '',
   manual_current_price: '',
   notes: '',
@@ -76,6 +76,7 @@ export default function InvestmentsPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPosition, setEditingPosition] = useState<InvestmentPosition | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [form, setForm] = useState<InvestmentFormState>(defaultForm);
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -135,13 +136,7 @@ export default function InvestmentsPage() {
       return;
     }
 
-    // Custom Validation: Asset Type vs Display Name consistency
-    const assetPrefix = form.asset_type.charAt(0).toUpperCase() + form.asset_type.slice(1);
-    if (form.display_name && !form.display_name.startsWith(assetPrefix)) {
-      if (!confirm(`Your display name doesn't start with "${assetPrefix}". Do you want to continue anyway?`)) {
-        return;
-      }
-    }
+    // Remove the annoying asset prefix validation
 
     setIsSaving(true);
     try {
@@ -181,6 +176,17 @@ export default function InvestmentsPage() {
       console.error('Failed to save investment:', err);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmId) return;
+    try {
+      await deletePosition(deleteConfirmId);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeleteConfirmId(null);
     }
   };
 
@@ -365,11 +371,7 @@ export default function InvestmentsPage() {
                         <div className="flex items-center justify-end gap-sm">
                           <Button variant="ghost" size="sm" onClick={() => openEditModal(position)}>Edit</Button>
                           <button
-                            onClick={async () => {
-                              if (confirm(`Archive ${position.symbol}?`)) {
-                                await deletePosition(position.id);
-                              }
-                            }}
+                            onClick={() => setDeleteConfirmId(position.id)}
                             className="p-sm text-danger hover:bg-danger/10 rounded-md transition-colors"
                           >
                             <Trash2 size={16} />
@@ -527,6 +529,16 @@ export default function InvestmentsPage() {
           </div>
         </div>
       </Modal>
+
+      <ConfirmModal
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        title="ARCHIVE POSITION"
+        description="Are you sure you want to archive this investment position? It will be removed from your active portfolio."
+        confirmText="ARCHIVE"
+        isDangerous={true}
+        onConfirm={handleConfirmDelete}
+      />
       </Layout>
     </>
   );

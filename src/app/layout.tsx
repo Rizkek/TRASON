@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { SmartInput } from '@/components/SmartInput';
+import NextTopLoader from 'nextjs-toploader';
 
 const sans = Instrument_Sans({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const serif = Cormorant_Garamond({ 
@@ -48,6 +49,17 @@ export default function RootLayout({
       </head>
       <body className={`${sans.variable} ${serif.variable} ${sans.className}`} suppressHydrationWarning>
         <ErrorBoundary>
+          <NextTopLoader 
+            color="#4E4FEB"
+            initialPosition={0.08}
+            crawlSpeed={200}
+            height={3}
+            crawl={true}
+            showSpinner={false}
+            easing="ease"
+            speed={200}
+            shadow="0 0 10px #4E4FEB,0 0 5px #4E4FEB"
+          />
           <AuthProvider>
             {children}
             <SmartInput />

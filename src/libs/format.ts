@@ -46,3 +46,12 @@ export const formatDatetime = (date: Date | string): string => {
 export const formatNumber = (num: number, decimals = 2): string => {
   return num.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
+
+/**
+ * Get current date in local timezone formatted as YYYY-MM-DD
+ * This avoids the issue of UTC dates pushing the day backward for Eastern timezones
+ */
+export const getLocalISODate = (date: Date = new Date()): string => {
+  const tzOffset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - tzOffset).toISOString().split('T')[0];
+};

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Layout, Card, Badge, Button, Loading, ErrorAlert } from '@/components';
 import { useAuthStore } from '@/store/authStore';
@@ -10,7 +10,7 @@ import { useReminder } from '@/hooks/useReminder';
 import { useInvestment } from '@/hooks/useInvestment';
 import { InvestmentInsightResponse } from '@/services/investmentService';
 import { getDateRange } from '@/libs/date';
-import { sanitizeError } from '@/libs/validation';
+
 
 // Setup SWR Dates
 const CURRENT_DATE = new Date();
@@ -20,8 +20,7 @@ import {
   Calendar as CalendarIcon, 
   Bell, 
   Lightbulb, 
-  Clock,
-  ArrowRight
+  Clock
 } from 'lucide-react';
 
 // Extracted Components
@@ -31,6 +30,10 @@ import { ActivitiesList } from './components/ActivitiesList';
 import { TransactionsList } from './components/TransactionsList';
 import { RemindersSidebar } from './components/RemindersSidebar';
 import { InvestmentSummary } from './components/InvestmentSummary';
+import { SportSummary } from './components/SportSummary';
+import { CareerSummary } from './components/CareerSummary';
+import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
+import { useCareer } from '@/hooks/useCareer';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -38,55 +41,14 @@ export default function DashboardPage() {
   const authLoading = useAuthStore((s) => s.isLoading);
   const user = useAuthStore((s) => s.user);
   
-  const [error, setError] = useState<string | null>(null);
-  
-  // SWR automatically handles transactions fetching in background
+  // SWR automatically handles all data fetching in background
   const { transactions } = useTransaction(CURRENT_START, CURRENT_END);
-  
-  // SWR fetches this based on CURRENT_DATE gracefully!
   const { activities } = useActivity(CURRENT_DATE);
-  
   const { reminders } = useReminder();
   const { summary: investmentSummary, insights: investmentInsights } = useInvestment();
-  // Type assertion to help TypeScript understand the type
   const typedInsights = investmentInsights as InvestmentInsightResponse | null;
-
-  const isInitialLoading = React.useRef(true);
-  const [dataLoaded, setDataLoaded] = React.useState(false);
-  const [isDataLoading, setIsDataLoading] = React.useState(false);
-  const fetchStarted = React.useRef(false);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    if (fetchStarted.current || dataLoaded) return;
-
-    const loadData = async () => {
-      fetchStarted.current = true;
-      setIsDataLoading(true);
-      const now = new Date();
-      const { start, end } = getDateRange(now.getMonth(), now.getFullYear());
-
-      try {
-        await Promise.all([
-          // transactions fetches itself via SWR
-          // activities fetches itself via SWR
-          // reminders fetches itself via SWR
-          // investments fetches itself via SWR
-        ]);
-        setDataLoaded(true);
-      } catch (err) {
-        const errorMessage = sanitizeError(err);
-        setError(errorMessage);
-        console.error('Failed to load dashboard data:', err);
-        fetchStarted.current = false;
-      } finally {
-        setIsDataLoading(false);
-        isInitialLoading.current = false;
-      }
-    };
-
-    loadData();
-  }, [isAuthenticated, dataLoaded]);
+  const { summary: sportSummary, isLoading: sportLoading } = useWeeklySportSummary();
+  const { stats: careerStats, nextInterview, isLoading: careerLoading } = useCareer();
 
   const greeting = useMemo(() => {
     const hours = new Date().getHours();
@@ -120,9 +82,7 @@ export default function DashboardPage() {
   if (!isAuthenticated) return null;
 
   return (
-    <>
-      <ErrorAlert error={error} onDismiss={() => setError(null)} />
-      <Layout>
+    <Layout>
         <div className="space-y-xl animate-fade-in">
         {/* Hero Greeting */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
@@ -139,25 +99,13 @@ export default function DashboardPage() {
               <p className="text-micro">{todayTime}</p>
             </div>
           </div>
-          <Button variant="primary" size="md" className="group shadow-lg shadow-primary/20">
-            <span>Daily Check-in</span>
-            <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
         </div>
 
         {/* Narrative Summary Card */}
         <DashboardHeader user={user} activities={activities} transactions={transactions} />
 
         {/* Financial Flow */}
-        {isDataLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-lg animate-pulse">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-28 bg-white/5 rounded-lg" />
-            ))}
-          </div>
-        ) : (
-          <FinancialSummary transactions={transactions} />
-        )}
+        <FinancialSummary transactions={transactions} />
 
         <InvestmentSummary summary={investmentSummary} />
 
@@ -190,6 +138,8 @@ export default function DashboardPage() {
           {/* Right Sidebar */}
           <div className="space-y-xl">
             <RemindersSidebar reminders={reminders} />
+            <SportSummary summary={sportSummary} isLoading={sportLoading} />
+            <CareerSummary stats={careerStats} nextInterview={nextInterview} isLoading={careerLoading} />
 
             <Card className="p-xl bg-gradient-to-br from-gray-strong to-black relative overflow-hidden group">
               <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-secondary opacity-10 blur-3xl rounded-full" />
@@ -201,7 +151,7 @@ export default function DashboardPage() {
                   <h3 className="font-serif italic text-lg text-white">Daily Insight</h3>
                 </div>
                 <p className="text-caption leading-relaxed tracking-wide text-gray-very-light italic">
-                  "{typedInsights?.headline || 'Pattern detected: You tend to spend more on Tuesdays. Consider setting a daily limit to stay on track.'}"
+                  &ldquo;{typedInsights?.headline || 'Pattern detected: You tend to spend more on Tuesdays. Consider setting a daily limit to stay on track.'}&rdquo;
                 </p>
                 <div className="pt-md">
                   <Button variant="ghost" size="sm" className="w-full border-white/10 hover:bg-white/5 h-10">
@@ -213,7 +163,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-      </Layout>
-    </>
+    </Layout>
   );
 }

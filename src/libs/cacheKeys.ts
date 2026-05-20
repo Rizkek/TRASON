@@ -67,6 +67,22 @@ export const CACHE_KEYS = {
     list: 'notifications:list',
     unread: 'notifications:unread',
   },
+
+  // Sport
+  sport: {
+    history: (start: string, end: string) => ['sport', 'history', start, end],
+    recentSessions: () => ['sport', 'sessions', 'recent'],
+    sessions: (start: string, end: string) => ['sport', 'sessions', start, end],
+    prBoard: () => ['sport', 'pr-board'],
+    weeklySummary: (weekStart: string) => ['sport', 'weekly', weekStart],
+  },
+
+  // Workout Plans
+  workoutPlans: {
+    list: () => ['workout-plans', 'list'],
+    byId: (id: string) => ['workout-plans', id],
+    active: () => ['workout-plans', 'active'],
+  },
 } as const;
 
 /**

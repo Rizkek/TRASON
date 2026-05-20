@@ -22,6 +22,15 @@
   --gradient-dark: linear-gradient(180deg, rgba(26, 26, 26, 0.8) 0%, rgba(15, 15, 15, 1) 100%);
 }
 
+.light {
+  /* Invert main background and text colors for light mode */
+  --color-warm-black: #F8FAFC; /* originally dark */
+  --color-soft-cream: #0B0F14; /* originally light */
+  
+  /* Make gradients slightly softer in light mode if needed */
+  --gradient-dark: linear-gradient(180deg, rgba(240, 240, 240, 0.8) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
 html {
   scroll-behavior: smooth;
   font-family: var(--font-inter);

@@ -24,12 +24,15 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
     
     if (theme === 'dark') {
       root.classList.add('dark');
+      root.classList.remove('light');
     } else if (theme === 'light') {
       root.classList.remove('dark');
+      root.classList.add('light');
     } else {
       // Auto
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       root.classList.toggle('dark', isDark);
+      root.classList.toggle('light', !isDark);
     }
   }, [user]);
 

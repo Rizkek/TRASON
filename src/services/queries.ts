@@ -1,4 +1,3 @@
-'use client';
 
 import {
   supabase,
@@ -443,7 +442,7 @@ export const activityQueries = {
         .eq('user_id', user.id)
         .is('deleted_at', null)
         .gte('start_time', `${dateStr}T00:00:00`)
-        .lt('start_time', `${dateStr}T23:59:59`)
+        .lte('start_time', `${dateStr}T23:59:59`)
         .order('start_time', { ascending: false });
 
       if (error) throw error;

@@ -1,0 +1,111 @@
+import React from 'react';
+import Link from 'next/link';
+import { Card } from '@/components';
+import { Dumbbell, Flame } from 'lucide-react';
+import { WeeklySportSummary } from '@/hooks/useWeeklySportSummary';
+
+interface Props {
+  summary: WeeklySportSummary;
+  isLoading?: boolean;
+}
+
+const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const TODAY_IDX = (() => {
+  const d = new Date().getDay(); // 0=Sun
+  return d === 0 ? 6 : d - 1;   // Mon=0
+})();
+
+export const SportSummary = ({ summary, isLoading }: Props) => {
+  const { totalSessions, totalMinutes, dayActivity, streak } = summary;
+  const maxMin = Math.max(...dayActivity, 1);
+  const totalHours = Math.floor(totalMinutes / 60);
+  const remMin = totalMinutes % 60;
+
+  if (isLoading) {
+    return (
+      <Card className="p-xl bg-white/[0.02] border-white/[0.05]">
+        <div className="h-20 animate-pulse bg-white/5 rounded-md" />
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="overflow-hidden bg-white/[0.02] border-white/[0.05]">
+      <div className="px-lg py-md border-b border-white/[0.05] flex justify-between items-center bg-white/[0.01]">
+        <div className="flex items-center gap-sm">
+          <Dumbbell size={16} className="text-secondary" />
+          <h3 className="text-sm font-bold tracking-tight">SPORT THIS WEEK</h3>
+        </div>
+        {streak >= 2 && (
+          <div className="flex items-center gap-1 text-amber-400">
+            <Flame size={14} />
+            <span className="text-xs font-bold">{streak}d</span>
+          </div>
+        )}
+      </div>
+
+      <div className="p-lg space-y-lg">
+        {totalSessions === 0 ? (
+          <p className="text-xs text-gray-light italic text-center py-md">No workouts logged yet this week.</p>
+        ) : (
+          <>
+            {/* Stats */}
+            <div className="flex items-center gap-xl">
+              <div>
+                <p className="text-2xl font-bold text-gradient">{totalSessions}</p>
+                <p className="text-[10px] text-gray-light uppercase tracking-widest">Sessions</p>
+              </div>
+              {totalMinutes > 0 && (
+                <div>
+                  <p className="text-2xl font-bold text-secondary">
+                    {totalHours > 0 ? `${totalHours}h${remMin > 0 ? ` ${remMin}m` : ''}` : `${remMin}m`}
+                  </p>
+                  <p className="text-[10px] text-gray-light uppercase tracking-widest">Active</p>
+                </div>
+              )}
+            </div>
+
+            {/* Mini bar chart: Mon-Sun */}
+            <div
+              className="flex items-end gap-1"
+              role="img"
+              aria-label={`Sport activity this week: ${dayActivity.map((m, i) => `${DAY_LABELS[i]}: ${m}min`).join(', ')}`}
+            >
+              {dayActivity.map((mins, idx) => {
+                const heightPct = Math.round((mins / maxMin) * 100);
+                const isToday = idx === TODAY_IDX;
+                const isActive = mins > 0;
+                return (
+                  <div key={idx} className="flex-1 flex flex-col items-center gap-0.5">
+                    <div
+                      className={`w-full rounded-sm transition-all ${
+                        isActive
+                          ? isToday
+                            ? 'bg-primary'
+                            : 'bg-secondary/70'
+                          : 'bg-white/[0.05]'
+                      }`}
+                      style={{ height: `${Math.max(heightPct * 0.32, 4)}px` }}
+                      title={`${DAY_LABELS[idx]}: ${mins}min`}
+                    />
+                    <span className={`text-[8px] ${isToday ? 'text-primary font-bold' : 'text-gray-light opacity-50'}`}>
+                      {DAY_LABELS[idx]}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        <Link
+          href="/schedule"
+          className="block text-center text-[10px] font-bold uppercase tracking-widest text-gray-light hover:text-primary transition-colors"
+          aria-label="Go to Schedule page to log workouts"
+        >
+          {totalSessions === 0 ? 'Log a workout →' : 'View Schedule →'}
+        </Link>
+      </div>
+    </Card>
+  );
+};

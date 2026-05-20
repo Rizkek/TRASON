@@ -30,13 +30,10 @@ export const SWR_CONFIG: SWRConfiguration = {
   // Retry on all errors (network, 4xx, 5xx)
   shouldRetryOnError: true,
 
-  // Use Map for client-side cache (works with SSR)
-  provider: () => new Map(),
-
   // Keep stale data while revalidating (optimistic updates)
   revalidateIfStale: true,
 
-  // Don't compare cache on mount
+  // Reference-equal comparison (fast)
   compare: (a: any, b: any) => a === b,
 };
 

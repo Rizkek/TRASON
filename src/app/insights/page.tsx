@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Layout, Card, Badge, Loading } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/authStore';
-import { insightQueries } from '@/services/queries';
+import { insightQueries, transactionQueries } from '@/services/queries';
 import { useInvestment } from '@/hooks/useInvestment';
 import { 
   Lightbulb, 
@@ -59,10 +59,38 @@ export default function InsightsPage() {
   const handleGenerateAI = async () => {
     try {
       setIsGenerating(true);
+      
+      // 1. Gather context data client-side where queries.ts works
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      const transactions = await transactionQueries.getTransactions(start, now);
+      
+      let totalSpend = 0;
+      let totalIncome = 0;
+      const categorySpend: Record<string, number> = {};
+
+      (transactions.data || []).forEach((t: any) => {
+        if (t.type === 'expense') {
+          totalSpend += t.amount;
+          if (t.categories?.name) {
+            categorySpend[t.categories.name] = (categorySpend[t.categories.name] || 0) + t.amount;
+          }
+        } else if (t.type === 'income') {
+          totalIncome += t.amount;
+        }
+      });
+
+      const userContextText = `
+User Financial Summary (Last 30 Days):
+- Total Income: $${totalIncome}
+- Total Expenses: $${totalSpend}
+- Category Breakdown: ${Object.entries(categorySpend).map(([cat, amount]) => `${cat}: $${amount}`).join(', ')}
+`;
+
       const res = await fetch('/api/insights/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: '00000000-0000-0000-0000-000000000000' }), // Mock user ID for now
+        body: JSON.stringify({ userContextText }), 
       });
       const data = await res.json();
       

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert } from '@/components';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useTransaction } from '@/hooks/useTransaction';
 import { validateTransaction, sanitizeError } from '@/libs/validation';
@@ -17,9 +17,11 @@ import {
   MoreVertical,
   ArrowUpRight,
   ArrowDownLeft,
-  Calendar
+  Calendar,
+  RefreshCcw,
+  Sparkles
 } from 'lucide-react';
-import { formatCurrency, formatDate } from '@/libs/format';
+import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
 import { getDateRange } from '@/libs/date';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 
@@ -34,6 +36,7 @@ export default function FinancePage() {
   const { transactions, isLoading: isTransactionsLoading, createTransaction, updateTransaction, deleteTransaction } = useTransaction(start, end);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
@@ -46,12 +49,9 @@ export default function FinancePage() {
     amount: '',
     type: 'expense' as 'income' | 'expense',
     category_id: '',
-    date: new Date().toISOString().split('T')[0],
+    date: getLocalISODate(),
     description: ''
   });
-
-  // SWR automatically handles fetching! No more manual useEffect logic 
-  // or fetchStartedRef guard rails needed.
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -60,7 +60,6 @@ export default function FinancePage() {
   }, [authLoading, isAuthenticated, router]);
 
   const handleSave = async () => {
-    // Validate form
     const validation = validateTransaction(form);
     if (!validation.isValid) {
       setFormErrors(validation.errors);
@@ -87,7 +86,6 @@ export default function FinancePage() {
         await createTransaction(payload);
       }
       setIsModalOpen(false);
-      // SWR's mutate() inside hook ensures it auto re-fetches!
     } catch (err) {
       const errorMessage = sanitizeError(err);
       setError(errorMessage);
@@ -97,14 +95,27 @@ export default function FinancePage() {
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmId) return;
+    try {
+      await deleteTransaction(deleteConfirmId);
+      setIsModalOpen(false);
+    } catch (err) {
+      const errorMessage = sanitizeError(err);
+      setError(errorMessage);
+    } finally {
+      setDeleteConfirmId(null);
+    }
+  };
+
   const openAddModal = () => {
     setEditingTransaction(null);
     setForm({
       title: '',
       amount: '',
-      type: 'expense',
+      type: 'expense' as const,
       category_id: '',
-      date: new Date().toISOString().split('T')[0],
+      date: getLocalISODate(),
       description: ''
     });
     setIsModalOpen(true);
@@ -152,7 +163,6 @@ export default function FinancePage() {
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
       <Layout>
       <div className="space-y-xl animate-fade-in">
-        {/* Header */}
         <div className="flex items-start justify-between flex-wrap gap-md">
           <div className="space-y-sm">
             <h1 className="text-display font-serif text-gradient">Financial Flow</h1>
@@ -166,7 +176,6 @@ export default function FinancePage() {
           </Button>
         </div>
 
-        {/* Global Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
           <Card className="p-xl relative overflow-hidden group">
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-all" />
@@ -196,7 +205,6 @@ export default function FinancePage() {
           </Card>
         </div>
 
-        {/* Filters & Search */}
         <div className="flex flex-col md:flex-row gap-md items-center justify-between">
           <div className="relative w-full md:w-96 group">
             <Search size={18} className="absolute left-md top-1/2 -translate-y-1/2 text-gray-light group-focus-within:text-primary transition-colors" />
@@ -217,7 +225,7 @@ export default function FinancePage() {
                 onClick={() => setFilterType(type)}
                 className={`px-xl py-sm text-[10px] font-bold rounded-sm transition-all uppercase tracking-widest ${
                   filterType === type 
-                    ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                    ? 'bg-primary text-warm-black shadow-lg shadow-primary/20' 
                     : 'text-gray-light hover:text-soft-cream'
                 }`}
               >
@@ -227,7 +235,6 @@ export default function FinancePage() {
           </div>
         </div>
 
-        {/* Transactions Table */}
         <Card className="overflow-hidden border-none shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -301,7 +308,6 @@ export default function FinancePage() {
         </Card>
       </div>
 
-      {/* Entry Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -404,13 +410,7 @@ export default function FinancePage() {
           {editingTransaction && (
             <button 
               type="button"
-              onClick={async () => {
-                if(confirm('Delete this entry forever?')) {
-                  await deleteTransaction(editingTransaction.id);
-                  setIsModalOpen(false);
-                  // SWR automatically re-fetches!
-                }
-              }}
+              onClick={() => setDeleteConfirmId(editingTransaction.id)}
               className="w-full py-md text-danger text-[10px] font-bold uppercase tracking-widest border border-danger/20 hover:bg-danger/5 rounded-md transition-all"
             >
               DELETE THIS TRANSACTION
@@ -418,6 +418,16 @@ export default function FinancePage() {
           )}
         </div>
       </Modal>
+
+      <ConfirmModal
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        title="DELETE TRANSACTION"
+        description="Are you sure you want to permanently delete this transaction? This action cannot be undone."
+        confirmText="DELETE"
+        isDangerous={true}
+        onConfirm={handleConfirmDelete}
+      />
       </Layout>
     </>
   );

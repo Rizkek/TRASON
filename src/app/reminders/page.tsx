@@ -8,16 +8,17 @@ import { useReminder } from '@/hooks/useReminder';
 import { validateReminder, sanitizeError } from '@/libs/validation';
 import { Reminder } from '@/types/database';
 import { 
-  Plus, 
-  Bell, 
-  CheckCircle2, 
-  Circle, 
-  Clock, 
-  Trash2, 
+  Bell,
+  CheckCircle2,
+  Circle,
+  Clock,
+  Plus,
+  Trash2,
   Filter,
   List,
   Calendar as CalendarIcon
 } from 'lucide-react';
+import { getLocalISODate } from '@/libs/format';
 
 export default function RemindersPage() {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function RemindersPage() {
   const [form, setForm] = useState({
     title: '',
     description: '',
-    dueDate: new Date().toISOString().split('T')[0],
+    dueDate: getLocalISODate(),
     dueTime: '12:00',
     priority: 'medium' as 'low' | 'medium' | 'high',
   });

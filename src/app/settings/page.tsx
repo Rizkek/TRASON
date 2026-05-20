@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Input, Loading, Alert, ErrorAlert } from '@/components';
+import { Layout, Card, Button, Input, Loading, Alert, ErrorAlert, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { supabase } from '@/services/supabaseClient';
 import { userQueries } from '@/services/queries';
@@ -208,6 +208,7 @@ export default function SettingsPage() {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isSavingPrefs, setIsSavingPrefs] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -239,12 +240,15 @@ export default function SettingsPage() {
     const root = window.document.documentElement;
     if (prefs.theme === 'dark') {
       root.classList.add('dark');
+      root.classList.remove('light');
     } else if (prefs.theme === 'light') {
       root.classList.remove('dark');
+      root.classList.add('light');
     } else {
       // Auto: check system preference
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       root.classList.toggle('dark', isDark);
+      root.classList.toggle('light', !isDark);
     }
   }, [prefs.theme]);
 
@@ -369,9 +373,17 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
-    const confirmed = prompt('Type "DELETE" to confirm account deletion');
-    if (confirmed !== 'DELETE') return;
-    showMessage('error', 'Account deletion requires manual verification. Contact support@trason.app');
+    try {
+      const { error } = await supabase.rpc('delete_user');
+      if (error) throw error;
+      
+      await supabase.auth.signOut();
+      router.push('/login');
+    } catch (err) {
+      showMessage('error', sanitizeError(err) || 'Failed to delete account. Migration 005 might be missing.');
+    } finally {
+      setDeleteConfirmOpen(false);
+    }
   };
 
   if (authLoading) {
@@ -420,7 +432,7 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-md px-xl py-md text-[10px] font-bold whitespace-nowrap rounded-md border transition-all ${
                   activeTab === tab.id
-                    ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                    ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20'
                     : 'bg-white/[0.02] text-gray-light border-white/[0.05] hover:border-white/[0.1] hover:text-soft-cream'
                 }`}
               >
@@ -525,7 +537,7 @@ export default function SettingsPage() {
                           onClick={() => setPrefs((p) => ({ ...p, theme: t as 'light' | 'dark' | 'auto' }))}
                           className={`flex-1 py-md rounded-md border text-xs font-bold uppercase tracking-widest transition-all ${
                             prefs.theme === t
-                              ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105'
+                              ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105'
                               : 'bg-white/[0.02] text-gray-light border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.2]'
                           }`}
                         >
@@ -709,18 +721,30 @@ export default function SettingsPage() {
               <div className="space-y-lg">
                 <p className="text-xs text-gray-light leading-relaxed tracking-wide">
                   Terminating your identity will result in <strong className="text-danger">TOTAL DATA ERASURE</strong>. 
-                  All logged focus sessions, financial data, and personal insights will be unrecoverable. 
                 </p>
-                <div className="pt-md">
-                  <Button variant="danger" size="sm" onClick={handleDeleteAccount} leftIcon={<Trash2 size={14} />}>
-                    TERMINATE IDENTITY
-                  </Button>
+                <div className="flex items-center gap-xl bg-danger/10 p-lg rounded-md border border-danger/20">
+                  <div className="flex-1">
+                    <p className="font-bold text-danger text-sm">Terminate Identity</p>
+                    <p className="text-xs text-danger/80">Erase all data and revoke system access.</p>
+                  </div>
+                  <Button variant="danger" size="md" onClick={() => setDeleteConfirmOpen(true)}>ERASE DATA</Button>
                 </div>
               </div>
             </Card>
           </div>
         )}
       </div>
+
+        <ConfirmModal
+          isOpen={deleteConfirmOpen}
+          onClose={() => setDeleteConfirmOpen(false)}
+          title="TERMINATE IDENTITY"
+          description="Are you absolutely sure you want to terminate your account? All your data, modules, insights, and history will be permanently erased. This action cannot be undone."
+          confirmText="ERASE EVERYTHING"
+          isDangerous={true}
+          requireInput="DELETE"
+          onConfirm={handleDeleteAccount}
+        />
       </Layout>
     </>
   );

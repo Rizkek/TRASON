@@ -44,8 +44,24 @@ export const MODULE_METADATA: Record<ModuleId, ModuleMetadata> = {
     name: 'Insights',
     description: 'AI-powered analytics and recommendations',
     icon: 'Lightbulb',
-    color: '#ec4899', // pink-500
+    color: '#ec4899',
     order: 5,
+  },
+  sport: {
+    id: 'sport',
+    name: 'Sport',
+    description: 'Track workouts, activity streaks, and fitness habits',
+    icon: 'Dumbbell',
+    color: '#10b981',
+    order: 6,
+  },
+  career: {
+    id: 'career',
+    name: 'Career',
+    description: 'Track job applications, interviews, and opportunities',
+    icon: 'Briefcase',
+    color: '#f59e0b',
+    order: 7,
   },
 };
 
@@ -144,21 +160,37 @@ export const MODULE_CONFIG: Record<ModuleId, ModuleConfig> = {
           { label: 'Finance', value: 'finance' },
           { label: 'Investments', value: 'investments' },
           { label: 'Timeline', value: 'timeline' },
+          { label: 'Sport', value: 'sport' },
+          { label: 'Career', value: 'career' },
         ],
       },
     ],
     requiredTables: ['insights'],
     dependencies: ['finance', 'investments'],
   },
+  sport: {
+    metadata: MODULE_METADATA.sport,
+    settings: [],
+    requiredTables: ['activities', 'sport_logs'],
+    dependencies: [],
+  },
+  career: {
+    metadata: MODULE_METADATA.career,
+    settings: [],
+    requiredTables: ['career_applications'],
+    dependencies: [],
+  },
 };
 
 // Default module status (all enabled)
 export const DEFAULT_MODULE_STATUS: Record<ModuleId, boolean> = {
   finance: true,
-  investments: false, // Disabled by default
+  investments: false,
   timeline: true,
   reminders: true,
   insights: true,
+  sport: true,
+  career: true,
 };
 
 // Get module metadata

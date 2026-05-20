@@ -33,9 +33,9 @@ export const Button = memo(
       const baseStyles = 'inline-flex items-center justify-center font-semibold transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none tracking-tight overflow-hidden relative focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-warm-black';
       
       const variants = {
-        primary: 'bg-primary text-white shadow-lg shadow-primary/25 hover:bg-indigo-500 hover:-translate-y-0.5',
+        primary: 'bg-warm-gold text-warm-black font-bold shadow-lg shadow-warm-gold/20 hover:bg-[#E3B84D] hover:shadow-warm-gold/30 hover:-translate-y-0.5',
         secondary: 'bg-gray-medium text-soft-cream border border-gray-light/30 hover:bg-gray-strong',
-        outline: 'bg-transparent border-2 border-primary text-soft-cream hover:bg-primary hover:text-white',
+        outline: 'bg-transparent border-2 border-warm-gold text-warm-gold hover:bg-warm-gold hover:text-warm-black',
         ghost: 'bg-transparent text-soft-cream hover:bg-white/10',
         danger: 'bg-danger text-white hover:bg-red-500',
       };

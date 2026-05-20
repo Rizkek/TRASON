@@ -48,7 +48,7 @@ export const useAuth = () => {
             try {
               // Load user profile with timeout to prevent lock hang
               const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Profile load timeout')), 3000)
+                setTimeout(() => reject(new Error('Profile load timeout')), 8000)
               );
               const userProfile = await Promise.race([
                 userQueries.getUserWithPreferences(),
@@ -59,7 +59,11 @@ export const useAuth = () => {
                 setUser(userProfile as User);
               }
             } catch (err) {
-              logError(err, 'useAuth.initSession');
+              if ((err as Error)?.message === 'Profile load timeout') {
+                console.warn('[useAuth.initSession] Profile load timed out, using basic session user');
+              } else {
+                logError(err, 'useAuth.initSession');
+              }
               if (isMountedRef.current) {
                 // Fallback to basic session user if profile fetch fails
                 const basicUser: User = {
@@ -117,7 +121,11 @@ export const useAuth = () => {
               setUser(userProfile as User);
             }
           } catch (err) {
-            logError(err, 'useAuth.authStateChange');
+            if ((err as Error)?.message === 'Profile load timeout') {
+              console.warn('[useAuth.authStateChange] Profile load timed out, using basic session user');
+            } else {
+              logError(err, 'useAuth.authStateChange');
+            }
             if (isMountedRef.current) {
               // Fallback to basic session user
               const basicUser: User = {

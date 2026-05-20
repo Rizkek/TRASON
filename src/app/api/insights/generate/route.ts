@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { openai } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
 import { z } from 'zod';
-import { aggregateUserDataForAI } from '@/modules/insights/aggregator';
 
 const insightsSchema = z.object({
   insights: z.array(
@@ -17,14 +16,13 @@ const insightsSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await req.json();
+    const { userContextText } = await req.json();
 
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    if (!userContextText) {
+      return NextResponse.json({ error: 'Context data is required' }, { status: 400 });
     }
 
-    // 1. Gather context
-    const userContextText = await aggregateUserDataForAI(userId);
+    // 1. Gather context (Already passed from client)
 
     // 2. Generate insights
     const { object } = await generateObject({

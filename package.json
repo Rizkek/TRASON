@@ -15,18 +15,20 @@
     "format": "prettier --write src/**/*.{js,ts,jsx,tsx,json,css,md}"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^3.0.54",
+    "@ai-sdk/openai": "^3.0.64",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.45.0",
     "@tanstack/react-virtual": "^3.13.24",
-    "ai": "^6.0.170",
+    "ai": "^6.0.184",
     "lucide-react": "^0.425.0",
     "next": "^15.0.0",
+    "nextjs-toploader": "^3.9.17",
     "openai": "^6.35.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^3.8.1",
     "swr": "^2.4.1",
+    "zod": "^4.4.3",
     "zustand": "^4.5.5"
   },
   "devDependencies": {

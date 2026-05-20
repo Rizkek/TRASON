@@ -4,6 +4,7 @@ export * from './ui/Badge';
 export * from './ui/Card';
 export * from './Loading';
 export * from './Modal';
+export * from './ConfirmModal';
 export * from './ui/Skeleton';
 export * from './ui/Calendar';
 export * from './Alert';

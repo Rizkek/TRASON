@@ -127,17 +127,7 @@ export const useInvestment = (): UseInvestmentReturn => {
     try {
       const position = await investmentQueries.createPosition(dataToCreate);
 
-      // Log to timeline (best effort - don't fail if this errors)
-      try {
-        await activityQueries.createActivity(
-          buildTimelinePayload(
-            buildInvestmentTimelineText(position, 'created'),
-            `Tracked ${position.amount} units of ${position.symbol.toUpperCase()} at ${position.buy_price.toFixed(2)}.`
-          )
-        );
-      } catch (timelineErr) {
-        logError(timelineErr, 'useInvestment.createPosition.timeline');
-      }
+      // Removed automatic timeline logging per user request
 
       // Cascade invalidation
       const keysToInvalidate = INVALIDATION_PATTERNS.onInvestmentChange();
@@ -167,17 +157,7 @@ export const useInvestment = (): UseInvestmentReturn => {
     try {
       const updated = await investmentQueries.updatePosition(id, updates);
 
-      // Log to timeline (best effort)
-      try {
-        await activityQueries.createActivity(
-          buildTimelinePayload(
-            buildInvestmentTimelineText(updated, 'updated'),
-            `Adjusted ${updated.symbol.toUpperCase()} holding details in Investment Analyst.`
-          )
-        );
-      } catch (timelineErr) {
-        logError(timelineErr, 'useInvestment.updatePosition.timeline');
-      }
+      // Removed automatic timeline logging per user request
 
       // Cascade invalidation
       const keysToInvalidate = INVALIDATION_PATTERNS.onInvestmentChange();
@@ -206,19 +186,7 @@ export const useInvestment = (): UseInvestmentReturn => {
 
       await investmentQueries.deletePosition(id);
 
-      // Log to timeline (best effort)
-      if (target) {
-        try {
-          await activityQueries.createActivity(
-            buildTimelinePayload(
-              buildInvestmentTimelineText(target, 'deleted'),
-              `Removed ${target.symbol.toUpperCase()} from the active portfolio view.`
-            )
-          );
-        } catch (timelineErr) {
-          logError(timelineErr, 'useInvestment.deletePosition.timeline');
-        }
-      }
+      // Removed automatic timeline logging per user request
 
       // Cascade invalidation
       const keysToInvalidate = INVALIDATION_PATTERNS.onInvestmentChange();

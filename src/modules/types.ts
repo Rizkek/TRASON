@@ -5,7 +5,7 @@
 import { ReactNode } from 'react';
 
 // Module identifiers
-export type ModuleId = 'finance' | 'investments' | 'timeline' | 'insights' | 'reminders';
+export type ModuleId = 'finance' | 'investments' | 'timeline' | 'insights' | 'reminders' | 'sport' | 'career';
 
 // Module metadata
 export interface ModuleMetadata {

@@ -47,6 +47,8 @@ export async function updateSession(request: NextRequest) {
     '/reminders',
     '/insights',
     '/settings',
+    '/sport',
+    '/career',
   ];
 
   const url = request.nextUrl.clone();

@@ -326,3 +326,137 @@ export interface Insight {
   created_at: string;
   updated_at: string;
 }
+
+/** Career / Job application tracker */
+export interface CareerApplication {
+  id: string;
+  user_id: string;
+  company_name: string;
+  role_title: string;
+  application_type: 'job' | 'internship' | 'freelance';
+  status: 'applied' | 'reviewing' | 'interview' | 'offer' | 'accepted' | 'rejected' | 'withdrawn';
+  applied_date: string;
+  interview_date?: string;
+  response_deadline?: string;
+  location?: string;
+  salary_range?: string;
+  notes?: string;
+  url?: string;
+  priority: 'low' | 'medium' | 'high';
+  tags?: string[];
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+}
+
+// ============================================================
+// SPORT — WORKOUT PLAN SYSTEM
+// ============================================================
+
+export type SportType = 'run' | 'lift' | 'cycle' | 'swim' | 'yoga' | 'hiit' | 'other';
+export type MetricType = 'weight' | 'distance' | 'reps' | 'duration' | 'pace';
+
+/** Workout Plan — multi-week training program */
+export interface WorkoutPlan {
+  id: string;
+  user_id: string;
+  name: string;
+  description?: string;
+  duration_weeks: number;
+  start_date?: string;
+  is_active: boolean;
+  is_completed: boolean;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+
+  // Computed / joined (not in DB column)
+  days?: WorkoutDay[];
+  progress_percent?: number;  // computed: sessions done / total planned sessions
+}
+
+/** Workout Day — a single training day within a plan */
+export interface WorkoutDay {
+  id: string;
+  workout_plan_id: string;
+  user_id: string;
+  day_of_week: number;          // 0=Sun, 1=Mon, ..., 6=Sat
+  name?: string;                // e.g. 'Push Day', 'Leg Day'
+  notes?: string;
+  target_duration_minutes?: number;
+  created_at: string;
+  updated_at: string;
+
+  // Joined
+  exercises?: WorkoutExercise[];
+}
+
+/** Workout Exercise — a single exercise within a workout day */
+export interface WorkoutExercise {
+  id: string;
+  workout_day_id: string;
+  user_id: string;
+  name: string;
+  sport_type: SportType;
+  notes?: string;
+  sort_order: number;
+  // Targets
+  target_sets?: number;
+  target_reps?: number;
+  target_weight_kg?: number;
+  target_distance_m?: number;
+  target_duration_s?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Per-exercise log entry (stored inside WorkoutSession.exercises_log JSONB) */
+export interface ExerciseLogEntry {
+  exercise_id?: string;         // optional: linked to WorkoutExercise
+  name: string;
+  sets_done?: number;
+  reps_done?: number;
+  weight_kg?: number;
+  distance_m?: number;
+  duration_s?: number;
+  notes?: string;
+}
+
+/** Workout Session — an actual completed workout */
+export interface WorkoutSession {
+  id: string;
+  user_id: string;
+  workout_plan_id?: string;
+  workout_day_id?: string;
+  activity_id?: string;          // linked to activities table
+  session_date: string;
+  started_at?: string;
+  completed_at?: string;
+  duration_minutes?: number;
+  mood?: string;
+  notes?: string;
+  rating?: number;
+  exercises_log: ExerciseLogEntry[];
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+
+  // Joined
+  workout_day?: Pick<WorkoutDay, 'id' | 'name' | 'day_of_week'>;
+  workout_plan?: Pick<WorkoutPlan, 'id' | 'name'>;
+}
+
+/** Personal Record — best achievement per exercise + metric */
+export interface PersonalRecord {
+  id: string;
+  user_id: string;
+  workout_session_id?: string;
+  exercise_name: string;
+  sport_type: SportType;
+  metric_type: MetricType;
+  metric_value: number;
+  metric_unit: string;            // 'kg', 'm', 'count', 's', 'min/km'
+  record_date: string;
+  notes?: string;
+  created_at: string;
+}

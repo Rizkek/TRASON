@@ -47,18 +47,30 @@ export const useAuthStore = create<AuthState>()(
 
       // Full sign-out: tells Supabase to invalidate the token, then clears local state
       signOut: async () => {
+        console.log('[authStore] Starting signOut process...');
         try {
-          await supabase.auth.signOut();
+          // Timeout to prevent hanging if Supabase server is unresponsive
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Supabase signOut timeout')), 2000)
+          );
+          
+          await Promise.race([
+            supabase.auth.signOut(),
+            timeoutPromise
+          ]);
+          console.log('[authStore] Supabase signOut successful');
         } catch (err) {
-          console.error('Supabase signOut error:', err);
+          console.error('[authStore] Supabase signOut error or timeout:', err);
+        } finally {
+          console.log('[authStore] Clearing local auth state...');
+          set({
+            user: null,
+            accessToken: null,
+            refreshToken: null,
+            isAuthenticated: false,
+            isLoading: false,
+          });
         }
-        set({
-          user: null,
-          accessToken: null,
-          refreshToken: null,
-          isAuthenticated: false,
-          isLoading: false,
-        });
       },
 
       clearError: () => set({ error: null }),

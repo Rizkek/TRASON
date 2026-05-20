@@ -5,26 +5,27 @@ module.exports = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
         // WCAG-friendly dark theme tokens
-        'primary': '#4F46E5',
-        'secondary': '#0EA5E9',
+        'primary': '#F4C95D',     // Was Indigo, now Warm Gold
+        'secondary': '#E3B84D',   // Was Blue, now Darker Gold
         'warm-black': '#0B0F14',
         'soft-cream': '#F8FAFC',
-        'accent-purple': '#7C3AED',
-        'accent-blue': '#1D4ED8',
+        'accent-purple': '#F4C95D', // Map to Gold
+        'accent-blue': '#D4AF37',   // Map to Dark Gold
         'warm-gold': '#F4C95D',
-        'pale-blush': '#FDE7EF',
-        'deep-sage': '#6B8F71',
+        'pale-blush': '#F8FAFC',    // Map to soft cream
+        'deep-sage': '#F4C95D',     // Was Green, now Gold
         'insight-taupe': '#8B7D6B',
 
         // Semantic palette
         'success': '#22C55E',
         'danger': '#EF4444',
         'warning': '#F59E0B',
-        'info': '#60A5FA',
+        'info': '#F4C95D',          // Map to Gold
 
         // Neutral grays
         'gray-strong': '#111827',
