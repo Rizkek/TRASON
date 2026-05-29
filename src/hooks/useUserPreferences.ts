@@ -46,17 +46,6 @@ export function useUserPreferences() {
   // from setUser() or setActiveLanguage() will immediately trigger a re-render.
   const activeLanguage = useAuthStore((s) => s.activeLanguage);
 
-  // --- DIAGNOSTIC LOGGING ---
-  if (process.env.NODE_ENV === 'development') {
-    console.log(
-      '[i18n] useUserPreferences |',
-      `store.activeLanguage="${activeLanguage}"`,
-      `| userPrefs.language="${userPrefs?.language ?? 'undefined'}"`,
-      `| user_preferences exists=${!!userPrefs}`,
-    );
-  }
-  // --- END DIAGNOSTIC ---
-
   const preferences = useMemo<AppPreferences>(
     () => ({
       ...DEFAULT_PREFERENCES,

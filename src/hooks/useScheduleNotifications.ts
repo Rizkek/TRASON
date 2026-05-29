@@ -70,16 +70,7 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
     swMessageListenerRef.current = true;
 
     const handler = (event: MessageEvent) => {
-      const { type, count, pending } = event.data || {};
-      if (process.env.NODE_ENV === 'development') {
-        if (type === 'SCHEDULE_CONFIRMED') {
-          console.log(`[useScheduleNotifications] SW confirmed: ${count} notification(s) scheduled`);
-        } else if (type === 'CLEAR_CONFIRMED') {
-          console.log('[useScheduleNotifications] SW confirmed: all notifications cleared');
-        } else if (type === 'STATUS') {
-          console.log(`[useScheduleNotifications] SW status: ${pending} pending, isChecking=${event.data.isChecking}`);
-        }
-      }
+      // Handled message internally
     };
 
     navigator.serviceWorker.addEventListener('message', handler);
@@ -107,22 +98,12 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
     const isSupported =
       typeof window !== 'undefined' && 'Notification' in window;
 
-    if (process.env.NODE_ENV === 'development') {
-      const permissionStatus = isSupported ? Notification.permission : 'unsupported';
-      console.log('[useScheduleNotifications] scheduleReminders()', {
-        enabled,
-        notifications_enabled: prefs.notifications_enabled,
-        permissionStatus,
-        total: reminders.length,
-      });
-    }
+
 
     if (!enabled) {
       // Clear all scheduled notifications from SW
       await postMessageToSW({ type: 'CLEAR_NOTIFICATIONS' });
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[useScheduleNotifications] Notifications disabled — cleared SW schedule');
-      }
+
       return;
     }
 
@@ -147,19 +128,10 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
     });
 
     if (swAvailable) {
-      if (process.env.NODE_ENV === 'development') {
-        const pending = reminders.filter(
-          (r) => r.status === 'pending' && r.due_datetime
-        );
-        console.log(
-          `[useScheduleNotifications] ✓ Sent ${pending.length} pending reminders to SW scheduler`
-        );
-      }
+
     } else {
       // SW not available — fall back to in-page setTimeout (e.g. HTTP localhost)
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[useScheduleNotifications] SW not available — using in-page fallback');
-      }
+
       scheduleFallback(reminders);
     }
   }, [enabled, prefs.notifications_enabled, requestNotificationPermission]);
@@ -201,11 +173,7 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
         }, timeUntil);
 
         fallbackTimeouts.current.set(key, t);
-        if (process.env.NODE_ENV === 'development') {
-          console.log(
-            `[useScheduleNotifications] Fallback scheduled: "${reminder.title}" in ${Math.round(timeUntil / 1000)}s`
-          );
-        }
+
       });
     });
   }, []);

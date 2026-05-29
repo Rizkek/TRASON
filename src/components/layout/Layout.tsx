@@ -100,15 +100,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     [menuItems, enabledModules]
   );
 
-  const { t, language } = useTranslation();
-
-  // --- DIAGNOSTIC LOGGING ---
-  if (process.env.NODE_ENV === 'development') {
-    console.log(
-      `[Layout/Sidebar] render | language="${language}" | t('nav.dashboard')="${t('nav.dashboard')}"`
-    );
-  }
-  // --- END DIAGNOSTIC ---
+  const { t } = useTranslation();
 
   if (!isAuthenticated) {
     return <>{children}</>;
@@ -117,13 +109,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
   const handleLogout = async () => {
-    console.log('[Layout] Logout button clicked');
     setIsLoggingOut(true);
-    
-    console.log('[Layout] Calling signOut()');
     await signOut();
-    
-    console.log('[Layout] signOut() finished, closing modal and redirecting');
     setIsLogoutModalOpen(false);
     setIsLoggingOut(false);
     router.push('/login');

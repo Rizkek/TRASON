@@ -291,13 +291,6 @@ export default function SettingsPage() {
       if (!userPrefs) {
         // Lock guard immediately to prevent multiple concurrent or sequential fetches
         isFormInitialized.current = true;
-        
-        if (process.env.NODE_ENV === 'development') {
-          console.log(
-            '[settings] initForm | No preferences found in Zustand cache. Querying Supabase...',
-            { userId: user.id }
-          );
-        }
 
         userQueries.getUserWithPreferences().then((fullProfile) => {
           if (fullProfile) {
@@ -308,12 +301,6 @@ export default function SettingsPage() {
             setUser(fullProfile as any); // Sync complete profile + preferences to Zustand
             
             if (freshPrefs) {
-              if (process.env.NODE_ENV === 'development') {
-                console.log(
-                  '[settings] initForm | Preferences fetched successfully from DB!',
-                  freshPrefs
-                );
-              }
               const loaded: PreferenceData = {
                 theme: freshPrefs.theme || 'dark',
                 language: freshPrefs.language || 'en',
@@ -326,19 +313,9 @@ export default function SettingsPage() {
               };
               setPrefs(loaded);
               setOriginalPrefs(loaded);
-            } else {
-              // No row in user_preferences table exists yet (e.g. newly signed up user)
-              if (process.env.NODE_ENV === 'development') {
-                console.log(
-                  '[settings] initForm | User has no preferences row in DB. Initializing with default values.'
-                );
-              }
             }
           }
         }).catch((err) => {
-          if (process.env.NODE_ENV === 'development') {
-            console.error('[settings] initForm | Failed to fetch preferences from DB:', err);
-          }
           if (navigator.onLine === false || err?.message === 'Offline') {
             setMessage({ type: 'error', text: 'You are offline. Showing cached preferences.' });
           }
@@ -374,13 +351,6 @@ export default function SettingsPage() {
       };
       setPrefs(loaded);
       setOriginalPrefs(loaded);
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log(
-          '[settings] initForm | Cache-hit! Preferences loaded directly from store.',
-          loaded
-        );
-      }
     }
   }, [authLoading, isAuthenticated, router, user, setUser]);
 

@@ -50,15 +50,6 @@ export const useAuthStore = create<AuthState>()(
         set((state) => {
           const extracted = extractLanguage(user);
           const newLang = extracted || state.activeLanguage || 'en';
-          if (process.env.NODE_ENV === 'development') {
-            console.log(
-              '[authStore] setUser |',
-              `extracted language="${extracted ?? 'none'}"`,
-              `| prev activeLanguage="${state.activeLanguage}"`,
-              `| new activeLanguage="${newLang}"`,
-              `| has user_preferences=${!!(user as any)?.user_preferences}`,
-            );
-          }
           return {
             user,
             isAuthenticated: true,
@@ -67,9 +58,6 @@ export const useAuthStore = create<AuthState>()(
         }),
 
       setActiveLanguage: (lang) => {
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`[authStore] setActiveLanguage → "${lang}"`);
-        }
         set({ activeLanguage: lang });
       },
 

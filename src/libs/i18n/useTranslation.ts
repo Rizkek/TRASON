@@ -17,20 +17,6 @@ export function useTranslation() {
   // Fallback to English if dictionary not found
   const dict = dictionaries[language] || en;
 
-  // --- DIAGNOSTIC LOGGING ---
-  if (process.env.NODE_ENV === 'development') {
-    const callerComponent = new Error().stack
-      ?.split('\n')
-      .find((line, i) => i > 1 && !line.includes('useTranslation') && !line.includes('useUserPreferences'))
-      ?.trim()
-      .replace(/.*at /, '')
-      .split(' ')[0] || 'unknown';
-    console.log(
-      `[i18n] useTranslation render | language="${language}" | dict=${language in dictionaries ? 'found' : 'MISSING→fallback en'} | caller=${callerComponent}`
-    );
-  }
-  // --- END DIAGNOSTIC ---
-
   // Simple key dot-notation resolver (e.g. 'nav.dashboard')
   const t = (key: string): string => {
     const keys = key.split('.');
