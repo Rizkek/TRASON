@@ -1,4 +1,4 @@
-import { calculateInvestmentPosition } from '../investmentService';
+import { calculateInvestmentPosition, calculatePortfolioSummary } from '../investmentService';
 import { InvestmentPosition } from '@/services/supabaseClient';
 
 describe('InvestmentService', () => {
@@ -9,6 +9,10 @@ describe('InvestmentService', () => {
     asset_type: 'stock',
     amount: 10,
     buy_price: 150,
+    buy_date: '2026-05-01',
+    quote_currency: 'USD',
+    price_source: 'manual',
+    is_active: true,
     created_at: '',
     updated_at: '',
   };
@@ -38,6 +42,30 @@ describe('InvestmentService', () => {
       expect(result.current_price).toBe(150);
       expect(result.current_value).toBe(1500);
       expect(result.profit_loss).toBe(0);
+    });
+  });
+
+  describe('calculatePortfolioSummary', () => {
+    it('should compute risk metadata for each position', () => {
+      const positions = [mockPosition];
+      const quotes = {
+        '1': {
+          symbol: 'AAPL',
+          assetType: 'stock' as const,
+          currentPrice: 180,
+          changePercent24h: 2,
+          source: 'alphavantage' as const,
+          asOf: '',
+        },
+      };
+
+      const { calculatedPositions, summary } = calculatePortfolioSummary(positions, quotes);
+      expect(calculatedPositions[0].portfolio_weight_pct).toBeGreaterThan(0);
+      expect(calculatedPositions[0].bucket_weight_pct).toBe(100);
+      expect(calculatedPositions[0].risk_score).toBeGreaterThanOrEqual(0);
+      expect(calculatedPositions[0].risk_category).toBeDefined();
+      expect(calculatedPositions[0].risk_status).toBe('overweight');
+      expect(summary.totalValue).toBe(1800);
     });
   });
 });

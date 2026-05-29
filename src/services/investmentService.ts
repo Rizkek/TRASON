@@ -23,6 +23,11 @@ export interface CalculatedInvestmentPosition extends InvestmentPosition {
   percentage_change: number;
   day_change_value: number;
   day_change_percent: number;
+  portfolio_weight_pct: number;
+  bucket_weight_pct: number;
+  risk_score: number;
+  risk_category: 'low' | 'moderate' | 'high';
+  risk_status: 'underweight' | 'balanced' | 'overweight';
 }
 
 export interface InvestmentPortfolioSummary {
@@ -41,11 +46,37 @@ export interface InvestmentPortfolioSummary {
 export interface InvestmentInsightResponse {
   headline: string;
   observations: string[];
+  scenario?: 'bearish' | 'neutral' | 'bullish';
+  confidence?: 'low' | 'moderate' | 'high';
+  riskWarning?: string;
+  recommendation?: string;
 }
 
 const safePercent = (numerator: number, denominator: number) => {
   if (!denominator) return 0;
   return (numerator / denominator) * 100;
+};
+
+const getRiskStatus = (portfolioWeightPct: number) => {
+  if (portfolioWeightPct >= 15) return 'overweight' as const;
+  if (portfolioWeightPct <= 3) return 'underweight' as const;
+  return 'balanced' as const;
+};
+
+const getRiskCategory = (score: number) => {
+  if (score >= 45) return 'high' as const;
+  if (score >= 25) return 'moderate' as const;
+  return 'low' as const;
+};
+
+const calculateRiskScore = (
+  position: CalculatedInvestmentPosition,
+  portfolioWeightPct: number
+) => {
+  const volatilityScore = Math.min(100, Math.abs(position.day_change_percent) * 4);
+  const weightScore = Math.min(100, portfolioWeightPct * 0.6);
+  const assetBonus = position.asset_type === 'crypto' ? 5 : position.asset_type === 'gold' ? 2 : 0;
+  return Math.min(100, weightScore + volatilityScore + assetBonus);
 };
 
 export const calculateInvestmentPosition = (
@@ -75,6 +106,11 @@ export const calculateInvestmentPosition = (
     percentage_change: percentageChange,
     day_change_value: dayChangeValue,
     day_change_percent: dayChangePercent,
+    portfolio_weight_pct: 0,
+    bucket_weight_pct: 0,
+    risk_score: 0,
+    risk_category: 'low',
+    risk_status: 'balanced',
   };
 };
 
@@ -102,11 +138,38 @@ export const calculatePortfolioSummary = (
     { stock: 0, crypto: 0, gold: 0 } as Record<InvestmentAssetType, number>
   );
 
-  const topPerformer = [...calculatedPositions].sort(
+  const bucketTotals = calculatedPositions.reduce(
+    (acc, item) => {
+      acc[item.asset_type] += item.current_value;
+      return acc;
+    },
+    { stock: 0, crypto: 0, gold: 0 } as Record<InvestmentAssetType, number>
+  );
+
+  const finalPositions = calculatedPositions.map((item) => {
+    const portfolioWeightPct = safePercent(item.current_value, totalValue);
+    const bucketWeightPct = bucketTotals[item.asset_type]
+      ? safePercent(item.current_value, bucketTotals[item.asset_type])
+      : 0;
+    const risk_score = calculateRiskScore(item, portfolioWeightPct);
+    const risk_category = getRiskCategory(risk_score);
+    const risk_status = getRiskStatus(portfolioWeightPct);
+
+    return {
+      ...item,
+      portfolio_weight_pct: portfolioWeightPct,
+      bucket_weight_pct: bucketWeightPct,
+      risk_score,
+      risk_category,
+      risk_status,
+    };
+  });
+
+  const topPerformer = [...finalPositions].sort(
     (a, b) => b.percentage_change - a.percentage_change
   )[0];
 
-  const volatilityByType = calculatedPositions.reduce(
+  const volatilityByType = finalPositions.reduce(
     (acc, item) => {
       acc[item.asset_type].total += Math.abs(item.day_change_percent);
       acc[item.asset_type].count += 1;
@@ -129,7 +192,7 @@ export const calculatePortfolioSummary = (
     .sort((a, b) => b.average - a.average)[0]?.type;
 
   return {
-    calculatedPositions,
+    calculatedPositions: finalPositions,
     summary: {
       totalCost,
       totalValue,
@@ -137,7 +200,7 @@ export const calculatePortfolioSummary = (
       totalChangePercent,
       dailyChangeValue,
       dailyChangePercent,
-      positionsCount: calculatedPositions.length,
+      positionsCount: finalPositions.length,
       allocationByType,
       topPerformer,
       riskiestBucket,

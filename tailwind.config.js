@@ -9,32 +9,29 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // WCAG-friendly dark theme tokens
-        'primary': '#F4C95D',     // Was Indigo, now Warm Gold
-        'secondary': '#E3B84D',   // Was Blue, now Darker Gold
-        'warm-black': '#0B0F14',
-        'soft-cream': '#F8FAFC',
-        'accent-purple': '#F4C95D', // Map to Gold
-        'accent-blue': '#D4AF37',   // Map to Dark Gold
-        'warm-gold': '#F4C95D',
-        'pale-blush': '#F8FAFC',    // Map to soft cream
-        'deep-sage': '#F4C95D',     // Was Green, now Gold
-        'insight-taupe': '#8B7D6B',
+        // WCAG-friendly dynamic theme tokens (mapped to globals.css variables)
+        'primary': 'rgb(var(--color-primary) / <alpha-value>)',
+        'secondary': 'rgb(var(--color-secondary) / <alpha-value>)',
+        'warm-black': 'rgb(var(--color-warm-black) / <alpha-value>)',
+        'soft-cream': 'rgb(var(--color-soft-cream) / <alpha-value>)',
+        'warm-gold': 'rgb(var(--color-primary) / <alpha-value>)', // Alias to primary
+        'deep-sage': '#8DA399',     // Static
+        'insight-taupe': '#A39482', // Static
 
-        // Semantic palette
-        'success': '#22C55E',
-        'danger': '#EF4444',
-        'warning': '#F59E0B',
-        'info': '#F4C95D',          // Map to Gold
+        // Semantic palette (Static)
+        'success': '#4ADE80',
+        'danger': '#F87171',
+        'warning': '#FB923C',
+        'info': '#60A5FA',
 
-        // Neutral grays
-        'gray-strong': '#111827',
-        'gray-medium': '#1F2937',
-        'gray-light': '#CBD5E1',
-        'gray-very-light': '#E2E8F0',
+        // Neutral grays - Dynamic
+        'gray-strong': 'rgb(var(--color-gray-strong) / <alpha-value>)',
+        'gray-medium': 'rgb(var(--color-gray-medium) / <alpha-value>)',
+        'gray-light': 'rgb(var(--color-gray-light) / <alpha-value>)',
+        'gray-very-light': 'rgb(var(--color-gray-very-light) / <alpha-value>)',
       },
       fontFamily: {
-        serif: ['var(--font-crimson)', 'serif'],
+        serif: ['var(--font-cormorant)', 'serif'],
         sans: ['var(--font-inter)', 'sans-serif'],
       },
       fontSize: {
@@ -53,6 +50,9 @@ module.exports = {
         'lg': '24px',
         'xl': '32px',
         '2xl': '48px',
+        '3xl': '64px',
+        '4xl': '96px',
+        '5xl': '128px',
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in',
@@ -83,5 +83,7 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 };

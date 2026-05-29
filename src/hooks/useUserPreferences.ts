@@ -31,17 +31,40 @@ const LANGUAGE_LOCALES: Record<string, string> = {
   en: 'en-US',
   id: 'id-ID',
   ja: 'ja-JP',
+  es: 'es-ES',
 };
 
 export function useUserPreferences() {
-  const userPrefs = useAuthStore((s) => (s.user as any)?.user_preferences?.[0]);
+  // Read the rest of the preferences (theme, currency, timezone, etc.) from user object
+  const userPrefs = useAuthStore((s) => {
+    const prefs = (s.user as any)?.user_preferences;
+    return Array.isArray(prefs) ? prefs[0] : prefs;
+  });
+
+  // Use dedicated string primitive for language — this is the reliable single source of truth.
+  // Zustand's strict equality check works perfectly on strings, so any language change
+  // from setUser() or setActiveLanguage() will immediately trigger a re-render.
+  const activeLanguage = useAuthStore((s) => s.activeLanguage);
+
+  // --- DIAGNOSTIC LOGGING ---
+  if (process.env.NODE_ENV === 'development') {
+    console.log(
+      '[i18n] useUserPreferences |',
+      `store.activeLanguage="${activeLanguage}"`,
+      `| userPrefs.language="${userPrefs?.language ?? 'undefined'}"`,
+      `| user_preferences exists=${!!userPrefs}`,
+    );
+  }
+  // --- END DIAGNOSTIC ---
 
   const preferences = useMemo<AppPreferences>(
     () => ({
       ...DEFAULT_PREFERENCES,
       ...userPrefs,
+      // Override language with the dedicated field — always authoritative
+      language: activeLanguage,
     }),
-    [userPrefs]
+    [userPrefs, activeLanguage]
   );
 
   const locale = LANGUAGE_LOCALES[preferences.language] || 'en-US';

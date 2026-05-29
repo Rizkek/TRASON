@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Layout, Card, Button, Input, Loading, Alert, ErrorAlert, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
-import { supabase } from '@/services/supabaseClient';
+import { User, supabase } from '@/services/supabaseClient';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import { userQueries } from '@/services/queries';
 import { sanitizeError, validateEmail } from '@/libs/validation';
 import { useAllModuleStatus, useModuleStatus } from '@/hooks/useModuleStatus';
 import { usePushNotification } from '@/hooks/usePushNotification';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ModuleId } from '@/modules/types';
 import {
   User as UserIcon,
@@ -18,12 +20,12 @@ import {
   Camera,
   Globe,
   Save,
-  Trash2,
   Lock,
   Grid3X3,
   Wallet,
   TrendingUp,
   Clock,
+  AlertTriangle,
   type LucideIcon
 } from 'lucide-react';
 
@@ -75,14 +77,15 @@ const LANGUAGE_OPTIONS = [
   { value: 'en', label: 'English' },
   { value: 'id', label: 'Bahasa Indonesia' },
   { value: 'ja', label: '日本語' },
+  { value: 'es', label: 'Español' },
 ];
 
 // Module Item Component to handle its own hook logic
-const ModuleItem: React.FC<{ 
-  id: ModuleId; 
-  isEnabled: boolean; 
-  metadata: any; 
-  userId?: string 
+const ModuleItem: React.FC<{
+  id: ModuleId;
+  isEnabled: boolean;
+  metadata: any;
+  userId?: string
 }> = ({ id, isEnabled, metadata, userId }) => {
   const { toggle, isLoading: isHookLoading } = useModuleStatus(id, userId);
   const [isLocalLoading, setIsLocalLoading] = useState(false);
@@ -200,20 +203,31 @@ const ModuleSettingsTab: React.FC<{ userId?: string }> = ({ userId }) => {
 export default function SettingsPage() {
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
+  const setActiveLanguage = useAuthStore((s) => s.setActiveLanguage);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
   const user = useAuthStore((s) => s.user) as UserData | null;
+  const { language: activeLanguage } = useUserPreferences();
 
   const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isSavingPrefs, setIsSavingPrefs] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  
+
+  /**
+   * Guard: ensure the profile/prefs form is only initialized ONCE from the DB,
+   * not on every re-render caused by setUser() (which would reset unsaved edits).
+   */
+  const isFormInitialized = React.useRef(false);
+
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const push = usePushNotification();
+
+  // Snapshot preferensi terakhir yang tersimpan di DB — untuk deteksi perubahan push setting
+  const [originalPrefs, setOriginalPrefs] = useState<PreferenceData | null>(null);
 
   // Profile form
   const [profile, setProfile] = useState<ProfileData>({
@@ -225,7 +239,7 @@ export default function SettingsPage() {
 
   // Preferences form
   const [prefs, setPrefs] = useState<PreferenceData>({
-    theme: 'dark', // Default to dark for TRASON
+    theme: 'dark',
     language: 'en',
     currency: 'USD',
     timezone: 'UTC',
@@ -234,6 +248,8 @@ export default function SettingsPage() {
     email_digest_enabled: true,
     digest_frequency: 'weekly',
   });
+
+  const { t } = useTranslation();
 
   // Apply theme instantly (Optimistic UI)
   useEffect(() => {
@@ -245,7 +261,6 @@ export default function SettingsPage() {
       root.classList.remove('dark');
       root.classList.add('light');
     } else {
-      // Auto: check system preference
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       root.classList.toggle('dark', isDark);
       root.classList.toggle('light', !isDark);
@@ -262,44 +277,124 @@ export default function SettingsPage() {
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated) {
+      // Reset the init guard on sign-out so next login re-initializes the form
+      isFormInitialized.current = false;
       router.push('/login');
       return;
     }
 
-    if (user) {
+    if (user && !isFormInitialized.current) {
+      const userPrefs = Array.isArray((user as any).user_preferences)
+        ? (user as any).user_preferences[0]
+        : (user as any).user_preferences;
+
+      if (!userPrefs) {
+        // Lock guard immediately to prevent multiple concurrent or sequential fetches
+        isFormInitialized.current = true;
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log(
+            '[settings] initForm | No preferences found in Zustand cache. Querying Supabase...',
+            { userId: user.id }
+          );
+        }
+
+        userQueries.getUserWithPreferences().then((fullProfile) => {
+          if (fullProfile) {
+            const freshPrefs = Array.isArray((fullProfile as any).user_preferences)
+              ? (fullProfile as any).user_preferences[0]
+              : (fullProfile as any).user_preferences;
+              
+            setUser(fullProfile as any); // Sync complete profile + preferences to Zustand
+            
+            if (freshPrefs) {
+              if (process.env.NODE_ENV === 'development') {
+                console.log(
+                  '[settings] initForm | Preferences fetched successfully from DB!',
+                  freshPrefs
+                );
+              }
+              const loaded: PreferenceData = {
+                theme: freshPrefs.theme || 'dark',
+                language: freshPrefs.language || 'en',
+                currency: freshPrefs.currency || 'USD',
+                timezone: freshPrefs.timezone || 'UTC',
+                notifications_enabled: freshPrefs.notifications_enabled ?? true,
+                push_notifications_enabled: freshPrefs.push_notifications_enabled ?? true,
+                email_digest_enabled: freshPrefs.email_digest_enabled ?? true,
+                digest_frequency: freshPrefs.digest_frequency || 'weekly',
+              };
+              setPrefs(loaded);
+              setOriginalPrefs(loaded);
+            } else {
+              // No row in user_preferences table exists yet (e.g. newly signed up user)
+              if (process.env.NODE_ENV === 'development') {
+                console.log(
+                  '[settings] initForm | User has no preferences row in DB. Initializing with default values.'
+                );
+              }
+            }
+          }
+        }).catch((err) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[settings] initForm | Failed to fetch preferences from DB:', err);
+          }
+          if (navigator.onLine === false || err?.message === 'Offline') {
+            setMessage({ type: 'error', text: 'You are offline. Showing cached preferences.' });
+          }
+        });
+
+        // Initialize profile immediately while preference request is in-flight (avoids layout shift)
+        setProfile({
+          first_name: user.first_name || '',
+          last_name: user.last_name || '',
+          phone: user.phone || '',
+          bio: user.bio || '',
+        });
+        return;
+      }
+
+      // User has cached preferences — initialize form directly
+      isFormInitialized.current = true;
       setProfile({
         first_name: user.first_name || '',
         last_name: user.last_name || '',
         phone: user.phone || '',
         bio: user.bio || '',
       });
-      const userPrefs = user.user_preferences?.[0];
-      if (userPrefs) {
-        setPrefs({
-          theme: userPrefs.theme || 'dark',
-          language: userPrefs.language || 'en',
-          currency: userPrefs.currency || 'USD',
-          timezone: userPrefs.timezone || 'UTC',
-          notifications_enabled: userPrefs.notifications_enabled ?? true,
-          push_notifications_enabled: userPrefs.push_notifications_enabled ?? true,
-          email_digest_enabled: userPrefs.email_digest_enabled ?? true,
-          digest_frequency: userPrefs.digest_frequency || 'weekly',
-        });
+      const loaded: PreferenceData = {
+        theme: userPrefs.theme || 'dark',
+        language: userPrefs.language || 'en',
+        currency: userPrefs.currency || 'USD',
+        timezone: userPrefs.timezone || 'UTC',
+        notifications_enabled: userPrefs.notifications_enabled ?? true,
+        push_notifications_enabled: userPrefs.push_notifications_enabled ?? true,
+        email_digest_enabled: userPrefs.email_digest_enabled ?? true,
+        digest_frequency: userPrefs.digest_frequency || 'weekly',
+      };
+      setPrefs(loaded);
+      setOriginalPrefs(loaded);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log(
+          '[settings] initForm | Cache-hit! Preferences loaded directly from store.',
+          loaded
+        );
       }
     }
-  }, [authLoading, isAuthenticated, router, user]);
+  }, [authLoading, isAuthenticated, router, user, setUser]);
+
 
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
-    setTimeout(() => setMessage(null), 4000);
+    setTimeout(() => setMessage(null), 5000);
   };
 
   const handleSaveProfile = async () => {
-    // Validation
     const errors: Record<string, string> = {};
     if (!profile.first_name.trim()) errors.first_name = 'First name is required';
     if (profile.bio.length > 500) errors.bio = 'Bio must be under 500 characters';
-    
+
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       showMessage('error', 'Validation failed. Check your inputs.');
@@ -309,6 +404,7 @@ export default function SettingsPage() {
     setIsSavingProfile(true);
     setFormErrors({});
     try {
+      if (navigator.onLine === false) throw new Error('Offline');
       await userQueries.updateUserProfile(profile);
       const updated = await userQueries.getUserWithPreferences();
       if (updated) setUser(updated as any);
@@ -322,22 +418,68 @@ export default function SettingsPage() {
 
   const handleSavePreferences = async () => {
     setIsSavingPrefs(true);
+    let pushWarning: string | null = null;
+
     try {
-      if (prefs.notifications_enabled && prefs.push_notifications_enabled) {
-        await push.subscribe();
-      } else {
-        try {
-          await push.unsubscribe();
-        } catch {
-          // Ignore
+      if (navigator.onLine === false) throw new Error('Offline');
+
+      // Hanya jalankan push subscribe/unsubscribe jika setting notifikasi berubah
+      const pushSettingChanged =
+        !originalPrefs ||
+        originalPrefs.notifications_enabled !== prefs.notifications_enabled ||
+        originalPrefs.push_notifications_enabled !== prefs.push_notifications_enabled;
+
+      if (pushSettingChanged) {
+        if (prefs.notifications_enabled && prefs.push_notifications_enabled) {
+          try {
+            await push.subscribe();
+          } catch (pushErr) {
+            // Non-blocking: catat peringatan, JANGAN hentikan penyimpanan ke DB
+            pushWarning = pushErr instanceof Error ? pushErr.message : 'Push subscription failed';
+          }
+        } else {
+          try {
+            await push.unsubscribe();
+          } catch {
+            // Abaikan error unsubscribe (mungkin memang belum terdaftar)
+          }
         }
       }
 
-      await userQueries.updateUserPreferences(prefs);
-      const updated = await userQueries.getUserWithPreferences();
-      if (updated) setUser(updated as any);
-      showMessage('success', 'Digital environment sync successful!');
+      const updatedPrefs = await userQueries.updateUserPreferences(prefs);
+
+      if (updatedPrefs) {
+        const freshUser = useAuthStore.getState().user;
+
+        const normalizedPrefs = {
+          theme: updatedPrefs.theme,
+          language: updatedPrefs.language,
+          currency: updatedPrefs.currency,
+          timezone: updatedPrefs.timezone,
+          notifications_enabled: updatedPrefs.notifications_enabled,
+          push_notifications_enabled: updatedPrefs.push_notifications_enabled,
+          email_digest_enabled: updatedPrefs.email_digest_enabled,
+          digest_frequency: updatedPrefs.digest_frequency,
+        };
+
+        setUser({ ...freshUser, user_preferences: [normalizedPrefs] } as any);
+        // Sync language to the dedicated store primitive
+        useAuthStore.setState({ activeLanguage: normalizedPrefs.language || 'en' });
+        // Sync local prefs state to keep the form consistent
+        setPrefs(normalizedPrefs as typeof prefs);
+        setOriginalPrefs({ ...prefs, ...normalizedPrefs });
+      }
+
+      if (pushWarning) {
+        showMessage('success', `Preferences saved! (Push: ${pushWarning})`);
+      } else {
+        showMessage('success', 'Digital environment sync successful!');
+      }
     } catch (err) {
+      // NOTE: We intentionally do NOT rollback the language on network failure.
+      // The optimistic language change is already in Zustand + localStorage.
+      // If Supabase is temporarily unreachable, the user's choice is preserved
+      // locally and they can try saving again when online.
       showMessage('error', sanitizeError(err));
     } finally {
       setIsSavingPrefs(false);
@@ -376,7 +518,6 @@ export default function SettingsPage() {
     try {
       const { error } = await supabase.rpc('delete_user');
       if (error) throw error;
-      
       await supabase.auth.signOut();
       router.push('/login');
     } catch (err) {
@@ -399,11 +540,11 @@ export default function SettingsPage() {
   if (!isAuthenticated) return null;
 
   const tabs: { id: Tab; label: string; icon: LucideIcon }[] = [
-    { id: 'profile', label: 'PROFILE', icon: UserIcon },
-    { id: 'preferences', label: 'INTERFACE', icon: Paintbrush },
-    { id: 'notifications', label: 'ALERTS', icon: BellRing },
-    { id: 'modules', label: 'MODULES', icon: Grid3X3 },
-    { id: 'security', label: 'SECURITY', icon: ShieldCheck },
+    { id: 'profile', label: t('settings.tabs.profile'), icon: UserIcon },
+    { id: 'preferences', label: t('settings.tabs.interface'), icon: Paintbrush },
+    { id: 'notifications', label: t('settings.tabs.alerts'), icon: BellRing },
+    { id: 'modules', label: t('settings.tabs.modules'), icon: Grid3X3 },
+    { id: 'security', label: t('settings.tabs.security'), icon: ShieldCheck },
   ];
 
   return (
@@ -411,339 +552,351 @@ export default function SettingsPage() {
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
       <Layout>
         <div className="space-y-xl animate-fade-in max-w-4xl">
-        <div className="space-y-sm">
-          <h1 className="text-display font-serif text-gradient">Account Settings</h1>
-          <p className="text-subtext">Manage your digital identity and preferences</p>
-        </div>
-
-        {message && (
-          <Alert type={message.type} className="glow-primary">
-            {message.text}
-          </Alert>
-        )}
-
-        <div className="flex gap-md overflow-x-auto pb-md no-scrollbar">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-md px-xl py-md text-[10px] font-bold whitespace-nowrap rounded-md border transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20'
-                    : 'bg-white/[0.02] text-gray-light border-white/[0.05] hover:border-white/[0.1] hover:text-soft-cream'
-                }`}
-              >
-                <Icon size={14} />
-                <span className="tracking-[0.2em]">{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Profile Tab */}
-        {activeTab === 'profile' && (
-          <Card className="glass border-none shadow-2xl relative overflow-hidden">
-             <div className="absolute top-0 right-0 w-64 h-64 bg-primary opacity-[0.02] blur-3xl pointer-events-none" />
-             
-            <div className="p-xl space-y-xl relative z-10">
-              <div className="flex flex-col md:flex-row items-center gap-xl pb-xl border-b border-white/[0.05]">
-                <div className="relative group">
-                  <div className="w-24 h-24 rounded-2xl bg-gradient-primary p-[2px]">
-                    <div className="w-full h-full rounded-2xl bg-gray-strong flex items-center justify-center text-3xl font-serif font-bold text-white relative overflow-hidden">
-                      {profile.first_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
-                      <div className="absolute inset-0 bg-primary opacity-5 group-hover:opacity-20 transition-opacity" />
-                    </div>
-                  </div>
-                  <button type="button" className="absolute -bottom-2 -right-2 p-sm bg-secondary text-white rounded-md shadow-lg border border-white/20 hover:scale-110 transition-transform">
-                    <Camera size={14} />
-                  </button>
-                </div>
-                <div className="text-center md:text-left">
-                  <h2 className="text-xl font-bold text-soft-cream tracking-tight">
-                    {profile.first_name || profile.last_name
-                      ? `${profile.first_name} ${profile.last_name}`.trim()
-                      : 'Syncing Identity...'}
-                  </h2>
-                  <p className="text-sm text-gray-light italic">{user?.email}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
-                <Input
-                  label="FIRST NAME"
-                  value={profile.first_name}
-                  onChange={(e) => setProfile((p) => ({ ...p, first_name: e.target.value }))}
-                  error={formErrors.first_name}
-                />
-                <Input
-                  label="LAST NAME"
-                  value={profile.last_name}
-                  onChange={(e) => setProfile((p) => ({ ...p, last_name: e.target.value }))}
-                />
-              </div>
-
-              <Input
-                label="CONTACT NUMBER"
-                placeholder="+00 000 000 000"
-                value={profile.phone}
-                onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
-              />
-
-              <div className="space-y-sm">
-                <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">SHORT BIO</label>
-                <textarea
-                  value={profile.bio}
-                  onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
-                  placeholder="Tell us about your mission..."
-                  rows={4}
-                  className={`w-full bg-gray-strong/40 border rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none transition-all ${
-                    formErrors.bio ? 'border-danger' : 'border-white/[0.05]'
-                  }`}
-                />
-                {formErrors.bio && <p className="text-[10px] text-danger mt-1">{formErrors.bio}</p>}
-              </div>
-
-              <div className="flex justify-end pt-md">
-                <Button 
-                  variant="primary" 
-                  size="md" 
-                  onClick={handleSaveProfile} 
-                  disabled={isSavingProfile}
-                  leftIcon={<Save size={18} />}
-                >
-                  {isSavingProfile ? 'PERSISTING...' : 'UPDATE PROFILE'}
-                </Button>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Preferences Tab */}
-        {activeTab === 'preferences' && (
-          <div className="space-y-lg">
-            <Card className="glass border-none" title="DISPLAY & INTERFACE">
-              <div className="space-y-xl">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
-                  <div className="space-y-sm">
-                    <label className="text-[10px] font-bold text-gray-light tracking-widest">THEME ENGINE</label>
-                    <div className="flex gap-md">
-                      {['light', 'dark', 'auto'].map((t) => (
-                        <button
-                          key={t}
-                          type="button"
-                          onClick={() => setPrefs((p) => ({ ...p, theme: t as 'light' | 'dark' | 'auto' }))}
-                          className={`flex-1 py-md rounded-md border text-xs font-bold uppercase tracking-widest transition-all ${
-                            prefs.theme === t
-                              ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105'
-                              : 'bg-white/[0.02] text-gray-light border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.2]'
-                          }`}
-                        >
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                    <p className="text-[10px] text-primary mt-2 italic opacity-80">
-                      * Previewing {prefs.theme} mode instantly. Click persist to save globally.
-                    </p>
-                  </div>
-                  <div className="space-y-sm">
-                    <label className="text-[10px] font-bold text-gray-light tracking-widest flex items-center gap-sm">
-                      <Globe size={12} className="text-secondary" /> REGIONAL LANGUAGE
-                    </label>
-                    <select
-                      value={prefs.language}
-                      onChange={(e) => setPrefs((p) => ({ ...p, language: e.target.value }))}
-                      className="w-full h-12 bg-gray-strong/40 border border-white/[0.05] rounded-md px-lg text-sm text-soft-cream focus:border-primary focus:outline-none"
-                    >
-                      {LANGUAGE_OPTIONS.map((l) => (
-                        <option key={l.value} value={l.value} className="bg-gray-strong">{l.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
-                  <div className="space-y-sm">
-                    <label className="text-[10px] font-bold text-gray-light tracking-widest">LOCAL CURRENCY</label>
-                    <select
-                      value={prefs.currency}
-                      onChange={(e) => setPrefs((p) => ({ ...p, currency: e.target.value }))}
-                      className="w-full h-12 bg-gray-strong/40 border border-white/[0.05] rounded-md px-lg text-sm text-soft-cream focus:border-primary focus:outline-none"
-                    >
-                      {CURRENCY_OPTIONS.map((c) => <option key={c} value={c} className="bg-gray-strong">{c}</option>)}
-                    </select>
-                  </div>
-                  <div className="space-y-sm">
-                    <label className="text-[10px] font-bold text-gray-light tracking-widest">TIMEZONE OFFSET</label>
-                    <select
-                      value={prefs.timezone}
-                      onChange={(e) => setPrefs((p) => ({ ...p, timezone: e.target.value }))}
-                      className="w-full h-12 bg-gray-strong/40 border border-white/[0.05] rounded-md px-lg text-sm text-soft-cream focus:border-primary focus:outline-none"
-                    >
-                      {TIMEZONE_OPTIONS.map((tz) => <option key={tz} value={tz} className="bg-gray-strong">{tz}</option>)}
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <div className="flex justify-end">
-              <Button variant="primary" size="md" onClick={handleSavePreferences} disabled={isSavingPrefs} leftIcon={<Save size={18} />}>
-                {isSavingPrefs ? 'SYNCING...' : 'PERSIST PREFERENCES'}
-              </Button>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-md mb-xl">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-soft-cream">
+                {t('settings.title')}
+              </h1>
+              <p className="text-gray-light mt-1 text-sm">{t('settings.subtitle')}</p>
             </div>
           </div>
-        )}
 
-        {/* Notifications Tab */}
-        {activeTab === 'notifications' && (
-          <div className="space-y-lg">
-            <Card className="glass border-none" title="ALERTS & UPDATES">
-              <div className="p-sm space-y-md">
-                {[
-                  { key: 'notifications_enabled', label: 'Push Sync', desc: 'Real-time heartbeat of your activities', icon: BellRing },
-                  { key: 'push_notifications_enabled', label: 'Mobile Pulse', desc: 'Critical alerts direct to your hardware', icon: Globe },
-                  { key: 'email_digest_enabled', label: 'Strategic Digest', desc: 'High-level weekly field reports', icon: Paintbrush },
-                ].map(({ key, label, desc, icon: Icon }) => (
-                  <div key={key} className="flex items-center justify-between p-lg rounded-md hover:bg-white/[0.02] border border-transparent hover:border-white/[0.05] transition-all">
-                    <div className="flex items-center gap-xl">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <Icon size={18} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold tracking-tight text-soft-cream uppercase">{label}</p>
-                        <p className="text-[10px] text-gray-light mt-0.5 opacity-60 font-medium uppercase tracking-widest">{desc}</p>
+          {message && (
+            <Alert type={message.type} className="glow-primary">
+              {message.text}
+            </Alert>
+          )}
+
+          <div className="flex gap-md overflow-x-auto pb-md no-scrollbar">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-md px-xl py-md text-[10px] font-bold whitespace-nowrap rounded-md border transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20'
+                      : 'bg-white/[0.02] text-gray-light border-white/[0.05] hover:border-white/[0.1] hover:text-soft-cream'
+                  }`}
+                >
+                  <Icon size={14} />
+                  <span className="tracking-[0.2em]">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Profile Tab */}
+          {activeTab === 'profile' && (
+            <Card className="glass border-none shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary opacity-[0.02] blur-3xl pointer-events-none" />
+
+              <div className="p-xl space-y-xl relative z-10">
+                <div className="flex flex-col md:flex-row items-center gap-xl pb-xl border-b border-white/[0.05]">
+                  <div className="relative group">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-primary p-[2px]">
+                      <div className="w-full h-full rounded-2xl bg-gray-strong flex items-center justify-center text-3xl font-serif font-bold text-white relative overflow-hidden">
+                        {profile.first_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
+                        <div className="absolute inset-0 bg-primary opacity-5 group-hover:opacity-20 transition-opacity" />
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setPrefs((p) => ({ ...p, [key]: !(p as any)[key] }))}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        (prefs as any)[key] ? 'bg-primary' : 'bg-gray-strong border border-white/[0.1]'
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          (prefs as any)[key] ? 'translate-x-6' : 'translate-x-1'
-                        }`}
-                      />
+                    <button type="button" className="absolute -bottom-2 -right-2 p-sm bg-secondary text-white rounded-md shadow-lg border border-white/20 hover:scale-110 transition-transform">
+                      <Camera size={14} />
                     </button>
                   </div>
-                ))}
-
-                {prefs.push_notifications_enabled && (
-                  <p className="text-xs text-gray-light px-lg">
-                    Browser permission: {push.isSupported ? Notification.permission : 'unsupported'}
-                  </p>
-                )}
-
-                {prefs.email_digest_enabled && (
-                  <div className="p-xl bg-white/[0.01] rounded-md border border-white/[0.03]">
-                    <label className="text-[10px] font-bold text-gray-light tracking-widest mb-md block">TRANSMISSION FREQUENCY</label>
-                    <div className="flex gap-md">
-                      {['daily', 'weekly', 'monthly'].map((freq) => (
-                        <button
-                          key={freq}
-                          type="button"
-                          onClick={() => setPrefs((p) => ({ ...p, digest_frequency: freq }))}
-                          className={`flex-1 py-md rounded-md border text-[10px] font-bold uppercase tracking-widest transition-all ${
-                            prefs.digest_frequency === freq
-                              ? 'bg-secondary text-white border-secondary shadow-lg shadow-secondary/20'
-                              : 'bg-transparent text-gray-light border-white/[0.1] hover:text-soft-cream'
-                          }`}
-                        >
-                          {freq}
-                        </button>
-                      ))}
-                    </div>
+                  <div className="text-center md:text-left">
+                    <h2 className="text-xl font-bold text-soft-cream tracking-tight">
+                      {profile.first_name || profile.last_name
+                        ? `${profile.first_name} ${profile.last_name}`.trim()
+                        : 'Syncing Identity...'}
+                    </h2>
+                    <p className="text-sm text-gray-light italic">{user?.email}</p>
                   </div>
-                )}
-              </div>
-            </Card>
+                </div>
 
-            <div className="flex justify-end">
-              <Button variant="primary" size="md" onClick={handleSavePreferences} disabled={isSavingPrefs} leftIcon={<Save size={18} />}>
-                {isSavingPrefs ? 'UPDATING...' : 'SYNC NOTIFICATIONS'}
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Modules Tab */}
-        {activeTab === 'modules' && (
-          <ModuleSettingsTab userId={user?.id} />
-        )}
-
-        {/* Security Tab */}
-        {activeTab === 'security' && (
-          <div className="space-y-xl">
-            <Card className="glass border-none" title="ACCESS PROTECTION">
-               <div className="absolute top-0 right-0 w-32 h-32 bg-danger opacity-[0.02] blur-3xl pointer-events-none" />
-              <div className="space-y-xl">
-                <div className="relative group">
-                   <Lock size={16} className="absolute left-md top-1/2 -translate-y-1/2 text-primary" />
-                   <Input
-                    label="AUTHENTICATION OVERRIDE"
-                    type="password"
-                    placeholder="New Secure Key"
-                    value={security.new_password}
-                    onChange={(e) => setSecurity((s) => ({ ...s, new_password: e.target.value }))}
-                    className="pl-xl"
-                    error={formErrors.new_password}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
+                  <Input
+                    label={t('settings.profile.firstName')}
+                    value={profile.first_name}
+                    onChange={(e) => setProfile((p) => ({ ...p, first_name: e.target.value }))}
+                    error={formErrors.first_name}
+                  />
+                  <Input
+                    label={t('settings.profile.lastName')}
+                    value={profile.last_name}
+                    onChange={(e) => setProfile((p) => ({ ...p, last_name: e.target.value }))}
                   />
                 </div>
+
                 <Input
-                  label="CONFIRM KEY"
-                  type="password"
-                  placeholder="Repeat Secure Key"
-                  value={security.confirm_password}
-                  onChange={(e) => setSecurity((s) => ({ ...s, confirm_password: e.target.value }))}
-                  error={formErrors.confirm_password}
+                  label={t('settings.profile.contactNumber')}
+                  placeholder="+00 000 000 000"
+                  value={profile.phone}
+                  onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
                 />
-                <div className="flex justify-end">
+
+                <div className="space-y-sm">
+                  <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('settings.profile.bio')}</label>
+                  <textarea
+                    value={profile.bio}
+                    onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
+                    placeholder={t('settings.profile.bioPlaceholder')}
+                    rows={4}
+                    className={`w-full bg-gray-strong/40 border rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none transition-all ${
+                      formErrors.bio ? 'border-danger' : 'border-soft-cream/10'
+                    }`}
+                  />
+                  {formErrors.bio && <p className="text-[10px] text-danger mt-1">{formErrors.bio}</p>}
+                </div>
+
+                <div className="flex justify-end pt-md">
                   <Button
                     variant="primary"
                     size="md"
-                    onClick={handleChangePassword}
-                    disabled={isChangingPassword || !security.new_password || !security.confirm_password}
-                    leftIcon={<ShieldCheck size={18} />}
+                    onClick={handleSaveProfile}
+                    disabled={isSavingProfile}
+                    leftIcon={<Save size={18} />}
                   >
-                    {isChangingPassword ? 'ENCRYPTING...' : 'RE-AUTHENTICATE'}
+                    {isSavingProfile ? t('settings.profile.savingBtn') : t('settings.profile.updateBtn')}
                   </Button>
                 </div>
               </div>
             </Card>
+          )}
 
-            <Card className="border border-danger/20 bg-danger/[0.02]" title="CRITICAL OVERRIDE">
-              <div className="space-y-lg">
-                <p className="text-xs text-gray-light leading-relaxed tracking-wide">
-                  Terminating your identity will result in <strong className="text-danger">TOTAL DATA ERASURE</strong>. 
-                </p>
-                <div className="flex items-center gap-xl bg-danger/10 p-lg rounded-md border border-danger/20">
-                  <div className="flex-1">
-                    <p className="font-bold text-danger text-sm">Terminate Identity</p>
-                    <p className="text-xs text-danger/80">Erase all data and revoke system access.</p>
+          {/* Preferences Tab */}
+          {activeTab === 'preferences' && (
+            <div className="space-y-lg">
+              <Card className="glass border-none" title={t('settings.interface.sectionTitle')}>
+                <div className="space-y-xl">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
+                    <div className="space-y-sm">
+                      <label className="text-[10px] font-bold text-gray-light tracking-widest">{t('settings.interface.themeEngine')}</label>
+                      <div className="flex gap-md">
+                        {['light', 'dark', 'auto'].map((th) => (
+                          <button
+                            key={th}
+                            type="button"
+                            onClick={() => setPrefs((p) => ({ ...p, theme: th as 'light' | 'dark' | 'auto' }))}
+                            className={`flex-1 py-md rounded-md border text-xs font-bold uppercase tracking-widest transition-all ${
+                              prefs.theme === th
+                                ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105'
+                                : 'bg-soft-cream/5 text-gray-light border-soft-cream/10 hover:bg-soft-cream/10 hover:border-soft-cream/20'
+                            }`}
+                          >
+                            {t(`settings.interface.${th}`)}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-primary mt-2 italic opacity-80">
+                        {t('settings.interface.themePreview')}
+                      </p>
+                    </div>
+                    <div className="space-y-sm">
+                      <label className="text-[10px] font-bold text-gray-light tracking-widest flex items-center gap-sm">
+                        <Globe size={12} className="text-secondary" /> {t('settings.interface.language')}
+                      </label>
+                      <select
+                        value={prefs.language}
+                        onChange={(e) => {
+                          const newLang = e.target.value;
+                          setPrefs((p) => ({ ...p, language: newLang }));
+                        }}
+                        className="w-full h-12 bg-gray-strong/40 border border-soft-cream/10 rounded-md px-lg text-sm text-soft-cream focus:border-primary focus:outline-none"
+                      >
+                        {LANGUAGE_OPTIONS.map((l) => (
+                          <option key={l.value} value={l.value} className="bg-gray-strong">{l.label}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                  <Button variant="danger" size="md" onClick={() => setDeleteConfirmOpen(true)}>ERASE DATA</Button>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
+                    <div className="space-y-sm">
+                      <label className="text-[10px] font-bold text-gray-light tracking-widest">{t('settings.interface.currency')}</label>
+                      <select
+                        value={prefs.currency}
+                        onChange={(e) => setPrefs((p) => ({ ...p, currency: e.target.value }))}
+                        className="w-full h-12 bg-gray-strong/40 border border-soft-cream/10 rounded-md px-lg text-sm text-soft-cream focus:border-primary focus:outline-none"
+                      >
+                        {CURRENCY_OPTIONS.map((c) => <option key={c} value={c} className="bg-gray-strong">{c}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-sm">
+                      <label className="text-[10px] font-bold text-gray-light tracking-widest">{t('settings.interface.timezone')}</label>
+                      <select
+                        value={prefs.timezone}
+                        onChange={(e) => setPrefs((p) => ({ ...p, timezone: e.target.value }))}
+                        className="w-full h-12 bg-gray-strong/40 border border-soft-cream/10 rounded-md px-lg text-sm text-soft-cream focus:border-primary focus:outline-none"
+                      >
+                        {TIMEZONE_OPTIONS.map((tz) => <option key={tz} value={tz} className="bg-gray-strong">{tz}</option>)}
+                      </select>
+                    </div>
+                  </div>
                 </div>
+              </Card>
+
+              <div className="flex justify-end">
+                <Button variant="primary" size="md" onClick={handleSavePreferences} disabled={isSavingPrefs} leftIcon={<Save size={18} />}>
+                  {isSavingPrefs ? t('settings.interface.savingBtn') : t('settings.interface.persistBtn')}
+                </Button>
               </div>
-            </Card>
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+
+          {/* Notifications Tab */}
+          {activeTab === 'notifications' && (
+            <Card className="glass border-none" title={t('settings.alerts.sectionTitle')}>
+                <div className="space-y-xl">
+                  <div className="flex items-center justify-between p-lg rounded-md border bg-white/[0.02] border-white/[0.05]">
+                    <div className="flex items-center gap-md">
+                      <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
+                        <BellRing size={20} className="text-secondary" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-soft-cream">{t('settings.alerts.push')}</h4>
+                        <p className="text-[10px] text-gray-light">{t('settings.alerts.pushDesc')}</p>
+                      </div>
+                    </div>
+                    {/* Toggle Switch */}
+                    <button
+                      type="button"
+                      onClick={() => setPrefs((p) => ({ ...p, push_notifications_enabled: !p.push_notifications_enabled }))}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        prefs.push_notifications_enabled ? 'bg-primary' : 'bg-gray-strong border border-white/[0.1]'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          prefs.push_notifications_enabled ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-lg rounded-md border bg-white/[0.02] border-white/[0.05]">
+                    <div className="flex items-center gap-md">
+                      <div className="w-10 h-10 rounded-lg bg-accent-purple/10 flex items-center justify-center">
+                        <Globe size={20} className="text-accent-purple" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-soft-cream">{t('settings.alerts.email')}</h4>
+                        <p className="text-[10px] text-gray-light">{t('settings.alerts.emailDesc')}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPrefs((p) => ({ ...p, email_digest_enabled: !p.email_digest_enabled }))}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        prefs.email_digest_enabled ? 'bg-primary' : 'bg-gray-strong border border-white/[0.1]'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          prefs.email_digest_enabled ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {prefs.email_digest_enabled && (
+                    <div className="space-y-sm animate-fade-in pl-14">
+                      <label className="text-[10px] font-bold text-gray-light tracking-widest">{t('settings.alerts.frequency')}</label>
+                      <select
+                        value={prefs.digest_frequency}
+                        onChange={(e) => setPrefs((p) => ({ ...p, digest_frequency: e.target.value }))}
+                        className="w-full md:w-64 h-10 bg-gray-strong/40 border border-soft-cream/10 rounded-md px-md text-sm text-soft-cream focus:border-primary focus:outline-none"
+                      >
+                        <option value="daily" className="bg-gray-strong">{t('settings.alerts.daily')}</option>
+                        <option value="weekly" className="bg-gray-strong">{t('settings.alerts.weekly')}</option>
+                        <option value="monthly" className="bg-gray-strong">{t('settings.alerts.monthly')}</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-end mt-xl">
+                  <Button variant="primary" size="md" onClick={handleSavePreferences} disabled={isSavingPrefs} leftIcon={<Save size={18} />}>
+                    {isSavingPrefs ? t('settings.profile.savingBtn') : t('settings.alerts.persistBtn')}
+                  </Button>
+                </div>
+              </Card>
+          )}
+
+          {/* Modules Tab */}
+          {activeTab === 'modules' && (
+            <div className="space-y-lg">
+              <Card className="glass border-none" title={t('settings.modules.sectionTitle')}>
+                <p className="text-sm text-gray-light mb-xl">
+                  {t('settings.modules.description')}
+                </p>
+                <ModuleSettingsTab userId={user?.id} />
+              </Card>
+            </div>
+          )}
+
+          {/* Security Tab */}
+          {activeTab === 'security' && (
+            <div className="space-y-xl">
+              <Card className="glass border-none border-t border-danger" title={t('settings.security.sectionTitle')}>
+                <div className="space-y-xl max-w-md">
+                  <Input
+                    label={t('settings.security.currentPass')}
+                    type="password"
+                    value={security.current_password}
+                    onChange={(e) => setSecurity((s) => ({ ...s, current_password: e.target.value }))}
+                    error={formErrors.current_password}
+                  />
+                  <Input
+                    label={t('settings.security.newPass')}
+                    type="password"
+                    value={security.new_password}
+                    onChange={(e) => setSecurity((s) => ({ ...s, new_password: e.target.value }))}
+                    error={formErrors.new_password}
+                  />
+                  <Input
+                    label={t('settings.security.confirmPass')}
+                    type="password"
+                    value={security.confirm_password}
+                    onChange={(e) => setSecurity((s) => ({ ...s, confirm_password: e.target.value }))}
+                    error={formErrors.confirm_password}
+                  />
+                  <Button variant="primary" onClick={handleChangePassword} disabled={isChangingPassword} className="w-full">
+                    {isChangingPassword ? t('settings.security.updatingBtn') : t('settings.security.updateBtn')}
+                  </Button>
+                </div>
+              </Card>
+
+              <Card className="glass border-none bg-danger/5 border-danger/20">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-xl">
+                  <div>
+                    <h3 className="text-lg font-bold text-danger flex items-center gap-2">
+                      <AlertTriangle size={20} /> {t('settings.security.deleteAccount')}
+                    </h3>
+                    <p className="text-sm text-gray-light mt-1">
+                      {t('settings.security.deleteDesc')}
+                    </p>
+                  </div>
+                  <Button variant="danger" size="md" onClick={() => setDeleteConfirmOpen(true)}>
+                    {t('settings.security.deleteBtn')}
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
+        </div>
 
         <ConfirmModal
           isOpen={deleteConfirmOpen}
           onClose={() => setDeleteConfirmOpen(false)}
-          title="TERMINATE IDENTITY"
-          description="Are you absolutely sure you want to terminate your account? All your data, modules, insights, and history will be permanently erased. This action cannot be undone."
-          confirmText="ERASE EVERYTHING"
-          isDangerous={true}
-          requireInput="DELETE"
           onConfirm={handleDeleteAccount}
+          title={t('settings.security.deleteConfirmTitle')}
+          description={t('settings.security.deleteConfirmDesc')}
+          confirmText={t('settings.security.confirmDeleteBtn')}
+          cancelText={t('nav.cancel')}
+          isDangerous={true}
         />
       </Layout>
     </>

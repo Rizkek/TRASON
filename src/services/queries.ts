@@ -74,6 +74,15 @@ export const userQueries = {
       .maybeSingle();
 
     if (error) {
+      const isDuplicateEmail =
+        error.code === '23505' &&
+        String(error.details || error.message || '').toLowerCase().includes('users_email_key');
+
+      if (isDuplicateEmail) {
+        logError(error, 'userQueries.ensureUserProfile.duplicateEmail');
+        throw handleQueryError(error);
+      }
+
       logError(error, 'userQueries.ensureUserProfile');
       throw handleQueryError(error);
     }
@@ -144,14 +153,52 @@ export const userQueries = {
       const user = await getCurrentUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      // Explicitly pick only the columns we manage — never pass id/user_id from `updates`
+      // to avoid upsert conflicts, and always select the exact preference fields so the
+      // returned shape matches what useUserPreferences expects.
+      const { theme, language, currency, timezone,
+              notifications_enabled, push_notifications_enabled,
+              email_digest_enabled, digest_frequency } = updates as any;
+
+      const payload: Record<string, unknown> = {
+        user_id: user.id,
+        updated_at: new Date().toISOString(),
+      };
+      if (theme !== undefined)                       payload.theme = theme;
+      if (language !== undefined)                    payload.language = language;
+      if (currency !== undefined)                    payload.currency = currency;
+      if (timezone !== undefined)                    payload.timezone = timezone;
+      if (notifications_enabled !== undefined)       payload.notifications_enabled = notifications_enabled;
+      if (push_notifications_enabled !== undefined)  payload.push_notifications_enabled = push_notifications_enabled;
+      if (email_digest_enabled !== undefined)        payload.email_digest_enabled = email_digest_enabled;
+      if (digest_frequency !== undefined)            payload.digest_frequency = digest_frequency;
+
+      // Safely check if a row exists first to avoid unique constraint issues
+      const { data: existingRow } = await supabase
         .from('user_preferences')
-        .upsert(
-          [{ user_id: user.id, ...updates, updated_at: new Date().toISOString() }],
-          { onConflict: 'user_id' }
-        )
-        .select()
-        .single();
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      let result;
+      if (existingRow) {
+        // Update existing
+        result = await supabase
+          .from('user_preferences')
+          .update(payload)
+          .eq('id', existingRow.id)
+          .select('theme, language, currency, timezone, notifications_enabled, push_notifications_enabled, email_digest_enabled, digest_frequency')
+          .single();
+      } else {
+        // Insert new
+        result = await supabase
+          .from('user_preferences')
+          .insert([payload])
+          .select('theme, language, currency, timezone, notifications_enabled, push_notifications_enabled, email_digest_enabled, digest_frequency')
+          .single();
+      }
+
+      const { data, error } = result;
 
       if (error) throw error;
       return data;

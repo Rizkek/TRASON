@@ -1,8 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card } from '@/components';
-import { Dumbbell, Flame } from 'lucide-react';
+import { FaDumbbell as Dumbbell } from 'react-icons/fa6';
+import { RiFireLine as Flame } from 'react-icons/ri';
 import { WeeklySportSummary } from '@/hooks/useWeeklySportSummary';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 
 interface Props {
   summary: WeeklySportSummary;
@@ -16,6 +18,7 @@ const TODAY_IDX = (() => {
 })();
 
 export const SportSummary = ({ summary, isLoading }: Props) => {
+  const { t } = useTranslation();
   const { totalSessions, totalMinutes, dayActivity, streak } = summary;
   const maxMin = Math.max(...dayActivity, 1);
   const totalHours = Math.floor(totalMinutes / 60);
@@ -34,7 +37,7 @@ export const SportSummary = ({ summary, isLoading }: Props) => {
       <div className="px-lg py-md border-b border-white/[0.05] flex justify-between items-center bg-white/[0.01]">
         <div className="flex items-center gap-sm">
           <Dumbbell size={16} className="text-secondary" />
-          <h3 className="text-sm font-bold tracking-tight">SPORT THIS WEEK</h3>
+          <h3 className="text-sm font-bold tracking-tight">{t('dashboard.vitality_this_week')}</h3>
         </div>
         {streak >= 2 && (
           <div className="flex items-center gap-1 text-amber-400">
@@ -46,21 +49,21 @@ export const SportSummary = ({ summary, isLoading }: Props) => {
 
       <div className="p-lg space-y-lg">
         {totalSessions === 0 ? (
-          <p className="text-xs text-gray-light italic text-center py-md">No workouts logged yet this week.</p>
+          <p className="text-xs text-gray-light italic text-center py-md">{t('dashboard.sport_empty_desc')}</p>
         ) : (
           <>
             {/* Stats */}
             <div className="flex items-center gap-xl">
               <div>
                 <p className="text-2xl font-bold text-gradient">{totalSessions}</p>
-                <p className="text-[10px] text-gray-light uppercase tracking-widest">Sessions</p>
+                <p className="text-[10px] text-gray-light uppercase tracking-widest">{t('dashboard.sessions')}</p>
               </div>
               {totalMinutes > 0 && (
                 <div>
                   <p className="text-2xl font-bold text-secondary">
                     {totalHours > 0 ? `${totalHours}h${remMin > 0 ? ` ${remMin}m` : ''}` : `${remMin}m`}
                   </p>
-                  <p className="text-[10px] text-gray-light uppercase tracking-widest">Active</p>
+                  <p className="text-[10px] text-gray-light uppercase tracking-widest">{t('dashboard.moved')}</p>
                 </div>
               )}
             </div>
@@ -103,7 +106,7 @@ export const SportSummary = ({ summary, isLoading }: Props) => {
           className="block text-center text-[10px] font-bold uppercase tracking-widest text-gray-light hover:text-primary transition-colors"
           aria-label="Go to Schedule page to log workouts"
         >
-          {totalSessions === 0 ? 'Log a workout →' : 'View Schedule →'}
+          {totalSessions === 0 ? t('dashboard.log_first_session') : t('dashboard.review_rhythm')}
         </Link>
       </div>
     </Card>

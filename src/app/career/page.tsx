@@ -8,6 +8,7 @@ import { useCareer } from '@/hooks/useCareer';
 import { CareerApplication } from '@/types/database';
 import { getLocalISODate } from '@/libs/format';
 import { sanitizeError } from '@/libs/validation';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import {
   Briefcase,
   Plus,
@@ -15,45 +16,20 @@ import {
   ExternalLink,
   Calendar,
   MapPin,
-  ChevronDown,
   Clock,
-  Star,
 } from 'lucide-react';
 
-// ─── Status config ────────────────────────────────────────────────────────────
-
-const STATUS_CONFIG: Record<
-  CareerApplication['status'],
-  { label: string; color: string; badgeVariant: 'default' | 'success' | 'warning' | 'danger' | 'income' | 'expense' | 'activity' | 'insight' | 'info' | undefined }
-> = {
-  applied:    { label: 'Applied',    color: 'text-primary', badgeVariant: 'default' },
-  reviewing:  { label: 'Reviewing',  color: 'text-amber-400', badgeVariant: 'warning' },
-  interview:  { label: 'Interview',  color: 'text-purple-400', badgeVariant: 'info' },
-  offer:      { label: 'Offer',      color: 'text-income', badgeVariant: 'income' },
-  accepted:   { label: 'Accepted',   color: 'text-income', badgeVariant: 'success' },
-  rejected:   { label: 'Rejected',   color: 'text-expense', badgeVariant: 'expense' },
-  withdrawn:  { label: 'Withdrawn',  color: 'text-gray-light', badgeVariant: undefined },
-};
-
-const TYPE_CONFIG: Record<CareerApplication['application_type'], { label: string; emoji: string }> = {
-  job:        { label: 'Job',        emoji: '💼' },
-  internship: { label: 'Internship', emoji: '🎓' },
-  freelance:  { label: 'Freelance',  emoji: '🚀' },
-};
-
 const FILTER_TABS = [
-  { id: 'all',      label: 'All' },
-  { id: 'active',   label: 'Active' },
-  { id: 'interview',label: 'Interview' },
-  { id: 'closed',   label: 'Closed' },
+  { id: 'all',      labelKey: 'all' },
+  { id: 'active',   labelKey: 'active' },
+  { id: 'interview',labelKey: 'interview' },
+  { id: 'closed',   labelKey: 'closed' },
 ] as const;
 
 type FilterTab = typeof FILTER_TABS[number]['id'];
 
 const ACTIVE_STATUSES: CareerApplication['status'][] = ['applied', 'reviewing', 'interview', 'offer'];
 const CLOSED_STATUSES: CareerApplication['status'][] = ['accepted', 'rejected', 'withdrawn'];
-
-// ─── Default form ─────────────────────────────────────────────────────────────
 
 type CareerFormData = {
   company_name: string;
@@ -83,8 +59,6 @@ const defaultForm: CareerFormData = {
   priority: 'medium',
 };
 
-// ─── Validation ───────────────────────────────────────────────────────────────
-
 function validateCareerForm(form: CareerFormData): Record<string, string> {
   const errors: Record<string, string> = {};
   if (!form.company_name.trim()) errors.company_name = 'Company name is required';
@@ -94,12 +68,11 @@ function validateCareerForm(form: CareerFormData): Record<string, string> {
   return errors;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default function CareerPage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
+  const { t } = useTranslation();
 
   const { applications, stats, isLoading, error, createApplication, updateApplication, deleteApplication } = useCareer();
 
@@ -111,6 +84,26 @@ export default function CareerPage() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [pageError, setPageError] = useState<string | null>(null);
+
+  // Status and Type configurations using translation hook
+  const STATUS_CONFIG: Record<
+    CareerApplication['status'],
+    { label: string; color: string; badgeVariant: 'default' | 'success' | 'warning' | 'danger' | 'income' | 'expense' | 'activity' | 'insight' | 'info' | undefined }
+  > = {
+    applied:    { label: t('career_page.form.options.status_applied'),    color: 'text-primary', badgeVariant: 'default' },
+    reviewing:  { label: t('career_page.form.options.status_reviewing'),  color: 'text-amber-400', badgeVariant: 'warning' },
+    interview:  { label: t('career_page.form.options.status_interview'),  color: 'text-purple-400', badgeVariant: 'info' },
+    offer:      { label: t('career_page.form.options.status_offer'),      color: 'text-income', badgeVariant: 'income' },
+    accepted:   { label: t('career_page.form.options.status_accepted'),   color: 'text-income', badgeVariant: 'success' },
+    rejected:   { label: t('career_page.form.options.status_rejected'),   color: 'text-expense', badgeVariant: 'expense' },
+    withdrawn:  { label: t('career_page.form.options.status_withdrawn'),  color: 'text-gray-light', badgeVariant: undefined },
+  };
+
+  const TYPE_CONFIG: Record<CareerApplication['application_type'], { label: string; emoji: string }> = {
+    job:        { label: t('career_page.form.options.job'),        emoji: '💼' },
+    internship: { label: t('career_page.form.options.internship'), emoji: '🎓' },
+    freelance:  { label: t('career_page.form.options.freelance'),  emoji: '🚀' },
+  };
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) router.push('/login');
@@ -201,7 +194,7 @@ export default function CareerPage() {
   if (authLoading) {
     return (
       <Layout>
-        <div className="flex justify-center py-2xl"><Loading /></div>
+        <div className="flex justify-center py-2xl"><Loading text={t('dashboard.checking_session')} /></div>
       </Layout>
     );
   }
@@ -217,13 +210,13 @@ export default function CareerPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-lg">
             <div className="space-y-xs">
               <h1 className="text-5xl font-serif">
-                Career <span className="text-warm-gold italic">Tracker</span>
+                {t('career_page.title')} <span className="text-warm-gold italic">{t('career_page.title_highlight')}</span>
               </h1>
-              <p className="text-gray-light font-light">Track your applications, interviews, and opportunities.</p>
+              <p className="text-gray-light font-light">{t('career_page.desc')}</p>
             </div>
             <Button variant="primary" onClick={openAddModal} className="rounded-full px-xl" aria-label="Add new application">
               <Plus size={18} className="mr-2" />
-              New Application
+              {t('career_page.new_application')}
             </Button>
           </div>
 
@@ -231,10 +224,10 @@ export default function CareerPage() {
           {!isLoading && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-md">
               {[
-                { label: 'APPLIED', value: stats.applied, color: 'text-primary' },
-                { label: 'REVIEWING', value: stats.reviewing, color: 'text-amber-400' },
-                { label: 'INTERVIEW', value: stats.interview, color: 'text-purple-400' },
-                { label: 'OFFER', value: stats.offer, color: 'text-income' },
+                { label: t('career_page.stats.applied'), value: stats.applied, color: 'text-primary' },
+                { label: t('career_page.stats.reviewing'), value: stats.reviewing, color: 'text-amber-400' },
+                { label: t('career_page.stats.interview'), value: stats.interview, color: 'text-purple-400' },
+                { label: t('career_page.stats.offer'), value: stats.offer, color: 'text-income' },
               ].map((s) => (
                 <Card key={s.label} className="glass border-none p-xl text-center">
                   <p className={`text-3xl font-bold ${s.color}`}>{s.value}</p>
@@ -258,7 +251,7 @@ export default function CareerPage() {
                     : 'text-gray-light hover:text-soft-cream'
                 }`}
               >
-                {tab.label}
+                {t(`career_page.tabs.${tab.labelKey}`)}
               </button>
             ))}
           </div>
@@ -270,7 +263,7 @@ export default function CareerPage() {
             <div className="glass-card p-4xl text-center space-y-md">
               <Briefcase size={48} className="mx-auto text-deep-sage opacity-20" />
               <p className="text-gray-light font-light italic">
-                {activeFilter === 'all' ? 'No applications yet. Start tracking your job search.' : `No ${activeFilter} applications.`}
+                {activeFilter === 'all' ? t('career_page.empty_all') : t('career_page.empty_filter').replace('{filter}', t(`career_page.tabs.${activeFilter}`))}
               </p>
             </div>
           ) : (
@@ -301,7 +294,7 @@ export default function CareerPage() {
                         </span>
                         {app.priority === 'high' && (
                           <span className="text-[9px] text-expense font-bold uppercase tracking-widest">
-                            HIGH PRIORITY
+                            {t('career_page.high_priority')}
                           </span>
                         )}
                       </div>
@@ -314,7 +307,7 @@ export default function CareerPage() {
                       <div className="flex flex-wrap items-center gap-md text-[10px] text-gray-light opacity-60">
                         <span className="flex items-center gap-1">
                           <Calendar size={10} />
-                          Applied {new Date(app.applied_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {t('career_page.applied_on')} {new Date(app.applied_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </span>
                         {app.location && (
                           <span className="flex items-center gap-1">
@@ -325,7 +318,7 @@ export default function CareerPage() {
                         {hasInterview && (
                           <span className="flex items-center gap-1 text-purple-400 opacity-100">
                             <Clock size={10} />
-                            Interview: {new Date(app.interview_date!).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                            {t('career_page.interview_on')} {new Date(app.interview_date!).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                           </span>
                         )}
                         {app.salary_range && (
@@ -358,7 +351,7 @@ export default function CareerPage() {
                         className="px-md py-sm text-[10px] font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-white/10 hover:border-white/20 rounded-md transition-all"
                         aria-label={`Edit ${app.company_name} application`}
                       >
-                        Edit
+                        {t('career_page.edit')}
                       </button>
                       <button
                         onClick={() => setDeleteConfirmId(app.id)}
@@ -379,12 +372,12 @@ export default function CareerPage() {
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title={editingApp ? 'EDIT APPLICATION' : 'NEW APPLICATION'}
+          title={editingApp ? t('career_page.edit_app') : t('career_page.new_app')}
           footer={
             <div className="flex gap-md justify-end">
-              <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)}>CANCEL</Button>
+              <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)}>{t('investment_page.cancel_upper')}</Button>
               <Button variant="primary" size="md" onClick={handleSave} disabled={isSaving}>
-                {isSaving ? 'SAVING...' : 'SAVE'}
+                {isSaving ? t('investment_page.saving_upper') : t('career_page.save')}
               </Button>
             </div>
           }
@@ -392,16 +385,16 @@ export default function CareerPage() {
           <div className="space-y-xl">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
               <Input
-                label="COMPANY NAME"
-                placeholder="Google, Tokopedia..."
+                label={t('career_page.form.company')}
+                placeholder={t('career_page.form.company_placeholder')}
                 value={form.company_name}
                 onChange={(e) => setForm((f) => ({ ...f, company_name: e.target.value }))}
                 error={formErrors.company_name}
                 autoFocus
               />
               <Input
-                label="ROLE / TITLE"
-                placeholder="Software Engineer..."
+                label={t('career_page.form.role')}
+                placeholder={t('career_page.form.role_placeholder')}
                 value={form.role_title}
                 onChange={(e) => setForm((f) => ({ ...f, role_title: e.target.value }))}
                 error={formErrors.role_title}
@@ -410,20 +403,20 @@ export default function CareerPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
               <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-type">TYPE</label>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-type">{t('career_page.form.type')}</label>
                 <select
                   id="modal-type"
                   value={form.application_type}
                   onChange={(e) => setForm((f) => ({ ...f, application_type: e.target.value as any }))}
                   className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
-                  <option value="job">💼 Job</option>
-                  <option value="internship">🎓 Internship</option>
-                  <option value="freelance">🚀 Freelance</option>
+                  {Object.entries(TYPE_CONFIG).map(([val, cfg]) => (
+                    <option key={val} value={val}>{cfg.emoji} {cfg.label}</option>
+                  ))}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-status">STATUS</label>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-status">{t('career_page.form.status')}</label>
                 <select
                   id="modal-status"
                   value={form.status}
@@ -436,23 +429,23 @@ export default function CareerPage() {
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-priority">PRIORITY</label>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-priority">{t('career_page.form.priority')}</label>
                 <select
                   id="modal-priority"
                   value={form.priority}
                   onChange={(e) => setForm((f) => ({ ...f, priority: e.target.value as any }))}
                   className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
+                  <option value="low">{t('career_page.form.options.low')}</option>
+                  <option value="medium">{t('career_page.form.options.medium')}</option>
+                  <option value="high">{t('career_page.form.options.high')}</option>
                 </select>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
               <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-applied">APPLIED DATE</label>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-applied">{t('career_page.form.applied_date')}</label>
                 <input
                   id="modal-applied"
                   type="date"
@@ -463,7 +456,7 @@ export default function CareerPage() {
                 {formErrors.applied_date && <p className="text-expense text-xs mt-1">{formErrors.applied_date}</p>}
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-interview">INTERVIEW DATE (optional)</label>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-interview">{t('career_page.form.interview_date')}</label>
                 <input
                   id="modal-interview"
                   type="date"
@@ -476,22 +469,22 @@ export default function CareerPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
               <Input
-                label="LOCATION (optional)"
-                placeholder="Remote, Jakarta..."
+                label={t('career_page.form.location')}
+                placeholder={t('career_page.form.location_placeholder')}
                 value={form.location}
                 onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
               />
               <Input
-                label="SALARY RANGE (optional)"
-                placeholder="Rp 8-12jt / $3-5k"
+                label={t('career_page.form.salary')}
+                placeholder={t('career_page.form.salary_placeholder')}
                 value={form.salary_range}
                 onChange={(e) => setForm((f) => ({ ...f, salary_range: e.target.value }))}
               />
             </div>
 
             <Input
-              label="JOB POSTING URL (optional)"
-              placeholder="https://..."
+              label={t('career_page.form.url')}
+              placeholder={t('career_page.form.url_placeholder')}
               value={form.url}
               onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
               error={formErrors.url}
@@ -500,7 +493,7 @@ export default function CareerPage() {
             <textarea
               value={form.notes}
               onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-              placeholder="Notes, contacts, impressions..."
+              placeholder={t('career_page.form.notes_placeholder')}
               rows={3}
               aria-label="Notes"
               className="w-full bg-gray-strong border border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
@@ -511,9 +504,9 @@ export default function CareerPage() {
         <ConfirmModal
           isOpen={!!deleteConfirmId}
           onClose={() => setDeleteConfirmId(null)}
-          title="REMOVE APPLICATION"
-          description="Are you sure you want to remove this job application? This action cannot be undone."
-          confirmText="REMOVE"
+          title={t('career_page.remove_app')}
+          description={t('career_page.remove_desc')}
+          confirmText={t('career_page.remove_btn')}
           isDangerous={true}
           onConfirm={handleConfirmDelete}
         />

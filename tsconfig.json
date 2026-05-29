@@ -20,6 +20,7 @@
     "moduleResolution": "bundler",
     "jsx": "preserve",
     "incremental": true,
+    "types": ["jest", "node"],
     "paths": {
       "@/*": [
         "./src/*"

@@ -36,7 +36,7 @@ export const Button = memo(
         primary: 'bg-warm-gold text-warm-black font-bold shadow-lg shadow-warm-gold/20 hover:bg-[#E3B84D] hover:shadow-warm-gold/30 hover:-translate-y-0.5',
         secondary: 'bg-gray-medium text-soft-cream border border-gray-light/30 hover:bg-gray-strong',
         outline: 'bg-transparent border-2 border-warm-gold text-warm-gold hover:bg-warm-gold hover:text-warm-black',
-        ghost: 'bg-transparent text-soft-cream hover:bg-white/10',
+        ghost: 'bg-transparent text-soft-cream hover:bg-soft-cream/10',
         danger: 'bg-danger text-white hover:bg-red-500',
       };
 

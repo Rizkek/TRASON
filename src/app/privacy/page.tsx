@@ -1,22 +1,29 @@
 import React from 'react';
 import Link from 'next/link';
-import { Compass, ArrowLeft } from 'lucide-react';
+import { FiArrowLeft } from 'react-icons/fi';
+import { RiCompass3Line } from 'react-icons/ri';
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-warm-black text-soft-cream font-sans selection:bg-warm-gold/30 selection:text-soft-cream">
+    <div className="min-h-screen bg-warm-black text-soft-cream font-sans selection:bg-warm-gold/30 selection:text-soft-cream relative overflow-x-hidden">
+      {/* Background Ambient Glows */}
+      <div className="fixed top-[-10%] right-[-5%] w-[600px] h-[600px] bg-warm-gold/5 blur-[140px] rounded-full pointer-events-none" />
+      <div className="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-deep-sage/5 blur-[120px] rounded-full pointer-events-none" />
+
       {/* Navigation */}
-      <nav className="border-b border-white/[0.05] bg-warm-black/50 backdrop-blur-md fixed top-0 w-full z-50">
-        <div className="max-w-4xl mx-auto px-lg h-20 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-sm group">
-            <div className="w-8 h-8 bg-warm-gold rounded-full flex items-center justify-center text-warm-black group-hover:rotate-12 transition-transform">
-              <Compass size={18} />
+      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.03]">
+        <div className="max-w-7xl mx-auto px-lg md:px-2xl h-20 flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-sm group cursor-pointer">
+            <FiArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-warm-gold" />
+            <span className="text-sm font-bold uppercase tracking-widest text-warm-gold">Back</span>
+          </Link>
+          <div className="flex items-center gap-sm">
+            <div className="w-8 h-8 bg-warm-gold rounded-full flex items-center justify-center text-warm-black">
+              <RiCompass3Line size={18} />
             </div>
-            <span className="text-xl font-serif font-medium tracking-tight">TRASON</span>
-          </Link>
-          <Link href="/" className="text-sm text-gray-light hover:text-warm-gold flex items-center gap-2 transition-colors">
-            <ArrowLeft size={16} /> Back to Home
-          </Link>
+            <span className="text-xl font-serif font-bold tracking-tight">TRASON</span>
+          </div>
+          <div className="w-20" /> {/* Spacer */}
         </div>
       </nav>
 

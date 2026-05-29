@@ -7,6 +7,7 @@ interface PushNotificationState {
   isSupported: boolean;
   isSubscribed: boolean;
   isLoading: boolean;
+  isConfigured: boolean; // true jika NEXT_PUBLIC_VAPID_PUBLIC_KEY tersedia
   error: string | null;
 }
 
@@ -22,10 +23,11 @@ export const usePushNotification = () => {
     isSupported: false,
     isSubscribed: false,
     isLoading: false,
+    isConfigured: !!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
     error: null,
   });
 
-  // Check if push notifications are supported
+  // Check if push notifications are supported & configured, then check existing subscription
   useEffect(() => {
     const isSupported =
       typeof window !== 'undefined' &&
@@ -33,7 +35,20 @@ export const usePushNotification = () => {
       'PushManager' in window &&
       'Notification' in window;
 
-    setState((prev) => ({ ...prev, isSupported }));
+    const isConfigured = !!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+
+    setState((prev) => ({ ...prev, isSupported, isConfigured }));
+
+    // Auto-detect if already subscribed
+    if (isSupported) {
+      navigator.serviceWorker.getRegistration().then((reg) => {
+        if (reg) {
+          reg.pushManager.getSubscription().then((sub) => {
+            setState((prev) => ({ ...prev, isSubscribed: sub !== null }));
+          });
+        }
+      }).catch(() => {});
+    }
   }, []);
 
   // Register service worker

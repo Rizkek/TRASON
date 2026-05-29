@@ -24,9 +24,14 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('[ErrorBoundary] Error caught:', error);
-    console.error('[ErrorBoundary] Error info:', errorInfo);
+    console.error('[ErrorBoundary] Error caught:', error.message, error);
+    // componentStack is not enumerable so logging errorInfo directly shows {}
+    console.error('[ErrorBoundary] Component stack:', errorInfo.componentStack);
   }
+
+  resetError = () => {
+    this.setState({ hasError: false, error: undefined });
+  };
 
   render() {
     if (this.state.hasError) {
@@ -48,8 +53,14 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 </p>
               </div>
               <button
-                onClick={() => window.location.reload()}
+                onClick={this.resetError}
                 className="w-full px-lg py-md bg-primary hover:bg-primary/90 text-warm-black rounded-md font-bold transition-colors"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full px-lg py-md bg-gray-strong hover:bg-gray-medium text-soft-cream rounded-md font-bold transition-colors"
               >
                 Reload Page
               </button>

@@ -20,6 +20,12 @@ interface Props {
 }
 
 export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const chartData = useMemo(() => {
     const data = [];
     const today = new Date();
@@ -82,15 +88,26 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
     return null;
   };
 
+  if (!isMounted) {
+    return (
+      <Card className="p-xl bg-white/[0.02] border-white/[0.05]">
+        <div className="mb-lg">
+          <h3 className="text-lg font-serif font-bold text-white">Activity History</h3>
+          <p className="text-sm text-gray-light">Last {days} days of training</p>
+        </div>
+        <div className="h-[250px] w-full bg-white/[0.01] rounded-lg animate-pulse" />
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-xl bg-white/[0.02] border-white/[0.05]">
       <div className="mb-lg">
         <h3 className="text-lg font-serif font-bold text-white">Activity History</h3>
         <p className="text-sm text-gray-light">Last {days} days of training</p>
       </div>
-      
-      <div className="h-[250px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="h-[250px] w-full" style={{ minWidth: 0 }}>
+        <ResponsiveContainer width="100%" height={250}>
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
             <XAxis 

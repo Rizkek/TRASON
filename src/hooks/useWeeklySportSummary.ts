@@ -30,10 +30,10 @@ export const useWeeklySportSummary = (): { summary: WeeklySportSummary; isLoadin
   const { start, end } = getWeekBounds();
   const { activities, isLoading } = useActivity(start, end);
 
-  const SPORT_CATEGORIES = ['Sport', 'Exercise'];
+  const SPORT_CATEGORIES = ['sport', 'exercise'];
 
   const sportActivities = activities.filter(
-    (a) => a.category && SPORT_CATEGORIES.includes(a.category)
+    (a) => a.category && SPORT_CATEGORIES.includes(a.category.toLowerCase())
   );
 
   // dayActivity index: 0=Mon, 1=Tue, ..., 6=Sun

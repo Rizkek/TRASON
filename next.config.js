@@ -1,6 +1,10 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Fix: explicitly set workspace root to silence lockfile warning & fix tracing
+  outputFileTracingRoot: path.join(__dirname, '../'),
   eslint: {
     ignoreDuringBuilds: false,
   },

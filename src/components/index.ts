@@ -11,3 +11,4 @@ export * from './Alert';
 export * from './ErrorAlert';
 export * from './ErrorBoundary';
 export * from './layout/Layout';
+export * from './LogoLoading';

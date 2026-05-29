@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Alert } from '@/components';
 import { supabase } from '@/services/supabaseClient';
 import { userQueries } from '@/services/queries';
 import { validateEmail, validatePassword, sanitizeError } from '@/libs/validation';
-import { Compass, ArrowLeft, Sparkles } from 'lucide-react';
+import { Compass, ArrowLeft, Sparkles, CheckCircle, AlertTriangle, Loader2, XCircle } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -21,9 +21,56 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Email domain check state
+  const [emailDomainStatus, setEmailDomainStatus] = useState<
+    null | 'checking' | 'valid' | 'warning' | 'invalid'
+  >(null);
+  const [emailDomainMessage, setEmailDomainMessage] = useState<string | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Reset domain status when email changes
+    if (name === 'email') {
+      setEmailDomainStatus(null);
+      setEmailDomainMessage(null);
+    }
+  };
+
+  const checkEmailDomain = async (email: string) => {
+    // Only check if basic format is valid
+    const formatError = validateEmail(email);
+    if (formatError) return;
+
+    setEmailDomainStatus('checking');
+    setEmailDomainMessage(null);
+    try {
+      const res = await fetch('/api/validate-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!data.valid) {
+        setEmailDomainStatus('invalid');
+        setEmailDomainMessage(data.reason || 'This email domain does not exist');
+      } else if (data.warning) {
+        setEmailDomainStatus('warning');
+        setEmailDomainMessage(data.warning);
+      } else {
+        setEmailDomainStatus('valid');
+        setEmailDomainMessage(null);
+      }
+    } catch {
+      // Network error — don't block the user
+      setEmailDomainStatus(null);
+    }
+  };
+
+  const handleEmailBlur = () => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => checkEmailDomain(formData.email), 300);
   };
 
   const validateForm = (): boolean => {
@@ -35,6 +82,8 @@ export default function SignupPage() {
     const emailError = validateEmail(formData.email);
     if (emailError) {
       errors.email = emailError;
+    } else if (emailDomainStatus === 'invalid') {
+      errors.email = emailDomainMessage || 'Email domain is invalid';
     }
 
     const passwordErrors = validatePassword(formData.password);
@@ -47,6 +96,21 @@ export default function SignupPage() {
     }
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
+  };
+
+  const getSignUpErrorMessage = (signUpError: any): string => {
+    const message = signUpError?.message ?? 'Unable to register';
+    if (signUpError?.status === 500) {
+      return 'Server error while registering. Check Supabase logs or try again later.';
+    }
+    if (
+      signUpError?.status === 409 ||
+      signUpError?.code === 'DUPLICATE' ||
+      /duplicate|already exists|users_email_key|email.*exists/i.test(message)
+    ) {
+      return 'That email is already registered. If you deleted the account, make sure the Supabase Auth user record is fully removed before signing up again.';
+    }
+    return message;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,7 +128,12 @@ export default function SignupPage() {
         options: { data: { first_name: firstName, last_name: lastName } },
       });
 
-      if (signUpError) throw new Error(signUpError.message);
+       if (signUpError) {
+        console.error('Supabase signUp error:', signUpError);
+        setError(getSignUpErrorMessage(signUpError));
+        setIsLoading(false);
+        return;
+      }
       if (data.user) {
         if (data.session) {
           await userQueries.ensureUserProfile();
@@ -91,12 +160,12 @@ export default function SignupPage() {
          <div className="relative z-10 max-w-md space-y-xl animate-fade-in">
             <Sparkles size={48} className="text-warm-gold opacity-40 mb-lg" />
             <h2 className="text-4xl lg:text-5xl font-serif italic leading-tight text-soft-cream/90">
-              "Growth is the only evidence of life."
+              "Build the system, then let the system carry you."
             </h2>
             <div className="space-y-sm">
-              <p className="text-lg font-medium text-warm-gold">— John Henry Newman</p>
+              <p className="text-lg font-medium text-warm-gold">TRASON</p>
               <p className="text-sm text-gray-light font-light leading-relaxed">
-                Take the first step toward a more intentional life. TRASON helps you bridge the gap between who you are and who you want to be.
+                Start with one private workspace for your money, habits, workouts, reminders, and long-term direction.
               </p>
             </div>
          </div>
@@ -109,15 +178,16 @@ export default function SignupPage() {
 
       {/* Right Side: Signup Form */}
       <div className="flex-1 flex flex-col justify-center items-center p-lg md:p-4xl relative overflow-y-auto">
-        <Link href="/" className="absolute top-12 left-12 flex items-center gap-sm text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
+        {isLoading && <div className="absolute top-0 left-0 right-0 h-1 bg-warm-gold animate-pulse" />}
+        <Link href="/" className="absolute top-12 z-10 left-16 flex items-center gap-sm text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           <span>Back to Home</span>
         </Link>
 
-        <div className="w-full max-w-sm space-y-2xl animate-slide-up py-4xl">
+        <div className="w-full max-w-sm space-y-xl animate-slide-up py-5xl">
           <div className="space-y-sm text-center md:text-left">
-            <h1 className="text-3xl font-serif">Begin Your Journey</h1>
-            <p className="text-sm text-gray-light font-light">Create your personal sanctuary in just a few steps.</p>
+            <h1 className="text-3xl font-serif">Create Your Personal OS</h1>
+            <p className="text-sm text-gray-light font-light">Set up a calm place to capture the day and understand your momentum.</p>
           </div>
 
           {error && (
@@ -142,17 +212,49 @@ export default function SignupPage() {
               className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold"
               required
             />
-            <Input
-              label="Email Address"
-              name="email"
-              type="email"
-              placeholder="email@example.com"
-              value={formData.email}
-              onChange={handleInputChange}
-              error={validationErrors.email}
-              className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold"
-              required
-            />
+            <div className="relative">
+              <Input
+                label="Email Address"
+                name="email"
+                type="email"
+                placeholder="email@example.com"
+                value={formData.email}
+                onChange={handleInputChange}
+                onBlur={handleEmailBlur}
+                error={validationErrors.email}
+                className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold"
+                required
+              />
+              {/* Domain validation indicator */}
+              {formData.email && !validationErrors.email && (
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  {emailDomainStatus === 'checking' && (
+                    <>
+                      <Loader2 size={12} className="text-gray-light animate-spin" />
+                      <span className="text-[10px] text-gray-light">Verifying email domain...</span>
+                    </>
+                  )}
+                  {emailDomainStatus === 'valid' && (
+                    <>
+                      <CheckCircle size={12} className="text-success" />
+                      <span className="text-[10px] text-success">Email domain verified</span>
+                    </>
+                  )}
+                  {emailDomainStatus === 'warning' && (
+                    <>
+                      <AlertTriangle size={12} className="text-primary" />
+                      <span className="text-[10px] text-primary">{emailDomainMessage}</span>
+                    </>
+                  )}
+                  {emailDomainStatus === 'invalid' && (
+                    <>
+                      <XCircle size={12} className="text-danger" />
+                      <span className="text-[10px] text-danger">{emailDomainMessage}</span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
             <Input
               label="Password"
               name="password"
@@ -183,13 +285,13 @@ export default function SignupPage() {
               isLoading={isLoading}
               className="py-lg rounded-full font-bold shadow-xl shadow-warm-gold/10 mt-xl"
             >
-              Start Journey
+              Create Account
             </Button>
           </form>
 
           <div className="text-center md:text-left">
             <p className="text-sm text-gray-light font-light">
-              Already walking with us?{' '}
+              Already have your workspace?{' '}
               <Link href="/login" className="text-warm-gold hover:underline font-medium underline-offset-4 decoration-warm-gold/30">
                 Sign in
               </Link>

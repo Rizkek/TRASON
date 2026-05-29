@@ -15,8 +15,8 @@ const serif = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: 'TRASON - Self-Improvement Platform',
-  description: 'Personal finance tracker, daily schedule, reminders, and AI insights',
+  title: 'TRASON - Your Personal OS for Intentional Growth',
+  description: 'A calm Personal OS for finance, routines, sport, reminders, career signals, and plain-language insights.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -41,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192x192.svg" />
@@ -50,7 +50,7 @@ export default function RootLayout({
       <body className={`${sans.variable} ${serif.variable} ${sans.className}`} suppressHydrationWarning>
         <ErrorBoundary>
           <NextTopLoader 
-            color="#4E4FEB"
+            color="#F4C95D"
             initialPosition={0.08}
             crawlSpeed={200}
             height={3}
@@ -58,7 +58,7 @@ export default function RootLayout({
             showSpinner={false}
             easing="ease"
             speed={200}
-            shadow="0 0 10px #4E4FEB,0 0 5px #4E4FEB"
+            shadow="0 0 10px #F4C95D,0 0 5px #F4C95D"
           />
           <AuthProvider>
             {children}

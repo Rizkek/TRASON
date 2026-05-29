@@ -1,9 +1,10 @@
 import React from 'react';
 import { Card } from '@/components';
-import { TrendingUp } from 'lucide-react';
+import { FiTrendingUp as TrendingUp } from 'react-icons/fi';
 import { formatCurrency } from '@/libs/format';
 import { User, Transaction, Activity } from '@/types/database';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 
 interface Props {
   user: User | null;
@@ -13,6 +14,8 @@ interface Props {
 
 export const DashboardHeader = ({ user, activities, transactions }: Props) => {
   const { currency, locale } = useUserPreferences();
+  const { t } = useTranslation();
+
   const totalExpenses = transactions
     .filter((t) => t.type === 'expense')
     .reduce((acc, t) => acc + t.amount, 0);
@@ -31,7 +34,7 @@ export const DashboardHeader = ({ user, activities, transactions }: Props) => {
         <div className="space-y-sm">
           <div className="flex flex-col md:flex-row md:items-center gap-md mb-sm">
             <h2 className="text-xl font-bold text-gradient">
-              Welcome back, {user?.first_name || 'Champion'}
+              {t('dashboard.welcome_back')}, {user?.first_name || t('dashboard.builder')}
             </h2>
             {user?.bio && (
               <span className="hidden md:inline text-xs bg-primary/10 text-primary px-md py-xs rounded-full border border-primary/20 italic">
@@ -40,9 +43,9 @@ export const DashboardHeader = ({ user, activities, transactions }: Props) => {
             )}
           </div>
           <p className="text-lg leading-relaxed text-soft-cream font-serif italic opacity-90">
-            "You've tracked <span className="text-primary font-bold">{activities.length} activities</span> today and 
-            invested <span className="text-secondary font-bold">{formatCurrency(totalExpenses, currency, locale)}</span> in yourself. 
-            {totalIncome > 0 ? ` Your positive momentum shows with an income of ${formatCurrency(totalIncome, currency, locale)}.` : ' Keep focus on your goals.'}"
+            "{t('dashboard.narrative_today')} <span className="text-primary font-bold">{activities.length} {t('dashboard.narrative_logged_moments')}</span> {t('dashboard.narrative_and')} 
+            <span className="text-secondary font-bold"> {formatCurrency(totalExpenses, currency, locale)}</span> {t('dashboard.narrative_in_outflow')} 
+            {totalIncome > 0 ? ` ${t('dashboard.narrative_income_msg').replace('{income}', formatCurrency(totalIncome, currency, locale))}` : ` ${t('dashboard.narrative_default_msg')}`}"
           </p>
           {user?.bio && (
             <p className="md:hidden text-xs text-gray-light italic mt-md opacity-70">

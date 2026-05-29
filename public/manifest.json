@@ -2,50 +2,38 @@
   "name": "TRASON - Self-Improvement Platform",
   "short_name": "TRASON",
   "description": "Personal finance tracker, daily timeline, reminders, and AI insights",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#0ea5e9",
-  "background_color": "#ffffff",
+  "background_color": "#0f0f0f",
   "screenshots": [
     {
-      "src": "/icon-192x192.svg",
+      "src": "/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icon-192x192.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "maskable any"
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "icons": [
     {
-      "src": "/icon-192x192.svg",
+      "src": "/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-192x192.svg",
+      "src": "/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-192x192.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icon-192x192.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
+      "src": "/badge-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "monochrome"
     }
   ],
   "categories": ["productivity", "utilities"],
@@ -57,9 +45,9 @@
       "url": "/dashboard",
       "icons": [
         {
-          "src": "/icon-192x192.svg",
+          "src": "/icon-192x192.png",
           "sizes": "192x192",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     },
@@ -70,9 +58,9 @@
       "url": "/finance",
       "icons": [
         {
-          "src": "/icon-192x192.svg",
+          "src": "/icon-192x192.png",
           "sizes": "192x192",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     },
@@ -83,9 +71,9 @@
       "url": "/timeline",
       "icons": [
         {
-          "src": "/icon-192x192.svg",
+          "src": "/icon-192x192.png",
           "sizes": "192x192",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     },
@@ -96,9 +84,9 @@
       "url": "/reminders",
       "icons": [
         {
-          "src": "/icon-192x192.svg",
+          "src": "/icon-192x192.png",
           "sizes": "192x192",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     }

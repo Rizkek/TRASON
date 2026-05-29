@@ -1,9 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card, Badge } from '@/components';
-import { Briefcase, Clock } from 'lucide-react';
+import { RiBriefcaseLine as Briefcase, RiTimeLine as Clock } from 'react-icons/ri';
 import { CareerStats } from '@/hooks/useCareer';
 import { CareerApplication } from '@/types/database';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 
 interface Props {
   stats: CareerStats;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export const CareerSummary = ({ stats, nextInterview, isLoading }: Props) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <Card className="p-xl bg-white/[0.02] border-white/[0.05]">
@@ -25,11 +27,11 @@ export const CareerSummary = ({ stats, nextInterview, isLoading }: Props) => {
       <div className="px-lg py-md border-b border-white/[0.05] flex justify-between items-center bg-white/[0.01]">
         <div className="flex items-center gap-sm">
           <Briefcase size={16} className="text-warm-gold" />
-          <h3 className="text-sm font-bold tracking-tight">APPLICATIONS</h3>
+          <h3 className="text-sm font-bold tracking-tight">{t('dashboard.career_pipeline')}</h3>
         </div>
         {stats.active > 0 && (
           <Badge variant="default" size="sm" aria-label={`${stats.active} active applications`}>
-            {stats.active} active
+            {stats.active} {t('dashboard.active')}
           </Badge>
         )}
       </div>
@@ -37,16 +39,16 @@ export const CareerSummary = ({ stats, nextInterview, isLoading }: Props) => {
       <div className="p-lg space-y-lg">
         {stats.total === 0 ? (
           <p className="text-xs text-gray-light italic text-center py-md">
-            No applications tracked yet.
+            {t('dashboard.career_empty_desc')}
           </p>
         ) : (
           <>
             {/* Quick stats */}
             <div className="grid grid-cols-3 gap-sm">
               {[
-                { label: 'Applied',   value: stats.applied,   color: 'text-primary' },
-                { label: 'Interview', value: stats.interview,  color: 'text-purple-400' },
-                { label: 'Offer',     value: stats.offer,     color: 'text-income' },
+                { label: t('dashboard.applied'),   value: stats.applied,   color: 'text-primary' },
+                { label: t('dashboard.interview'), value: stats.interview,  color: 'text-purple-400' },
+                { label: t('dashboard.offer'),     value: stats.offer,     color: 'text-income' },
               ].map((s) => (
                 <div key={s.label} className="text-center">
                   <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
@@ -64,7 +66,7 @@ export const CareerSummary = ({ stats, nextInterview, isLoading }: Props) => {
               >
                 <Clock size={14} className="text-purple-400 flex-shrink-0 mt-0.5" />
                 <div className="min-w-0">
-                  <p className="text-[10px] text-purple-400 font-bold uppercase tracking-widest">Next Interview</p>
+                  <p className="text-[10px] text-purple-400 font-bold uppercase tracking-widest">{t('dashboard.next_conversation')}</p>
                   <p className="text-sm font-semibold text-soft-cream truncate">{nextInterview.company_name}</p>
                   <p className="text-[10px] text-gray-light">
                     {new Date(nextInterview.interview_date!).toLocaleDateString('en-US', {
@@ -84,7 +86,7 @@ export const CareerSummary = ({ stats, nextInterview, isLoading }: Props) => {
           className="block text-center text-[10px] font-bold uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors"
           aria-label="Go to Career Tracker"
         >
-          {stats.total === 0 ? 'Start tracking →' : 'View all applications →'}
+          {stats.total === 0 ? t('dashboard.add_first_move') : t('dashboard.review_pipeline')}
         </Link>
       </div>
     </Card>

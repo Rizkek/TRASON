@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import useSWR, { mutate as globalMutate } from 'swr';
 import { activityQueries } from '@/services/queries';
 import { Activity } from '@/services/supabaseClient';
-import { SWR_CONFIG } from '@/config/swr';
+import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { handleQueryError, getUserErrorMessage, logError } from '@/libs/apiErrors';
 
@@ -46,7 +46,7 @@ export const useActivity = (startDate?: Date, endDate?: Date): UseActivityReturn
         throw handleQueryError(err);
       }
     },
-    SWR_CONFIG
+    SWR_CONFIG_DASHBOARD
   );
 
   const createActivity = useCallback(

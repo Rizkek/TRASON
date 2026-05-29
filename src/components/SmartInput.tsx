@@ -2,8 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Loader2, Send } from 'lucide-react';
-import { transactionQueries } from '@/services/queries';
 import { getLocalISODate } from '@/libs/format';
+import { 
+  createTransactionWithInvalidation,
+  createActivityWithInvalidation,
+  createReminderWithInvalidation
+} from '@/libs/mutations';
 
 export function SmartInput() {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,27 +63,51 @@ export function SmartInput() {
   };
 
   const handleConfirm = async () => {
-    if (!result || result.type !== 'transaction' || result.action !== 'create' || !result.data) return;
+    if (!result || result.action !== 'create' || !result.data) return;
 
     try {
       setIsLoading(true);
-      // Dummy user ID for now, should come from auth
-      await transactionQueries.createTransaction({
-        title: result.data.title || 'Untitled',
-        amount: result.data.amount || 0,
-        type: result.data.transactionType || 'expense',
-        date: result.data.date || getLocalISODate(),
-        category_id: null as any, // Nullable category allowed
-        time: '00:00:00',
-        description: '',
-        payment_method: 'cash',
-        tags: []
-      });
+      
+      if (result.type === 'transaction') {
+        await createTransactionWithInvalidation({
+          title: result.data.title || 'Untitled Transaction',
+          amount: result.data.amount || 0,
+          type: result.data.transactionType || 'expense',
+          date: result.data.date || getLocalISODate(),
+          category_id: null as any,
+          time: '00:00:00',
+          description: '',
+          payment_method: 'cash',
+          tags: []
+        });
+      } else if (result.type === 'activity') {
+        await createActivityWithInvalidation({
+          title: result.data.title || 'Untitled Activity',
+          category: result.data.activityCategory || 'general',
+          duration_minutes: result.data.durationMinutes || 0,
+          start_time: result.data.startTime || new Date().toISOString(),
+          tags: []
+        }, result.data.date || getLocalISODate());
+      } else if (result.type === 'reminder') {
+        const datePart = result.data.date || getLocalISODate();
+        const timePart = result.data.dueTime || '00:00:00';
+        await createReminderWithInvalidation({
+          title: result.data.title || 'Untitled Reminder',
+          priority: result.data.priority || 'medium',
+          due_date: datePart,
+          due_time: timePart,
+          due_datetime: result.data.dueDatetime || new Date(`${datePart}T${timePart}`).toISOString(),
+          status: 'pending',
+          is_recurring: false,
+          tags: []
+        });
+      } else {
+        throw new Error('Unsupported item type.');
+      }
       
       setIsOpen(false);
       setInput('');
       setResult(null);
-      // Optional: trigger mutate if using SWR
     } catch (error) {
       console.error('Failed to save:', error);
       setResult({ ...result, error: 'Failed to save to database.' });

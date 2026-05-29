@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import useSWR, { mutate as globalMutate } from 'swr';
 import { reminderQueries } from '@/services/queries';
 import { Reminder } from '@/services/supabaseClient';
-import { SWR_CONFIG } from '@/config/swr';
+import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { handleQueryError, getUserErrorMessage, logError } from '@/libs/apiErrors';
 
@@ -45,7 +45,7 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
         throw handleQueryError(err);
       }
     },
-    SWR_CONFIG
+    SWR_CONFIG_DASHBOARD
   );
 
   const createReminder = useCallback(

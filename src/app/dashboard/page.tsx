@@ -11,17 +11,17 @@ import { useInvestment } from '@/hooks/useInvestment';
 import { InvestmentInsightResponse } from '@/services/investmentService';
 import { getDateRange } from '@/libs/date';
 
-
 // Setup SWR Dates
 const CURRENT_DATE = new Date();
 const { start: CURRENT_START, end: CURRENT_END } = getDateRange(CURRENT_DATE.getMonth(), CURRENT_DATE.getFullYear());
 
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import { 
-  Calendar as CalendarIcon, 
-  Bell, 
-  Lightbulb, 
-  Clock
-} from 'lucide-react';
+  RiCalendarLine as CalendarIcon, 
+  RiNotification3Line as Bell, 
+  RiLightbulbLine as Lightbulb, 
+  RiTimeLine as Clock 
+} from 'react-icons/ri';
 
 // Extracted Components
 import { DashboardHeader } from './components/DashboardHeader';
@@ -34,12 +34,15 @@ import { SportSummary } from './components/SportSummary';
 import { CareerSummary } from './components/CareerSummary';
 import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useCareer } from '@/hooks/useCareer';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 export default function DashboardPage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
   const user = useAuthStore((s) => s.user);
+  const { t } = useTranslation();
+  const { locale, timezone } = useUserPreferences();
   
   // SWR automatically handles all data fetching in background
   const { transactions } = useTransaction(CURRENT_START, CURRENT_END);
@@ -52,16 +55,16 @@ export default function DashboardPage() {
 
   const greeting = useMemo(() => {
     const hours = new Date().getHours();
-    return hours < 12 ? 'Good Morning' : hours < 18 ? 'Good Afternoon' : 'Good Evening';
-  }, []);
+    return hours < 12 ? t('dashboard.greeting_morning') : hours < 18 ? t('dashboard.greeting_afternoon') : t('dashboard.greeting_evening');
+  }, [t]);
 
   const todayDate = useMemo(() => {
-    return new Date().toLocaleDateString('id-ID', { weekday: 'long', month: 'long', day: 'numeric' });
-  }, []);
+    return new Date().toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric', timeZone: timezone });
+  }, [locale, timezone]);
 
   const todayTime = useMemo(() => {
-    return new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-  }, []);
+    return new Date().toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone });
+  }, [locale, timezone]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -73,7 +76,7 @@ export default function DashboardPage() {
     return (
       <Layout>
         <div className="flex items-center justify-center h-[60vh]">
-          <Loading text="Checking your session..." />
+          <Loading text={t('dashboard.checking_session')} />
         </div>
       </Layout>
     );
@@ -87,7 +90,7 @@ export default function DashboardPage() {
         {/* Hero Greeting */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
           <div className="space-y-sm">
-            <h1 className="text-display font-serif text-white flex items-center gap-md">
+            <h1 className="text-display font-serif text-white flex flex-wrap items-baseline gap-x-md">
               <span className="text-gradient">{greeting}</span>, 
               <span>{user?.first_name || user?.name?.split(' ')[0] || 'User'}</span>
             </h1>
@@ -121,11 +124,11 @@ export default function DashboardPage() {
                   </div>
                   <input
                     type="text"
-                    placeholder="Log an activity, expense, or thought..."
+                    placeholder={t('dashboard.capture_placeholder')}
                     className="w-full pl-xl pr-lg py-md bg-gray-strong/40 border border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
                   />
                 </div>
-                <Button variant="primary" size="md">LOG NOW</Button>
+                <Button variant="primary" size="md">{t('dashboard.capture_btn')}</Button>
               </div>
             </Card>
 
@@ -148,14 +151,30 @@ export default function DashboardPage() {
                   <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center text-secondary glow-secondary">
                     <Lightbulb size={20} />
                   </div>
-                  <h3 className="font-serif italic text-lg text-white">Daily Insight</h3>
+                  <h3 className="font-serif italic text-lg text-white">{t('dashboard.daily_insight')}</h3>
                 </div>
                 <p className="text-caption leading-relaxed tracking-wide text-gray-very-light italic">
-                  &ldquo;{typedInsights?.headline || 'Pattern detected: You tend to spend more on Tuesdays. Consider setting a daily limit to stay on track.'}&rdquo;
+                  &ldquo;{typedInsights?.headline || t('dashboard.default_insight')}&rdquo;
                 </p>
+                <div className="flex flex-wrap gap-2 pt-sm">
+                  {typedInsights?.scenario ? (
+                    <Badge variant="info" size="sm">{t(`investment_page.scenario_${typedInsights.scenario}`)}</Badge>
+                  ) : null}
+                  {typedInsights?.confidence ? (
+                    <Badge variant={typedInsights.confidence === 'low' ? 'danger' : typedInsights.confidence === 'moderate' ? 'warning' : 'success'} size="sm">
+                      {t(`investment_page.confidence_${typedInsights.confidence}`)}
+                    </Badge>
+                  ) : null}
+                </div>
+                {typedInsights?.riskWarning ? (
+                  <p className="text-xs text-warning mt-2">{typedInsights.riskWarning}</p>
+                ) : null}
+                {typedInsights?.recommendation ? (
+                  <p className="text-xs text-gray-light mt-2">{typedInsights.recommendation}</p>
+                ) : null}
                 <div className="pt-md">
                   <Button variant="ghost" size="sm" className="w-full border-white/10 hover:bg-white/5 h-10">
-                    <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Deep Analysis</span>
+                    <span className="text-[10px] font-bold tracking-[0.2em] uppercase">{t('dashboard.open_insights')}</span>
                   </Button>
                 </div>
               </div>

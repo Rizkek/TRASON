@@ -24,12 +24,14 @@ import {
 import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
 import { getDateRange } from '@/libs/date';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 
 export default function FinancePage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
-  const { currency, locale } = useUserPreferences();
+  const { t } = useTranslation();
+  const { currency, locale, timezone } = useUserPreferences();
   const now = new Date();
   const { start, end } = getDateRange(now.getMonth(), now.getFullYear());
   
@@ -49,7 +51,7 @@ export default function FinancePage() {
     amount: '',
     type: 'expense' as 'income' | 'expense',
     category_id: '',
-    date: getLocalISODate(),
+    date: getLocalISODate(new Date(), timezone),
     description: ''
   });
 
@@ -115,7 +117,7 @@ export default function FinancePage() {
       amount: '',
       type: 'expense' as const,
       category_id: '',
-      date: getLocalISODate(),
+      date: getLocalISODate(new Date(), timezone),
       description: ''
     });
     setIsModalOpen(true);
@@ -165,21 +167,21 @@ export default function FinancePage() {
       <div className="space-y-xl animate-fade-in">
         <div className="flex items-start justify-between flex-wrap gap-md">
           <div className="space-y-sm">
-            <h1 className="text-display font-serif text-gradient">Financial Flow</h1>
+            <h1 className="text-display font-serif text-gradient">{t('finance.title')}</h1>
             <p className="text-subtext flex items-center gap-sm">
               <Wallet size={14} className="text-primary" />
-              Manage your resources and track architecture
+              {t('finance.subtitle')}
             </p>
           </div>
           <Button variant="primary" size="md" onClick={openAddModal} leftIcon={<Plus size={18} />}>
-            New Entry
+            {t('finance.newEntry')}
           </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
           <Card className="p-xl relative overflow-hidden group">
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-all" />
-            <p className="text-micro text-gray-light mb-md tracking-widest">TOTAL INCOME</p>
+            <p className="text-micro text-gray-light mb-md tracking-widest">{t('finance.totalIncome')}</p>
             <div className="flex items-end justify-between">
               <p className="text-3xl font-bold text-success">{formatCurrency(totalIncome, currency, locale)}</p>
               <div className="p-sm bg-success/10 rounded-md text-success"><ArrowUpRight size={20} /></div>
@@ -188,7 +190,7 @@ export default function FinancePage() {
           
           <Card className="p-xl relative overflow-hidden group">
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-danger/5 rounded-full blur-2xl group-hover:bg-danger/10 transition-all" />
-            <p className="text-micro text-gray-light mb-md tracking-widest">TOTAL EXPENSES</p>
+            <p className="text-micro text-gray-light mb-md tracking-widest">{t('finance.totalExpense')}</p>
             <div className="flex items-end justify-between">
               <p className="text-3xl font-bold text-danger">{formatCurrency(totalExpense, currency, locale)}</p>
               <div className="p-sm bg-danger/10 rounded-md text-danger"><ArrowDownLeft size={20} /></div>
@@ -197,7 +199,7 @@ export default function FinancePage() {
 
           <Card className="p-xl relative overflow-hidden group border-b-2 border-primary/20">
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
-            <p className="text-micro text-gray-light mb-md tracking-widest">NET BALANCE</p>
+            <p className="text-micro text-gray-light mb-md tracking-widest">{t('finance.netBalance')}</p>
             <div className="flex items-end justify-between">
               <p className="text-3xl font-bold text-white">{formatCurrency(totalIncome - totalExpense, currency, locale)}</p>
               <div className="p-sm bg-primary/10 rounded-md text-primary"><TrendingUp size={20} /></div>
@@ -210,7 +212,7 @@ export default function FinancePage() {
             <Search size={18} className="absolute left-md top-1/2 -translate-y-1/2 text-gray-light group-focus-within:text-primary transition-colors" />
             <input 
               type="text" 
-              placeholder="Search transactions..." 
+              placeholder={t('finance.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-xl pr-md py-md bg-gray-strong/40 border border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none transition-all"
@@ -229,7 +231,7 @@ export default function FinancePage() {
                     : 'text-gray-light hover:text-soft-cream'
                 }`}
               >
-                {type}
+                {t(`finance.filter${type.charAt(0).toUpperCase() + type.slice(1)}` as any)}
               </button>
             ))}
           </div>
@@ -240,11 +242,11 @@ export default function FinancePage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-white/[0.02] border-b border-white/[0.05]">
-                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">Transaction</th>
-                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">Date</th>
-                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">Category</th>
-                  <th className="px-xl py-lg text-right text-[10px] font-bold text-gray-light tracking-widest uppercase">Amount</th>
-                  <th className="px-xl py-lg text-right text-[10px] font-bold text-gray-light tracking-widest uppercase">Actions</th>
+                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.transaction')}</th>
+                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.date')}</th>
+                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.category')}</th>
+                  <th className="px-xl py-lg text-right text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.amount')}</th>
+                  <th className="px-xl py-lg text-right text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white divide-opacity-[0.03]">
@@ -297,8 +299,12 @@ export default function FinancePage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="py-2xl text-center text-gray-light text-xs italic opacity-60">
-                      No transactions match your current view.
+                    <td colSpan={5} className="py-2xl text-center">
+                      <div className="flex flex-col items-center justify-center opacity-50">
+                        <Sparkles size={32} className="text-gray-light mb-md" />
+                        <p className="text-sm text-soft-cream">{t('moduleCommon.emptyTitle')}</p>
+                        <p className="text-xs text-gray-light">{t('moduleCommon.emptyDesc')}</p>
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -311,12 +317,12 @@ export default function FinancePage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingTransaction ? 'EDIT TRANSACTION' : 'RECORD NEW FLOW'}
+        title={editingTransaction ? t('finance.modal.editTitle') : t('finance.modal.addTitle')}
         footer={
           <div className="flex gap-md justify-end">
-            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)} disabled={isSaving}>CANCEL</Button>
-            <Button variant="primary" size="md" onClick={handleSave} isLoading={isSaving} disabled={isSaving}>
-              {editingTransaction ? 'UPDATE LOG' : 'PERSIST TRANSACTION'}
+            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)} disabled={isSaving}>{t('common.cancel')}</Button>
+            <Button variant="primary" onClick={handleSave} disabled={isSaving} className="w-full">
+              {isSaving ? t('finance.modal.savingBtn') : t('finance.modal.saveBtn')}
             </Button>
           </div>
         }
@@ -334,7 +340,7 @@ export default function FinancePage() {
                     : 'text-gray-light hover:text-soft-cream'
                 }`}
               >
-                {type}
+                {t(`finance.modal.type.${type}`)}
               </button>
             ))}
           </div>
@@ -422,9 +428,10 @@ export default function FinancePage() {
       <ConfirmModal
         isOpen={!!deleteConfirmId}
         onClose={() => setDeleteConfirmId(null)}
-        title="DELETE TRANSACTION"
-        description="Are you sure you want to permanently delete this transaction? This action cannot be undone."
-        confirmText="DELETE"
+        title={t('finance.modal.deleteConfirmTitle')}
+        description={t('finance.modal.deleteConfirmDesc')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         isDangerous={true}
         onConfirm={handleConfirmDelete}
       />

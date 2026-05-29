@@ -23,6 +23,7 @@ import {
 import { formatCurrency, formatNumber, getLocalISODate } from '@/libs/format';
 import { formatSignedCurrency, formatSignedPercent } from '@/services/investmentService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 
 type AssetType = 'stock' | 'crypto' | 'gold';
 
@@ -61,6 +62,7 @@ export default function InvestmentsPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
   const { currency, locale, timezone } = useUserPreferences();
+  const { t } = useTranslation();
   const {
     calculatedPositions,
     summary,
@@ -192,15 +194,17 @@ export default function InvestmentsPage() {
 
   const headerInsight = useMemo(() => {
     if (insights?.headline) return insights.headline;
-    if (!summary) return 'Track long-term positions with simple signals instead of trading-screen noise.';
-    return `Your portfolio is currently worth ${formatCurrency(summary.totalValue, currency, locale)} across ${summary.positionsCount} tracked positions.`;
-  }, [currency, insights, locale, summary]);
+    if (!summary) return t('investment_page.default_insight');
+    return t('investment_page.portfolio_worth')
+      .replace('{value}', formatCurrency(summary.totalValue, currency, locale))
+      .replace('{count}', String(summary.positionsCount));
+  }, [currency, insights, locale, summary, t]);
 
   if (authLoading) {
     return (
       <Layout>
         <div className="flex items-center justify-center h-[60vh]">
-          <Loading text="Checking your session..." />
+          <Loading text={t('dashboard.checking_session')} />
         </div>
       </Layout>
     );
@@ -215,26 +219,26 @@ export default function InvestmentsPage() {
         <div className="space-y-xl animate-fade-in">
           <div className="flex items-start justify-between gap-md flex-wrap">
           <div className="space-y-sm max-w-2xl">
-            <h1 className="text-display font-serif text-gradient">Investment Analyst</h1>
+            <h1 className="text-display font-serif text-gradient">{t('investment_page.investment_analyst_title')}</h1>
             <p className="text-subtext flex items-center gap-sm">
               <BriefcaseBusiness size={14} className="text-primary" />
-              Track stocks, crypto, and gold without turning your Personal OS into a trading terminal.
+              {t('investment_page.investment_analyst_desc')}
             </p>
           </div>
           <div className="flex gap-md">
             <Button variant="ghost" size="md" onClick={() => refreshPortfolio()} disabled={isRefreshing}>
               <RefreshCcw size={16} className={`mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-              Refresh Prices
+              {t('investment_page.refresh_prices')}
             </Button>
             <Button variant="primary" size="md" onClick={openNewModal}>
               <Plus size={16} className="mr-2" />
-              Add Position
+              {t('investment_page.add_position')}
             </Button>
           </div>
         </div>
 
         {error && (
-          <Alert type="error" title="Investment Analyst">
+          <Alert type="error" title={t('investment_page.investment_analyst_title')}>
             {error?.message || String(error)}
           </Alert>
         )}
@@ -243,6 +247,22 @@ export default function InvestmentsPage() {
           <div className="absolute top-0 right-0 w-44 h-44 bg-primary/10 blur-3xl rounded-full" />
           <div className="relative z-10 space-y-sm">
             <p className="text-sm text-soft-cream italic">"{headerInsight}"</p>
+            <div className="flex flex-wrap gap-sm pt-sm">
+              {insights?.scenario ? (
+                <Badge variant="info" size="sm">{t(`investment_page.scenario_${insights.scenario}`)}</Badge>
+              ) : null}
+              {insights?.confidence ? (
+                <Badge variant={insights.confidence === 'low' ? 'danger' : insights.confidence === 'moderate' ? 'warning' : 'success'} size="sm">
+                  {t(`investment_page.confidence_${insights.confidence}`)}
+                </Badge>
+              ) : null}
+            </div>
+            {insights?.riskWarning ? (
+              <p className="text-xs text-warning mt-2">{insights.riskWarning}</p>
+            ) : null}
+            {insights?.recommendation ? (
+              <p className="text-sm text-gray-light mt-2">{insights.recommendation}</p>
+            ) : null}
             {insights?.observations?.length ? (
               <div className="flex flex-wrap gap-sm pt-sm">
                 {insights.observations.map((item) => (
@@ -255,28 +275,43 @@ export default function InvestmentsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-lg">
           <Card className="p-xl">
-            <p className="text-micro text-gray-light mb-sm">PORTFOLIO VALUE</p>
+            <p className="text-micro text-gray-light mb-sm">{t('investment_page.portfolio_value')}</p>
             <p className="text-2xl font-bold text-white">{formatCurrency(summary?.totalValue || 0, currency, locale)}</p>
           </Card>
           <Card className="p-xl">
-            <p className="text-micro text-gray-light mb-sm">UNREALIZED P/L</p>
+            <p className="text-micro text-gray-light mb-sm">{t('investment_page.unrealized_pl')}</p>
             <p className={`text-2xl font-bold ${(summary?.totalProfitLoss || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
               {formatSignedCurrency(summary?.totalProfitLoss || 0, currency, locale)}
             </p>
           </Card>
           <Card className="p-xl">
-            <p className="text-micro text-gray-light mb-sm">TODAY</p>
+            <p className="text-micro text-gray-light mb-sm">{t('dashboard.today')}</p>
             <p className={`text-2xl font-bold ${(summary?.dailyChangeValue || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
               {formatSignedCurrency(summary?.dailyChangeValue || 0, currency, locale)}
             </p>
             <p className="text-xs text-gray-light mt-1">{formatSignedPercent(summary?.dailyChangePercent || 0)}</p>
           </Card>
           <Card className="p-xl">
-            <p className="text-micro text-gray-light mb-sm">ALLOCATION MIX</p>
-            <div className="space-y-2 text-xs text-gray-light">
-              <div className="flex justify-between"><span>Stocks</span><span>{formatCurrency(summary?.allocationByType.stock || 0, currency, locale)}</span></div>
-              <div className="flex justify-between"><span>Crypto</span><span>{formatCurrency(summary?.allocationByType.crypto || 0, currency, locale)}</span></div>
-              <div className="flex justify-between"><span>Gold</span><span>{formatCurrency(summary?.allocationByType.gold || 0, currency, locale)}</span></div>
+            <p className="text-micro text-gray-light mb-sm">{t('investment_page.allocation_mix')}</p>
+            <div className="space-y-3 text-xs text-gray-light">
+              {['stock', 'crypto', 'gold'].map((type) => {
+                const value = summary?.allocationByType[type as keyof typeof summary['allocationByType']] || 0;
+                const percent = summary?.totalValue ? (value / summary.totalValue) * 100 : 0;
+                return (
+                  <div key={type} className="space-y-2">
+                    <div className="flex justify-between text-[11px]">
+                      <span>{t(`dashboard.${type === 'stock' ? 'stocks' : type === 'crypto' ? 'crypto' : 'gold'}`)}</span>
+                      <span>{percent.toFixed(0)}%</span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
+                      <div
+                        style={{ width: `${Math.min(percent, 100)}%` }}
+                        className={`h-full rounded-full ${type === 'stock' ? 'bg-info' : type === 'crypto' ? 'bg-activity' : 'bg-warning'}`}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </Card>
         </div>
@@ -284,13 +319,13 @@ export default function InvestmentsPage() {
         <Card className="overflow-hidden">
           <div className="px-lg py-md border-b border-white/5 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold tracking-tight">PORTFOLIO TRACKER</h3>
-              <p className="text-xs text-gray-light mt-1">Simple cost-basis tracking with daily pricing and narrative insights.</p>
+              <h3 className="text-sm font-bold tracking-tight">{t('investment_page.portfolio_tracker')}</h3>
+              <p className="text-xs text-gray-light mt-1">{t('investment_page.portfolio_tracker_desc')}</p>
             </div>
             {summary?.topPerformer ? (
               <Badge variant="success" size="sm">
                 <TrendingUp size={12} className="mr-1" />
-                Top performer: {summary.topPerformer.symbol}
+                {t('investment_page.top_performer')} {summary.topPerformer.symbol}
               </Badge>
             ) : null}
           </div>
@@ -302,14 +337,15 @@ export default function InvestmentsPage() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-gray-light">
-                    <th className="px-lg py-md">Asset</th>
-                    <th className="px-lg py-md">Amount</th>
-                    <th className="px-lg py-md">Avg Cost</th>
-                    <th className="px-lg py-md">Current Price</th>
-                    <th className="px-lg py-md">Day Chg</th>
-                    <th className="px-lg py-md">Value</th>
-                    <th className="px-lg py-md">P/L</th>
-                    <th className="px-lg py-md text-right">Actions</th>
+                    <th className="px-lg py-md">{t('investment_page.asset')}</th>
+                    <th className="px-lg py-md">{t('investment_page.amount')}</th>
+                    <th className="px-lg py-md">{t('investment_page.avg_cost')}</th>
+                    <th className="px-lg py-md">{t('investment_page.current_price')}</th>
+                    <th className="px-lg py-md">{t('investment_page.day_chg')}</th>
+                    <th className="px-lg py-md">{t('investment_page.value')}</th>
+                    <th className="px-lg py-md">{t('investment_page.pl')}</th>
+                    <th className="px-lg py-md">{t('investment_page.risk')}</th>
+                    <th className="px-lg py-md text-right">{t('investment_page.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -337,7 +373,7 @@ export default function InvestmentsPage() {
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-gray-light">{position.display_name || 'Tracked position'}</p>
+                          <p className="text-xs text-gray-light">{position.display_name || t('investment_page.tracked_position')}</p>
                         </div>
                       </td>
                       <td className="px-lg py-lg text-sm text-soft-cream">{formatNumber(position.amount, 4)}</td>
@@ -345,7 +381,7 @@ export default function InvestmentsPage() {
                       <td className="px-lg py-lg">
                         <p className="text-sm text-soft-cream">{formatCurrency(position.current_price, currency, locale)}</p>
                         {lastUpdated && (
-                          <p className="text-[10px] text-gray-light mt-1">update {lastUpdated}</p>
+                          <p className="text-[10px] text-gray-light mt-1">{t('investment_page.update_label')} {lastUpdated}</p>
                         )}
                       </td>
                       <td className="px-lg py-lg">
@@ -367,9 +403,27 @@ export default function InvestmentsPage() {
                         </div>
                         <div className="text-xs text-gray-light">{formatSignedPercent(position.percentage_change)}</div>
                       </td>
+                      <td className="px-lg py-lg align-top">
+                        <div className="space-y-1">
+                          <Badge
+                            variant={position.risk_category === 'high' ? 'danger' : position.risk_category === 'moderate' ? 'warning' : 'success'}
+                            size="sm"
+                          >
+                            {position.risk_category.toUpperCase()}
+                          </Badge>
+                          <p className="text-[11px] text-gray-light">
+                            {position.risk_status === 'overweight'
+                              ? t('investment_page.overweight')
+                              : position.risk_status === 'underweight'
+                              ? t('investment_page.underweight')
+                              : t('investment_page.balanced')}
+                          </p>
+                          <p className="text-[10px] text-gray-light">{position.portfolio_weight_pct.toFixed(1)}% of portfolio</p>
+                        </div>
+                      </td>
                       <td className="px-lg py-lg">
                         <div className="flex items-center justify-end gap-sm">
-                          <Button variant="ghost" size="sm" onClick={() => openEditModal(position)}>Edit</Button>
+                          <Button variant="ghost" size="sm" onClick={() => openEditModal(position)}>{t('investment_page.edit')}</Button>
                           <button
                             onClick={() => setDeleteConfirmId(position.id)}
                             className="p-sm text-danger hover:bg-danger/10 rounded-md transition-colors"
@@ -389,11 +443,11 @@ export default function InvestmentsPage() {
               <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-lg text-primary">
                 <Shield size={28} />
               </div>
-              <h3 className="text-lg font-bold text-white">Start with one position</h3>
+              <h3 className="text-lg font-bold text-white">{t('dashboard.start_with_one_position')}</h3>
               <p className="text-sm text-gray-light max-w-lg mx-auto mt-sm">
-                Add a stock, a crypto holding, or your gold allocation. The module will surface value, unrealized profit and loss, and lightweight insights without replacing your current system.
+                {t('investment_page.investment_empty_state_desc')}
               </p>
-              <Button variant="primary" size="md" className="mt-lg" onClick={openNewModal}>Add First Position</Button>
+              <Button variant="primary" size="md" className="mt-lg" onClick={openNewModal}>{t('investment_page.add_first_position')}</Button>
             </div>
           )}
         </Card>
@@ -403,21 +457,21 @@ export default function InvestmentsPage() {
             <Card className="p-xl">
               <div className="flex items-center gap-sm mb-md text-secondary">
                 <Landmark size={16} />
-                <p className="text-micro">STOCKS</p>
+                <p className="text-micro">{t('investment_page.stocks_upper')}</p>
               </div>
               <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.stock || 0, currency, locale)}</p>
             </Card>
             <Card className="p-xl">
               <div className="flex items-center gap-sm mb-md text-primary">
                 <Coins size={16} />
-                <p className="text-micro">CRYPTO</p>
+                <p className="text-micro">{t('investment_page.crypto_upper')}</p>
               </div>
               <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.crypto || 0, currency, locale)}</p>
             </Card>
             <Card className="p-xl">
               <div className="flex items-center gap-sm mb-md text-warning">
                 <Shield size={16} />
-                <p className="text-micro">GOLD</p>
+                <p className="text-micro">{t('investment_page.gold_upper')}</p>
               </div>
               <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.gold || 0, currency, locale)}</p>
             </Card>
@@ -428,12 +482,12 @@ export default function InvestmentsPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingPosition ? 'EDIT POSITION' : 'ADD POSITION'}
+        title={editingPosition ? t('investment_page.edit_position') : t('investment_page.add_position_title')}
         footer={
           <div className="flex justify-end gap-md">
-            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)} disabled={isSaving}>CANCEL</Button>
+            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)} disabled={isSaving}>{t('investment_page.cancel_upper')}</Button>
             <Button variant="primary" size="md" onClick={handleSave} isLoading={isSaving} disabled={isSaving}>
-              {isSaving ? 'SAVING...' : editingPosition ? 'UPDATE POSITION' : 'SAVE POSITION'}
+              {isSaving ? t('investment_page.saving_upper') : editingPosition ? t('investment_page.update_position_upper') : t('investment_page.save_position_upper')}
             </Button>
           </div>
         }
@@ -442,7 +496,7 @@ export default function InvestmentsPage() {
         <div className="space-y-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
             <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">Asset Type</label>
+              <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('investment_page.asset_type')}</label>
               <select
                 value={form.asset_type}
                 onChange={(e) => setForm((prev) => ({ ...prev, asset_type: e.target.value as AssetType }))}
@@ -454,7 +508,7 @@ export default function InvestmentsPage() {
               </select>
             </div>
             <Input
-              label="SYMBOL"
+              label={t('investment_page.symbol')}
               placeholder={form.asset_type === 'gold' ? 'XAU' : 'AAPL / BTC'}
               value={form.symbol}
               onChange={(e) => setForm((prev) => ({ ...prev, symbol: e.target.value }))}
@@ -463,13 +517,13 @@ export default function InvestmentsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
             <Input
-              label="DISPLAY NAME"
+              label={t('investment_page.display_name')}
               placeholder="Apple Inc. / Bitcoin / Gold"
               value={form.display_name}
               onChange={(e) => setForm((prev) => ({ ...prev, display_name: e.target.value }))}
             />
             <Input
-              label="BUY DATE"
+              label={t('investment_page.buy_date')}
               type="date"
               value={form.buy_date}
               onChange={(e) => setForm((prev) => ({ ...prev, buy_date: e.target.value }))}
@@ -478,7 +532,7 @@ export default function InvestmentsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
             <Input
-              label="AMOUNT"
+              label={t('investment_page.amount_upper')}
               type="number"
               step="0.0001"
               placeholder="1.25"
@@ -486,7 +540,7 @@ export default function InvestmentsPage() {
               onChange={(e) => setForm((prev) => ({ ...prev, amount: e.target.value }))}
             />
             <Input
-              label="BUY PRICE (USD)"
+              label={t('investment_page.buy_price_usd')}
               type="number"
               step="0.0001"
               placeholder="0.00"
@@ -497,33 +551,33 @@ export default function InvestmentsPage() {
 
           {form.asset_type === 'crypto' && (
             <Input
-              label="COINGECKO ID"
+              label={t('investment_page.coingecko_id')}
               placeholder="bitcoin / ethereum / solana"
               value={form.external_id}
               onChange={(e) => setForm((prev) => ({ ...prev, external_id: e.target.value }))}
-              helpText="Recommended for crypto because CoinGecko identifies assets by coin id, not ticker."
+              helpText={t('investment_page.coingecko_help')}
             />
           )}
 
           {form.asset_type === 'gold' && (
             <Input
-              label="MANUAL CURRENT PRICE (OPTIONAL)"
+              label={t('investment_page.manual_price')}
               type="number"
               step="0.01"
               placeholder="Useful if API pricing is unavailable"
               value={form.manual_current_price}
               onChange={(e) => setForm((prev) => ({ ...prev, manual_current_price: e.target.value }))}
-              helpText="Gold can use a manual fallback price to keep the module simple and reliable."
+              helpText={t('investment_page.manual_price_help')}
             />
           )}
 
           <div className="space-y-sm">
-            <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">Notes</label>
+            <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('investment_page.notes_upper')}</label>
             <textarea
               rows={4}
               value={form.notes}
               onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))}
-              placeholder="Why you opened this position, target allocation, or context."
+              placeholder={t('investment_page.notes_placeholder')}
               className="w-full bg-gray-strong border border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
           </div>
@@ -533,9 +587,9 @@ export default function InvestmentsPage() {
       <ConfirmModal
         isOpen={!!deleteConfirmId}
         onClose={() => setDeleteConfirmId(null)}
-        title="ARCHIVE POSITION"
-        description="Are you sure you want to archive this investment position? It will be removed from your active portfolio."
-        confirmText="ARCHIVE"
+        title={t('investment_page.archive_position')}
+        description={t('investment_page.archive_desc')}
+        confirmText={t('investment_page.archive_btn')}
         isDangerous={true}
         onConfirm={handleConfirmDelete}
       />

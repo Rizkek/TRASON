@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useActivity } from '@/hooks/useActivity';
 import { validateActivity, sanitizeError } from '@/libs/validation';
 import { Activity } from '@/services/supabaseClient';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import {
   Plus,
   Trash2,
@@ -19,15 +20,15 @@ import {
 } from 'lucide-react';
 
 const MOOD_OPTIONS = [
-  { label: 'Happy', emoji: '😊', value: 'Happy' },
-  { label: 'Neutral', emoji: '😐', value: 'Neutral' },
-  { label: 'Tired', emoji: '😴', value: 'Tired' },
-  { label: 'Energized', emoji: '💪', value: 'Energized' },
-  { label: 'Stressed', emoji: '😤', value: 'Stressed' },
-  { label: 'Calm', emoji: '🧘', value: 'Calm' },
+  { labelKey: 'happy', emoji: '😊', value: 'Happy' },
+  { labelKey: 'neutral', emoji: '😐', value: 'Neutral' },
+  { labelKey: 'tired', emoji: '😴', value: 'Tired' },
+  { labelKey: 'energized', emoji: '💪', value: 'Energized' },
+  { labelKey: 'stressed', emoji: '😤', value: 'Stressed' },
+  { labelKey: 'calm', emoji: '🧘', value: 'Calm' },
 ];
 
-const CATEGORY_OPTIONS = ['Work', 'Study', 'Exercise', 'Sport', 'Meals', 'Social', 'Rest', 'Personal', 'Other'];
+const CATEGORY_OPTIONS = ['work', 'study', 'exercise', 'sport', 'meals', 'social', 'rest', 'personal', 'other'];
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 function formatHour(h: number) {
@@ -81,6 +82,7 @@ interface ActivityFormData {
   duration_minutes: number;
   location: string;
   rating: number;
+  applyToAllDays: boolean;
 }
 
 const defaultForm: ActivityFormData = {
@@ -97,6 +99,7 @@ const defaultForm: ActivityFormData = {
   duration_minutes: 60,
   location: '',
   rating: 0,
+  applyToAllDays: false,
 };
 
 const CELL_HEIGHT = 64; // px per hour row
@@ -105,6 +108,7 @@ export default function TimelinePage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
+  const { t } = useTranslation();
 
   const { start: weekStart, end: weekEnd } = getCurrentWeekBounds();
   const daysOfWeek = getDaysOfWeek(weekStart);
@@ -170,6 +174,7 @@ export default function TimelinePage() {
       duration_minutes: end ? Math.round((end.getTime() - start.getTime()) / 60000) : 60,
       location: activity.location || '',
       rating: activity.rating || 0,
+      applyToAllDays: false,
     });
     setIsModalOpen(true);
   }, []);
@@ -177,39 +182,97 @@ export default function TimelinePage() {
   const handleSave = async () => {
     if (!form.title.trim()) return;
 
-    // Calculate actual date for the selected day in THIS week
-    const startDate = new Date(weekStart);
-    startDate.setDate(startDate.getDate() + form.dayIndex);
-    startDate.setHours(form.start_hour, form.start_minute, 0, 0);
-    const endDate = new Date(startDate.getTime() + form.duration_minutes * 60000);
-
-    const payload = {
-      title: form.title.trim(),
-      description: form.description.trim() || undefined,
-      category: form.category || undefined,
-      mood: form.mood || undefined,
-      start_time: startDate.toISOString(),
-      end_time: endDate.toISOString(),
-      duration_minutes: form.duration_minutes,
-      location: form.location.trim() || undefined,
-      rating: form.rating || undefined,
-    };
-
-    const validation = validateActivity(payload);
-    if (!validation.isValid) {
-      setFormErrors(validation.errors);
-      return;
-    }
-
     setIsSaving(true);
     setFormErrors({});
     setError(null);
 
     try {
       if (editingActivity) {
+        // Calculate actual date for the selected day in THIS week
+        const startDate = new Date(weekStart);
+        startDate.setDate(startDate.getDate() + form.dayIndex);
+        startDate.setHours(form.start_hour, form.start_minute, 0, 0);
+        const endDate = new Date(startDate.getTime() + form.duration_minutes * 60000);
+
+        const payload = {
+          title: form.title.trim(),
+          description: form.description.trim() || undefined,
+          category: form.category || undefined,
+          mood: form.mood || undefined,
+          start_time: startDate.toISOString(),
+          end_time: endDate.toISOString(),
+          duration_minutes: form.duration_minutes,
+          location: form.location.trim() || undefined,
+          rating: form.rating || undefined,
+        };
+
+        const validation = validateActivity(payload);
+        if (!validation.isValid) {
+          setFormErrors(validation.errors);
+          setIsSaving(false);
+          return;
+        }
+
         await updateActivity(editingActivity.id, payload);
       } else {
-        await createActivity(payload);
+        if (form.applyToAllDays) {
+          // Loop and create for all 7 days of the week
+          const promises = [];
+          for (let i = 0; i < 7; i++) {
+            const startDate = new Date(weekStart);
+            startDate.setDate(startDate.getDate() + i);
+            startDate.setHours(form.start_hour, form.start_minute, 0, 0);
+            const endDate = new Date(startDate.getTime() + form.duration_minutes * 60000);
+
+            const payload = {
+              title: form.title.trim(),
+              description: form.description.trim() || undefined,
+              category: form.category || undefined,
+              mood: form.mood || undefined,
+              start_time: startDate.toISOString(),
+              end_time: endDate.toISOString(),
+              duration_minutes: form.duration_minutes,
+              location: form.location.trim() || undefined,
+              rating: form.rating || undefined,
+            };
+
+            const validation = validateActivity(payload);
+            if (!validation.isValid) {
+              setFormErrors(validation.errors);
+              setIsSaving(false);
+              return;
+            }
+            promises.push(createActivity(payload));
+          }
+          await Promise.all(promises);
+        } else {
+          // Calculate actual date for the selected day in THIS week
+          const startDate = new Date(weekStart);
+          startDate.setDate(startDate.getDate() + form.dayIndex);
+          startDate.setHours(form.start_hour, form.start_minute, 0, 0);
+          const endDate = new Date(startDate.getTime() + form.duration_minutes * 60000);
+
+          const payload = {
+            title: form.title.trim(),
+            description: form.description.trim() || undefined,
+            category: form.category || undefined,
+            mood: form.mood || undefined,
+            start_time: startDate.toISOString(),
+            end_time: endDate.toISOString(),
+            duration_minutes: form.duration_minutes,
+            location: form.location.trim() || undefined,
+            rating: form.rating || undefined,
+          };
+
+          const validation = validateActivity(payload);
+          if (!validation.isValid) {
+            setFormErrors(validation.errors);
+            setIsSaving(false);
+            return;
+          }
+
+          await createActivity(payload);
+        }
       }
       setIsModalOpen(false);
     } catch (err) {
@@ -234,7 +297,7 @@ export default function TimelinePage() {
     return (
       <Layout>
         <div className="flex justify-center py-2xl">
-          <Loading text="Checking your session..." />
+          <Loading text={t('dashboard.checking_session')} />
         </div>
       </Layout>
     );
@@ -274,10 +337,10 @@ export default function TimelinePage() {
           {/* Header */}
           <div className="flex items-start justify-between flex-wrap gap-md">
             <div className="space-y-xs">
-              <h1 className="text-display font-serif text-gradient">Timeline</h1>
+              <h1 className="text-display font-serif text-gradient">{t('timeline_page.title')}</h1>
               <p className="text-subtext flex items-center gap-sm">
                 <Clock size={14} className="text-primary" />
-                Weekly activity log
+                {t('timeline_page.desc')}
               </p>
             </div>
             <div className="flex items-center gap-md">
@@ -285,18 +348,18 @@ export default function TimelinePage() {
                 <div className="flex items-center gap-xl text-center">
                   <div>
                     <p className="text-2xl font-bold text-gradient">{activities.length}</p>
-                    <p className="text-[10px] text-gray-light uppercase tracking-widest">Logs</p>
+                    <p className="text-[10px] text-gray-light uppercase tracking-widest">{t('timeline_page.logs_upper')}</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-secondary">
                       {totalHours > 0 ? `${totalHours}h` : `${remMinutes}m`}
                     </p>
-                    <p className="text-[10px] text-gray-light uppercase tracking-widest">Logged</p>
+                    <p className="text-[10px] text-gray-light uppercase tracking-widest">{t('timeline_page.logged_upper')}</p>
                   </div>
                 </div>
               )}
               <Button variant="primary" size="md" onClick={() => openAddModal()} leftIcon={<Plus size={18} />}>
-                Log Activity
+                {t('timeline_page.log_activity_btn')}
               </Button>
             </div>
           </div>
@@ -451,20 +514,20 @@ export default function TimelinePage() {
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title={editingActivity ? 'EDIT LOG' : 'LOG ACTIVITY'}
+          title={editingActivity ? t('timeline_page.edit_log') : t('timeline_page.log_activity_modal')}
           footer={
             <div className="flex gap-md justify-end">
-              <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)}>CANCEL</Button>
+              <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)}>{t('investment_page.cancel_upper')}</Button>
               <Button variant="primary" size="md" onClick={handleSave} disabled={isSaving}>
-                {isSaving ? 'SAVING...' : 'SAVE'}
+                {isSaving ? t('investment_page.saving_upper') : t('career_page.save')}
               </Button>
             </div>
           }
         >
           <div className="space-y-xl">
             <Input
-              label="ACTIVITY TITLE"
-              placeholder="What are you doing..."
+              label={t('timeline_page.form.title')}
+              placeholder={t('timeline_page.form.title_placeholder')}
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
               error={formErrors.title}
@@ -473,20 +536,35 @@ export default function TimelinePage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-md">
               <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-day">DAY</label>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-day">{t('timeline_page.form.day')}</label>
                 <select
                   id="form-day"
                   value={form.dayIndex}
                   onChange={(e) => setForm((f) => ({ ...f, dayIndex: +e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  disabled={form.applyToAllDays}
+                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none disabled:opacity-50"
                 >
                   {daysOfWeek.map((d, i) => (
                     <option key={i} value={i}>{d.toLocaleDateString('en-US', { weekday: 'long' })}</option>
                   ))}
                 </select>
+                {!editingActivity && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="form-apply-all"
+                      checked={form.applyToAllDays}
+                      onChange={(e) => setForm(f => ({ ...f, applyToAllDays: e.target.checked }))}
+                      className="accent-primary rounded-sm bg-white/5 border-white/10"
+                    />
+                    <label htmlFor="form-apply-all" className="text-[10px] text-gray-light uppercase tracking-wider cursor-pointer select-none">
+                      {t('timeline_page.form.repeat_everyday')}
+                    </label>
+                  </div>
+                )}
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-hour">HOUR</label>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-hour">{t('timeline_page.form.hour')}</label>
                 <select
                   id="form-hour"
                   value={form.start_hour}
@@ -497,7 +575,7 @@ export default function TimelinePage() {
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-min">MIN</label>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-min">{t('timeline_page.form.min')}</label>
                 <select
                   id="form-min"
                   value={form.start_minute}
@@ -508,7 +586,7 @@ export default function TimelinePage() {
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-dur">DURATION</label>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-dur">{t('timeline_page.form.duration')}</label>
                 <select
                   id="form-dur"
                   value={form.duration_minutes}
@@ -522,33 +600,33 @@ export default function TimelinePage() {
 
             <div className="grid grid-cols-2 gap-md">
               <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-cat">CATEGORY</label>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-cat">{t('timeline_page.form.category')}</label>
                 <select
                   id="form-cat"
                   value={form.category}
                   onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
                   className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
-                  <option value="">UNCATEGORIZED</option>
-                  {CATEGORY_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
+                  <option value="">{t('timeline_page.form.uncategorized')}</option>
+                  {CATEGORY_OPTIONS.map((c) => <option key={c} value={c}>{t(`timeline_page.form.categories.${c}`)}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-mood">MOOD</label>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-mood">{t('timeline_page.form.mood')}</label>
                 <select
                   id="form-mood"
                   value={form.mood}
                   onChange={(e) => setForm((f) => ({ ...f, mood: e.target.value }))}
                   className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
-                  <option value="">NONE</option>
-                  {MOOD_OPTIONS.map((m) => <option key={m.value} value={m.value}>{m.emoji} {m.label}</option>)}
+                  <option value="">{t('timeline_page.form.none')}</option>
+                  {MOOD_OPTIONS.map((m) => <option key={m.value} value={m.value}>{m.emoji} {t(`timeline_page.form.moods.${m.labelKey}`)}</option>)}
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="text-[10px] font-bold text-gray-light mb-2 block">RATING</label>
+              <label className="text-[10px] font-bold text-gray-light mb-2 block">{t('timeline_page.form.rating')}</label>
               <div className="flex gap-md" role="group" aria-label="Rating">
                 {[1, 2, 3, 4, 5].map((s) => (
                   <button
@@ -567,7 +645,7 @@ export default function TimelinePage() {
             <div className="relative">
               <MapPin size={14} className="absolute left-md top-1/2 -translate-y-1/2 text-primary" />
               <input
-                placeholder="Location (optional)"
+                placeholder={t('timeline_page.form.location')}
                 value={form.location}
                 onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
                 aria-label="Location"
@@ -578,7 +656,7 @@ export default function TimelinePage() {
             <textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              placeholder="Notes..."
+              placeholder={t('timeline_page.form.notes')}
               rows={3}
               aria-label="Notes"
               className="w-full bg-gray-strong border border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
@@ -589,9 +667,9 @@ export default function TimelinePage() {
         <ConfirmModal
           isOpen={!!deleteConfirmId}
           onClose={() => setDeleteConfirmId(null)}
-          title="DELETE ACTIVITY"
-          description="Are you sure you want to delete this activity? This action cannot be undone."
-          confirmText="DELETE"
+          title={t('timeline_page.delete_activity')}
+          description={t('timeline_page.delete_desc')}
+          confirmText={t('timeline_page.delete_btn')}
           isDangerous={true}
           onConfirm={handleConfirmDelete}
         />

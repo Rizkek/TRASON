@@ -14,8 +14,8 @@ export const SWR_CONFIG: SWRConfiguration = {
   revalidateOnReconnect: true,
 
   // Deduplicate requests made within this time window (ms)
-  // Multiple identical requests within 2s will use cached response
-  dedupingInterval: 2000,
+  // Dinaikkan ke 10 detik agar 7 hooks dashboard tidak balapan saat mount bersamaan
+  dedupingInterval: 10000,
 
   // After window focus, only revalidate after this interval (ms)
   // Prevents excessive revalidation on repeated focus events
@@ -30,11 +30,27 @@ export const SWR_CONFIG: SWRConfiguration = {
   // Retry on all errors (network, 4xx, 5xx)
   shouldRetryOnError: true,
 
-  // Keep stale data while revalidating (optimistic updates)
-  revalidateIfStale: true,
+  // DIMATIKAN: revalidateIfStale = true menyebabkan semua data refetch setiap kali
+  // user navigasi balik ke halaman yang sudah di-load sebelumnya (penyebab LCP tinggi).
+  // Data tetap fresh karena mutate() dipanggil setelah setiap create/update/delete.
+  revalidateIfStale: false,
 
   // Reference-equal comparison (fast)
   compare: (a: any, b: any) => a === b,
+};
+
+/**
+ * Dashboard SWR Config
+ * Dioptimasi untuk halaman yang load banyak hook sekaligus (7 hooks).
+ * Data di-cache agresif — hanya refresh jika user eksplisit atau data berubah.
+ */
+export const SWR_CONFIG_DASHBOARD: SWRConfiguration = {
+  ...SWR_CONFIG,
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,  // Jangan auto-refetch saat reconnect di dashboard
+  revalidateIfStale: false,
+  dedupingInterval: 30000,       // 30 detik — cukup lama untuk prevent cascading requests
+  errorRetryCount: 1,
 };
 
 /**
@@ -55,8 +71,10 @@ export const SWR_CONFIG_REALTIME: SWRConfiguration = {
 export const SWR_CONFIG_STABLE: SWRConfiguration = {
   ...SWR_CONFIG,
   revalidateOnFocus: false,
+  revalidateIfStale: false,
   errorRetryCount: 1,            // Retry once only
   focusThrottleInterval: 600000, // 10 minutes
+  dedupingInterval: 60000,       // 1 menit — data statis jarang berubah
 };
 
 /**
@@ -70,3 +88,4 @@ export const SWR_CONFIG_OFFLINE: SWRConfiguration = {
   revalidateOnMount: true,       // Always load from cache first
   dedupingInterval: 5000,        // Higher dedup for reliability
 };
+

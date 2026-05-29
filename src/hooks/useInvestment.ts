@@ -16,7 +16,7 @@ import {
   CalculatedInvestmentPosition,
 } from '@/services/investmentService';
 import { activityQueries } from '@/services/queries';
-import { SWR_CONFIG } from '@/config/swr';
+import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { handleQueryError, getUserErrorMessage, logError } from '@/libs/apiErrors';
 
@@ -57,7 +57,7 @@ export const useInvestment = (): UseInvestmentReturn => {
         throw handleQueryError(err);
       }
     },
-    SWR_CONFIG
+    SWR_CONFIG_DASHBOARD
   );
 
   // Derived data: calculated positions and summary
@@ -76,7 +76,7 @@ export const useInvestment = (): UseInvestmentReturn => {
         return null;
       }
     },
-    SWR_CONFIG
+    SWR_CONFIG_DASHBOARD
   );
 
   const refreshPortfolio = useCallback(async () => {

@@ -16,16 +16,13 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
+        async setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           );
+          Object.entries(headers).forEach(([key, value]) => {
+            supabaseResponse.headers.set(key, value);
+          });
         },
       },
     }
@@ -33,16 +30,21 @@ export async function updateSession(request: NextRequest) {
 
   // Memicu refresh cookie jika sudah hampir kedaluwarsa.
   // getSession sudah cukup untuk memeriksa siapa yang login tanpa harus menyuruh server lock / ping database terus-menerus.
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  let session = null;
+  try {
+    const {
+      data: { session: fetchedSession },
+    } = await supabase.auth.getSession();
+    session = fetchedSession;
+  } catch (error) {
+    console.error('[Supabase middleware] auth.getSession failed:', error);
+  }
 
   // Rute-rute yang HANYA boleh diakses oleh user yang sudah login
   const protectedPaths = [
     '/dashboard',
     '/finance',
     '/investments',
-    '/schedule',
     '/timeline',
     '/reminders',
     '/insights',
@@ -66,6 +68,13 @@ export async function updateSession(request: NextRequest) {
   // Jika user SUDAH login dan mencoba mengakses rute Publik/Auth (contoh: /login)
   const isAuthPath = url.pathname === '/login' || url.pathname === '/signup';
   if (session && isAuthPath) {
+    url.pathname = '/dashboard';
+    return NextResponse.redirect(url);
+  }
+
+  // Jika user SUDAH login dan mengakses root "/" → langsung ke dashboard
+  // Ini menghindari landing page compile (29s!) sebelum JS client redirect
+  if (session && url.pathname === '/') {
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
   }

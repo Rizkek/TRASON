@@ -42,15 +42,22 @@ export const Calendar: React.FC<CalendarProps> = ({
     
     // Check for events on this date
     const dateEvents = events.filter(e => {
-       const eDate = new Date(e.due_datetime || e.due_date);
-       return eDate.toDateString() === date.toDateString();
+       // Format both dates as YYYY-MM-DD strings for a clean timezone-agnostic comparison
+       const eventDateStr = e.due_date || (e.due_datetime ? e.due_datetime.split('T')[0] : '');
+       
+       // Format calendar cell date as local YYYY-MM-DD
+       const cellDateStr = date.getFullYear() + '-' + 
+         String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+         String(date.getDate()).padStart(2, '0');
+         
+       return eventDateStr === cellDateStr;
     });
 
     days.push(
       <div 
         key={d}
         onClick={() => onDateSelect?.(date)}
-        className={`h-24 md:h-32 border border-white/[0.03] p-2 transition-all cursor-pointer group hover:bg-white/[0.02] ${
+        className={`h-14 md:h-32 border border-white/[0.03] p-2 transition-all cursor-pointer group hover:bg-white/[0.02] ${
           isSelected ? 'bg-warm-gold/5 border-warm-gold/20' : ''
         }`}
       >
@@ -66,7 +73,7 @@ export const Calendar: React.FC<CalendarProps> = ({
           )}
         </div>
         
-        <div className="mt-2 space-y-1 overflow-hidden">
+        <div className="mt-2 space-y-1 overflow-hidden hidden md:block">
           {dateEvents.slice(0, 2).map((e, i) => (
             <div key={i} className="text-[10px] truncate bg-deep-sage/10 text-soft-cream px-1.5 py-0.5 rounded border border-deep-sage/20 font-light">
               {e.title}

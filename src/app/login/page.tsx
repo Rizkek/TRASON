@@ -17,9 +17,6 @@ export default function LoginPage() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const [loginProgress, setLoginProgress] = useState(0);
-  const [showProgress, setShowProgress] = useState(false);
 
   useEffect(() => {
     // Redirect if already authenticated (skip if still loading)
@@ -67,14 +64,10 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setShowProgress(true);
-    setLoginProgress(0);
-    setError(null);
+    if (!validateForm()) return;
 
-    const interval = setInterval(() => {
-      setLoginProgress(p => p >= 90 ? 90 : p + Math.floor(Math.random() * 15) + 5);
-    }, 100);
+    setIsLoading(true);
+    setError(null);
 
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -84,46 +77,13 @@ export default function LoginPage() {
 
       if (signInError) throw new Error(signInError.message);
       if (!data.session) throw new Error('No session created');
-      
-      clearInterval(interval);
-      setLoginProgress(100);
-      
-      // Delay slightly so user sees 100% before redirect
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 500);
-      
+
+      router.push('/dashboard');
     } catch (err) {
-      clearInterval(interval);
-      setShowProgress(false);
       setError(sanitizeError(err));
       setIsLoading(false);
     }
   };
-
-  if (showProgress) {
-    return (
-      <div className="fixed inset-0 z-[100] bg-warm-black flex flex-col items-center justify-center font-sans overflow-hidden transition-opacity duration-700">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 border border-warm-gold/10 rounded-full animate-[spin_10s_linear_infinite]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 border border-warm-gold/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
-        
-        <div className="relative w-24 h-24 mb-2xl">
-          <div className="absolute inset-0 bg-warm-gold/20 rotate-45 blur-xl animate-pulse" />
-          <div className="absolute inset-0 border border-warm-gold rotate-45 flex items-center justify-center bg-warm-black/50 backdrop-blur-sm">
-            <span className="text-3xl font-serif text-warm-gold -rotate-45">T</span>
-          </div>
-        </div>
-
-        <div className="text-center space-y-md z-10">
-          <div className="text-display font-light text-soft-cream font-serif tracking-tighter">
-            {loginProgress}%
-          </div>
-          <p className="text-micro tracking-[0.4em] uppercase text-warm-gold">Authenticating</p>
-        </div>
-        <div className="absolute bottom-0 left-0 h-1 bg-warm-gold transition-all duration-100 ease-out" style={{ width: `${loginProgress}%` }} />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
@@ -136,12 +96,12 @@ export default function LoginPage() {
          <div className="relative z-10 max-w-md space-y-xl animate-fade-in">
             <Quote size={48} className="text-warm-gold opacity-40 mb-lg" />
             <h2 className="text-4xl lg:text-5xl font-serif italic leading-tight text-soft-cream/90">
-              "The only journey is the one within."
+              "Return to the signal. Leave the noise outside."
             </h2>
             <div className="space-y-sm">
-              <p className="text-lg font-medium text-warm-gold">— Rainer Maria Rilke</p>
+              <p className="text-lg font-medium text-warm-gold">TRASON</p>
               <p className="text-sm text-gray-light font-light leading-relaxed">
-                Continue your path to clarity and growth. Your digital living space is ready for your return.
+                Your dashboard is ready to show what matters next: money, movement, reminders, and momentum.
               </p>
             </div>
          </div>
@@ -155,15 +115,16 @@ export default function LoginPage() {
 
       {/* Right Side: Login Form */}
       <div className="flex-1 flex flex-col justify-center items-center p-lg md:p-4xl relative">
-        <Link href="/" className="absolute top-12 left-12 flex items-center gap-sm text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
+        {isLoading && <div className="absolute top-0 left-0 right-0 h-1 bg-warm-gold animate-pulse" />}
+        <Link href="/" className="absolute top-12 left-16 flex items-center gap-sm text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           <span>Back to Home</span>
         </Link>
 
-        <div className="w-full max-w-sm space-y-2xl animate-slide-up">
+        <div className="w-full max-w-sm space-y-xl animate-slide-up">
           <div className="space-y-sm text-center md:text-left">
             <h1 className="text-3xl font-serif">Welcome Back</h1>
-            <p className="text-sm text-gray-light font-light">Enter your credentials to access your sanctuary.</p>
+            <p className="text-sm text-gray-light font-light">Sign in to continue where your last signal left off.</p>
           </div>
 
           {error && (
@@ -203,13 +164,13 @@ export default function LoginPage() {
               isLoading={isLoading}
               className="py-lg rounded-full font-bold shadow-xl shadow-warm-gold/10"
             >
-              Enter TRASON
+              Open Dashboard
             </Button>
           </form>
 
           <div className="text-center md:text-left">
             <p className="text-sm text-gray-light font-light">
-              New to the journey?{' '}
+              New to TRASON?{' '}
               <Link href="/signup" className="text-warm-gold hover:underline font-medium underline-offset-4 decoration-warm-gold/30">
                 Begin here
               </Link>

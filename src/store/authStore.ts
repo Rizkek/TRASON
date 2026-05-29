@@ -3,6 +3,14 @@ import { persist } from 'zustand/middleware';
 import { User } from '@/types/index';
 import { supabase } from '@/services/supabaseClient';
 
+// Helper to extract language from a user object (handles array or single pref)
+const extractLanguage = (user: any): string | undefined => {
+  const prefs = user?.user_preferences;
+  if (!prefs) return undefined;
+  const pref = Array.isArray(prefs) ? prefs[0] : prefs;
+  return pref?.language;
+};
+
 interface AuthState {
   user: User | null;
   accessToken: string | null;
@@ -10,12 +18,17 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  /** Dedicated string primitive for the active UI language.
+   *  Kept separate from user.user_preferences so Zustand's strict-equality
+   *  check reliably triggers a re-render when the language changes. */
+  activeLanguage: string;
 
   // Actions
   setUser: (user: User) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
+  setActiveLanguage: (lang: string) => void;
   logout: () => void;
-  signOut: () => Promise<void>; // Full sign-out: clears Supabase session + local state
+  signOut: () => Promise<void>;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -30,8 +43,36 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      activeLanguage: 'en',
 
-      setUser: (user) => set({ user, isAuthenticated: true }),
+      // When a full user profile is set, also sync activeLanguage automatically
+      setUser: (user) =>
+        set((state) => {
+          const extracted = extractLanguage(user);
+          const newLang = extracted || state.activeLanguage || 'en';
+          if (process.env.NODE_ENV === 'development') {
+            console.log(
+              '[authStore] setUser |',
+              `extracted language="${extracted ?? 'none'}"`,
+              `| prev activeLanguage="${state.activeLanguage}"`,
+              `| new activeLanguage="${newLang}"`,
+              `| has user_preferences=${!!(user as any)?.user_preferences}`,
+            );
+          }
+          return {
+            user,
+            isAuthenticated: true,
+            activeLanguage: newLang,
+          };
+        }),
+
+      setActiveLanguage: (lang) => {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[authStore] setActiveLanguage → "${lang}"`);
+        }
+        set({ activeLanguage: lang });
+      },
+
       setTokens: (accessToken, refreshToken) =>
         set({ accessToken, refreshToken }),
 
@@ -43,32 +84,26 @@ export const useAuthStore = create<AuthState>()(
           refreshToken: null,
           isAuthenticated: false,
           isLoading: false,
+          activeLanguage: 'en',
         }),
 
       // Full sign-out: tells Supabase to invalidate the token, then clears local state
       signOut: async () => {
-        console.log('[authStore] Starting signOut process...');
         try {
-          // Timeout to prevent hanging if Supabase server is unresponsive
-          const timeoutPromise = new Promise((_, reject) => 
+          const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Supabase signOut timeout')), 2000)
           );
-          
-          await Promise.race([
-            supabase.auth.signOut(),
-            timeoutPromise
-          ]);
-          console.log('[authStore] Supabase signOut successful');
-        } catch (err) {
-          console.error('[authStore] Supabase signOut error or timeout:', err);
+          await Promise.race([supabase.auth.signOut(), timeoutPromise]);
+        } catch {
+          // Ignore timeout/error — still clear local state
         } finally {
-          console.log('[authStore] Clearing local auth state...');
           set({
             user: null,
             accessToken: null,
             refreshToken: null,
             isAuthenticated: false,
             isLoading: false,
+            activeLanguage: 'en',
           });
         }
       },
@@ -82,6 +117,22 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        activeLanguage: state.activeLanguage,
+      }),
+      // Always keep actions from the live store — never let serialized localStorage data
+      // overwrite them (functions serialize to null in JSON, breaking the actions).
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as Partial<AuthState>),
+        // Explicitly restore all actions from the live store so they are never null
+        setUser: currentState.setUser,
+        setTokens: currentState.setTokens,
+        setActiveLanguage: currentState.setActiveLanguage,
+        logout: currentState.logout,
+        signOut: currentState.signOut,
+        clearError: currentState.clearError,
+        setLoading: currentState.setLoading,
+        setError: currentState.setError,
       }),
     }
   )

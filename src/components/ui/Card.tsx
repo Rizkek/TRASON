@@ -22,9 +22,9 @@ export const Card: React.FC<CardProps> = ({
       {...props}
     >
       {(title || description) && (
-        <div className="px-lg py-md border-b border-white/[0.03]">
+        <div className="px-lg py-md border-b border-soft-cream/10">
           {title && (
-            <h3 className="text-sm font-bold tracking-tight text-white uppercase opacity-90">
+            <h3 className="text-sm font-bold tracking-tight text-soft-cream uppercase opacity-90">
               {title}
             </h3>
           )}
