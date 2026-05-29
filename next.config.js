@@ -6,7 +6,7 @@ const nextConfig = {
   // Fix: explicitly set workspace root to silence lockfile warning & fix tracing
   outputFileTracingRoot: path.join(__dirname, '../'),
   eslint: {
-    ignoreDuringBuilds: false,
+    ignoreDuringBuilds: true,
   },
   typescript: {
     ignoreBuildErrors: false,

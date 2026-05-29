@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 import { parseNaturalLanguageInput } from '@/services/ai/parser';
+import { getAuthenticatedUser } from '@/utils/supabase/server';
 
 export async function POST(req: Request) {
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
+  }
+
   try {
     const { prompt } = await req.json();
 

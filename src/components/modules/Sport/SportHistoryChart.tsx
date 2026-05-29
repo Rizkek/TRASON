@@ -14,6 +14,31 @@ import {
 } from 'recharts';
 import type { WorkoutSession } from '@/types/database';
 
+// Custom tooltip for Recharts
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-warm-black/90 border border-white/10 p-md rounded-md backdrop-blur-md shadow-2xl">
+        <p className="font-bold text-white mb-1">{data.displayDate}</p>
+        {data.hasWorkout ? (
+          <>
+            <p className="text-sm text-primary">
+              {data.minutes} minutes
+            </p>
+            <p className="text-xs text-gray-light">
+              {data.sessionsCount} session{data.sessionsCount > 1 ? 's' : ''}
+            </p>
+          </>
+        ) : (
+          <p className="text-sm text-gray-light">Rest Day</p>
+        )}
+      </div>
+    );
+  }
+  return null;
+};
+
 interface Props {
   sessions: WorkoutSession[];
   days?: number;
@@ -62,31 +87,6 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
     }
     return data;
   }, [sessions, days]);
-
-  // Custom tooltip for Recharts
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-warm-black/90 border border-white/10 p-md rounded-md backdrop-blur-md shadow-2xl">
-          <p className="font-bold text-white mb-1">{data.displayDate}</p>
-          {data.hasWorkout ? (
-            <>
-              <p className="text-sm text-primary">
-                {data.minutes} minutes
-              </p>
-              <p className="text-xs text-gray-light">
-                {data.sessionsCount} session{data.sessionsCount > 1 ? 's' : ''}
-              </p>
-            </>
-          ) : (
-            <p className="text-sm text-gray-light">Rest Day</p>
-          )}
-        </div>
-      );
-    }
-    return null;
-  };
 
   if (!isMounted) {
     return (

@@ -43,13 +43,12 @@ export default function InsightsPage() {
   const { stats: careerStats, nextInterview } = useCareer();
 
   // Load last 7 days of activities stably
-  const sevenDaysAgo = useRef<Date | null>(null);
-  if (!sevenDaysAgo.current) {
+  const sevenDaysAgo = React.useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() - 7);
-    sevenDaysAgo.current = d;
-  }
-  const { activities: weeklyActivities } = useActivity(sevenDaysAgo.current, new Date());
+    return d;
+  }, []);
+  const { activities: weeklyActivities } = useActivity(sevenDaysAgo, new Date());
 
   const fetchStarted = useRef(false);
 

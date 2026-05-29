@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { openai } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
 import { z } from 'zod';
+import { getAuthenticatedUser } from '@/utils/supabase/server';
 
 // Tambah maxDuration agar Vercel memberi waktu lebih untuk AI generation
 // Free: max 10s, Pro: max 60s — set 25s sebagai kompromi
@@ -19,6 +20,12 @@ const insightsSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  // Verify session
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
+  }
+
   // AbortController dengan timeout 22 detik (sedikit di bawah maxDuration)
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 22000);

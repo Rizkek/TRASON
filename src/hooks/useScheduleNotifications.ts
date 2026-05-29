@@ -91,52 +91,6 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
   }, []);
 
   // ==========================================================================
-  // scheduleReminders — main entry point
-  // ==========================================================================
-
-  const scheduleReminders = useCallback(async (reminders: Reminder[]) => {
-    const isSupported =
-      typeof window !== 'undefined' && 'Notification' in window;
-
-
-
-    if (!enabled) {
-      // Clear all scheduled notifications from SW
-      await postMessageToSW({ type: 'CLEAR_NOTIFICATIONS' });
-
-      return;
-    }
-
-    if (!isSupported) {
-      console.warn('[useScheduleNotifications] Notifications not supported in this browser');
-      return;
-    }
-
-    // Request permission if not yet granted
-    if (Notification.permission !== 'granted') {
-      const granted = await requestNotificationPermission();
-      if (!granted) {
-        console.warn('[useScheduleNotifications] Permission denied — skipping schedule');
-        return;
-      }
-    }
-
-    // Try to send reminders to SW scheduler
-    const swAvailable = await postMessageToSW({
-      type: 'SCHEDULE_NOTIFICATIONS',
-      reminders,
-    });
-
-    if (swAvailable) {
-
-    } else {
-      // SW not available — fall back to in-page setTimeout (e.g. HTTP localhost)
-
-      scheduleFallback(reminders);
-    }
-  }, [enabled, prefs.notifications_enabled, requestNotificationPermission]);
-
-  // ==========================================================================
   // Fallback: in-page setTimeout (when SW unavailable)
   // Only for dev/degraded environments
   // ==========================================================================
@@ -180,11 +134,55 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
 
   // Cleanup fallback timeouts on unmount
   useEffect(() => {
+    const timeouts = fallbackTimeouts.current;
     return () => {
-      fallbackTimeouts.current.forEach((t) => clearTimeout(t));
-      fallbackTimeouts.current.clear();
+      timeouts.forEach((t) => clearTimeout(t));
+      timeouts.clear();
     };
   }, []);
+
+  // ==========================================================================
+  // scheduleReminders — main entry point
+  // ==========================================================================
+
+  const scheduleReminders = useCallback(async (reminders: Reminder[]) => {
+    const isSupported =
+      typeof window !== 'undefined' && 'Notification' in window;
+
+
+
+    if (!enabled) {
+      // Clear all scheduled notifications from SW
+      await postMessageToSW({ type: 'CLEAR_NOTIFICATIONS' });
+
+      return;
+    }
+
+    if (!isSupported) {
+      console.warn('[useScheduleNotifications] Notifications not supported in this browser');
+      return;
+    }
+
+    // Request permission if not yet granted
+    if (Notification.permission !== 'granted') {
+      const granted = await requestNotificationPermission();
+      if (!granted) {
+        console.warn('[useScheduleNotifications] Permission denied — skipping schedule');
+        return;
+      }
+    }
+
+    // Try to send reminders to SW scheduler
+    const swAvailable = await postMessageToSW({
+      type: 'SCHEDULE_NOTIFICATIONS',
+      reminders,
+    });
+
+    if (!swAvailable) {
+      // SW not available — fall back to in-page setTimeout (e.g. HTTP localhost)
+      scheduleFallback(reminders);
+    }
+  }, [enabled, requestNotificationPermission, scheduleFallback]);
 
   // ==========================================================================
   // sendNotification — direct one-shot (still available for manual use)

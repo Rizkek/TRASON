@@ -19,28 +19,26 @@ const urlBase64ToUint8Array = (base64String: string) => {
 };
 
 export const usePushNotification = () => {
-  const [state, setState] = useState<PushNotificationState>({
-    isSupported: false,
-    isSubscribed: false,
-    isLoading: false,
-    isConfigured: !!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-    error: null,
-  });
-
-  // Check if push notifications are supported & configured, then check existing subscription
-  useEffect(() => {
+  const [state, setState] = useState<PushNotificationState>(() => {
     const isSupported =
       typeof window !== 'undefined' &&
       'serviceWorker' in navigator &&
       'PushManager' in window &&
       'Notification' in window;
 
-    const isConfigured = !!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    return {
+      isSupported,
+      isSubscribed: false,
+      isLoading: false,
+      isConfigured: !!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      error: null,
+    };
+  });
 
-    setState((prev) => ({ ...prev, isSupported, isConfigured }));
-
+  // Check if push notifications are supported & configured, then check existing subscription
+  useEffect(() => {
     // Auto-detect if already subscribed
-    if (isSupported) {
+    if (state.isSupported) {
       navigator.serviceWorker.getRegistration().then((reg) => {
         if (reg) {
           reg.pushManager.getSubscription().then((sub) => {
@@ -49,7 +47,7 @@ export const usePushNotification = () => {
         }
       }).catch(() => {});
     }
-  }, []);
+  }, [state.isSupported]);
 
   // Register service worker
   const registerServiceWorker = useCallback(async () => {
