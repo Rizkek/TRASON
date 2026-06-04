@@ -17,6 +17,7 @@ import {
   Clock,
   Plus,
   Trash2,
+  Edit2,
   List,
   Calendar as CalendarIcon,
   Wifi,
@@ -42,6 +43,7 @@ export default function RemindersPage() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [showNotifBanner, setShowNotifBanner] = useState(true);
+  const [filter, setFilter] = useState<'active' | 'history'>('active');
 
   const [form, setForm] = useState({
     title: '',
@@ -93,6 +95,32 @@ export default function RemindersPage() {
       dueTime: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
       priority: 'medium',
       notifyTimes: [60, 180, 360],
+    });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (reminder: Reminder) => {
+    setEditingReminder(reminder);
+    
+    // Extract date and time from due_datetime if available, otherwise fallback
+    let dDate = getLocalISODate();
+    let dTime = '12:00';
+    if (reminder.due_datetime) {
+      const d = new Date(reminder.due_datetime);
+      dDate = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      dTime = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    } else {
+      dDate = reminder.due_date || dDate;
+      dTime = reminder.due_time || dTime;
+    }
+
+    setForm({
+      title: reminder.title,
+      description: reminder.description || '',
+      dueDate: dDate,
+      dueTime: dTime,
+      priority: reminder.priority || 'medium',
+      notifyTimes: Array.isArray(reminder.notify_times) ? reminder.notify_times : [60, 180, 360],
     });
     setIsModalOpen(true);
   };
@@ -267,18 +295,38 @@ export default function RemindersPage() {
               />
             ) : (
               <div className="space-y-md">
-                {reminders.length === 0 ? (
+                {/* Tabs */}
+                <div className="flex items-center gap-md mb-xl pb-md border-b border-white/[0.05]">
+                  <button
+                    onClick={() => setFilter('active')}
+                    className={`pb-2 px-1 border-b-2 transition-all ${filter === 'active' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
+                  >
+                    Active
+                  </button>
+                  <button
+                    onClick={() => setFilter('history')}
+                    className={`pb-2 px-1 border-b-2 transition-all ${filter === 'history' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
+                  >
+                    History
+                  </button>
+                </div>
+
+                {reminders.filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed').length === 0 ? (
                   <div className="glass-card p-4xl text-center space-y-md">
                     <Bell size={48} className="mx-auto text-deep-sage opacity-20" />
-                    <p className="text-gray-light font-light italic">{t('reminders_page.empty_reminders')}</p>
+                    <p className="text-gray-light font-light italic">
+                      {filter === 'active' ? t('reminders_page.empty_reminders') : 'No completed reminders yet.'}
+                    </p>
                   </div>
                 ) : (
-                  reminders.map(reminder => (
+                  reminders
+                    .filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed')
+                    .map(reminder => (
                     <div key={reminder.id} className="glass-card p-xl flex items-center justify-between group">
                       <div className="flex items-center gap-xl">
                         <button 
                           onClick={() => updateReminder(reminder.id, { status: reminder.status === 'completed' ? 'pending' : 'completed' })}
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
                             reminder.status === 'completed' ? 'bg-income border-income text-warm-black' : 'border-gray-medium hover:border-warm-gold'
                           }`}
                         >
@@ -294,7 +342,10 @@ export default function RemindersPage() {
                           </div>
                         </div>
                       </div>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-sm">
+                         <button onClick={() => openEditModal(reminder)} className="text-gray-light hover:text-warm-gold p-2">
+                           <Edit2 size={16} />
+                         </button>
                          <button onClick={() => deleteReminder(reminder.id)} className="text-gray-light hover:text-expense p-2">
                            <Trash2 size={18} />
                          </button>
@@ -310,7 +361,7 @@ export default function RemindersPage() {
           <div className="lg:col-span-4 space-y-xl">
              <div className="glass-card p-xl border-warm-gold/10">
                 <h3 className="font-serif text-xl mb-xl">
-                  {selectedDate.toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric', timeZone: timezone })}
+                  {selectedDate.toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' })}
                 </h3>
                 
                 <div className="space-y-md">
