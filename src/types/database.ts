@@ -327,6 +327,26 @@ export interface Insight {
   updated_at: string;
 }
 
+/**
+ * DailyTask — template-based daily checklist item.
+ * The task itself is permanent (like a habit), only the completion status
+ * resets each day. `last_reset_date` is the date string (YYYY-MM-DD) of the
+ * last time the task was reset; `completed_today` reflects today's status.
+ */
+export interface DailyTask {
+  id: string;
+  user_id: string;
+  title: string;
+  description?: string;
+  category?: string;
+  sort_order: number;
+  completed_today: boolean;
+  last_reset_date: string; // YYYY-MM-DD — date when completed_today was last reset
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+}
+
 /** Career / Job application tracker */
 export interface CareerApplication {
   id: string;

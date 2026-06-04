@@ -11,7 +11,9 @@ import {
   UserPreferences,
   getCurrentUser,
 } from './supabaseClient';
+import type { DailyTask } from '@/types/database';
 import { handleQueryError, logError } from '@/libs/apiErrors';
+
 
 type AuthUserLike = Awaited<ReturnType<typeof getCurrentUser>>;
 
@@ -892,3 +894,175 @@ export const batchQueries = {
     }
   },
 };
+
+/**
+ * ==================== DAILY TASK QUERIES ====================
+ * Daily reset checklist — tasks are permanent templates, only
+ * completed_today resets each day (lazy reset on first fetch).
+ */
+
+const getTodayDateStr = () => new Date().toISOString().split('T')[0];
+
+export const dailyTaskQueries = {
+  // Fetch all tasks and lazily reset if today is a new day
+  async getTodaysTasks(): Promise<DailyTask[]> {
+    try {
+      const user = await getCurrentUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const today = getTodayDateStr();
+
+      // Fetch all non-deleted tasks
+      const { data, error } = await supabase
+        .from('daily_tasks')
+        .select('*')
+        .eq('user_id', user.id)
+        .is('deleted_at', null)
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        // Table might not exist yet — return empty list gracefully
+        if (
+          error.code === '42P01' ||
+          error.message?.includes('does not exist') ||
+          error.message?.includes('relation')
+        ) {
+          return [];
+        }
+        throw error;
+      }
+
+      if (!data || data.length === 0) return [];
+
+      // Lazy daily reset: if any task has last_reset_date !== today, reset it
+      const stale = data.filter((t) => t.last_reset_date !== today && t.completed_today);
+      if (stale.length > 0) {
+        const staleIds = stale.map((t) => t.id);
+        await supabase
+          .from('daily_tasks')
+          .update({
+            completed_today: false,
+            last_reset_date: today,
+            updated_at: new Date().toISOString(),
+          })
+          .in('id', staleIds)
+          .eq('user_id', user.id);
+
+        // Return with reset applied locally (avoid a second fetch)
+        return data.map((t) =>
+          staleIds.includes(t.id)
+            ? { ...t, completed_today: false, last_reset_date: today }
+            : t
+        );
+      }
+
+      return data;
+    } catch (err) {
+      logError(err, 'dailyTaskQueries.getTodaysTasks');
+      throw handleQueryError(err);
+    }
+  },
+
+  // Create a new daily task template
+  async createTask(
+    task: Pick<DailyTask, 'title' | 'description' | 'category' | 'sort_order'>
+  ): Promise<DailyTask> {
+    try {
+      const user = await getCurrentUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const today = getTodayDateStr();
+      const { data, error } = await supabase
+        .from('daily_tasks')
+        .insert([
+          {
+            ...task,
+            user_id: user.id,
+            completed_today: false,
+            last_reset_date: today,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      logError(err, 'dailyTaskQueries.createTask');
+      throw handleQueryError(err);
+    }
+  },
+
+  // Toggle today's completion status
+  async toggleTask(id: string, completed: boolean): Promise<DailyTask> {
+    try {
+      const user = await getCurrentUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const today = getTodayDateStr();
+      const { data, error } = await supabase
+        .from('daily_tasks')
+        .update({
+          completed_today: completed,
+          last_reset_date: today,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      logError(err, 'dailyTaskQueries.toggleTask');
+      throw handleQueryError(err);
+    }
+  },
+
+  // Update task title/description
+  async updateTask(
+    id: string,
+    updates: Partial<Pick<DailyTask, 'title' | 'description' | 'category' | 'sort_order'>>
+  ): Promise<DailyTask> {
+    try {
+      const user = await getCurrentUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('daily_tasks')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      logError(err, 'dailyTaskQueries.updateTask');
+      throw handleQueryError(err);
+    }
+  },
+
+  // Soft delete a task
+  async deleteTask(id: string): Promise<void> {
+    try {
+      const user = await getCurrentUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('daily_tasks')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    } catch (err) {
+      logError(err, 'dailyTaskQueries.deleteTask');
+      throw handleQueryError(err);
+    }
+  },
+};
+

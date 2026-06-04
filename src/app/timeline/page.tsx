@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useActivity } from '@/hooks/useActivity';
+import { useDailyTasks } from '@/hooks/useDailyTasks';
 import { validateActivity, sanitizeError } from '@/libs/validation';
 import { Activity } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -17,7 +18,13 @@ import {
   MapPin,
   Star,
   Activity as ActivityIcon,
+  CheckSquare2,
+  Square,
+  ListChecks,
+  CalendarDays,
+  RotateCcw,
 } from 'lucide-react';
+
 
 const MOOD_OPTIONS = [
   { labelKey: 'happy', emoji: '😊', value: 'Happy' },
@@ -125,6 +132,14 @@ export default function TimelinePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Daily checklist tab
+  const [activeTab, setActiveTab] = useState<'weekly-log' | 'daily-checklist'>('weekly-log');
+  const { tasks, isLoading: isTasksLoading, completedCount, totalCount, createTask, toggleTask, deleteTask } = useDailyTasks();
+  const [newTaskInput, setNewTaskInput] = useState('');
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  const [taskError, setTaskError] = useState<string | null>(null);
+
 
   const currentHour = new Date().getHours();
   const currentMinute = new Date().getMinutes();
@@ -344,7 +359,7 @@ export default function TimelinePage() {
               </p>
             </div>
             <div className="flex items-center gap-md">
-              {activities.length > 0 && (
+              {activeTab === 'weekly-log' && activities.length > 0 && (
                 <div className="flex items-center gap-xl text-center">
                   <div>
                     <p className="text-2xl font-bold text-gradient">{activities.length}</p>
@@ -358,18 +373,195 @@ export default function TimelinePage() {
                   </div>
                 </div>
               )}
-              <Button variant="primary" size="md" onClick={() => openAddModal()} leftIcon={<Plus size={18} />}>
-                {t('timeline_page.log_activity_btn')}
-              </Button>
+              {activeTab === 'daily-checklist' && totalCount > 0 && (
+                <div className="flex items-center gap-sm">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-gradient">{completedCount}<span className="text-gray-light opacity-50 text-lg">/{totalCount}</span></p>
+                    <p className="text-[10px] text-gray-light uppercase tracking-widest">Done Today</p>
+                  </div>
+                </div>
+              )}
+              {activeTab === 'weekly-log' && (
+                <Button variant="primary" size="md" onClick={() => openAddModal()} leftIcon={<Plus size={18} />}>
+                  {t('timeline_page.log_activity_btn')}
+                </Button>
+              )}
             </div>
           </div>
 
-          {/* Hour Grid */}
-          {isLoading ? (
+          {/* Tab Switcher */}
+          <div className="flex items-center gap-0 bg-white/[0.03] p-1 rounded-lg border border-white/[0.05] w-fit">
+            <button
+              onClick={() => setActiveTab('weekly-log')}
+              className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === 'weekly-log'
+                  ? 'bg-primary text-white shadow-lg'
+                  : 'text-gray-light hover:text-soft-cream'
+              }`}
+            >
+              <CalendarDays size={14} />
+              Weekly Log
+            </button>
+            <button
+              onClick={() => setActiveTab('daily-checklist')}
+              className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === 'daily-checklist'
+                  ? 'bg-primary text-white shadow-lg'
+                  : 'text-gray-light hover:text-soft-cream'
+              }`}
+            >
+              <ListChecks size={14} />
+              Daily Checklist
+              {totalCount > 0 && (
+                <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
+                  completedCount === totalCount ? 'bg-income/20 text-income' : 'bg-white/10 text-gray-light'
+                }`}>
+                  {completedCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Daily Checklist Panel */}
+          {activeTab === 'daily-checklist' && (
+            <div className="glass rounded-xl border border-white/[0.05] overflow-hidden">
+              {/* Checklist Header */}
+              <div className="flex items-center justify-between px-xl py-lg border-b border-white/[0.05] bg-gray-strong/40">
+                <div className="space-y-xs">
+                  <h2 className="text-sm font-bold text-soft-cream uppercase tracking-widest flex items-center gap-sm">
+                    <ListChecks size={15} className="text-primary" />
+                    {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                  </h2>
+                  {totalCount > 0 && (
+                    <div className="flex items-center gap-sm">
+                      <div className="flex-1 h-1.5 bg-white/[0.05] rounded-full overflow-hidden" style={{ width: '120px' }}>
+                        <div
+                          className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500"
+                          style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+                        />
+                      </div>
+                      <span className="text-[10px] text-gray-light">
+                        {completedCount === totalCount && totalCount > 0 ? '🎉 All done!' : `${completedCount} of ${totalCount}`}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-sm text-[9px] text-gray-light opacity-50">
+                  <RotateCcw size={11} />
+                  Resets midnight
+                </div>
+              </div>
+
+              {/* Add Task Input */}
+              <div className="px-xl py-lg border-b border-white/[0.05]">
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const title = newTaskInput.trim();
+                    if (!title || isAddingTask) return;
+                    setIsAddingTask(true);
+                    setTaskError(null);
+                    try {
+                      await createTask({ title, description: undefined, category: undefined });
+                      setNewTaskInput('');
+                    } catch (err) {
+                      setTaskError(sanitizeError(err));
+                    } finally {
+                      setIsAddingTask(false);
+                    }
+                  }}
+                  className="flex gap-sm"
+                >
+                  <input
+                    value={newTaskInput}
+                    onChange={(e) => setNewTaskInput(e.target.value)}
+                    placeholder="Add a task to repeat daily... (e.g. Morning workout, Read 20 pages)"
+                    disabled={isAddingTask}
+                    className="flex-1 bg-gray-strong/40 border border-white/5 rounded-md px-lg py-sm text-sm text-soft-cream placeholder-gray-light/40 focus:border-primary focus:outline-none transition-all disabled:opacity-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!newTaskInput.trim() || isAddingTask}
+                    className="flex items-center gap-sm px-lg py-sm bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary rounded-md text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <Plus size={14} />
+                    Add
+                  </button>
+                </form>
+                {taskError && <p className="text-[11px] text-expense mt-sm">{taskError}</p>}
+              </div>
+
+              {/* Task List */}
+              <div className="divide-y divide-white/[0.03]">
+                {isTasksLoading ? (
+                  <div className="flex justify-center py-2xl">
+                    <Loading />
+                  </div>
+                ) : tasks.length === 0 ? (
+                  <div className="flex flex-col items-center py-3xl gap-md text-center px-xl">
+                    <ListChecks size={40} className="text-gray-light opacity-20" />
+                    <p className="text-sm text-gray-light opacity-60 font-light italic">
+                      No tasks yet. Add something you want to do every day.
+                    </p>
+                    <p className="text-[10px] text-gray-light opacity-40">
+                      Tasks reset automatically at midnight — perfect for daily habits.
+                    </p>
+                  </div>
+                ) : (
+                  tasks.map((task) => (
+                    <div
+                      key={task.id}
+                      className={`flex items-center gap-lg px-xl py-lg group transition-all hover:bg-white/[0.01] ${
+                        task.completed_today ? 'opacity-60' : ''
+                      }`}
+                    >
+                      {/* Checkbox */}
+                      <button
+                        onClick={() => toggleTask(task.id, !task.completed_today)}
+                        className={`flex-shrink-0 transition-all ${
+                          task.completed_today ? 'text-income' : 'text-gray-light hover:text-primary'
+                        }`}
+                        aria-label={task.completed_today ? 'Mark as not done' : 'Mark as done'}
+                      >
+                        {task.completed_today ? (
+                          <CheckSquare2 size={20} className="drop-shadow-[0_0_6px_rgba(0,200,100,0.4)]" />
+                        ) : (
+                          <Square size={20} />
+                        )}
+                      </button>
+
+                      {/* Title */}
+                      <span
+                        className={`flex-1 text-sm transition-all ${
+                          task.completed_today
+                            ? 'line-through text-gray-light'
+                            : 'text-soft-cream'
+                        }`}
+                      >
+                        {task.title}
+                      </span>
+
+                      {/* Delete (hover) */}
+                      <button
+                        onClick={() => deleteTask(task.id)}
+                        className="opacity-0 group-hover:opacity-100 text-gray-light hover:text-expense transition-all p-sm"
+                        aria-label={`Delete ${task.title}`}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Hour Grid — only shown on weekly-log tab */}
+          {activeTab === 'weekly-log' && isLoading ? (
             <div className="flex justify-center py-2xl">
               <Loading />
             </div>
-          ) : (
+          ) : activeTab === 'weekly-log' && (
             <div className="glass rounded-xl border border-white/[0.05] overflow-hidden">
               {/* Day Headers — sticky */}
               <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-white/[0.05] bg-gray-strong/60 sticky top-0 z-20">

@@ -202,11 +202,11 @@ export const id = {
       notes_label: 'CATATAN TAKTIS',
       notes_placeholder: 'Detail operasional...',
       notify_options: {
-        h6: 'H-6 Jam',
-        h3: 'H-3 Jam',
-        h1: 'H-1 Jam',
-        m15: '15 Menit',
-        now: 'Saat Jatuh Tempo'
+        d2: '2 Hari sebelumnya',
+        d1: '1 Hari sebelumnya',
+        h6: '6 Jam sebelumnya',
+        h3: '3 Jam sebelumnya',
+        h1: '1 Jam sebelumnya',
       }
     }
   },

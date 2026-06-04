@@ -48,6 +48,14 @@ function ReminderSchedulerInner() {
   const { reminders } = useReminder();
   const { scheduleReminders } = useScheduleNotifications();
 
+  // Auto-register the Service Worker on first load (silent, no push subscription needed).
+  // This ensures SW-based notifications work even if the user hasn't visited Settings.
+  React.useEffect(() => {
+    import('@/hooks/useScheduleNotifications').then(({ ensureSWRegistered }) => {
+      ensureSWRegistered();
+    });
+  }, []);
+
   React.useEffect(() => {
     if (reminders.length > 0) {
       try {
@@ -63,6 +71,7 @@ function ReminderSchedulerInner() {
 
   return null;
 }
+
 
 
 interface LayoutProps {

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Reminder } from '@/types/database';
 import { useUserPreferences } from './useUserPreferences';
+import { useAuthStore } from '@/store/authStore';
 
 export interface UseScheduleNotificationsOptions {
   enabled?: boolean;
@@ -53,11 +54,71 @@ function showFallbackNotification(reminder: Reminder): void {
 }
 
 // =============================================================================
+// Auto-register Service Worker (silent, no push subscription needed)
+// =============================================================================
+
+let swRegistrationPromise: Promise<ServiceWorkerRegistration | null> | null = null;
+
+export async function ensureSWRegistered(): Promise<ServiceWorkerRegistration | null> {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return null;
+
+  if (!swRegistrationPromise) {
+    swRegistrationPromise = navigator.serviceWorker
+      .register('/sw.js')
+      .then((reg) => {
+        console.log('[SW] Registered successfully:', reg.scope);
+        return reg;
+      })
+      .catch((err) => {
+        console.warn('[SW] Registration failed:', err);
+        swRegistrationPromise = null;
+        return null;
+      });
+  }
+
+  return swRegistrationPromise;
+}
+
+// =============================================================================
+// Server-side push helper — sends push via /api/push/send-reminder
+// =============================================================================
+
+async function sendServerPush(
+  userId: string,
+  reminder: Reminder,
+  minsBefore: number
+): Promise<boolean> {
+  try {
+    const minsBeforeText =
+      minsBefore > 0
+        ? ` — ${minsBefore >= 60 ? `${minsBefore / 60}h` : `${minsBefore}m`} before`
+        : '';
+
+    const res = await fetch('/api/push/send-reminder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        title: `${reminder.title}${minsBeforeText}`,
+        body: reminder.description || 'Tap to open TRASON',
+        url: '/reminders',
+        tag: `reminder-${reminder.id}-${minsBefore}`,
+      }),
+    });
+
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+// =============================================================================
 // Hook
 // =============================================================================
 
 export function useScheduleNotifications(options: UseScheduleNotificationsOptions = {}) {
   const prefs = useUserPreferences();
+  const userId = useAuthStore((s) => (s.user as any)?.id as string | undefined);
   const enabled = (options.enabled ?? true) && prefs.notifications_enabled;
 
   // Track whether we've registered the SW message listener this session
@@ -69,7 +130,7 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
     if (swMessageListenerRef.current) return;
     swMessageListenerRef.current = true;
 
-    const handler = (event: MessageEvent) => {
+    const handler = (_event: MessageEvent) => {
       // Handled message internally
     };
 
@@ -127,7 +188,6 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
         }, timeUntil);
 
         fallbackTimeouts.current.set(key, t);
-
       });
     });
   }, []);
@@ -143,62 +203,97 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
 
   // ==========================================================================
   // scheduleReminders — main entry point
+  // Combines SW scheduling (works when browser is open) +
+  // server-side push scheduling (works even when browser is closed)
   // ==========================================================================
 
-  const scheduleReminders = useCallback(async (reminders: Reminder[]) => {
-    const isSupported =
-      typeof window !== 'undefined' && 'Notification' in window;
+  const scheduleReminders = useCallback(
+    async (reminders: Reminder[]) => {
+      const isSupported = typeof window !== 'undefined' && 'Notification' in window;
 
-
-
-    if (!enabled) {
-      // Clear all scheduled notifications from SW
-      await postMessageToSW({ type: 'CLEAR_NOTIFICATIONS' });
-
-      return;
-    }
-
-    if (!isSupported) {
-      console.warn('[useScheduleNotifications] Notifications not supported in this browser');
-      return;
-    }
-
-    // Request permission if not yet granted
-    if (Notification.permission !== 'granted') {
-      const granted = await requestNotificationPermission();
-      if (!granted) {
-        console.warn('[useScheduleNotifications] Permission denied — skipping schedule');
+      if (!enabled) {
+        await postMessageToSW({ type: 'CLEAR_NOTIFICATIONS' });
         return;
       }
-    }
 
-    // Try to send reminders to SW scheduler
-    const swAvailable = await postMessageToSW({
-      type: 'SCHEDULE_NOTIFICATIONS',
-      reminders,
-    });
+      if (!isSupported) {
+        console.warn('[useScheduleNotifications] Notifications not supported in this browser');
+        return;
+      }
 
-    if (!swAvailable) {
-      // SW not available — fall back to in-page setTimeout (e.g. HTTP localhost)
-      scheduleFallback(reminders);
-    }
-  }, [enabled, requestNotificationPermission, scheduleFallback]);
+      // Request permission if not yet granted
+      if (Notification.permission !== 'granted') {
+        const granted = await requestNotificationPermission();
+        if (!granted) {
+          console.warn('[useScheduleNotifications] Permission denied — skipping schedule');
+          return;
+        }
+      }
+
+      // Ensure SW is registered (auto, no push subscription needed)
+      await ensureSWRegistered();
+
+      // 1️⃣ SW-based scheduling — works as long as browser is open
+      const swAvailable = await postMessageToSW({
+        type: 'SCHEDULE_NOTIFICATIONS',
+        reminders,
+      });
+
+      if (!swAvailable) {
+        // SW not available — fall back to in-page setTimeout
+        scheduleFallback(reminders);
+      }
+
+      // 2️⃣ Server-side push — schedules reminders via the server so notifications
+      //    arrive even after browser restart (requires push subscription + VAPID)
+      if (userId && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
+        const now = Date.now();
+        const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+        for (const reminder of reminders) {
+          if (reminder.status !== 'pending' || !reminder.due_datetime) continue;
+
+          const dueTime = new Date(reminder.due_datetime).getTime();
+          const notifyMins: number[] = Array.isArray(reminder.notify_times)
+            ? reminder.notify_times
+            : [0, 60, 180, 360];
+
+          for (const mins of notifyMins) {
+            const notifyTime = dueTime - mins * 60_000;
+            const timeUntil = notifyTime - now;
+
+            // Only schedule near-future (between 10s and 7 days from now)
+            if (timeUntil > 10_000 && timeUntil < ONE_WEEK_MS) {
+              // Delay the server push call to match the notify time
+              setTimeout(() => {
+                sendServerPush(userId, reminder, mins).catch(() => {});
+              }, timeUntil);
+            }
+          }
+        }
+      }
+    },
+    [enabled, userId, requestNotificationPermission, scheduleFallback]
+  );
 
   // ==========================================================================
   // sendNotification — direct one-shot (still available for manual use)
   // ==========================================================================
 
-  const sendNotification = useCallback(async (reminder: Reminder) => {
-    if (!('Notification' in window)) {
-      console.warn('[useScheduleNotifications] Notifications not supported');
-      return;
-    }
-    if (Notification.permission !== 'granted') {
-      const granted = await requestNotificationPermission();
-      if (!granted) return;
-    }
-    showFallbackNotification(reminder);
-  }, [requestNotificationPermission]);
+  const sendNotification = useCallback(
+    async (reminder: Reminder) => {
+      if (!('Notification' in window)) {
+        console.warn('[useScheduleNotifications] Notifications not supported');
+        return;
+      }
+      if (Notification.permission !== 'granted') {
+        const granted = await requestNotificationPermission();
+        if (!granted) return;
+      }
+      showFallbackNotification(reminder);
+    },
+    [requestNotificationPermission]
+  );
 
   // ==========================================================================
   // Debug helper — query SW status
@@ -212,8 +307,7 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
   // Derived state
   // ==========================================================================
 
-  const isSupported =
-    typeof window !== 'undefined' && 'Notification' in window;
+  const isSupported = typeof window !== 'undefined' && 'Notification' in window;
 
   const permission = (() => {
     try {

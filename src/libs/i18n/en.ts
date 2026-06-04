@@ -202,11 +202,11 @@ export const en = {
       notes_label: 'TACTICAL NOTES',
       notes_placeholder: 'Operational details...',
       notify_options: {
+        d2: '2 Days before',
+        d1: '1 Day before',
         h6: '6 Hours before',
         h3: '3 Hours before',
         h1: '1 Hour before',
-        m15: '15 Minutes before',
-        now: 'At due time'
       }
     }
   },

@@ -5,22 +5,25 @@ import { useRouter } from 'next/navigation';
 import { Layout, Button, Loading, Modal, Input, ErrorAlert, Calendar as CalendarUI } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useReminder } from '@/hooks/useReminder';
+import { useScheduleNotifications } from '@/hooks/useScheduleNotifications';
 import { validateReminder, sanitizeError } from '@/libs/validation';
 import { Reminder } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { 
   Bell,
+  BellOff,
   CheckCircle2,
-  Circle,
   Clock,
   Plus,
   Trash2,
-  Filter,
   List,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
 import { getLocalISODate } from '@/libs/format';
+
 
 export default function RemindersPage() {
   const router = useRouter();
@@ -29,7 +32,8 @@ export default function RemindersPage() {
   const { reminders = [], isLoading: isRemindersLoading, createReminder, updateReminder, deleteReminder } = useReminder();
   const { t } = useTranslation();
   const { locale, timezone } = useUserPreferences();
-  
+  const { permission, isSupported, requestNotificationPermission } = useScheduleNotifications();
+
   const [view, setView] = useState<'calendar' | 'list'>('calendar');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,6 +41,7 @@ export default function RemindersPage() {
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [showNotifBanner, setShowNotifBanner] = useState(true);
 
   const [form, setForm] = useState({
     title: '',
@@ -44,16 +49,16 @@ export default function RemindersPage() {
     dueDate: getLocalISODate(),
     dueTime: '12:00',
     priority: 'medium' as 'low' | 'medium' | 'high',
-    notifyTimes: [60, 180, 360] as number[], // default: 1 jam, 3 jam, 6 jam sebelum
+    notifyTimes: [60, 180, 360] as number[], // default: 1h, 3h, 6h sebelum
   });
 
   // Pilihan waktu notifikasi (dalam menit sebelum jatuh tempo)
   const NOTIFY_OPTIONS = [
-    { value: 360, label: t('reminders_page.form.notify_options.h6') },
-    { value: 180, label: t('reminders_page.form.notify_options.h3') },
-    { value: 60,  label: t('reminders_page.form.notify_options.h1') },
-    { value: 15,  label: t('reminders_page.form.notify_options.m15') },
-    { value: 0,   label: t('reminders_page.form.notify_options.now') },
+    { value: 2880, label: t('reminders_page.form.notify_options.d2') },
+    { value: 1440, label: t('reminders_page.form.notify_options.d1') },
+    { value: 360,  label: t('reminders_page.form.notify_options.h6') },
+    { value: 180,  label: t('reminders_page.form.notify_options.h3') },
+    { value: 60,   label: t('reminders_page.form.notify_options.h1') },
   ];
 
   const toggleNotifyTime = (value: number) => {
@@ -195,6 +200,55 @@ export default function RemindersPage() {
             </Button>
           </div>
         </div>
+
+        {/* Notification Status Banner */}
+        {showNotifBanner && isSupported && (
+          <div className={`flex items-center justify-between gap-md px-lg py-md rounded-xl border text-sm transition-all ${
+            permission === 'granted'
+              ? 'bg-income/5 border-income/20 text-income'
+              : permission === 'denied'
+              ? 'bg-expense/5 border-expense/20 text-expense'
+              : 'bg-warm-gold/5 border-warm-gold/20 text-warm-gold'
+          }`}>
+            <div className="flex items-center gap-md">
+              {permission === 'granted' ? (
+                <Wifi size={16} className="flex-shrink-0" />
+              ) : (
+                <WifiOff size={16} className="flex-shrink-0" />
+              )}
+              <div>
+                {permission === 'granted' ? (
+                  <span className="font-medium">
+                    Notifikasi aktif — bekerja selama browser terbuka.{' '}
+                    <span className="opacity-70 font-normal text-xs">
+                      Server push aktif untuk pengiriman saat browser baru dibuka.
+                    </span>
+                  </span>
+                ) : permission === 'denied' ? (
+                  <span className="font-medium">
+                    Notifikasi diblokir — aktifkan di pengaturan browser untuk menerima pengingat.
+                  </span>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      await requestNotificationPermission();
+                    }}
+                    className="font-medium hover:underline text-left"
+                  >
+                    Klik untuk mengaktifkan notifikasi reminder →
+                  </button>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={() => setShowNotifBanner(false)}
+              className="text-current opacity-40 hover:opacity-100 transition-opacity flex-shrink-0 text-lg leading-none"
+              aria-label="Tutup banner"
+            >
+              ×
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-2xl">
           {/* Main View */}
