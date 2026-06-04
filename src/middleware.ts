@@ -18,6 +18,6 @@ export const config = {
      * - api/ (API routes - biasakan API route jaga JWT nya mandiri)
      * Feel free to modify this pattern to include more paths.
      */
-    '/((?!_next/static|_next/image|favicon.ico|manifest.json|icon-*|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next|manifest.json|icons|favicon.ico|api|icon-*|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

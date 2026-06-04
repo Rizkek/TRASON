@@ -231,7 +231,13 @@ export default function RemindersPage() {
                 ) : (
                   <button
                     onClick={async () => {
-                      await requestNotificationPermission();
+                      const granted = await requestNotificationPermission();
+                      if (granted) {
+                        window.location.reload();
+                      } else {
+                        alert('Browser memblokir notifikasi atau Anda membatalkan permintaan. Silakan izinkan dari pengaturan browser/URL bar.');
+                        window.location.reload();
+                      }
                     }}
                     className="font-medium hover:underline text-left"
                   >
