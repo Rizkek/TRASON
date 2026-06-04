@@ -208,13 +208,19 @@ self.addEventListener('message', async (event) => {
     const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
     const toStore = [];
 
+    console.groupCollapsed('[SW] Schedule Evaluation');
     reminders.forEach((reminder) => {
-      if (reminder.status !== 'pending' || !reminder.due_datetime) return;
+      if (reminder.status !== 'pending' || !reminder.due_datetime) {
+        console.log(`[Skip] "${reminder.title}" (status: ${reminder.status})`);
+        return;
+      }
 
       const dueTime = new Date(reminder.due_datetime).getTime();
       const notifyMins = Array.isArray(reminder.notify_times)
         ? reminder.notify_times
-        : [0, 60, 180, 360];
+        : [60, 180, 360];
+
+      console.log(`[Evaluate] "${reminder.title}" | Due: ${new Date(dueTime).toLocaleString()} | Options:`, notifyMins);
 
       notifyMins.forEach((mins) => {
         const notifyTime = dueTime - mins * 60_000;
@@ -222,6 +228,7 @@ self.addEventListener('message', async (event) => {
 
         // Only schedule if in the future and within the next 7 days
         if (timeUntil > 0 && timeUntil < ONE_WEEK_MS) {
+          console.log(`  -> ✅ [${mins}m before] Scheduled in ${Math.round(timeUntil / 1000)}s (at ${new Date(notifyTime).toLocaleTimeString()})`);
           const key = `${reminder.id}-${mins}`;
           const record = {
             key,
@@ -234,9 +241,12 @@ self.addEventListener('message', async (event) => {
           };
           pendingNotifications.set(key, record);
           toStore.push(record);
+        } else {
+          console.log(`  -> ❌ [${mins}m before] Skipped. Time until: ${Math.round(timeUntil / 1000)}s`);
         }
       });
     });
+    console.groupEnd();
 
     if (toStore.length > 0) {
       await dbPutAll(toStore);

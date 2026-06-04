@@ -219,9 +219,9 @@ export default function RemindersPage() {
               <div>
                 {permission === 'granted' ? (
                   <span className="font-medium">
-                    Notifikasi aktif — bekerja selama browser terbuka.{' '}
+                    Notifikasi push aktif (Server-Side VAPID).{' '}
                     <span className="opacity-70 font-normal text-xs">
-                      Server push aktif untuk pengiriman saat browser baru dibuka.
+                      Pengingat akan dikirimkan langsung ke perangkat Anda melalui push service.
                     </span>
                   </span>
                 ) : permission === 'denied' ? (

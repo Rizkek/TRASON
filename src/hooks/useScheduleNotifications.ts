@@ -250,13 +250,19 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
         const now = Date.now();
         const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
+        console.groupCollapsed('[useScheduleNotifications] Server Push Evaluation');
         for (const reminder of reminders) {
-          if (reminder.status !== 'pending' || !reminder.due_datetime) continue;
+          if (reminder.status !== 'pending' || !reminder.due_datetime) {
+            console.log(`[Skip] "${reminder.title}" (status: ${reminder.status})`);
+            continue;
+          }
 
           const dueTime = new Date(reminder.due_datetime).getTime();
           const notifyMins: number[] = Array.isArray(reminder.notify_times)
             ? reminder.notify_times
-            : [0, 60, 180, 360];
+            : [60, 180, 360];
+
+          console.log(`[Evaluate] "${reminder.title}" | Due: ${new Date(dueTime).toLocaleString()} | Options:`, notifyMins);
 
           for (const mins of notifyMins) {
             const notifyTime = dueTime - mins * 60_000;
@@ -264,13 +270,20 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
 
             // Only schedule near-future (between 10s and 7 days from now)
             if (timeUntil > 10_000 && timeUntil < ONE_WEEK_MS) {
+              console.log(`  -> ✅ [${mins}m before] Scheduled in ${Math.round(timeUntil / 1000)}s (at ${new Date(notifyTime).toLocaleTimeString()})`);
               // Delay the server push call to match the notify time
               setTimeout(() => {
-                sendServerPush(userId, reminder, mins).catch(() => {});
+                console.log(`  -> 🚀 [${mins}m before] EXECUTING Server Push for "${reminder.title}" NOW`);
+                sendServerPush(userId, reminder, mins).catch((err) => {
+                  console.error('Failed to send server push:', err);
+                });
               }, timeUntil);
+            } else {
+              console.log(`  -> ❌ [${mins}m before] Skipped. Time until: ${Math.round(timeUntil / 1000)}s (needs to be > 10s and < 7d)`);
             }
           }
         }
+        console.groupEnd();
       }
     },
     [enabled, userId, requestNotificationPermission, scheduleFallback]
