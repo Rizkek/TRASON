@@ -202,11 +202,11 @@ export const ja = {
       notes_label: '戦術的メモ',
       notes_placeholder: '運用上の詳細...',
       notify_options: {
+        d2: '2日前',
+        d1: '1日前',
         h6: '6時間前',
         h3: '3時間前',
         h1: '1時間前',
-        m15: '15分前',
-        now: '期限時'
       }
     }
   },

@@ -202,11 +202,11 @@ export const es = {
       notes_label: 'NOTAS TÁCTICAS',
       notes_placeholder: 'Detalles operativos...',
       notify_options: {
+        d2: '2 Días antes',
+        d1: '1 Día antes',
         h6: '6 Horas antes',
         h3: '3 Horas antes',
         h1: '1 Hora antes',
-        m15: '15 Minutos antes',
-        now: 'Al momento'
       }
     }
   },
