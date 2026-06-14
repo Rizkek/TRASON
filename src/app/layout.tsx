@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { SmartInput } from '@/components/SmartInput';
+import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import NextTopLoader from 'nextjs-toploader';
 
 const sans = Instrument_Sans({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
@@ -102,6 +103,7 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <SmartInput />
+            <PwaInstallPrompt />
           </AuthProvider>
         </ErrorBoundary>
       </body>
