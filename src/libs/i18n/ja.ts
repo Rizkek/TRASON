@@ -360,6 +360,8 @@ export const ja = {
     greeting_evening: 'こんばんは',
     overview: 'システム概要',
     quickActions: 'クイックアクション',
+    financial_analytics: 'Financial Analytics',
+    monthly_overview: 'Monthly Overview',
     capture_placeholder: 'ワークアウト、経費、リマインダー、または考えを記録する...',
     capture_btn: '記録',
     daily_insight: '毎日のインサイト',
