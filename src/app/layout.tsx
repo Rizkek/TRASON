@@ -15,16 +15,55 @@ const serif = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: 'TRASON - Your Personal OS for Intentional Growth',
+  metadataBase: new URL('https://trason.vercel.app'),
+  title: {
+    default: 'TRASON - Your Personal OS for Intentional Growth',
+    template: '%s | TRASON',
+  },
   description: 'A calm Personal OS for finance, routines, sport, reminders, career signals, and plain-language insights.',
+  keywords: [
+    'Personal OS', 'habit tracker', 'financial planner', 
+    'career growth', 'reminders', 'productivity', 'TRASON'
+  ],
+  authors: [{ name: 'TRASON' }],
+  creator: 'TRASON',
+  publisher: 'TRASON',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    title: 'TRASON - Your Personal OS',
+    description: 'A calm Personal OS for finance, routines, sport, reminders, and career signals.',
+    url: 'https://trason.vercel.app',
+    siteName: 'TRASON',
+    images: [
+      {
+        url: '/icon-192x192.png',
+        width: 192,
+        height: 192,
+        alt: 'TRASON Logo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'TRASON - Your Personal OS',
+    description: 'A calm Personal OS for finance, routines, sport, reminders, and career signals.',
+    images: ['/icon-192x192.png'],
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
+    title: 'TRASON',
   },
   icons: {
     icon: '/favicon.svg',
-    apple: '/icon-192x192.svg',
+    apple: '/icon-192x192.png',
   },
 };
 
@@ -44,7 +83,7 @@ export default function RootLayout({
     <html lang="en" data-scroll-behavior="smooth">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/icon-192x192.svg" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className={`${sans.variable} ${serif.variable} ${sans.className}`} suppressHydrationWarning>
