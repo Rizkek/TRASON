@@ -28,18 +28,6 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // Memicu refresh cookie jika sudah hampir kedaluwarsa.
-  // getSession sudah cukup untuk memeriksa siapa yang login tanpa harus menyuruh server lock / ping database terus-menerus.
-  let session = null;
-  try {
-    const {
-      data: { session: fetchedSession },
-    } = await supabase.auth.getSession();
-    session = fetchedSession;
-  } catch (error) {
-    console.error('[Supabase middleware] auth.getSession failed:', error);
-  }
-
   // Rute-rute yang HANYA boleh diakses oleh user yang sudah login
   const protectedPaths = [
     '/dashboard',
@@ -58,6 +46,25 @@ export async function updateSession(request: NextRequest) {
     (path) => url.pathname === path || url.pathname.startsWith(`${path}/`)
   );
 
+  const isAuthPath = url.pathname === '/login' || url.pathname === '/signup';
+  const isRootPath = url.pathname === '/';
+
+  // Optimization: Only ping Supabase if it's a route that cares about auth state
+  // OR if they might have a session (they have cookies).
+  const needsAuthCheck = isProtectedPath || isAuthPath || isRootPath;
+
+  let session = null;
+  if (needsAuthCheck) {
+    try {
+      const {
+        data: { session: fetchedSession },
+      } = await supabase.auth.getSession();
+      session = fetchedSession;
+    } catch (error) {
+      console.error('[Supabase middleware] auth.getSession failed:', error);
+    }
+  }
+
   // Jika user belum login dan mencoba mengakses rute terproteksi
   if (!session && isProtectedPath) {
     url.pathname = '/login';
@@ -66,15 +73,13 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Jika user SUDAH login dan mencoba mengakses rute Publik/Auth (contoh: /login)
-  const isAuthPath = url.pathname === '/login' || url.pathname === '/signup';
   if (session && isAuthPath) {
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
   }
 
   // Jika user SUDAH login dan mengakses root "/" → langsung ke dashboard
-  // Ini menghindari landing page compile (29s!) sebelum JS client redirect
-  if (session && url.pathname === '/') {
+  if (session && isRootPath) {
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
   }
