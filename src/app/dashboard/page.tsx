@@ -26,6 +26,7 @@ import {
 // Extracted Components
 import { DashboardHeader } from './components/DashboardHeader';
 import { FinancialSummary } from './components/FinancialSummary';
+import { FinancialChart } from './components/FinancialChart';
 import { ActivitiesList } from './components/ActivitiesList';
 import { TransactionsList } from './components/TransactionsList';
 import { RemindersSidebar } from './components/RemindersSidebar';
@@ -109,6 +110,9 @@ export default function DashboardPage() {
 
         {/* Financial Flow */}
         <FinancialSummary transactions={transactions} />
+
+        {/* Financial Analytics Chart */}
+        <FinancialChart transactions={transactions} />
 
         <InvestmentSummary summary={investmentSummary} />
 
