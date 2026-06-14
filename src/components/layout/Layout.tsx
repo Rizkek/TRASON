@@ -210,7 +210,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         </header>
 
         <main className="flex-1 overflow-y-auto relative z-10">
-          <div className="container mx-auto px-lg py-xl md:px-2xl max-w-6xl">
+          <div className="container mx-auto px-md py-lg md:px-2xl md:py-xl max-w-6xl">
             {children}
           </div>
         </main>

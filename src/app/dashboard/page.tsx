@@ -87,11 +87,11 @@ export default function DashboardPage() {
 
   return (
     <Layout>
-        <div className="space-y-xl animate-fade-in">
+      <div className="space-y-md md:space-y-xl animate-fade-in">
         {/* Hero Greeting */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg md:mb-xl">
           <div className="space-y-sm">
-            <h1 className="text-display font-serif text-white flex flex-wrap items-baseline gap-x-md">
+            <h1 className="text-3xl md:text-display font-serif text-white flex flex-wrap items-baseline gap-x-md">
               <span className="text-gradient">{greeting}</span>, 
               <span>{user?.first_name || user?.name?.split(' ')[0] || 'User'}</span>
             </h1>
@@ -117,10 +117,10 @@ export default function DashboardPage() {
         <InvestmentSummary summary={investmentSummary} />
 
         {/* Dynamic Insight Card & Lists */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-xl">
-          <div className="lg:col-span-2 space-y-xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-md md:gap-xl">
+          <div className="lg:col-span-2 space-y-md md:space-y-xl">
             {/* Quick Action Input */}
-            <Card className="p-lg bg-white/[0.02] border-white/[0.05]">
+            <Card className="p-md md:p-lg bg-white/[0.02] border-white/[0.05]">
               <div className="flex flex-col md:flex-row gap-md">
                 <div className="flex-1 relative group">
                   <div className="absolute left-md top-1/2 -translate-y-1/2 text-primary">
@@ -136,19 +136,19 @@ export default function DashboardPage() {
               </div>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-md md:gap-xl">
               <ActivitiesList activities={activities} />
               <TransactionsList transactions={transactions} />
             </div>
           </div>
 
           {/* Right Sidebar */}
-          <div className="space-y-xl">
+          <div className="space-y-md md:space-y-xl">
             <RemindersSidebar reminders={reminders} />
             <SportSummary summary={sportSummary} isLoading={sportLoading} />
             <CareerSummary stats={careerStats} nextInterview={nextInterview} isLoading={careerLoading} />
 
-            <Card className="p-xl bg-gradient-to-br from-gray-strong to-black relative overflow-hidden group">
+            <Card className="p-md md:p-xl bg-gradient-to-br from-gray-strong to-black relative overflow-hidden group">
               <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-secondary opacity-10 blur-3xl rounded-full" />
               <div className="space-y-lg relative z-10">
                 <div className="flex items-center gap-md">

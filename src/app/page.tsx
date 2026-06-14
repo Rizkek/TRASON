@@ -137,7 +137,7 @@ export default function Home() {
             <FiCommand size={14} /> Meet The Personal OS
           </div>
 
-          <h1 className="text-5xl md:text-8xl lg:text-[7rem] font-serif leading-[1] tracking-tighter animate-slide-up [animation-delay:0.1s]">
+          <h1 className="text-4xl md:text-8xl lg:text-[7rem] font-serif leading-[1.1] md:leading-[1] tracking-tighter animate-slide-up [animation-delay:0.1s]">
             Your Life's <br className="hidden md:block" />
             <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-warm-gold via-soft-cream to-warm-gold">Command Center.</span>
           </h1>
@@ -166,7 +166,7 @@ export default function Home() {
            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-warm-black/50 to-warm-black z-20 pointer-events-none" />
            
            {/* Center Big Card (Finance) */}
-           <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[90%] md:w-[700px] h-[350px] md:h-[450px] bg-gray-strong/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-[0_30px_60px_-20px_rgba(244,201,93,0.15)] overflow-hidden transform hover:-translate-y-2 transition-transform duration-700">
+           <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[90%] md:w-[700px] h-[300px] md:h-[450px] bg-gray-strong/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-[0_30px_60px_-20px_rgba(244,201,93,0.15)] overflow-hidden transform hover:-translate-y-2 transition-transform duration-700">
               <div className="h-12 border-b border-white/5 flex items-center px-lg gap-sm bg-white/[0.02]">
                 <div className="flex gap-1.5"><div className="w-3 h-3 rounded-full bg-expense/50" /><div className="w-3 h-3 rounded-full bg-warm-gold/50" /><div className="w-3 h-3 rounded-full bg-income/50" /></div>
                 <div className="mx-auto text-[10px] uppercase tracking-widest text-gray-light/40 font-bold">Finance Module</div>
@@ -174,7 +174,7 @@ export default function Home() {
               <div className="p-xl md:p-3xl space-y-xl">
                  <div className="space-y-sm">
                     <p className="text-gray-light font-medium">Total Balance</p>
-                    <h2 className="text-5xl font-serif">$142,850.00</h2>
+                    <h2 className="text-4xl md:text-5xl font-serif">$142,850.00</h2>
                  </div>
                  <div className="w-full h-32 md:h-48 border-b border-warm-gold/20 flex items-end justify-between px-md pb-md relative">
                     {/* Mock Graph */}
@@ -225,10 +225,10 @@ export default function Home() {
       </header>
 
       {/* BENTO GRID SECTION */}
-      <section id="architecture" className="py-24 md:py-40 px-lg bg-white/[0.01]">
+      <section id="architecture" className="py-16 md:py-40 px-md md:px-lg bg-white/[0.01]">
          <div className="max-w-7xl mx-auto">
             <div className="text-center mb-2xl space-y-md">
-               <h2 className="text-4xl md:text-6xl font-serif">The Architecture of Sovereignty</h2>
+               <h2 className="text-3xl md:text-6xl font-serif">The Architecture of Sovereignty</h2>
                <p className="text-xl text-gray-light/60 max-w-2xl mx-auto font-light">Four integrated modules working seamlessly to give you absolute clarity over your life's trajectory.</p>
             </div>
 
@@ -314,10 +314,10 @@ export default function Home() {
       </section>
 
       {/* SECURITY / TRUST SECTION */}
-      <section id="security" className="py-24 md:py-40 px-lg relative overflow-hidden">
+      <section id="security" className="py-16 md:py-40 px-md md:px-lg relative overflow-hidden">
          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-warm-gold/[0.02] to-transparent pointer-events-none" />
          <div className="max-w-4xl mx-auto">
-            <div className="p-2xl md:p-4xl rounded-[3rem] bg-gray-strong border border-white/[0.05] shadow-[0_0_100px_rgba(0,0,0,0.5)] text-center space-y-xl relative overflow-hidden">
+            <div className="p-xl md:p-4xl rounded-[3rem] bg-gray-strong border border-white/[0.05] shadow-[0_0_100px_rgba(0,0,0,0.5)] text-center space-y-lg md:space-y-xl relative overflow-hidden">
                {/* Badge Background Glow */}
                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-warm-gold/10 blur-[80px] rounded-full" />
                
@@ -326,8 +326,8 @@ export default function Home() {
                </div>
                
                <div className="relative z-10 space-y-md">
-                 <h2 className="text-4xl md:text-5xl font-serif">Absolute Sovereignty.</h2>
-                 <p className="text-gray-light text-lg font-light leading-relaxed max-w-2xl mx-auto">
+                 <h2 className="text-3xl md:text-5xl font-serif">Absolute Sovereignty.</h2>
+                 <p className="text-gray-light text-base md:text-lg font-light leading-relaxed max-w-2xl mx-auto">
                    Your personal records belong in a private workspace, not a harvest for algorithms. TRASON ensures your sanctuary is strictly yours with end-to-end authentication.
                  </p>
                </div>
@@ -344,8 +344,8 @@ export default function Home() {
       </section>
 
       {/* CTA SECTION */}
-      <section className="py-24 md:py-40 px-lg text-center space-y-xl bg-warm-black border-t border-white/[0.02]">
-         <h2 className="text-5xl md:text-7xl font-serif italic tracking-tight">
+      <section className="py-16 md:py-40 px-md md:px-lg text-center space-y-lg md:space-y-xl bg-warm-black border-t border-white/[0.02]">
+         <h2 className="text-4xl md:text-7xl font-serif italic tracking-tight leading-[1.2] md:leading-[1]">
            Build the sanctuary <br className="hidden md:block" /> your life deserves.
          </h2>
          <div className="max-w-sm mx-auto space-y-lg pt-lg">
