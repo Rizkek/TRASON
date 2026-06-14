@@ -7,7 +7,7 @@ import { Button, Input, Alert, Loading } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { sanitizeError, validateEmail } from '@/libs/validation';
 import { supabase } from '@/services/supabaseClient';
-import { Compass, ArrowLeft, Quote } from 'lucide-react';
+import { Compass, ArrowLeft, Quote, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     // Redirect if already authenticated (skip if still loading)
@@ -70,8 +71,9 @@ export default function LoginPage() {
     setError(null);
 
     try {
+      const email = formData.email.trim();
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
+        email,
         password: formData.password,
       });
 
@@ -148,12 +150,22 @@ export default function LoginPage() {
               <Input
                 label="Password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleInputChange}
                 className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold transition-all"
                 required
+                suffix={
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="p-1 hover:text-white transition-colors focus:outline-none"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                }
               />
             </div>
 

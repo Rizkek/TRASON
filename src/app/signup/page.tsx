@@ -7,7 +7,7 @@ import { Button, Input, Alert } from '@/components';
 import { supabase } from '@/services/supabaseClient';
 import { userQueries } from '@/services/queries';
 import { validateEmail, validatePassword, sanitizeError } from '@/libs/validation';
-import { Compass, ArrowLeft, Sparkles, CheckCircle, AlertTriangle, Loader2, XCircle } from 'lucide-react';
+import { Compass, ArrowLeft, Sparkles, CheckCircle, AlertTriangle, Loader2, XCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -20,6 +20,8 @@ export default function SignupPage() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Email domain check state
   const [emailDomainStatus, setEmailDomainStatus] = useState<
@@ -122,8 +124,9 @@ export default function SignupPage() {
     try {
       const [firstName, ...lastNameParts] = formData.name.trim().split(/\s+/);
       const lastName = lastNameParts.join(' ');
+      const email = formData.email.trim();
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
+        email,
         password: formData.password,
         options: { data: { first_name: firstName, last_name: lastName } },
       });
@@ -258,24 +261,44 @@ export default function SignupPage() {
             <Input
               label="Password"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               value={formData.password}
               onChange={handleInputChange}
               error={validationErrors.password}
               className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold"
               required
+              suffix={
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="p-1 hover:text-white transition-colors focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
             />
             <Input
               label="Confirm Password"
               name="confirmPassword"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="••••••••"
               value={formData.confirmPassword}
               onChange={handleInputChange}
               error={validationErrors.confirmPassword}
               className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold"
               required
+              suffix={
+                <button 
+                  type="button" 
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="p-1 hover:text-white transition-colors focus:outline-none"
+                  aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
             />
 
             <Button 

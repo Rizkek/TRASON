@@ -7,10 +7,11 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   helpText?: string;
   icon?: React.ReactNode;
+  suffix?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, helpText, icon, className = '', ...props }, ref) => {
+  ({ label, error, helpText, icon, suffix, className = '', ...props }, ref) => {
     return (
       <div className="w-full space-y-sm">
         {label && (
@@ -21,7 +22,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="relative group">
           {icon && (
-            <div className="absolute left-md top-1/2 -translate-y-1/2 text-gray-light group-focus-within:text-primary transition-colors">
+            <div className="absolute left-md top-1/2 -translate-y-1/2 text-gray-light group-focus-within:text-primary transition-colors z-10 pointer-events-none">
               {icon}
             </div>
           )}
@@ -29,9 +30,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             className={`w-full h-12 px-lg bg-gray-strong/70 border transition-all duration-300 rounded-md focus:ring-2 focus:ring-secondary/40 text-soft-cream placeholder:text-gray-light/70 disabled:opacity-50 disabled:cursor-not-allowed ${
               icon ? 'pl-2xl' : ''
-            } ${error ? 'border-danger focus:border-danger' : 'border-gray-light/25 focus:border-secondary'} ${className}`}
+            } ${suffix ? 'pr-2xl' : ''} ${error ? 'border-danger focus:border-danger' : 'border-gray-light/25 focus:border-secondary'} ${className}`}
             {...props}
           />
+          {suffix && (
+            <div className="absolute right-md top-1/2 -translate-y-1/2 text-gray-light transition-colors z-10">
+              {suffix}
+            </div>
+          )}
           {/* Bottom highlight beam on focus */}
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-primary group-focus-within:w-full transition-all duration-500 rounded-full" />
         </div>
