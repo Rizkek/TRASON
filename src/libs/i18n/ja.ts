@@ -344,8 +344,12 @@ export const ja = {
       editTitle: 'トランザクションを編集',
       saveBtn: 'エントリを保存',
       savingBtn: '保存中...',
-      deleteConfirmTitle: 'トランザクションを削除',
-      deleteConfirmDesc: 'このトランザクションを削除してもよろしいですか？'
+      deleteConfirmTitle: '取引を削除',
+      deleteConfirmDesc: 'この取引を削除してもよろしいですか？',
+      type: {
+        income: '収入',
+        expense: '支出'
+      }
     }
   },
   dashboard: {
@@ -360,8 +364,8 @@ export const ja = {
     greeting_evening: 'こんばんは',
     overview: 'システム概要',
     quickActions: 'クイックアクション',
-    financial_analytics: 'Financial Analytics',
-    monthly_overview: 'Monthly Overview',
+    financial_analytics: '財務分析',
+    monthly_overview: '月間概要',
     capture_placeholder: 'ワークアウト、経費、リマインダー、または考えを記録する...',
     capture_btn: '記録',
     daily_insight: '毎日のインサイト',

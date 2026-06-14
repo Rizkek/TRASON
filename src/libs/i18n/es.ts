@@ -345,7 +345,11 @@ export const es = {
       saveBtn: 'Guardar Entrada',
       savingBtn: 'Guardando...',
       deleteConfirmTitle: 'Eliminar Transacción',
-      deleteConfirmDesc: '¿Estás seguro de que deseas eliminar esta transacción?'
+      deleteConfirmDesc: '¿Estás seguro de que deseas eliminar esta transacción?',
+      type: {
+        income: 'INGRESOS',
+        expense: 'GASTOS'
+      }
     }
   },
   dashboard: {
@@ -360,8 +364,8 @@ export const es = {
     greeting_evening: 'Buenas noches',
     overview: 'VISIÓN GENERAL',
     quickActions: 'ACCIONES RÁPIDAS',
-    financial_analytics: 'Financial Analytics',
-    monthly_overview: 'Monthly Overview',
+    financial_analytics: 'Análisis Financiero',
+    monthly_overview: 'Resumen Mensual',
     capture_placeholder: 'Registra un entrenamiento, gasto, recordatorio o pensamiento...',
     capture_btn: 'REGISTRAR',
     daily_insight: 'Perspectiva Diaria',

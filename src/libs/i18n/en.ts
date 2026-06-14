@@ -345,7 +345,11 @@ export const en = {
       saveBtn: 'Persist Entry',
       savingBtn: 'Syncing...',
       deleteConfirmTitle: 'Remove Entry',
-      deleteConfirmDesc: 'Are you sure you want to remove this financial record?'
+      deleteConfirmDesc: 'Are you sure you want to remove this financial record?',
+      type: {
+        income: 'INCOME',
+        expense: 'EXPENSE'
+      }
     }
   },
   dashboard: {

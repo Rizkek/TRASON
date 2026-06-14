@@ -345,7 +345,11 @@ export const id = {
       saveBtn: 'Simpan Entri',
       savingBtn: 'Menyimpan...',
       deleteConfirmTitle: 'Hapus Transaksi',
-      deleteConfirmDesc: 'Apakah Anda yakin ingin menghapus transaksi ini?'
+      deleteConfirmDesc: 'Apakah Anda yakin ingin menghapus transaksi ini?',
+      type: {
+        income: 'PEMASUKAN',
+        expense: 'PENGELUARAN'
+      }
     }
   },
   dashboard: {
