@@ -23,7 +23,7 @@ export const InvestmentSummary = ({ summary }: Props) => {
 
   if (!summary || summary.positionsCount === 0) {
     return (
-      <Card className="p-xl border border-dashed border-white/10 bg-transparent">
+      <Card className="p-xl border border-dashed border-black/10 dark:border-white/10 bg-transparent">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-lg">
           <div className="space-y-sm w-full sm:w-auto flex-1 min-w-0">
             <p className="text-micro text-gray-light">{t('dashboard.investment_analyst')}</p>
@@ -55,7 +55,7 @@ export const InvestmentSummary = ({ summary }: Props) => {
             </p>
           </div>
           <Link href="/investments">
-            <Button variant="ghost" size="sm" className="border-white/10">
+            <Button variant="ghost" size="sm" className="border-black/10 dark:border-white/10">
               {t('dashboard.review_positions')}
               <ArrowRight size={14} className="ml-2" />
             </Button>
@@ -63,7 +63,7 @@ export const InvestmentSummary = ({ summary }: Props) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
-          <div className="p-lg rounded-md bg-white/5 border border-white/5">
+          <div className="p-lg rounded-md bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
             <p className="text-[10px] text-gray-light uppercase tracking-widest mb-2">{t('dashboard.built_up_pl')}</p>
             <p className={`text-lg font-bold ${summary.totalProfitLoss >= 0 ? 'text-success' : 'text-danger'}`}>
               {formatSignedCurrency(summary.totalProfitLoss, currency, locale)}
@@ -71,7 +71,7 @@ export const InvestmentSummary = ({ summary }: Props) => {
             <p className="text-xs text-gray-light mt-1">{formatSignedPercent(summary.totalChangePercent)} {t('dashboard.from_cost_basis')}</p>
           </div>
 
-          <div className="p-lg rounded-md bg-white/5 border border-white/5">
+          <div className="p-lg rounded-md bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
             <p className="text-[10px] text-gray-light uppercase tracking-widest mb-2">{t('dashboard.today')}</p>
             <p className={`text-lg font-bold ${summary.dailyChangeValue >= 0 ? 'text-success' : 'text-danger'}`}>
               {formatSignedCurrency(summary.dailyChangeValue, currency, locale)}
@@ -79,7 +79,7 @@ export const InvestmentSummary = ({ summary }: Props) => {
             <p className="text-xs text-gray-light mt-1">{formatSignedPercent(summary.dailyChangePercent)} {t('dashboard.movement_today')}</p>
           </div>
 
-          <div className="p-lg rounded-md bg-white/5 border border-white/5">
+          <div className="p-lg rounded-md bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
             <p className="text-[10px] text-gray-light uppercase tracking-widest mb-2">{t('dashboard.allocation')}</p>
             <div className="flex flex-wrap gap-2">
               <Badge variant="info" size="sm"><Landmark size={12} className="mr-1" />{getAllocationLabel(summary, 'stock').toFixed(0)}% {t('dashboard.stocks')}</Badge>

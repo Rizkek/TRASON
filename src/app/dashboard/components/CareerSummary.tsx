@@ -16,15 +16,15 @@ export const CareerSummary = ({ stats, nextInterview, isLoading }: Props) => {
   const { t } = useTranslation();
   if (isLoading) {
     return (
-      <Card className="p-xl bg-white/[0.02] border-white/[0.05]">
-        <div className="h-20 animate-pulse bg-white/5 rounded-md" />
+      <Card className="p-xl bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+        <div className="h-20 animate-pulse bg-black/5 dark:bg-white/5 rounded-md" />
       </Card>
     );
   }
 
   return (
-    <Card className="overflow-hidden bg-white/[0.02] border-white/[0.05]">
-      <div className="px-lg py-md border-b border-white/[0.05] flex justify-between items-center bg-white/[0.01]">
+    <Card className="overflow-hidden bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+      <div className="px-lg py-md border-b border-black/[0.05] dark:border-white/[0.05] flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01]">
         <div className="flex items-center gap-sm">
           <Briefcase size={16} className="text-warm-gold" />
           <h3 className="text-sm font-bold tracking-tight">{t('dashboard.career_pipeline')}</h3>

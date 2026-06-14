@@ -76,8 +76,8 @@ const TIMEZONE_OPTIONS = [
 const LANGUAGE_OPTIONS = [
   { value: 'en', label: 'English' },
   { value: 'id', label: 'Bahasa Indonesia' },
-  { value: 'ja', label: '日本語' },
-  { value: 'es', label: 'Español' },
+  { value: 'ja', label: 'æ—¥æœ¬èªž' },
+  { value: 'es', label: 'EspaÃ±ol' },
 ];
 
 // Module Item Component to handle its own hook logic
@@ -108,8 +108,8 @@ const ModuleItem: React.FC<{
     <div
       className={`flex items-center justify-between p-lg rounded-md border transition-all ${
         isEnabled
-          ? 'bg-white/[0.02] border-white/[0.05]'
-          : 'bg-transparent border-white/[0.02] opacity-60'
+          ? 'bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]'
+          : 'bg-transparent border-black/[0.02] dark:border-white/[0.02] opacity-60'
       }`}
     >
       <div className="flex items-center gap-md">
@@ -132,7 +132,7 @@ const ModuleItem: React.FC<{
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
           isEnabled
             ? 'bg-primary'
-            : 'bg-gray-strong border border-white/[0.1]'
+            : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
         } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
       >
         <span
@@ -184,13 +184,13 @@ const ModuleSettingsTab: React.FC<{ userId?: string }> = ({ userId }) => {
         </div>
       </Card>
 
-      <Card className="glass border-none bg-white/[0.01]" title="MODULE STATUS">
+      <Card className="glass border-none bg-black/[0.01] dark:bg-white/[0.01]" title="MODULE STATUS">
         <div className="grid grid-cols-2 gap-md">
-          <div className="p-lg rounded-md bg-white/[0.02] border border-white/[0.05]">
+          <div className="p-lg rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05]">
             <div className="text-2xl font-bold text-primary">{enabledModules.length}</div>
             <div className="text-[10px] text-gray-light tracking-widest">ENABLED MODULES</div>
           </div>
-          <div className="p-lg rounded-md bg-white/[0.02] border border-white/[0.05]">
+          <div className="p-lg rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05]">
             <div className="text-2xl font-bold text-secondary">{disabledModules.length}</div>
             <div className="text-[10px] text-gray-light tracking-widest">DISABLED MODULES</div>
           </div>
@@ -226,7 +226,7 @@ export default function SettingsPage() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const push = usePushNotification();
 
-  // Snapshot preferensi terakhir yang tersimpan di DB — untuk deteksi perubahan push setting
+  // Snapshot preferensi terakhir yang tersimpan di DB â€” untuk deteksi perubahan push setting
   const [originalPrefs, setOriginalPrefs] = useState<PreferenceData | null>(null);
 
   // Profile form
@@ -331,7 +331,7 @@ export default function SettingsPage() {
         return;
       }
 
-      // User has cached preferences — initialize form directly
+      // User has cached preferences â€” initialize form directly
       isFormInitialized.current = true;
       setProfile({
         first_name: user.first_name || '',
@@ -548,7 +548,7 @@ export default function SettingsPage() {
                   className={`flex items-center gap-md px-xl py-md text-[10px] font-bold whitespace-nowrap rounded-md border transition-all ${
                     activeTab === tab.id
                       ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20'
-                      : 'bg-white/[0.02] text-gray-light border-white/[0.05] hover:border-white/[0.1] hover:text-soft-cream'
+                      : 'bg-black/[0.02] dark:bg-white/[0.02] text-gray-light border-black/[0.05] dark:border-white/[0.05] hover:border-black/[0.1] dark:border-white/[0.1] hover:text-soft-cream'
                   }`}
                 >
                   <Icon size={14} />
@@ -564,7 +564,7 @@ export default function SettingsPage() {
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary opacity-[0.02] blur-3xl pointer-events-none" />
 
               <div className="p-xl space-y-xl relative z-10">
-                <div className="flex flex-col md:flex-row items-center gap-xl pb-xl border-b border-white/[0.05]">
+                <div className="flex flex-col md:flex-row items-center gap-xl pb-xl border-b border-black/[0.05] dark:border-white/[0.05]">
                   <div className="relative group">
                     <div className="w-24 h-24 rounded-2xl bg-gradient-primary p-[2px]">
                       <div className="w-full h-full rounded-2xl bg-gray-strong flex items-center justify-center text-3xl font-serif font-bold text-white relative overflow-hidden">
@@ -572,7 +572,7 @@ export default function SettingsPage() {
                         <div className="absolute inset-0 bg-primary opacity-5 group-hover:opacity-20 transition-opacity" />
                       </div>
                     </div>
-                    <button type="button" className="absolute -bottom-2 -right-2 p-sm bg-secondary text-white rounded-md shadow-lg border border-white/20 hover:scale-110 transition-transform">
+                    <button type="button" className="absolute -bottom-2 -right-2 p-sm bg-secondary text-white rounded-md shadow-lg border border-black/20 dark:border-white/20 hover:scale-110 transition-transform">
                       <Camera size={14} />
                     </button>
                   </div>
@@ -720,7 +720,7 @@ export default function SettingsPage() {
           {activeTab === 'notifications' && (
             <Card className="glass border-none" title={t('settings.alerts.sectionTitle')}>
                 <div className="space-y-xl">
-                  <div className="flex items-center justify-between p-lg rounded-md border bg-white/[0.02] border-white/[0.05]">
+                  <div className="flex items-center justify-between p-lg rounded-md border bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
                     <div className="flex items-center gap-md">
                       <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
                         <BellRing size={20} className="text-secondary" />
@@ -735,7 +735,7 @@ export default function SettingsPage() {
                       type="button"
                       onClick={() => setPrefs((p) => ({ ...p, push_notifications_enabled: !p.push_notifications_enabled }))}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        prefs.push_notifications_enabled ? 'bg-primary' : 'bg-gray-strong border border-white/[0.1]'
+                        prefs.push_notifications_enabled ? 'bg-primary' : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                       }`}
                     >
                       <span
@@ -746,7 +746,7 @@ export default function SettingsPage() {
                     </button>
                   </div>
 
-                  <div className="flex items-center justify-between p-lg rounded-md border bg-white/[0.02] border-white/[0.05]">
+                  <div className="flex items-center justify-between p-lg rounded-md border bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
                     <div className="flex items-center gap-md">
                       <div className="w-10 h-10 rounded-lg bg-accent-purple/10 flex items-center justify-center">
                         <Globe size={20} className="text-accent-purple" />
@@ -760,7 +760,7 @@ export default function SettingsPage() {
                       type="button"
                       onClick={() => setPrefs((p) => ({ ...p, email_digest_enabled: !p.email_digest_enabled }))}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        prefs.email_digest_enabled ? 'bg-primary' : 'bg-gray-strong border border-white/[0.1]'
+                        prefs.email_digest_enabled ? 'bg-primary' : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                       }`}
                     >
                       <span

@@ -32,7 +32,7 @@ export const Calendar: React.FC<CalendarProps> = ({
 
   // Padding for start of month
   for (let i = 0; i < startOffset; i++) {
-    days.push(<div key={`pad-${i}`} className="h-24 border border-white/[0.03] bg-transparent opacity-20" />);
+    days.push(<div key={`pad-${i}`} className="h-24 border border-black/[0.03] dark:border-white/[0.03] bg-transparent opacity-20" />);
   }
 
   for (let d = 1; d <= totalDays; d++) {
@@ -57,7 +57,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       <div 
         key={d}
         onClick={() => onDateSelect?.(date)}
-        className={`h-14 md:h-32 border border-white/[0.03] p-2 transition-all cursor-pointer group hover:bg-white/[0.02] ${
+        className={`h-14 md:h-32 border border-black/[0.03] dark:border-white/[0.03] p-2 transition-all cursor-pointer group hover:bg-black/[0.02] dark:bg-white/[0.02] ${
           isSelected ? 'bg-warm-gold/5 border-warm-gold/20' : ''
         }`}
       >
@@ -88,24 +88,24 @@ export const Calendar: React.FC<CalendarProps> = ({
   }
 
   return (
-    <div className="glass-card overflow-hidden border-white/[0.03]">
+    <div className="glass-card overflow-hidden border-black/[0.03] dark:border-white/[0.03]">
       {/* Calendar Header */}
-      <div className="flex items-center justify-between p-lg border-b border-white/[0.03]">
+      <div className="flex items-center justify-between p-lg border-b border-black/[0.03] dark:border-white/[0.03]">
         <h3 className="font-serif text-2xl">
           <span className="text-warm-gold">{monthName}</span> <span className="text-soft-cream/40 font-light">{year}</span>
         </h3>
         <div className="flex gap-sm">
-          <button onClick={handlePrevMonth} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+          <button onClick={handlePrevMonth} className="p-2 hover:bg-black/5 dark:bg-white/5 rounded-full transition-colors">
             <ChevronLeft size={20} />
           </button>
-          <button onClick={handleNextMonth} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+          <button onClick={handleNextMonth} className="p-2 hover:bg-black/5 dark:bg-white/5 rounded-full transition-colors">
             <ChevronRight size={20} />
           </button>
         </div>
       </div>
 
       {/* Days of week */}
-      <div className="grid grid-cols-7 border-b border-white/[0.03] bg-white/[0.01]">
+      <div className="grid grid-cols-7 border-b border-black/[0.03] dark:border-white/[0.03] bg-black/[0.01] dark:bg-white/[0.01]">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
           <div key={day} className="py-2 text-center text-[10px] uppercase tracking-[0.2em] text-gray-light/60 font-bold">
             {day}

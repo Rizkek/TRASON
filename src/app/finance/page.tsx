@@ -215,11 +215,11 @@ export default function FinancePage() {
               placeholder={t('finance.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-xl pr-md py-md bg-gray-strong/40 border border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none transition-all"
+              className="w-full pl-xl pr-md py-md bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none transition-all"
             />
           </div>
           
-          <div className="flex bg-gray-strong/40 p-1 rounded-md border border-white/[0.05]">
+          <div className="flex bg-gray-strong/40 p-1 rounded-md border border-black/[0.05] dark:border-white/[0.05]">
             {(['all', 'income', 'expense'] as const).map((type) => (
               <button
                 key={type}
@@ -241,7 +241,7 @@ export default function FinancePage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-white/[0.02] border-b border-white/[0.05]">
+                <tr className="bg-black/[0.02] dark:bg-white/[0.02] border-b border-black/[0.05] dark:border-white/[0.05]">
                   <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.transaction')}</th>
                   <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.date')}</th>
                   <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.category')}</th>
@@ -258,7 +258,7 @@ export default function FinancePage() {
                   filteredTransactions.map((t) => (
                     <tr 
                       key={t.id} 
-                      className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
+                      className="group hover:bg-black/[0.02] dark:bg-white/[0.02] transition-colors cursor-pointer"
                       onClick={() => openEditModal(t)}
                     >
                       <td className="px-xl py-xl">
@@ -291,7 +291,7 @@ export default function FinancePage() {
                         </p>
                       </td>
                       <td className="px-xl py-xl text-right">
-                        <button type="button" title="More options" aria-label="More options" className="p-sm text-gray-light hover:text-soft-cream rounded-md hover:bg-white/5 transition-all">
+                        <button type="button" title="More options" aria-label="More options" className="p-sm text-gray-light hover:text-soft-cream rounded-md hover:bg-black/5 dark:bg-white/5 transition-all">
                           <MoreVertical size={16} />
                         </button>
                       </td>
@@ -328,7 +328,7 @@ export default function FinancePage() {
         }
       >
         <div className="space-y-xl">
-          <div className="flex bg-gray-strong p-1 rounded-md border border-white/[0.05]">
+          <div className="flex bg-gray-strong p-1 rounded-md border border-black/[0.05] dark:border-white/[0.05]">
             {(['income', 'expense'] as const).map((type) => (
               <button
                 key={type}
@@ -396,7 +396,7 @@ export default function FinancePage() {
                     });
                   }
                 }}
-                className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm px-md text-sm text-soft-cream focus:border-primary focus:outline-none"
+                className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm px-md text-sm text-soft-cream focus:border-primary focus:outline-none"
               />
               {formErrors.date && <p className="text-xs text-danger">{formErrors.date}</p>}
             </div>
@@ -409,7 +409,7 @@ export default function FinancePage() {
               rows={4}
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-              className="w-full bg-gray-strong/40 border border-white/[0.05] rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
           </div>
 

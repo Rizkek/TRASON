@@ -53,7 +53,7 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Modal Container */}
       <div className="fixed inset-0 z-[70] flex items-center justify-center p-md pointer-events-none">
         <div
-          className="bg-gray-strong border border-white/10 rounded-md shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] max-w-lg w-full max-h-[90vh] overflow-auto pointer-events-auto animate-slide-up relative"
+          className="bg-gray-strong border border-black/10 dark:border-white/10 rounded-md shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] max-w-lg w-full max-h-[90vh] overflow-auto pointer-events-auto animate-slide-up relative"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top highlight glow */}
@@ -61,7 +61,7 @@ export const Modal: React.FC<ModalProps> = ({
           
           {/* Header */}
           {(title || closeButton) && (
-            <div className="flex items-center justify-between px-xl py-xl border-b border-white/[0.05]">
+            <div className="flex items-center justify-between px-xl py-xl border-b border-black/[0.05] dark:border-white/[0.05]">
               {title && (
                 <h2 className="text-xl font-bold tracking-tight text-white uppercase italic">
                    {title}
@@ -72,7 +72,7 @@ export const Modal: React.FC<ModalProps> = ({
                   onClick={onClose}
                   title="Close modal"
                   aria-label="Close modal"
-                  className="text-gray-light hover:text-white hover:bg-white/5 p-sm rounded-md transition-all ml-2"
+                  className="text-gray-light hover:text-white hover:bg-black/5 dark:bg-white/5 p-sm rounded-md transition-all ml-2"
                 >
                   <X size={20} />
                 </button>
@@ -94,7 +94,7 @@ export const Modal: React.FC<ModalProps> = ({
 
           {/* Footer */}
           {footer && (
-            <div className="px-xl py-xl bg-white/[0.02] border-t border-white/[0.05]">
+            <div className="px-xl py-xl bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
               {footer}
             </div>
           )}

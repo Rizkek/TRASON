@@ -56,13 +56,13 @@ export const CreatePlanModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, is
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-md p-3 text-white focus:outline-none focus:border-primary/50 transition-colors"
+            className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-md p-3 text-white focus:outline-none focus:border-primary/50 transition-colors"
             rows={3}
             placeholder="What is the goal of this plan?"
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-md border-t border-white/10">
+        <div className="flex justify-end gap-3 pt-md border-t border-black/10 dark:border-white/10">
           <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>

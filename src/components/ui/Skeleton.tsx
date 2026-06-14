@@ -13,7 +13,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   width,
   height,
 }) => {
-  const baseClasses = "relative overflow-hidden bg-white/[0.03]";
+  const baseClasses = "relative overflow-hidden bg-black/[0.03] dark:bg-white/[0.03]";
   
   const variantClasses = {
     rect: "rounded-md",

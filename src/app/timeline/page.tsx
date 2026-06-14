@@ -27,12 +27,12 @@ import {
 
 
 const MOOD_OPTIONS = [
-  { labelKey: 'happy', emoji: '😊', value: 'Happy' },
-  { labelKey: 'neutral', emoji: '😐', value: 'Neutral' },
-  { labelKey: 'tired', emoji: '😴', value: 'Tired' },
-  { labelKey: 'energized', emoji: '💪', value: 'Energized' },
-  { labelKey: 'stressed', emoji: '😤', value: 'Stressed' },
-  { labelKey: 'calm', emoji: '🧘', value: 'Calm' },
+  { labelKey: 'happy', emoji: 'ðŸ˜Š', value: 'Happy' },
+  { labelKey: 'neutral', emoji: 'ðŸ˜', value: 'Neutral' },
+  { labelKey: 'tired', emoji: 'ðŸ˜´', value: 'Tired' },
+  { labelKey: 'energized', emoji: 'ðŸ’ª', value: 'Energized' },
+  { labelKey: 'stressed', emoji: 'ðŸ˜¤', value: 'Stressed' },
+  { labelKey: 'calm', emoji: 'ðŸ§˜', value: 'Calm' },
 ];
 
 const CATEGORY_OPTIONS = ['work', 'study', 'exercise', 'sport', 'meals', 'social', 'rest', 'personal', 'other'];
@@ -320,7 +320,7 @@ export default function TimelinePage() {
 
   if (!isAuthenticated) return null;
 
-  // Build lookup: day index (0=Mon) → hour → activities
+  // Build lookup: day index (0=Mon) â†’ hour â†’ activities
   const grid: Record<number, Record<number, Activity[]>> = {};
   for (let d = 0; d < 7; d++) {
     grid[d] = {};
@@ -390,7 +390,7 @@ export default function TimelinePage() {
           </div>
 
           {/* Tab Switcher */}
-          <div className="flex items-center gap-0 bg-white/[0.03] p-1 rounded-lg border border-white/[0.05] w-fit">
+          <div className="flex items-center gap-0 bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-lg border border-black/[0.05] dark:border-white/[0.05] w-fit">
             <button
               onClick={() => setActiveTab('weekly-log')}
               className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
@@ -414,7 +414,7 @@ export default function TimelinePage() {
               Daily Checklist
               {totalCount > 0 && (
                 <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
-                  completedCount === totalCount ? 'bg-income/20 text-income' : 'bg-white/10 text-gray-light'
+                  completedCount === totalCount ? 'bg-income/20 text-income' : 'bg-black/10 dark:bg-white/10 text-gray-light'
                 }`}>
                   {completedCount}
                 </span>
@@ -424,9 +424,9 @@ export default function TimelinePage() {
 
           {/* Daily Checklist Panel */}
           {activeTab === 'daily-checklist' && (
-            <div className="glass rounded-xl border border-white/[0.05] overflow-hidden">
+            <div className="glass rounded-xl border border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
               {/* Checklist Header */}
-              <div className="flex items-center justify-between px-xl py-lg border-b border-white/[0.05] bg-gray-strong/40">
+              <div className="flex items-center justify-between px-xl py-lg border-b border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/40">
                 <div className="space-y-xs">
                   <h2 className="text-sm font-bold text-soft-cream uppercase tracking-widest flex items-center gap-sm">
                     <ListChecks size={15} className="text-primary" />
@@ -434,14 +434,14 @@ export default function TimelinePage() {
                   </h2>
                   {totalCount > 0 && (
                     <div className="flex items-center gap-sm">
-                      <div className="flex-1 h-1.5 bg-white/[0.05] rounded-full overflow-hidden" style={{ width: '120px' }}>
+                      <div className="flex-1 h-1.5 bg-black/[0.05] dark:bg-white/[0.05] rounded-full overflow-hidden" style={{ width: '120px' }}>
                         <div
                           className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500"
                           style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
                         />
                       </div>
                       <span className="text-[10px] text-gray-light">
-                        {completedCount === totalCount && totalCount > 0 ? '🎉 All done!' : `${completedCount} of ${totalCount}`}
+                        {completedCount === totalCount && totalCount > 0 ? 'ðŸŽ‰ All done!' : `${completedCount} of ${totalCount}`}
                       </span>
                     </div>
                   )}
@@ -453,7 +453,7 @@ export default function TimelinePage() {
               </div>
 
               {/* Add Task Input */}
-              <div className="px-xl py-lg border-b border-white/[0.05]">
+              <div className="px-xl py-lg border-b border-black/[0.05] dark:border-white/[0.05]">
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
@@ -477,7 +477,7 @@ export default function TimelinePage() {
                     onChange={(e) => setNewTaskInput(e.target.value)}
                     placeholder="Add a task to repeat daily... (e.g. Morning workout, Read 20 pages)"
                     disabled={isAddingTask}
-                    className="flex-1 bg-gray-strong/40 border border-white/5 rounded-md px-lg py-sm text-sm text-soft-cream placeholder-gray-light/40 focus:border-primary focus:outline-none transition-all disabled:opacity-50"
+                    className="flex-1 bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md px-lg py-sm text-sm text-soft-cream placeholder-gray-light/40 focus:border-primary focus:outline-none transition-all disabled:opacity-50"
                   />
                   <button
                     type="submit"
@@ -504,14 +504,14 @@ export default function TimelinePage() {
                       No tasks yet. Add something you want to do every day.
                     </p>
                     <p className="text-[10px] text-gray-light opacity-40">
-                      Tasks reset automatically at midnight — perfect for daily habits.
+                      Tasks reset automatically at midnight â€” perfect for daily habits.
                     </p>
                   </div>
                 ) : (
                   tasks.map((task) => (
                     <div
                       key={task.id}
-                      className={`flex items-center gap-lg px-xl py-lg group transition-all hover:bg-white/[0.01] ${
+                      className={`flex items-center gap-lg px-xl py-lg group transition-all hover:bg-black/[0.01] dark:bg-white/[0.01] ${
                         task.completed_today ? 'opacity-60' : ''
                       }`}
                     >
@@ -556,22 +556,22 @@ export default function TimelinePage() {
             </div>
           )}
 
-          {/* Hour Grid — only shown on weekly-log tab */}
+          {/* Hour Grid â€” only shown on weekly-log tab */}
           {activeTab === 'weekly-log' && isLoading ? (
             <div className="flex justify-center py-2xl">
               <Loading />
             </div>
           ) : activeTab === 'weekly-log' && (
-            <div className="glass rounded-xl border border-white/[0.05] overflow-hidden">
-              {/* Day Headers — sticky */}
-              <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-white/[0.05] bg-gray-strong/60 sticky top-0 z-20">
-                <div className="border-r border-white/[0.03]" />
+            <div className="glass rounded-xl border border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
+              {/* Day Headers â€” sticky */}
+              <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/60 sticky top-0 z-20">
+                <div className="border-r border-black/[0.03] dark:border-white/[0.03]" />
                 {daysOfWeek.map((day, idx) => {
                   const isToday = day.toDateString() === new Date().toDateString();
                   return (
                     <div
                       key={idx}
-                      className={`px-sm py-md text-center border-r border-white/[0.03] last:border-r-0 relative ${
+                      className={`px-sm py-md text-center border-r border-black/[0.03] dark:border-white/[0.03] last:border-r-0 relative ${
                         isToday ? 'bg-primary/10' : ''
                       }`}
                     >
@@ -618,7 +618,7 @@ export default function TimelinePage() {
                         role="row"
                       >
                         {/* Hour label */}
-                        <div className={`flex items-start justify-end pr-sm pt-sm border-r border-white/[0.03] sticky left-0 bg-gray-strong/40 ${
+                        <div className={`flex items-start justify-end pr-sm pt-sm border-r border-black/[0.03] dark:border-white/[0.03] sticky left-0 bg-gray-strong/40 ${
                           isCurrentHour ? 'text-red-400' : 'text-gray-light opacity-40'
                         }`}>
                           <span className="text-[10px] font-bold font-mono">
@@ -635,8 +635,8 @@ export default function TimelinePage() {
                             <div
                               key={dayIdx}
                               role="gridcell"
-                              className={`border-r border-b border-white/[0.03] last:border-r-0 p-0.5 cursor-pointer group relative ${
-                                isToday ? 'bg-primary/[0.02]' : 'hover:bg-white/[0.01]'
+                              className={`border-r border-b border-black/[0.03] dark:border-white/[0.03] last:border-r-0 p-0.5 cursor-pointer group relative ${
+                                isToday ? 'bg-primary/[0.02]' : 'hover:bg-black/[0.01] dark:bg-white/[0.01]'
                               }`}
                               onClick={() => {
                                 if (cellActivities.length === 0) openAddModal(day, hour);
@@ -734,7 +734,7 @@ export default function TimelinePage() {
                   value={form.dayIndex}
                   onChange={(e) => setForm((f) => ({ ...f, dayIndex: +e.target.value }))}
                   disabled={form.applyToAllDays}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none disabled:opacity-50"
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none disabled:opacity-50"
                 >
                   {daysOfWeek.map((d, i) => (
                     <option key={i} value={i}>{d.toLocaleDateString('en-US', { weekday: 'long' })}</option>
@@ -747,7 +747,7 @@ export default function TimelinePage() {
                       id="form-apply-all"
                       checked={form.applyToAllDays}
                       onChange={(e) => setForm(f => ({ ...f, applyToAllDays: e.target.checked }))}
-                      className="accent-primary rounded-sm bg-white/5 border-white/10"
+                      className="accent-primary rounded-sm bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10"
                     />
                     <label htmlFor="form-apply-all" className="text-[10px] text-gray-light uppercase tracking-wider cursor-pointer select-none">
                       {t('timeline_page.form.repeat_everyday')}
@@ -761,7 +761,7 @@ export default function TimelinePage() {
                   id="form-hour"
                   value={form.start_hour}
                   onChange={(e) => setForm((f) => ({ ...f, start_hour: +e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
                   {HOURS.map((h) => <option key={h} value={h}>{formatHour(h)}</option>)}
                 </select>
@@ -772,7 +772,7 @@ export default function TimelinePage() {
                   id="form-min"
                   value={form.start_minute}
                   onChange={(e) => setForm((f) => ({ ...f, start_minute: +e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
                   {[0, 15, 30, 45].map((m) => <option key={m} value={m}>{String(m).padStart(2, '0')}</option>)}
                 </select>
@@ -783,7 +783,7 @@ export default function TimelinePage() {
                   id="form-dur"
                   value={form.duration_minutes}
                   onChange={(e) => setForm((f) => ({ ...f, duration_minutes: +e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
                   {[15, 30, 45, 60, 90, 120, 180, 240].map((m) => <option key={m} value={m}>{m < 60 ? `${m}m` : `${m / 60}h`}</option>)}
                 </select>
@@ -797,7 +797,7 @@ export default function TimelinePage() {
                   id="form-cat"
                   value={form.category}
                   onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
                   <option value="">{t('timeline_page.form.uncategorized')}</option>
                   {CATEGORY_OPTIONS.map((c) => <option key={c} value={c}>{t(`timeline_page.form.categories.${c}`)}</option>)}
@@ -809,7 +809,7 @@ export default function TimelinePage() {
                   id="form-mood"
                   value={form.mood}
                   onChange={(e) => setForm((f) => ({ ...f, mood: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
                   <option value="">{t('timeline_page.form.none')}</option>
                   {MOOD_OPTIONS.map((m) => <option key={m.value} value={m.value}>{m.emoji} {t(`timeline_page.form.moods.${m.labelKey}`)}</option>)}
@@ -841,7 +841,7 @@ export default function TimelinePage() {
                 value={form.location}
                 onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
                 aria-label="Location"
-                className="w-full pl-xl pr-md py-md bg-gray-strong/40 border border-white/5 rounded-md text-sm focus:border-primary focus:outline-none transition-all"
+                className="w-full pl-xl pr-md py-md bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md text-sm focus:border-primary focus:outline-none transition-all"
               />
             </div>
 
@@ -851,7 +851,7 @@ export default function TimelinePage() {
               placeholder={t('timeline_page.form.notes')}
               rows={3}
               aria-label="Notes"
-              className="w-full bg-gray-strong border border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
           </div>
         </Modal>

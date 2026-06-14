@@ -14,7 +14,7 @@ export const ActivitiesList = ({ activities }: Props) => {
 
   return (
     <Card className="overflow-hidden">
-      <div className="px-lg py-md border-b border-white/[0.05] flex justify-between items-center bg-white/[0.01]">
+      <div className="px-lg py-md border-b border-black/[0.05] dark:border-white/[0.05] flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01]">
         <div className="flex items-center gap-sm">
           <Clock size={16} className="text-primary" />
           <h3 className="text-sm font-bold tracking-tight">{t('dashboard.recent_moments')}</h3>
@@ -24,7 +24,7 @@ export const ActivitiesList = ({ activities }: Props) => {
       <div className="p-sm">
         {recentActivities.length > 0 ? (
           recentActivities.map((activity) => (
-            <div key={activity.id} className="group flex items-center gap-md p-md rounded-md hover:bg-white/[0.02] transition-colors">
+            <div key={activity.id} className="group flex items-center gap-md p-md rounded-md hover:bg-black/[0.02] dark:bg-white/[0.02] transition-colors">
               <div className="w-1 h-8 bg-primary/20 rounded-full group-hover:bg-primary transition-colors" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate">{activity.title}</p>

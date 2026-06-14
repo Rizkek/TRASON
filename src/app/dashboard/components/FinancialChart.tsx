@@ -24,7 +24,7 @@ interface Props {
 const CustomTooltip = ({ active, payload, label, currency, locale }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-black/90 border border-white/10 p-md rounded-xl shadow-2xl backdrop-blur-xl">
+      <div className="bg-black/90 border border-black/10 dark:border-white/10 p-md rounded-xl shadow-2xl backdrop-blur-xl">
         <p className="text-gray-light text-xs font-semibold mb-sm">{label}</p>
         <div className="space-y-xs">
           {payload.map((entry: any, index: number) => (
@@ -91,7 +91,7 @@ export const FinancialChart = ({ transactions }: Props) => {
 
 
   return (
-    <Card className="p-xl bg-gradient-to-br from-[#0F172A]/80 to-[#020617]/80 backdrop-blur-2xl border border-white/[0.05] relative overflow-hidden group">
+    <Card className="p-xl bg-gradient-to-br from-[#0F172A]/80 to-[#020617]/80 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
       {/* Glow Effect Behind Chart */}
       <div className="absolute top-0 left-1/4 w-1/2 h-full bg-primary/5 blur-3xl rounded-full pointer-events-none" />
 

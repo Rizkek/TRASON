@@ -11,7 +11,7 @@ export default function TermsPage() {
       <div className="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-deep-sage/5 blur-[120px] rounded-full pointer-events-none" />
 
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.03]">
+      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-black/[0.03] dark:border-white/[0.03]">
         <div className="max-w-7xl mx-auto px-lg md:px-2xl h-20 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-sm group cursor-pointer">
             <FiArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-warm-gold" />
@@ -70,7 +70,7 @@ export default function TermsPage() {
             Your use of the service is at your sole risk.
           </p>
 
-          <div className="mt-12 p-lg bg-white/[0.02] border border-white/[0.05] rounded-xl text-center">
+          <div className="mt-12 p-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl text-center">
             <p className="m-0 text-sm">
               If you have any questions about these Terms, please contact us at <a href="mailto:legal@trason.app">legal@trason.app</a>
             </p>

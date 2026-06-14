@@ -99,7 +99,7 @@ export default function Home() {
       <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-deep-sage/5 blur-[140px] rounded-full pointer-events-none" />
 
       {/* Professional Navbar */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'py-sm backdrop-blur-xl bg-warm-black/80 border-b border-white/[0.05] shadow-2xl' : 'py-md bg-transparent'}`}>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'py-sm backdrop-blur-xl bg-warm-black/80 border-b border-black/[0.05] dark:border-white/[0.05] shadow-2xl' : 'py-md bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-lg md:px-2xl flex justify-between items-center">
           <Link href="/" className="flex items-center gap-sm group cursor-pointer">
             <div className="w-10 h-10 bg-warm-gold rounded-xl flex items-center justify-center text-warm-black transform transition-transform duration-500 shadow-[0_0_20px_rgba(244,201,93,0.3)]">
@@ -108,7 +108,7 @@ export default function Home() {
             <span className="text-2xl font-serif font-bold tracking-tight">TRASON</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-2xl bg-white/[0.03] px-xl py-sm rounded-full border border-white/[0.05]">
+          <div className="hidden md:flex items-center gap-2xl bg-black/[0.03] dark:bg-white/[0.03] px-xl py-sm rounded-full border border-black/[0.05] dark:border-white/[0.05]">
              <Link href="#features" className="text-sm font-medium text-gray-light hover:text-warm-gold transition-colors">Features</Link>
              <Link href="#architecture" className="text-sm font-medium text-gray-light hover:text-warm-gold transition-colors">Architecture</Link>
              <Link href="#security" className="text-sm font-medium text-gray-light hover:text-warm-gold transition-colors">Security</Link>
@@ -123,7 +123,7 @@ export default function Home() {
                 <span className="relative z-10 flex items-center gap-2">
                   Get Started <FiArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </span>
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+                <div className="absolute inset-0 bg-black/20 dark:bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
               </button>
             </Link>
           </div>
@@ -154,7 +154,7 @@ export default function Home() {
               </button>
             </Link>
             <Link href="#architecture">
-              <button className="w-full sm:w-auto bg-white/[0.03] border border-white/[0.1] hover:bg-white/[0.08] text-soft-cream px-3xl py-4 rounded-xl font-medium transition-all backdrop-blur-sm text-lg flex items-center justify-center gap-sm">
+              <button className="w-full sm:w-auto bg-black/[0.03] dark:bg-white/[0.03] border border-black/[0.1] dark:border-white/[0.1] hover:bg-black/[0.08] dark:bg-white/[0.08] text-soft-cream px-3xl py-4 rounded-xl font-medium transition-all backdrop-blur-sm text-lg flex items-center justify-center gap-sm">
                 Explore Architecture
               </button>
             </Link>
@@ -166,8 +166,8 @@ export default function Home() {
            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-warm-black/50 to-warm-black z-20 pointer-events-none" />
            
            {/* Center Big Card (Finance) */}
-           <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[90%] md:w-[700px] h-[300px] md:h-[450px] bg-gray-strong/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-[0_30px_60px_-20px_rgba(244,201,93,0.15)] overflow-hidden transform hover:-translate-y-2 transition-transform duration-700">
-              <div className="h-12 border-b border-white/5 flex items-center px-lg gap-sm bg-white/[0.02]">
+           <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[90%] md:w-[700px] h-[300px] md:h-[450px] bg-gray-strong/80 backdrop-blur-xl rounded-3xl border border-black/10 dark:border-white/10 shadow-[0_30px_60px_-20px_rgba(244,201,93,0.15)] overflow-hidden transform hover:-translate-y-2 transition-transform duration-700">
+              <div className="h-12 border-b border-black/5 dark:border-white/5 flex items-center px-lg gap-sm bg-black/[0.02] dark:bg-white/[0.02]">
                 <div className="flex gap-1.5"><div className="w-3 h-3 rounded-full bg-expense/50" /><div className="w-3 h-3 rounded-full bg-warm-gold/50" /><div className="w-3 h-3 rounded-full bg-income/50" /></div>
                 <div className="mx-auto text-[10px] uppercase tracking-widest text-gray-light/40 font-bold">Finance Module</div>
               </div>
@@ -187,7 +187,7 @@ export default function Home() {
            </div>
 
            {/* Side Card Left (Habits/Vitality) */}
-           <div className="hidden md:block absolute top-40 left-[5%] w-[300px] h-[300px] bg-gray-strong/90 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden transform -rotate-6 hover:rotate-0 transition-all duration-700 z-10">
+           <div className="hidden md:block absolute top-40 left-[5%] w-[300px] h-[300px] bg-gray-strong/90 backdrop-blur-2xl rounded-3xl border border-black/10 dark:border-white/10 shadow-2xl overflow-hidden transform -rotate-6 hover:rotate-0 transition-all duration-700 z-10">
               <div className="p-xl space-y-lg">
                  <div className="w-12 h-12 rounded-xl bg-deep-sage/20 flex items-center justify-center text-deep-sage">
                     <FiActivity size={24} />
@@ -195,14 +195,14 @@ export default function Home() {
                  <h3 className="text-xl font-serif">Vitality Heatmap</h3>
                  <div className="grid grid-cols-7 gap-xs opacity-80">
                     {Array.from({length: 28}).map((_, i) => (
-                      <div key={i} className={`w-full aspect-square rounded-sm ${((i * 13) % 10) > 3 ? 'bg-deep-sage/40' : 'bg-white/5'}`} />
+                      <div key={i} className={`w-full aspect-square rounded-sm ${((i * 13) % 10) > 3 ? 'bg-deep-sage/40' : 'bg-black/5 dark:bg-white/5'}`} />
                     ))}
                  </div>
               </div>
            </div>
 
            {/* Side Card Right (Reminders) */}
-           <div className="hidden md:block absolute top-20 right-[5%] w-[320px] h-[360px] bg-gray-strong/90 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden transform rotate-3 hover:rotate-0 transition-all duration-700 z-30">
+           <div className="hidden md:block absolute top-20 right-[5%] w-[320px] h-[360px] bg-gray-strong/90 backdrop-blur-2xl rounded-3xl border border-black/10 dark:border-white/10 shadow-2xl overflow-hidden transform rotate-3 hover:rotate-0 transition-all duration-700 z-30">
               <div className="p-xl space-y-lg">
                  <div className="w-12 h-12 rounded-xl bg-warm-gold/20 flex items-center justify-center text-warm-gold">
                     <RiNotification3Line size={24} />
@@ -210,11 +210,11 @@ export default function Home() {
                  <h3 className="text-xl font-serif">Incoming Signals</h3>
                  <div className="space-y-md">
                     {[1, 2, 3].map(i => (
-                      <div key={i} className="p-md rounded-xl bg-white/5 border border-white/5 flex gap-md items-center">
+                      <div key={i} className="p-md rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 flex gap-md items-center">
                          <div className="w-4 h-4 rounded-full border-2 border-warm-gold" />
                          <div className="space-y-1">
-                           <div className="w-24 h-2 bg-white/40 rounded" />
-                           <div className="w-16 h-1.5 bg-white/20 rounded" />
+                           <div className="w-24 h-2 bg-black/40 dark:bg-white/40 rounded" />
+                           <div className="w-16 h-1.5 bg-black/20 dark:bg-white/20 rounded" />
                          </div>
                       </div>
                     ))}
@@ -225,7 +225,7 @@ export default function Home() {
       </header>
 
       {/* BENTO GRID SECTION */}
-      <section id="architecture" className="py-16 md:py-40 px-md md:px-lg bg-white/[0.01]">
+      <section id="architecture" className="py-16 md:py-40 px-md md:px-lg bg-black/[0.01] dark:bg-white/[0.01]">
          <div className="max-w-7xl mx-auto">
             <div className="text-center mb-2xl space-y-md">
                <h2 className="text-3xl md:text-6xl font-serif">The Architecture of Sovereignty</h2>
@@ -234,7 +234,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-lg auto-rows-[300px] md:auto-rows-[350px]">
                {/* Bento 1: Finance (Wide) */}
-               <div className="md:col-span-2 relative group overflow-hidden rounded-[2rem] bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.05] hover:border-warm-gold/30 transition-all duration-500 p-xl flex flex-col justify-between">
+               <div className="md:col-span-2 relative group overflow-hidden rounded-[2rem] bg-gradient-to-br from-white/[0.04] to-transparent border border-black/[0.05] dark:border-white/[0.05] hover:border-warm-gold/30 transition-all duration-500 p-xl flex flex-col justify-between">
                   <div className="absolute top-0 right-0 w-96 h-96 bg-warm-gold/5 rounded-full blur-[100px] group-hover:bg-warm-gold/10 transition-colors" />
                   <div className="relative z-10 space-y-md max-w-md">
                      <div className="w-12 h-12 rounded-xl bg-warm-gold/10 flex items-center justify-center text-warm-gold">
@@ -244,8 +244,8 @@ export default function Home() {
                      <p className="text-gray-light font-light leading-relaxed">Audit your resources, track asset movement, and ensure your capital architecture aligns with your core mission.</p>
                   </div>
                   {/* Subtle UI Hint */}
-                  <div className="relative z-10 w-full h-24 mt-auto border-t border-white/10 pt-md flex items-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
-                     <div className="h-full w-1/4 bg-white/5 rounded-t-lg" />
+                  <div className="relative z-10 w-full h-24 mt-auto border-t border-black/10 dark:border-white/10 pt-md flex items-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                     <div className="h-full w-1/4 bg-black/5 dark:bg-white/5 rounded-t-lg" />
                      <div className="h-[60%] w-1/4 bg-warm-gold/20 rounded-t-lg" />
                      <div className="h-[80%] w-1/4 bg-income/20 rounded-t-lg" />
                      <div className="h-[40%] w-1/4 bg-expense/20 rounded-t-lg" />
@@ -253,7 +253,7 @@ export default function Home() {
                </div>
 
                {/* Bento 2: Vitality (Square) */}
-               <div className="relative group overflow-hidden rounded-[2rem] bg-gradient-to-bl from-white/[0.04] to-transparent border border-white/[0.05] hover:border-deep-sage/30 transition-all duration-500 p-xl flex flex-col justify-between">
+               <div className="relative group overflow-hidden rounded-[2rem] bg-gradient-to-bl from-white/[0.04] to-transparent border border-black/[0.05] dark:border-white/[0.05] hover:border-deep-sage/30 transition-all duration-500 p-xl flex flex-col justify-between">
                   <div className="relative z-10 space-y-md">
                      <div className="w-12 h-12 rounded-xl bg-deep-sage/10 flex items-center justify-center text-deep-sage">
                         <FiActivity size={24} />
@@ -269,9 +269,9 @@ export default function Home() {
                </div>
 
                {/* Bento 3: Timeline (Square) */}
-               <div className="relative group overflow-hidden rounded-[2rem] bg-gradient-to-tr from-white/[0.04] to-transparent border border-white/[0.05] hover:border-soft-cream/30 transition-all duration-500 p-xl flex flex-col justify-between">
+               <div className="relative group overflow-hidden rounded-[2rem] bg-gradient-to-tr from-white/[0.04] to-transparent border border-black/[0.05] dark:border-white/[0.05] hover:border-soft-cream/30 transition-all duration-500 p-xl flex flex-col justify-between">
                   <div className="relative z-10 space-y-md">
-                     <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-soft-cream">
+                     <div className="w-12 h-12 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-soft-cream">
                         <RiHistoryLine size={24} />
                      </div>
                      <h3 className="text-3xl font-serif">Timeline</h3>
@@ -280,17 +280,17 @@ export default function Home() {
                   <div className="space-y-4 mt-auto opacity-50 group-hover:opacity-100 transition-opacity">
                      <div className="flex gap-4 items-center">
                         <div className="w-2 h-2 rounded-full bg-soft-cream" />
-                        <div className="h-2 w-32 bg-white/10 rounded" />
+                        <div className="h-2 w-32 bg-black/10 dark:bg-white/10 rounded" />
                      </div>
-                     <div className="flex gap-4 items-center pl-1 border-l border-white/10">
+                     <div className="flex gap-4 items-center pl-1 border-l border-black/10 dark:border-white/10">
                         <div className="w-2 h-2 rounded-full bg-transparent" />
-                        <div className="h-2 w-24 bg-white/5 rounded" />
+                        <div className="h-2 w-24 bg-black/5 dark:bg-white/5 rounded" />
                      </div>
                   </div>
                </div>
 
                {/* Bento 4: Career (Wide) */}
-               <div className="md:col-span-2 relative group overflow-hidden rounded-[2rem] bg-gradient-to-tl from-white/[0.04] to-transparent border border-white/[0.05] hover:border-warm-gold/30 transition-all duration-500 p-xl flex flex-col sm:flex-row gap-xl items-center justify-between">
+               <div className="md:col-span-2 relative group overflow-hidden rounded-[2rem] bg-gradient-to-tl from-white/[0.04] to-transparent border border-black/[0.05] dark:border-white/[0.05] hover:border-warm-gold/30 transition-all duration-500 p-xl flex flex-col sm:flex-row gap-xl items-center justify-between">
                   <div className="relative z-10 space-y-md max-w-sm">
                      <div className="w-12 h-12 rounded-xl bg-warm-gold/10 flex items-center justify-center text-warm-gold">
                         <RiBriefcaseLine size={24} />
@@ -298,13 +298,13 @@ export default function Home() {
                      <h3 className="text-3xl font-serif">Career Architect</h3>
                      <p className="text-gray-light font-light leading-relaxed">Design your professional trajectory. Organize applications and growth milestones within your personal system.</p>
                   </div>
-                  <div className="w-full sm:w-1/2 h-full bg-white/5 rounded-xl border border-white/5 p-lg flex flex-col gap-sm opacity-50 group-hover:opacity-100 transition-opacity justify-center">
+                  <div className="w-full sm:w-1/2 h-full bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 p-lg flex flex-col gap-sm opacity-50 group-hover:opacity-100 transition-opacity justify-center">
                      <div className="p-md rounded-lg bg-warm-gold/10 border border-warm-gold/20 flex justify-between items-center">
                         <div className="h-2 w-20 bg-warm-gold/50 rounded" />
                         <div className="text-xs font-bold text-warm-gold">INTERVIEW</div>
                      </div>
-                     <div className="p-md rounded-lg bg-white/5 border border-white/5 flex justify-between items-center">
-                        <div className="h-2 w-24 bg-white/20 rounded" />
+                     <div className="p-md rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 flex justify-between items-center">
+                        <div className="h-2 w-24 bg-black/20 dark:bg-white/20 rounded" />
                         <div className="text-xs font-bold text-gray-light">APPLIED</div>
                      </div>
                   </div>
@@ -317,7 +317,7 @@ export default function Home() {
       <section id="security" className="py-16 md:py-40 px-md md:px-lg relative overflow-hidden">
          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-warm-gold/[0.02] to-transparent pointer-events-none" />
          <div className="max-w-4xl mx-auto">
-            <div className="p-xl md:p-4xl rounded-[3rem] bg-gray-strong border border-white/[0.05] shadow-[0_0_100px_rgba(0,0,0,0.5)] text-center space-y-lg md:space-y-xl relative overflow-hidden">
+            <div className="p-xl md:p-4xl rounded-[3rem] bg-gray-strong border border-black/[0.05] dark:border-white/[0.05] shadow-[0_0_100px_rgba(0,0,0,0.5)] text-center space-y-lg md:space-y-xl relative overflow-hidden">
                {/* Badge Background Glow */}
                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-warm-gold/10 blur-[80px] rounded-full" />
                
@@ -344,7 +344,7 @@ export default function Home() {
       </section>
 
       {/* CTA SECTION */}
-      <section className="py-16 md:py-40 px-md md:px-lg text-center space-y-lg md:space-y-xl bg-warm-black border-t border-white/[0.02]">
+      <section className="py-16 md:py-40 px-md md:px-lg text-center space-y-lg md:space-y-xl bg-warm-black border-t border-black/[0.02] dark:border-white/[0.02]">
          <h2 className="text-4xl md:text-7xl font-serif italic tracking-tight leading-[1.2] md:leading-[1]">
            Build the sanctuary <br className="hidden md:block" /> your life deserves.
          </h2>
@@ -361,7 +361,7 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-12 px-lg border-t border-white/[0.05] bg-black/20">
+      <footer className="py-12 px-lg border-t border-black/[0.05] dark:border-white/[0.05] bg-black/20">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-xl">
            <div className="flex items-center gap-sm">
              <RiCompass3Line size={24} className="text-warm-gold" />
@@ -375,7 +375,7 @@ export default function Home() {
            </div>
            
            <p className="text-[10px] uppercase tracking-[0.2em] text-gray-light/40 text-center md:text-right">
-              © 2026 TRASON OS
+              Â© 2026 TRASON OS
            </p>
         </div>
       </footer>

@@ -120,9 +120,9 @@ export function SmartInput() {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center pt-[20vh]">
-      <div className="bg-gray-strong border border-white/10 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      <div className="bg-gray-strong border border-black/10 dark:border-white/10 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col">
         
-        <form onSubmit={handleSubmit} className="relative flex items-center p-md border-b border-white/10">
+        <form onSubmit={handleSubmit} className="relative flex items-center p-md border-b border-black/10 dark:border-white/10">
           <Search className="absolute left-lg text-gray-light" size={20} />
           <input
             ref={inputRef}
@@ -147,7 +147,7 @@ export function SmartInput() {
             <p className="text-sm text-gray-light mb-md">{result.message}</p>
             
             {result.data && (
-              <div className="bg-white/5 rounded-lg p-md mb-md font-mono text-xs text-white/80">
+              <div className="bg-black/5 dark:bg-white/5 rounded-lg p-md mb-md font-mono text-xs text-white/80">
                 {JSON.stringify(result.data, null, 2)}
               </div>
             )}

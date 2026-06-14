@@ -120,7 +120,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-md md:gap-xl">
           <div className="lg:col-span-2 space-y-md md:space-y-xl">
             {/* Quick Action Input */}
-            <Card className="p-md md:p-lg bg-white/[0.02] border-white/[0.05]">
+            <Card className="p-md md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
               <div className="flex flex-col md:flex-row gap-md">
                 <div className="flex-1 relative group">
                   <div className="absolute left-md top-1/2 -translate-y-1/2 text-primary">
@@ -129,7 +129,7 @@ export default function DashboardPage() {
                   <input
                     type="text"
                     placeholder={t('dashboard.capture_placeholder')}
-                    className="w-full pl-xl pr-lg py-md bg-gray-strong/40 border border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
+                    className="w-full pl-xl pr-lg py-md bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
                   />
                 </div>
                 <Button variant="primary" size="md">{t('dashboard.capture_btn')}</Button>
@@ -177,7 +177,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-gray-light mt-2">{typedInsights.recommendation}</p>
                 ) : null}
                 <div className="pt-md">
-                  <Button variant="ghost" size="sm" className="w-full border-white/10 hover:bg-white/5 h-10">
+                  <Button variant="ghost" size="sm" className="w-full border-black/10 dark:border-white/10 hover:bg-black/5 dark:bg-white/5 h-10">
                     <span className="text-[10px] font-bold tracking-[0.2em] uppercase">{t('dashboard.open_insights')}</span>
                   </Button>
                 </div>

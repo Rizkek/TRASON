@@ -350,7 +350,7 @@ User Context Profile (TRASON Unified Life OS):
                       </p>
                       
                       {insight.content && (
-                         <div className="p-lg bg-white/[0.02] border border-white/[0.05] rounded-md mt-md">
+                         <div className="p-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-md mt-md">
                             <p className="text-xs text-soft-cream opacity-90 group-hover:opacity-100 transition-opacity whitespace-pre-wrap break-words">
                                {insight.content}
                             </p>
@@ -364,7 +364,7 @@ User Context Profile (TRASON Unified Life OS):
               // Empty state with some placeholder premium cards
               <>
                 <Card className="p-xl flex flex-col justify-center items-center text-center space-y-md opacity-60">
-                  <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center text-gray-light">
+                  <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center text-gray-light">
                     <Layers size={32} />
                   </div>
                   <h3 className="text-lg font-bold">{t('insights_page.no_insights_title')}</h3>
@@ -373,8 +373,8 @@ User Context Profile (TRASON Unified Life OS):
                   </p>
                 </Card>
                 
-                <Card className="p-xl border-dashed border-white/10 bg-transparent flex flex-col justify-center items-center text-center space-y-md opacity-40">
-                  <div className="w-12 h-12 border border-white/10 rounded-full flex items-center justify-center">
+                <Card className="p-xl border-dashed border-black/10 dark:border-white/10 bg-transparent flex flex-col justify-center items-center text-center space-y-md opacity-40">
+                  <div className="w-12 h-12 border border-black/10 dark:border-white/10 rounded-full flex items-center justify-center">
                     <Target size={20} />
                   </div>
                   <p className="text-[10px] font-bold tracking-[0.2em] uppercase">{t('insights_page.system_idle')}</p>

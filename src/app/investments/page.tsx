@@ -303,7 +303,7 @@ export default function InvestmentsPage() {
                       <span>{t(`dashboard.${type === 'stock' ? 'stocks' : type === 'crypto' ? 'crypto' : 'gold'}`)}</span>
                       <span>{percent.toFixed(0)}%</span>
                     </div>
-                    <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
+                    <div className="h-2 w-full rounded-full bg-black/5 dark:bg-white/5 overflow-hidden">
                       <div
                         style={{ width: `${Math.min(percent, 100)}%` }}
                         className={`h-full rounded-full ${type === 'stock' ? 'bg-info' : type === 'crypto' ? 'bg-activity' : 'bg-warning'}`}
@@ -317,7 +317,7 @@ export default function InvestmentsPage() {
         </div>
 
         <Card className="overflow-hidden">
-          <div className="px-lg py-md border-b border-white/5 flex items-center justify-between">
+          <div className="px-lg py-md border-b border-black/5 dark:border-white/5 flex items-center justify-between">
             <div>
               <h3 className="text-sm font-bold tracking-tight">{t('investment_page.portfolio_tracker')}</h3>
               <p className="text-xs text-gray-light mt-1">{t('investment_page.portfolio_tracker_desc')}</p>
@@ -336,7 +336,7 @@ export default function InvestmentsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-gray-light">
+                  <tr className="border-b border-black/5 dark:border-white/5 text-[10px] uppercase tracking-widest text-gray-light">
                     <th className="px-lg py-md">{t('investment_page.asset')}</th>
                     <th className="px-lg py-md">{t('investment_page.amount')}</th>
                     <th className="px-lg py-md">{t('investment_page.avg_cost')}</th>
@@ -355,7 +355,7 @@ export default function InvestmentsPage() {
                       ? new Date(position.last_valued_at).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone })
                       : null;
                     return (
-                    <tr key={position.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <tr key={position.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:bg-white/5 transition-colors">
                       <td className="px-lg py-lg">
                         <div className="space-y-1">
                           <div className="flex items-center gap-sm">
@@ -440,7 +440,7 @@ export default function InvestmentsPage() {
             </div>
           ) : (
             <div className="py-2xl text-center">
-              <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-lg text-primary">
+              <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-lg text-primary">
                 <Shield size={28} />
               </div>
               <h3 className="text-lg font-bold text-white">{t('dashboard.start_with_one_position')}</h3>
@@ -500,7 +500,7 @@ export default function InvestmentsPage() {
               <select
                 value={form.asset_type}
                 onChange={(e) => setForm((prev) => ({ ...prev, asset_type: e.target.value as AssetType }))}
-                className="w-full h-12 bg-gray-strong border border-white/5 rounded-md px-md text-sm text-white focus:border-primary focus:outline-none"
+                className="w-full h-12 bg-gray-strong border border-black/5 dark:border-white/5 rounded-md px-md text-sm text-white focus:border-primary focus:outline-none"
               >
                 <option value="stock">Stock</option>
                 <option value="crypto">Crypto</option>
@@ -578,7 +578,7 @@ export default function InvestmentsPage() {
               value={form.notes}
               onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))}
               placeholder={t('investment_page.notes_placeholder')}
-              className="w-full bg-gray-strong border border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
           </div>
         </div>

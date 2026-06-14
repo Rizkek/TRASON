@@ -102,7 +102,7 @@ export default function SupportPage() {
       <div className="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-deep-sage/5 blur-[120px] rounded-full pointer-events-none" />
 
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.03]">
+      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-black/[0.03] dark:border-white/[0.03]">
         <div className="max-w-7xl mx-auto px-lg md:px-2xl h-20 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-sm group cursor-pointer">
             <FiArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-warm-gold" />
@@ -138,7 +138,7 @@ export default function SupportPage() {
                 placeholder="Search FAQs (e.g. privacy, stocks, sync)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-xl py-lg bg-white/[0.02] border border-white/[0.08] group-hover:border-warm-gold/30 focus:border-warm-gold focus:outline-none focus:ring-1 focus:ring-warm-gold/20 rounded-full text-sm transition-all text-soft-cream placeholder:text-gray-light/40 shadow-xl"
+                className="w-full px-xl py-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] group-hover:border-warm-gold/30 focus:border-warm-gold focus:outline-none focus:ring-1 focus:ring-warm-gold/20 rounded-full text-sm transition-all text-soft-cream placeholder:text-gray-light/40 shadow-xl"
               />
             </div>
           </section>
@@ -158,7 +158,7 @@ export default function SupportPage() {
                   className={`flex items-center gap-sm px-xl py-md rounded-full text-xs font-bold uppercase tracking-wider transition-all border duration-300 ${
                     isActive 
                       ? 'bg-warm-gold text-warm-black border-warm-gold scale-105 shadow-lg shadow-warm-gold/15' 
-                      : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/10 text-gray-light hover:text-soft-cream'
+                      : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] hover:bg-black/[0.05] dark:bg-white/[0.05] hover:border-black/10 dark:border-white/10 text-gray-light hover:text-soft-cream'
                   }`}
                 >
                   <Icon size={14} />
@@ -177,7 +177,7 @@ export default function SupportPage() {
                 return (
                   <div 
                     key={index} 
-                    className="overflow-hidden rounded-2xl bg-white/[0.01] border border-white/[0.03] hover:border-white/[0.08] transition-all"
+                    className="overflow-hidden rounded-2xl bg-black/[0.01] dark:bg-white/[0.01] border border-black/[0.03] dark:border-white/[0.03] hover:border-black/[0.08] dark:border-white/[0.08] transition-all"
                   >
                     <button
                       onClick={() => setExpandedFAQ(isExpanded ? null : index)}
@@ -190,7 +190,7 @@ export default function SupportPage() {
                     </button>
                     <div 
                       className={`transition-all duration-500 ease-in-out overflow-hidden ${
-                        isExpanded ? 'max-h-60 border-t border-white/[0.03]' : 'max-h-0'
+                        isExpanded ? 'max-h-60 border-t border-black/[0.03] dark:border-white/[0.03]' : 'max-h-0'
                       }`}
                     >
                       <p className="px-xl py-lg text-xs md:text-sm text-gray-light leading-relaxed font-light">
@@ -209,7 +209,7 @@ export default function SupportPage() {
           </section>
 
           {/* Contact Sanctuary Form */}
-          <section className="bg-white/[0.01] border border-white/[0.03] rounded-[2.5rem] p-xl md:p-3xl space-y-xl relative overflow-hidden">
+          <section className="bg-black/[0.01] dark:bg-white/[0.01] border border-black/[0.03] dark:border-white/[0.03] rounded-[2.5rem] p-xl md:p-3xl space-y-xl relative overflow-hidden">
             <div className="absolute -right-16 -bottom-16 w-48 h-48 bg-deep-sage/10 blur-[80px] rounded-full pointer-events-none" />
             
             <div className="max-w-xl mx-auto space-y-lg">
@@ -250,7 +250,7 @@ export default function SupportPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Jean Doe"
-                        className="w-full h-12 bg-white/[0.02] border border-white/[0.05] rounded-lg px-md text-sm text-white focus:border-warm-gold focus:outline-none focus:ring-1 focus:ring-warm-gold/20"
+                        className="w-full h-12 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-lg px-md text-sm text-white focus:border-warm-gold focus:outline-none focus:ring-1 focus:ring-warm-gold/20"
                       />
                     </div>
                     <div className="space-y-sm">
@@ -261,7 +261,7 @@ export default function SupportPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="jean@sanctuary.com"
-                        className="w-full h-12 bg-white/[0.02] border border-white/[0.05] rounded-lg px-md text-sm text-white focus:border-warm-gold focus:outline-none focus:ring-1 focus:ring-warm-gold/20"
+                        className="w-full h-12 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-lg px-md text-sm text-white focus:border-warm-gold focus:outline-none focus:ring-1 focus:ring-warm-gold/20"
                       />
                     </div>
                   </div>
@@ -274,7 +274,7 @@ export default function SupportPage() {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="How can we help? Share your bug reports, feature requests, or words of encouragement..."
-                      className="w-full bg-white/[0.02] border border-white/[0.05] rounded-lg p-lg text-sm text-soft-cream focus:border-warm-gold focus:outline-none focus:ring-1 focus:ring-warm-gold/20 resize-none"
+                      className="w-full bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-lg p-lg text-sm text-soft-cream focus:border-warm-gold focus:outline-none focus:ring-1 focus:ring-warm-gold/20 resize-none"
                     />
                   </div>
 
@@ -294,9 +294,9 @@ export default function SupportPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-20 px-lg border-t border-white/[0.03] text-center">
+      <footer className="py-20 px-lg border-t border-black/[0.03] dark:border-white/[0.03] text-center">
         <p className="text-[10px] uppercase tracking-[0.3em] text-gray-light/20">
-          TRASON — CO-CREATED FOR SOVEREIGN GROWTH.
+          TRASON â€” CO-CREATED FOR SOVEREIGN GROWTH.
         </p>
       </footer>
     </div>

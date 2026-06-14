@@ -17,7 +17,7 @@ export const RemindersSidebar = ({ reminders }: Props) => {
   return (
     <Card className="overflow-hidden relative group">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="px-lg py-md border-b border-white/[0.05] flex justify-between items-center bg-white/[0.01]">
+      <div className="px-lg py-md border-b border-black/[0.05] dark:border-white/[0.05] flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01]">
         <div className="flex items-center gap-sm">
           <Bell size={16} className="text-secondary" />
           <h3 className="text-sm font-bold tracking-tight">{t('dashboard.next_signals')}</h3>
@@ -28,7 +28,7 @@ export const RemindersSidebar = ({ reminders }: Props) => {
       </div>
       <div className="p-md space-y-md relative z-10">
         {upcomingReminders.map((r) => (
-          <div key={r.id} className="flex gap-md p-sm rounded-md bg-white/[0.02] border border-white/[0.03]">
+          <div key={r.id} className="flex gap-md p-sm rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]">
             <div className="text-xs font-serif italic text-secondary min-w-[40px] pt-0.5">
               {r.due_time || t('dashboard.today')}
             </div>

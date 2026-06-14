@@ -19,7 +19,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-warm-black/90 border border-white/10 p-md rounded-md backdrop-blur-md shadow-2xl">
+      <div className="bg-warm-black/90 border border-black/10 dark:border-white/10 p-md rounded-md backdrop-blur-md shadow-2xl">
         <p className="font-bold text-white mb-1">{data.displayDate}</p>
         {data.hasWorkout ? (
           <>
@@ -90,18 +90,18 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
 
   if (!isMounted) {
     return (
-      <Card className="p-xl bg-white/[0.02] border-white/[0.05]">
+      <Card className="p-xl bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
         <div className="mb-lg">
           <h3 className="text-lg font-serif font-bold text-white">Activity History</h3>
           <p className="text-sm text-gray-light">Last {days} days of training</p>
         </div>
-        <div className="h-[250px] w-full bg-white/[0.01] rounded-lg animate-pulse" />
+        <div className="h-[250px] w-full bg-black/[0.01] dark:bg-white/[0.01] rounded-lg animate-pulse" />
       </Card>
     );
   }
 
   return (
-    <Card className="p-xl bg-white/[0.02] border-white/[0.05]">
+    <Card className="p-xl bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
       <div className="mb-lg">
         <h3 className="text-lg font-serif font-bold text-white">Activity History</h3>
         <p className="text-sm text-gray-light">Last {days} days of training</p>

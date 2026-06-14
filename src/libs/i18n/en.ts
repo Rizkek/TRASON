@@ -360,6 +360,8 @@ export const en = {
     greeting_evening: 'Good Evening',
     overview: 'SYSTEM OVERVIEW',
     quickActions: 'QUICK ACTIONS',
+    financial_analytics: 'Financial Analytics',
+    monthly_overview: 'Monthly Overview',
     capture_placeholder: 'Capture a workout, expense, reminder, or thought...',
     capture_btn: 'CAPTURE',
     daily_insight: 'Daily Insight',

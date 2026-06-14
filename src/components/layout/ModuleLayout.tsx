@@ -53,7 +53,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
       {showBreadcrumbs && (
         <button
           onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4 transition-colors"
+          className="flex items-center gap-1 text-sm text-gray-light hover:text-soft-cream mb-4 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Dashboard
@@ -69,9 +69,9 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             <Icon className="w-6 h-6" style={{ color: metadata.color }} />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+            <h1 className="text-2xl font-serif font-bold text-soft-cream">{title}</h1>
             {description && (
-              <p className="text-sm text-gray-500 mt-0.5">{description}</p>
+              <p className="text-sm text-gray-light mt-0.5">{description}</p>
             )}
           </div>
         </div>
@@ -103,11 +103,11 @@ const ModuleDisabledPlaceholder: React.FC<ModuleDisabledPlaceholderProps> = ({
         <Icon className="w-8 h-8" style={{ color: metadata.color }} />
       </div>
 
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <h3 className="text-lg font-serif font-bold text-soft-cream mb-2">
         {metadata.name} is disabled
       </h3>
 
-      <p className="text-sm text-gray-500 max-w-sm mb-6">
+      <p className="text-sm text-gray-light max-w-sm mb-6">
         {metadata.description} Enable this module in settings to start using it.
       </p>
 
@@ -132,15 +132,15 @@ const ModuleUnavailablePlaceholder: React.FC<
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
-        <Lock className="w-8 h-8 text-gray-400" />
+      <div className="w-16 h-16 rounded-2xl bg-gray-strong flex items-center justify-center mb-4 border border-black/[0.05] dark:border-white/[0.05]">
+        <Lock className="w-8 h-8 text-gray-light" />
       </div>
 
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <h3 className="text-lg font-serif font-bold text-soft-cream mb-2">
         {metadata.name} is unavailable
       </h3>
 
-      <p className="text-sm text-gray-500 max-w-sm">
+      <p className="text-sm text-gray-light max-w-sm">
         This module requires a subscription or additional setup. Contact
         support for access.
       </p>
@@ -158,12 +158,12 @@ const ModuleDependencyWarning: React.FC<ModuleDependencyWarningProps> = ({
   const missingNames = missing.map((id) => getModuleMetadata(id).name);
 
   return (
-    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+    <div className="bg-warning/10 border border-warning/20 rounded-lg p-4 mb-6">
       <div className="flex items-start gap-3">
-        <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+        <AlertCircle className="w-5 h-5 text-warning mt-0.5" />
         <div>
-          <h4 className="font-medium text-amber-900">Dependencies required</h4>
-          <p className="text-sm text-amber-700 mt-1">
+          <h4 className="font-medium text-warning">Dependencies required</h4>
+          <p className="text-sm text-warning/80 mt-1">
             This module requires the following modules to be enabled:{" "}
             {missingNames.join(', ')}.
           </p>

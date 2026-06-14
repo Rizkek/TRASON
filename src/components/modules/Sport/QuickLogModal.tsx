@@ -65,7 +65,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
                 className={`px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all ${
                   sportType === type 
                     ? 'bg-primary text-warm-black shadow-[0_0_10px_rgba(78,79,235,0.3)]' 
-                    : 'bg-white/5 text-gray-light hover:bg-white/10'
+                    : 'bg-black/5 dark:bg-white/5 text-gray-light hover:bg-black/10 dark:bg-white/10'
                 }`}
               >
                 {type}
@@ -79,13 +79,13 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-md p-3 text-white focus:outline-none focus:border-primary/50 transition-colors"
+            className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-md p-3 text-white focus:outline-none focus:border-primary/50 transition-colors"
             rows={3}
             placeholder="How did it feel?"
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-md border-t border-white/10">
+        <div className="flex justify-end gap-3 pt-md border-t border-black/10 dark:border-white/10">
           <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>

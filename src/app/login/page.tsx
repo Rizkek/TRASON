@@ -90,7 +90,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
       {/* Left Side: Aesthetic/Quote (Hidden on mobile) */}
-      <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-4xl overflow-hidden border-r border-white/[0.05]">
+      <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-4xl overflow-hidden border-r border-black/[0.05] dark:border-white/[0.05]">
          {/* Decorative elements */}
          <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-deep-sage/10 blur-[100px] rounded-full" />
          <div className="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-warm-gold/5 blur-[80px] rounded-full" />
@@ -144,17 +144,17 @@ export default function LoginPage() {
                 placeholder="email@example.com"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold transition-all"
+                className="bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.08] dark:border-white/[0.08] focus:border-warm-gold transition-all"
                 required
               />
               <Input
                 label="Password"
                 name="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold transition-all"
+                className="bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.08] dark:border-white/[0.08] focus:border-warm-gold transition-all"
                 required
                 suffix={
                   <button 

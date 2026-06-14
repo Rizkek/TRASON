@@ -100,9 +100,9 @@ export default function CareerPage() {
   };
 
   const TYPE_CONFIG: Record<CareerApplication['application_type'], { label: string; emoji: string }> = {
-    job:        { label: t('career_page.form.options.job'),        emoji: '💼' },
-    internship: { label: t('career_page.form.options.internship'), emoji: '🎓' },
-    freelance:  { label: t('career_page.form.options.freelance'),  emoji: '🚀' },
+    job:        { label: t('career_page.form.options.job'),        emoji: 'ðŸ’¼' },
+    internship: { label: t('career_page.form.options.internship'), emoji: 'ðŸŽ“' },
+    freelance:  { label: t('career_page.form.options.freelance'),  emoji: 'ðŸš€' },
   };
 
   useEffect(() => {
@@ -238,7 +238,7 @@ export default function CareerPage() {
           )}
 
           {/* Filter Tabs */}
-          <div className="flex bg-white/[0.03] p-1 rounded-full border border-white/[0.05] w-fit gap-0.5" role="tablist" aria-label="Application filter">
+          <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] w-fit gap-0.5" role="tablist" aria-label="Application filter">
             {FILTER_TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -276,9 +276,9 @@ export default function CareerPage() {
                 return (
                   <div
                     key={app.id}
-                    className="glass-card p-xl flex flex-col sm:flex-row sm:items-center gap-lg group transition-all hover:border-white/10"
+                    className="glass-card p-xl flex flex-col sm:flex-row sm:items-center gap-lg group transition-all hover:border-black/10 dark:border-white/10"
                     role="article"
-                    aria-label={`${app.company_name} — ${app.role_title}`}
+                    aria-label={`${app.company_name} â€” ${app.role_title}`}
                   >
                     {/* Left: Info */}
                     <div className="flex-1 min-w-0 space-y-sm">
@@ -340,7 +340,7 @@ export default function CareerPage() {
                           href={app.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-sm text-gray-light hover:text-primary transition-colors rounded-md hover:bg-white/5"
+                          className="p-sm text-gray-light hover:text-primary transition-colors rounded-md hover:bg-black/5 dark:bg-white/5"
                           aria-label={`Open ${app.company_name} job posting`}
                         >
                           <ExternalLink size={16} />
@@ -348,14 +348,14 @@ export default function CareerPage() {
                       )}
                       <button
                         onClick={() => openEditModal(app)}
-                        className="px-md py-sm text-[10px] font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-white/10 hover:border-white/20 rounded-md transition-all"
+                        className="px-md py-sm text-[10px] font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 rounded-md transition-all"
                         aria-label={`Edit ${app.company_name} application`}
                       >
                         {t('career_page.edit')}
                       </button>
                       <button
                         onClick={() => setDeleteConfirmId(app.id)}
-                        className="p-sm text-gray-light hover:text-expense transition-colors rounded-md hover:bg-white/5"
+                        className="p-sm text-gray-light hover:text-expense transition-colors rounded-md hover:bg-black/5 dark:bg-white/5"
                         aria-label={`Delete ${app.company_name} application`}
                       >
                         <Trash2 size={16} />
@@ -408,7 +408,7 @@ export default function CareerPage() {
                   id="modal-type"
                   value={form.application_type}
                   onChange={(e) => setForm((f) => ({ ...f, application_type: e.target.value as any }))}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
                   {Object.entries(TYPE_CONFIG).map(([val, cfg]) => (
                     <option key={val} value={val}>{cfg.emoji} {cfg.label}</option>
@@ -421,7 +421,7 @@ export default function CareerPage() {
                   id="modal-status"
                   value={form.status}
                   onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as any }))}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
                   {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
                     <option key={val} value={val}>{cfg.label}</option>
@@ -434,7 +434,7 @@ export default function CareerPage() {
                   id="modal-priority"
                   value={form.priority}
                   onChange={(e) => setForm((f) => ({ ...f, priority: e.target.value as any }))}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
                   <option value="low">{t('career_page.form.options.low')}</option>
                   <option value="medium">{t('career_page.form.options.medium')}</option>
@@ -451,7 +451,7 @@ export default function CareerPage() {
                   type="date"
                   value={form.applied_date}
                   onChange={(e) => setForm((f) => ({ ...f, applied_date: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 />
                 {formErrors.applied_date && <p className="text-expense text-xs mt-1">{formErrors.applied_date}</p>}
               </div>
@@ -462,7 +462,7 @@ export default function CareerPage() {
                   type="date"
                   value={form.interview_date}
                   onChange={(e) => setForm((f) => ({ ...f, interview_date: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 />
               </div>
             </div>
@@ -496,7 +496,7 @@ export default function CareerPage() {
               placeholder={t('career_page.form.notes_placeholder')}
               rows={3}
               aria-label="Notes"
-              className="w-full bg-gray-strong border border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
           </div>
         </Modal>

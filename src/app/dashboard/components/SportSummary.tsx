@@ -26,15 +26,15 @@ export const SportSummary = ({ summary, isLoading }: Props) => {
 
   if (isLoading) {
     return (
-      <Card className="p-xl bg-white/[0.02] border-white/[0.05]">
-        <div className="h-20 animate-pulse bg-white/5 rounded-md" />
+      <Card className="p-xl bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+        <div className="h-20 animate-pulse bg-black/5 dark:bg-white/5 rounded-md" />
       </Card>
     );
   }
 
   return (
-    <Card className="overflow-hidden bg-white/[0.02] border-white/[0.05]">
-      <div className="px-lg py-md border-b border-white/[0.05] flex justify-between items-center bg-white/[0.01]">
+    <Card className="overflow-hidden bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+      <div className="px-lg py-md border-b border-black/[0.05] dark:border-white/[0.05] flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01]">
         <div className="flex items-center gap-sm">
           <Dumbbell size={16} className="text-secondary" />
           <h3 className="text-sm font-bold tracking-tight">{t('dashboard.vitality_this_week')}</h3>
@@ -86,7 +86,7 @@ export const SportSummary = ({ summary, isLoading }: Props) => {
                           ? isToday
                             ? 'bg-primary'
                             : 'bg-secondary/70'
-                          : 'bg-white/[0.05]'
+                          : 'bg-black/[0.05] dark:bg-white/[0.05]'
                       }`}
                       style={{ height: `${Math.max(heightPct * 0.32, 4)}px` }}
                       title={`${DAY_LABELS[idx]}: ${mins}min`}

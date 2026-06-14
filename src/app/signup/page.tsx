@@ -65,7 +65,7 @@ export default function SignupPage() {
         setEmailDomainMessage(null);
       }
     } catch {
-      // Network error — don't block the user
+      // Network error â€” don't block the user
       setEmailDomainStatus(null);
     }
   };
@@ -156,7 +156,7 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
       {/* Left Side: Aesthetic (Hidden on mobile) */}
-      <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-4xl overflow-hidden border-r border-white/[0.05]">
+      <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-4xl overflow-hidden border-r border-black/[0.05] dark:border-white/[0.05]">
          <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-deep-sage/10 blur-[100px] rounded-full" />
          <div className="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-warm-gold/5 blur-[80px] rounded-full" />
          
@@ -212,7 +212,7 @@ export default function SignupPage() {
               value={formData.name}
               onChange={handleInputChange}
               error={validationErrors.name}
-              className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold"
+              className="bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.08] dark:border-white/[0.08] focus:border-warm-gold"
               required
             />
             <div className="relative">
@@ -225,7 +225,7 @@ export default function SignupPage() {
                 onChange={handleInputChange}
                 onBlur={handleEmailBlur}
                 error={validationErrors.email}
-                className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold"
+                className="bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.08] dark:border-white/[0.08] focus:border-warm-gold"
                 required
               />
               {/* Domain validation indicator */}
@@ -262,11 +262,11 @@ export default function SignupPage() {
               label="Password"
               name="password"
               type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
+              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               value={formData.password}
               onChange={handleInputChange}
               error={validationErrors.password}
-              className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold"
+              className="bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.08] dark:border-white/[0.08] focus:border-warm-gold"
               required
               suffix={
                 <button 
@@ -283,11 +283,11 @@ export default function SignupPage() {
               label="Confirm Password"
               name="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
-              placeholder="••••••••"
+              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               value={formData.confirmPassword}
               onChange={handleInputChange}
               error={validationErrors.confirmPassword}
-              className="bg-white/[0.03] border-white/[0.08] focus:border-warm-gold"
+              className="bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.08] dark:border-white/[0.08] focus:border-warm-gold"
               required
               suffix={
                 <button 

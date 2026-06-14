@@ -208,7 +208,7 @@ export default function RemindersPage() {
             <p className="text-gray-light font-light">{t('reminders_page.desc')}</p>
           </div>
           <div className="flex items-center gap-md">
-            <div className="flex bg-white/[0.03] p-1 rounded-full border border-white/[0.05]">
+            <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05]">
               <button 
                 onClick={() => setView('calendar')}
                 className={`p-2 rounded-full transition-all ${view === 'calendar' ? 'bg-warm-gold text-warm-black shadow-lg' : 'text-gray-light hover:text-soft-cream'}`}
@@ -254,7 +254,7 @@ export default function RemindersPage() {
                   </span>
                 ) : permission === 'denied' ? (
                   <span className="font-medium">
-                    Notifikasi diblokir — aktifkan di pengaturan browser untuk menerima pengingat.
+                    Notifikasi diblokir â€” aktifkan di pengaturan browser untuk menerima pengingat.
                   </span>
                 ) : (
                   <button
@@ -269,7 +269,7 @@ export default function RemindersPage() {
                     }}
                     className="font-medium hover:underline text-left"
                   >
-                    Klik untuk mengaktifkan notifikasi reminder →
+                    Klik untuk mengaktifkan notifikasi reminder â†’
                   </button>
                 )}
               </div>
@@ -279,7 +279,7 @@ export default function RemindersPage() {
               className="text-current opacity-40 hover:opacity-100 transition-opacity flex-shrink-0 text-lg leading-none"
               aria-label="Tutup banner"
             >
-              ×
+              Ã—
             </button>
           </div>
         )}
@@ -296,7 +296,7 @@ export default function RemindersPage() {
             ) : (
               <div className="space-y-md">
                 {/* Tabs */}
-                <div className="flex items-center gap-md mb-xl pb-md border-b border-white/[0.05]">
+                <div className="flex items-center gap-md mb-xl pb-md border-b border-black/[0.05] dark:border-white/[0.05]">
                   <button
                     onClick={() => setFilter('active')}
                     className={`pb-2 px-1 border-b-2 transition-all ${filter === 'active' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
@@ -337,7 +337,7 @@ export default function RemindersPage() {
                           <div className="flex items-center gap-md text-micro text-gray-light uppercase tracking-widest mt-1">
                             <Clock size={12} />
                             <span>{new Date(reminder.due_datetime || reminder.due_date || '').toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone })}</span>
-                            <span>•</span>
+                            <span>â€¢</span>
                             <span className={reminder.priority === 'high' ? 'text-expense font-bold' : ''}>{t(`career_page.form.options.${reminder.priority}`)}</span>
                           </div>
                         </div>
@@ -369,7 +369,7 @@ export default function RemindersPage() {
                     <p className="text-sm text-gray-light font-light italic opacity-60">{t('reminders_page.empty_date')}</p>
                   ) : (
                     selectedDateReminders.map(r => (
-                      <div key={r.id} className="p-md rounded-lg bg-white/[0.02] border border-white/[0.03] space-y-sm">
+                      <div key={r.id} className="p-md rounded-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03] space-y-sm">
                         <div className="flex justify-between items-start">
                           <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-tighter font-bold ${
                             r.priority === 'high' ? 'bg-expense/20 text-expense' : 'bg-deep-sage/20 text-deep-sage'
@@ -385,7 +385,7 @@ export default function RemindersPage() {
                   
                   <button 
                     onClick={openAddModal}
-                    className="w-full py-md mt-md border border-dashed border-white/10 rounded-lg text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold hover:border-warm-gold/40 transition-all"
+                    className="w-full py-md mt-md border border-dashed border-black/10 dark:border-white/10 rounded-lg text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold hover:border-warm-gold/40 transition-all"
                   >
                     {t('reminders_page.add_to_day')}
                   </button>
@@ -411,7 +411,7 @@ export default function RemindersPage() {
         onClose={() => setIsModalOpen(false)} 
         title={editingReminder ? t('reminders_page.edit_reminder') : t('reminders_page.new_reminder_modal')}
         footer={
-          <div className="pt-xl border-t border-white/5 flex gap-md">
+          <div className="pt-xl border-t border-black/5 dark:border-white/5 flex gap-md">
             <Button variant="ghost" fullWidth onClick={() => setIsModalOpen(false)} disabled={isSaving}>{t('investment_page.cancel_upper')}</Button>
             <Button variant="primary" fullWidth onClick={handleSave} isLoading={isSaving} disabled={isSaving}>{t('reminders_page.save_reminder')}</Button>
           </div>
@@ -423,7 +423,7 @@ export default function RemindersPage() {
             value={form.title} 
             onChange={e => setForm({...form, title: e.target.value})}
             placeholder={t('reminders_page.form.title_placeholder')}
-            className="bg-white/[0.03]"
+            className="bg-black/[0.03] dark:bg-white/[0.03]"
           />
           <div className="grid grid-cols-2 gap-md">
             <Input 
@@ -431,14 +431,14 @@ export default function RemindersPage() {
               type="date" 
               value={form.dueDate} 
               onChange={e => setForm({...form, dueDate: e.target.value})}
-              className="bg-white/[0.03]"
+              className="bg-black/[0.03] dark:bg-white/[0.03]"
             />
             <Input 
               label={t('reminders_page.form.time')} 
               type="time" 
               value={form.dueTime} 
               onChange={e => setForm({...form, dueTime: e.target.value})}
-              className="bg-white/[0.03]"
+              className="bg-black/[0.03] dark:bg-white/[0.03]"
             />
           </div>
           <div>
@@ -449,7 +449,7 @@ export default function RemindersPage() {
                   key={p}
                   onClick={() => setForm({...form, priority: p as any})}
                   className={`flex-1 py-2 rounded-md text-xs uppercase tracking-widest font-bold border transition-all ${
-                    form.priority === p ? 'bg-warm-gold text-warm-black border-warm-gold' : 'bg-white/[0.02] border-white/10 text-gray-light'
+                    form.priority === p ? 'bg-warm-gold text-warm-black border-warm-gold' : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/10 dark:border-white/10 text-gray-light'
                   }`}
                 >
                   {t(`career_page.form.options.${p}`)}
@@ -470,10 +470,10 @@ export default function RemindersPage() {
                   className={`px-md py-sm rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${
                     form.notifyTimes.includes(opt.value)
                       ? 'bg-warm-gold/20 text-warm-gold border-warm-gold/50'
-                      : 'bg-white/[0.02] border-white/10 text-gray-light hover:border-white/30'
+                      : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/10 dark:border-white/10 text-gray-light hover:border-black/30 dark:border-white/30'
                   }`}
                 >
-                  {form.notifyTimes.includes(opt.value) ? '✓ ' : ''}{opt.label}
+                  {form.notifyTimes.includes(opt.value) ? 'âœ“ ' : ''}{opt.label}
                 </button>
               ))}
             </div>
@@ -486,7 +486,7 @@ export default function RemindersPage() {
               rows={4}
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-              className="w-full bg-gray-strong/40 border border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
           </div>
         </div>

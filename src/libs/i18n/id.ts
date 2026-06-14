@@ -360,6 +360,8 @@ export const id = {
     greeting_evening: 'Selamat Malam',
     overview: 'TINJAUAN SISTEM',
     quickActions: 'AKSI CEPAT',
+    financial_analytics: 'Analisis Keuangan',
+    monthly_overview: 'Tinjauan Bulanan',
     capture_placeholder: 'Catat olahraga, pengeluaran, pengingat, atau pemikiran...',
     capture_btn: 'CATAT',
     daily_insight: 'Wawasan Harian',

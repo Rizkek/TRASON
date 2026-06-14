@@ -21,7 +21,7 @@ export default function AboutOS() {
       <div className="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-deep-sage/5 blur-[120px] rounded-full pointer-events-none" />
 
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.03]">
+      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-black/[0.03] dark:border-white/[0.03]">
         <div className="max-w-7xl mx-auto px-lg md:px-2xl h-20 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-sm group cursor-pointer">
             <FiArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-warm-gold" />
@@ -79,7 +79,7 @@ export default function AboutOS() {
                 </div>
               </div>
             </div>
-            <div className="relative aspect-square bg-white/[0.02] border border-white/[0.05] rounded-[3rem] p-xl flex items-center justify-center">
+            <div className="relative aspect-square bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-[3rem] p-xl flex items-center justify-center">
                {/* Visual representation of sanctuary architecture */}
                <div className="relative w-full h-full border border-warm-gold/20 rounded-full animate-[spin_20s_linear_infinite]">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><RiWallet3Line size={20} /></div>
@@ -96,7 +96,7 @@ export default function AboutOS() {
           </section>
 
           {/* Why "Personal Sanctuary"? */}
-          <section className="bg-white/[0.02] border border-white/[0.05] rounded-[2rem] p-xl md:p-3xl space-y-xl">
+          <section className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-[2rem] p-xl md:p-3xl space-y-xl">
              <h2 className="text-3xl md:text-4xl font-serif text-center">Principles of the Sanctuary</h2>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
                 <div className="space-y-md">
@@ -127,7 +127,7 @@ export default function AboutOS() {
                  
                  { t: "Integrated Mesh", d: "Specific environments for Financial Flow, Vitality, and Career Architect that share the same design DNA.", i: RiStackLine }
                ].map((item, i) => (
-                 <div key={i} className="flex flex-col md:flex-row gap-xl p-xl border-b border-white/5 items-center">
+                 <div key={i} className="flex flex-col md:flex-row gap-xl p-xl border-b border-black/5 dark:border-white/5 items-center">
                     <div className="w-12 h-12 text-warm-gold shrink-0"><item.i size={48} /></div>
                     <div className="space-y-sm">
                        <h3 className="text-2xl font-serif">{item.t}</h3>
@@ -152,9 +152,9 @@ export default function AboutOS() {
       </main>
 
       {/* Footer */}
-      <footer className="py-20 px-lg border-t border-white/[0.03] text-center">
+      <footer className="py-20 px-lg border-t border-black/[0.03] dark:border-white/[0.03] text-center">
         <p className="text-[10px] uppercase tracking-[0.3em] text-gray-light/20">
-          TRASON — ARCHITECTED FOR THE SOVEREIGN INDIVIDUAL.
+          TRASON â€” ARCHITECTED FOR THE SOVEREIGN INDIVIDUAL.
         </p>
       </footer>
 
