@@ -69,8 +69,9 @@ export async function GET(request: Request) {
         // Ambil data subscription push untuk user ini
         const { data: subs } = await supabase
           .from('push_subscriptions')
-          .select('subscription')
-          .eq('user_id', r.user_id);
+          .select('endpoint, p256dh, auth')
+          .eq('user_id', r.user_id)
+          .eq('is_active', true);
 
         if (subs && subs.length > 0) {
           const minsBeforeText = mins >= 60 ? `${mins/60}h` : `${mins}m`;
@@ -82,14 +83,23 @@ export async function GET(request: Request) {
 
           for (const sub of subs) {
             try {
-              await webpush.sendNotification(sub.subscription, payload);
+              await webpush.sendNotification(
+                {
+                  endpoint: sub.endpoint,
+                  keys: {
+                    p256dh: sub.p256dh,
+                    auth: sub.auth,
+                  },
+                },
+                payload
+              );
               sentCount++;
               console.log(`[CRON] ✅ Push sent successfully to subscription`);
             } catch (err: any) {
               console.error(`[CRON] ❌ Push failed:`, err.message);
-              // Jika endpoint langganan sudah mati/kadaluwarsa (HTTP 410/404), kita bisa hapus dari DB
+              // Jika endpoint langganan sudah mati/kadaluwarsa (HTTP 410/404), kita bisa update is_active
               if (err.statusCode === 410 || err.statusCode === 404) {
-                await supabase.from('push_subscriptions').delete().eq('subscription->>endpoint', sub.subscription.endpoint);
+                await supabase.from('push_subscriptions').update({ is_active: false }).eq('endpoint', sub.endpoint);
               }
             }
           }

@@ -233,58 +233,14 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
       // Ensure SW is registered (auto, no push subscription needed)
       await ensureSWRegistered();
 
-      // 1️⃣ SW-based scheduling — works as long as browser is open
-      const swAvailable = await postMessageToSW({
-        type: 'SCHEDULE_NOTIFICATIONS',
-        reminders,
-      });
+      // ==========================================================================
+      // The background notification bug is fixed here by REMOVING client-side
+      // setTimeouts and SW postMessages. All scheduling is now purely handled
+      // by the Vercel Cron Job (/api/cron/reminders) reading from Supabase.
+      // We only ensure the Service Worker is registered and permissions are granted.
+      // ==========================================================================
 
-      if (!swAvailable) {
-        // SW not available — fall back to in-page setTimeout
-        scheduleFallback(reminders);
-      }
-
-      // 2️⃣ Server-side push — schedules reminders via the server so notifications
-      //    arrive even after browser restart (requires push subscription + VAPID)
-      if (userId && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
-        const now = Date.now();
-        const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-
-        console.groupCollapsed('[useScheduleNotifications] Server Push Evaluation');
-        for (const reminder of reminders) {
-          if (reminder.status !== 'pending' || !reminder.due_datetime) {
-            console.log(`[Skip] "${reminder.title}" (status: ${reminder.status})`);
-            continue;
-          }
-
-          const dueTime = new Date(reminder.due_datetime).getTime();
-          const notifyMins: number[] = Array.isArray(reminder.notify_times)
-            ? reminder.notify_times
-            : [60, 180, 360];
-
-          console.log(`[Evaluate] "${reminder.title}" | Due: ${new Date(dueTime).toLocaleString()} | Options:`, notifyMins);
-
-          for (const mins of notifyMins) {
-            const notifyTime = dueTime - mins * 60_000;
-            const timeUntil = notifyTime - now;
-
-            // Only schedule near-future (between 10s and 7 days from now)
-            if (timeUntil > 10_000 && timeUntil < ONE_WEEK_MS) {
-              console.log(`  -> ✅ [${mins}m before] Scheduled in ${Math.round(timeUntil / 1000)}s (at ${new Date(notifyTime).toLocaleTimeString()})`);
-              // Delay the server push call to match the notify time
-              setTimeout(() => {
-                console.log(`  -> 🚀 [${mins}m before] EXECUTING Server Push for "${reminder.title}" NOW`);
-                sendServerPush(userId, reminder, mins).catch((err) => {
-                  console.error('Failed to send server push:', err);
-                });
-              }, timeUntil);
-            } else {
-              console.log(`  -> ❌ [${mins}m before] Skipped. Time until: ${Math.round(timeUntil / 1000)}s (needs to be > 10s and < 7d)`);
-            }
-          }
-        }
-        console.groupEnd();
-      }
+      console.log('[useScheduleNotifications] Delegating scheduling to Server Cron Job.');
     },
     [enabled, userId, requestNotificationPermission, scheduleFallback]
   );
