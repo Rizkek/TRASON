@@ -195,7 +195,7 @@ export default function Home() {
                  <h3 className="text-xl font-serif">Vitality Heatmap</h3>
                  <div className="grid grid-cols-7 gap-xs opacity-80">
                     {Array.from({length: 28}).map((_, i) => (
-                      <div key={i} className={`w-full aspect-square rounded-sm ${Math.random() > 0.3 ? 'bg-deep-sage/40' : 'bg-white/5'}`} />
+                      <div key={i} className={`w-full aspect-square rounded-sm ${((i * 13) % 10) > 3 ? 'bg-deep-sage/40' : 'bg-white/5'}`} />
                     ))}
                  </div>
               </div>

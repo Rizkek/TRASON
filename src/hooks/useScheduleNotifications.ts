@@ -80,45 +80,11 @@ export async function ensureSWRegistered(): Promise<ServiceWorkerRegistration | 
 }
 
 // =============================================================================
-// Server-side push helper — sends push via /api/push/send-reminder
-// =============================================================================
-
-async function sendServerPush(
-  userId: string,
-  reminder: Reminder,
-  minsBefore: number
-): Promise<boolean> {
-  try {
-    const minsBeforeText =
-      minsBefore > 0
-        ? ` — ${minsBefore >= 60 ? `${minsBefore / 60}h` : `${minsBefore}m`} before`
-        : '';
-
-    const res = await fetch('/api/push/send-reminder', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: userId,
-        title: `${reminder.title}${minsBeforeText}`,
-        body: reminder.description || 'Tap to open TRASON',
-        url: '/reminders',
-        tag: `reminder-${reminder.id}-${minsBefore}`,
-      }),
-    });
-
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-// =============================================================================
 // Hook
 // =============================================================================
 
 export function useScheduleNotifications(options: UseScheduleNotificationsOptions = {}) {
   const prefs = useUserPreferences();
-  const userId = useAuthStore((s) => (s.user as any)?.id as string | undefined);
   const enabled = (options.enabled ?? true) && prefs.notifications_enabled;
 
   // Track whether we've registered the SW message listener this session
@@ -149,56 +115,6 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
 
     const permission = await Notification.requestPermission();
     return permission === 'granted';
-  }, []);
-
-  // ==========================================================================
-  // Fallback: in-page setTimeout (when SW unavailable)
-  // Only for dev/degraded environments
-  // ==========================================================================
-
-  const fallbackTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
-
-  const scheduleFallback = useCallback((reminders: Reminder[]) => {
-    // Clear existing fallback timeouts
-    fallbackTimeouts.current.forEach((t) => clearTimeout(t));
-    fallbackTimeouts.current.clear();
-
-    const now = Date.now();
-    const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-
-    reminders.forEach((reminder) => {
-      if (reminder.status !== 'pending' || !reminder.due_datetime) return;
-
-      const dueTime = new Date(reminder.due_datetime).getTime();
-      const notifyMins: number[] = Array.isArray(reminder.notify_times)
-        ? reminder.notify_times
-        : [0, 60, 180, 360];
-
-      notifyMins.forEach((mins) => {
-        const notifyTime = dueTime - mins * 60_000;
-        const timeUntil = notifyTime - now;
-        if (timeUntil <= 0 || timeUntil >= ONE_WEEK_MS) return;
-
-        const key = `${reminder.id}-${mins}`;
-        if (fallbackTimeouts.current.has(key)) return;
-
-        const t = setTimeout(() => {
-          showFallbackNotification(reminder);
-          fallbackTimeouts.current.delete(key);
-        }, timeUntil);
-
-        fallbackTimeouts.current.set(key, t);
-      });
-    });
-  }, []);
-
-  // Cleanup fallback timeouts on unmount
-  useEffect(() => {
-    const timeouts = fallbackTimeouts.current;
-    return () => {
-      timeouts.forEach((t) => clearTimeout(t));
-      timeouts.clear();
-    };
   }, []);
 
   // ==========================================================================
@@ -242,7 +158,7 @@ export function useScheduleNotifications(options: UseScheduleNotificationsOption
 
       console.log('[useScheduleNotifications] Delegating scheduling to Server Cron Job.');
     },
-    [enabled, userId, requestNotificationPermission, scheduleFallback]
+    [enabled, requestNotificationPermission]
   );
 
   // ==========================================================================

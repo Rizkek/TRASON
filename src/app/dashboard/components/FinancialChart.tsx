@@ -20,6 +20,31 @@ interface Props {
   transactions: Transaction[];
 }
 
+// Custom Tooltip for premium aesthetics
+const CustomTooltip = ({ active, payload, label, currency, locale }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-black/90 border border-white/10 p-md rounded-xl shadow-2xl backdrop-blur-xl">
+        <p className="text-gray-light text-xs font-semibold mb-sm">{label}</p>
+        <div className="space-y-xs">
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center gap-md justify-between">
+              <span style={{ color: entry.color }} className="text-sm flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                {entry.name}
+              </span>
+              <span className="text-white font-mono text-sm font-bold">
+                {formatCurrency(entry.value, currency, locale)}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export const FinancialChart = ({ transactions }: Props) => {
   const { t } = useTranslation();
   const { currency, locale, timezone } = useUserPreferences();
@@ -63,30 +88,7 @@ export const FinancialChart = ({ transactions }: Props) => {
 
   }, [transactions, locale]);
 
-  // Custom Tooltip for premium aesthetics
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-black/90 border border-white/10 p-md rounded-xl shadow-2xl backdrop-blur-xl">
-          <p className="text-gray-light text-xs font-semibold mb-sm">{label}</p>
-          <div className="space-y-xs">
-            {payload.map((entry: any, index: number) => (
-              <div key={index} className="flex items-center gap-md justify-between">
-                <span style={{ color: entry.color }} className="text-sm flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                  {entry.name}
-                </span>
-                <span className="text-white font-mono text-sm font-bold">
-                  {formatCurrency(entry.value, currency, locale)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
+
 
   return (
     <Card className="p-xl bg-gradient-to-br from-[#0F172A]/80 to-[#020617]/80 backdrop-blur-2xl border border-white/[0.05] relative overflow-hidden group">
@@ -130,7 +132,7 @@ export const FinancialChart = ({ transactions }: Props) => {
               hide={true} 
               domain={['auto', 'auto']} 
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '3 3' }} />
+            <Tooltip content={<CustomTooltip currency={currency} locale={locale} />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '3 3' }} />
             
             <Area 
               type="monotone" 
