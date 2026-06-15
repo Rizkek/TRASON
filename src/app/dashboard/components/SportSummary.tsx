@@ -102,9 +102,9 @@ export const SportSummary = ({ summary, isLoading }: Props) => {
         )}
 
         <Link
-          href="/schedule"
+          href="/sport"
           className="block text-center text-[10px] font-bold uppercase tracking-widest text-gray-light hover:text-primary transition-colors"
-          aria-label="Go to Schedule page to log workouts"
+          aria-label="Go to Sport page to log workouts"
         >
           {totalSessions === 0 ? t('dashboard.log_first_session') : t('dashboard.review_rhythm')}
         </Link>
