@@ -196,6 +196,7 @@ export const ja = {
     notif_push_denied: '通知がブロックされています — ブラウザの設定で有効にしてリマインダーを受け取ってください。',
     notif_push_request: 'クリックしてリマインダー通知を有効にする →',
     notif_push_denied_alert: 'ブラウザが通知をブロックしたか、リクエストをキャンセルしました。ブラウザの設定/URLバーから許可してください。',
+    notif_push_deactivate: '無効化',
     filter_active: 'アクティブ',
     filter_history: '履歴',
     form: {

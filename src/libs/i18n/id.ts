@@ -196,6 +196,7 @@ export const id = {
     notif_push_denied: 'Notifikasi diblokir — aktifkan di pengaturan browser untuk menerima pengingat.',
     notif_push_request: 'Klik untuk mengaktifkan notifikasi reminder →',
     notif_push_denied_alert: 'Browser memblokir notifikasi atau Anda membatalkan permintaan. Silakan izinkan dari pengaturan browser/URL bar.',
+    notif_push_deactivate: 'Nonaktifkan',
     filter_active: 'Aktif',
     filter_history: 'Riwayat',
     form: {

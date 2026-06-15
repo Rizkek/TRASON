@@ -6,6 +6,7 @@ import { Layout, Button, Loading, Modal, Input, ErrorAlert, Calendar as Calendar
 import { useAuthStore } from '@/store/authStore';
 import { useReminder } from '@/hooks/useReminder';
 import { useScheduleNotifications } from '@/hooks/useScheduleNotifications';
+import { usePushNotification } from '@/hooks/usePushNotification';
 import { validateReminder, sanitizeError } from '@/libs/validation';
 import { Reminder } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -34,6 +35,7 @@ export default function RemindersPage() {
   const { t } = useTranslation();
   const { locale, timezone } = useUserPreferences();
   const { permission, isSupported, requestNotificationPermission } = useScheduleNotifications();
+  const push = usePushNotification();
 
   const [view, setView] = useState<'calendar' | 'list'>('calendar');
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -230,46 +232,61 @@ export default function RemindersPage() {
         </div>
 
         {/* Notification Status Banner */}
-        {showNotifBanner && isSupported && (
+        {showNotifBanner && push.isSupported && (
           <div className={`flex items-center justify-between gap-md px-lg py-md rounded-xl border text-sm transition-all ${
-            permission === 'granted'
+            push.isSubscribed
               ? 'bg-income/5 border-income/20 text-income'
-              : permission === 'denied'
+              : (typeof window !== 'undefined' && Notification.permission === 'denied')
               ? 'bg-expense/5 border-expense/20 text-expense'
               : 'bg-warm-gold/5 border-warm-gold/20 text-warm-gold'
           }`}>
             <div className="flex items-center gap-md">
-              {permission === 'granted' ? (
+              {push.isSubscribed ? (
                 <Wifi size={16} className="flex-shrink-0" />
               ) : (
                 <WifiOff size={16} className="flex-shrink-0" />
               )}
-              <div>
-                {permission === 'granted' ? (
-                  <span className="font-medium">
-                    {t('reminders_page.notif_push_active')}{' '}
-                    <span className="opacity-70 font-normal text-xs">
-                      {t('reminders_page.notif_push_active_sub')}
+              <div className="flex flex-wrap items-center gap-sm">
+                {push.isSubscribed ? (
+                  <>
+                    <span className="font-medium">
+                      {t('reminders_page.notif_push_active')}{' '}
+                      <span className="opacity-70 font-normal text-xs">
+                        {t('reminders_page.notif_push_active_sub')}
+                      </span>
                     </span>
-                  </span>
-                ) : permission === 'denied' ? (
+                    <button
+                      onClick={async () => {
+                        try {
+                          await push.unsubscribe();
+                        } catch (err) {
+                          console.error('Failed to unsubscribe:', err);
+                        }
+                      }}
+                      disabled={push.isLoading}
+                      className="text-xs underline hover:text-expense-light disabled:opacity-50 ml-md font-bold"
+                    >
+                      {push.isLoading ? 'Deactivating...' : `[ ${t('reminders_page.notif_push_deactivate')} ]`}
+                    </button>
+                  </>
+                ) : (typeof window !== 'undefined' && Notification.permission === 'denied') ? (
                   <span className="font-medium">
                     {t('reminders_page.notif_push_denied')}
                   </span>
                 ) : (
                   <button
                     onClick={async () => {
-                      const granted = await requestNotificationPermission();
-                      if (granted) {
-                        window.location.reload();
-                      } else {
+                      try {
+                        await push.subscribe();
+                      } catch (err) {
                         alert(t('reminders_page.notif_push_denied_alert'));
-                        window.location.reload();
+                        console.error('Failed to subscribe:', err);
                       }
                     }}
+                    disabled={push.isLoading}
                     className="font-medium hover:underline text-left"
                   >
-                    {t('reminders_page.notif_push_request')}
+                    {push.isLoading ? 'Activating...' : t('reminders_page.notif_push_request')}
                   </button>
                 )}
               </div>

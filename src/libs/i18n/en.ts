@@ -196,6 +196,7 @@ export const en = {
     notif_push_denied: 'Notifications blocked — enable in browser settings to receive reminders.',
     notif_push_request: 'Click to enable reminder notifications →',
     notif_push_denied_alert: 'Browser blocked notifications or you cancelled the request. Please allow from browser/URL bar settings.',
+    notif_push_deactivate: 'Deactivate',
     filter_active: 'Active',
     filter_history: 'History',
     form: {

@@ -196,6 +196,7 @@ export const es = {
     notif_push_denied: 'Notificaciones bloqueadas — actívalas en la configuración del navegador para recibir recordatorios.',
     notif_push_request: 'Haz clic para activar las notificaciones de recordatorios →',
     notif_push_denied_alert: 'El navegador bloqueó las notificaciones o cancelaste la solicitud. Por favor, permite desde la configuración del navegador/barra de URL.',
+    notif_push_deactivate: 'Desactivar',
     filter_active: 'Activo',
     filter_history: 'Historial',
     form: {
