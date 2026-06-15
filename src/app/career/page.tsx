@@ -100,9 +100,9 @@ export default function CareerPage() {
   };
 
   const TYPE_CONFIG: Record<CareerApplication['application_type'], { label: string; emoji: string }> = {
-    job:        { label: t('career_page.form.options.job'),        emoji: 'ðŸ’¼' },
-    internship: { label: t('career_page.form.options.internship'), emoji: 'ðŸŽ“' },
-    freelance:  { label: t('career_page.form.options.freelance'),  emoji: 'ðŸš€' },
+    job:        { label: t('career_page.form.options.job'),        emoji: '💼' },
+    internship: { label: t('career_page.form.options.internship'), emoji: '🎓' },
+    freelance:  { label: t('career_page.form.options.freelance'),  emoji: '🚀' },
   };
 
   useEffect(() => {
@@ -278,7 +278,7 @@ export default function CareerPage() {
                     key={app.id}
                     className="glass-card p-xl flex flex-col sm:flex-row sm:items-center gap-lg group transition-all hover:border-black/10 dark:border-white/10"
                     role="article"
-                    aria-label={`${app.company_name} â€” ${app.role_title}`}
+                    aria-label={`${app.company_name} — ${app.role_title}`}
                   >
                     {/* Left: Info */}
                     <div className="flex-1 min-w-0 space-y-sm">

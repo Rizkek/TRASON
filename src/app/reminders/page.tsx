@@ -354,7 +354,7 @@ export default function RemindersPage() {
                           <div className="flex items-center gap-md text-micro text-gray-light uppercase tracking-widest mt-1">
                             <Clock size={12} />
                             <span>{new Date(reminder.due_datetime || reminder.due_date || '').toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone })}</span>
-                            <span>â€¢</span>
+                            <span>•</span>
                             <span className={reminder.priority === 'high' ? 'text-expense font-bold' : ''}>{t(`career_page.form.options.${reminder.priority}`)}</span>
                           </div>
                         </div>
@@ -490,7 +490,7 @@ export default function RemindersPage() {
                       : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/10 dark:border-white/10 text-gray-light hover:border-black/30 dark:border-white/30'
                   }`}
                 >
-                  {form.notifyTimes.includes(opt.value) ? 'âœ“ ' : ''}{opt.label}
+                  {form.notifyTimes.includes(opt.value) ? '✓ ' : ''}{opt.label}
                 </button>
               ))}
             </div>
