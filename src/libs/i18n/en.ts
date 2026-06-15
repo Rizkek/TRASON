@@ -191,6 +191,13 @@ export const en = {
     edit_reminder: 'Refine Reminder',
     new_reminder_modal: 'Capture New Reminder',
     save_reminder: 'Save Reminder',
+    notif_push_active: 'Push notifications active (Server-Side VAPID).',
+    notif_push_active_sub: 'Reminders will be delivered directly to your device via push service.',
+    notif_push_denied: 'Notifications blocked — enable in browser settings to receive reminders.',
+    notif_push_request: 'Click to enable reminder notifications →',
+    notif_push_denied_alert: 'Browser blocked notifications or you cancelled the request. Please allow from browser/URL bar settings.',
+    filter_active: 'Active',
+    filter_history: 'History',
     form: {
       title_label: 'What should we remind you of?',
       title_placeholder: 'e.g., Evening Meditation',

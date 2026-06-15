@@ -5,7 +5,7 @@ import useSWR, { mutate as globalMutate } from 'swr';
 import { reminderQueries } from '@/services/queries';
 import { Reminder } from '@/services/supabaseClient';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
-import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
+import { CACHE_KEYS } from '@/libs/cacheKeys';
 import { handleQueryError, getUserErrorMessage, logError } from '@/libs/apiErrors';
 
 export interface UseReminderReturn {
@@ -53,18 +53,11 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
       try {
         const newReminder = await reminderQueries.createReminder(dataToCreate);
 
-        // Cascade invalidation: invalidate all related caches
-        const keysToInvalidate = INVALIDATION_PATTERNS.onReminderChange();
-        await Promise.all(keysToInvalidate.map(k => {
-          if (typeof k === 'string') {
-            return globalMutate(k);
-          }
-          return globalMutate(
-            (key) => Array.isArray(key) && key[0] === 'reminders',
-            undefined,
-            { revalidate: true }
-          );
-        }));
+        // Direct exact-key invalidation — more reliable than filter function
+        await globalMutate(['reminders', 'pending'], undefined, { revalidate: true });
+        await globalMutate(['reminders', 'completed'], undefined, { revalidate: true });
+        await globalMutate('dashboard:overview', undefined, { revalidate: true });
+        await mutate();
 
         return newReminder;
       } catch (err) {
@@ -72,7 +65,7 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
         throw handleQueryError(err);
       }
     },
-    []
+    [mutate]
   );
 
   const updateReminder = useCallback(
@@ -80,18 +73,11 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
       try {
         const updatedReminder = await reminderQueries.updateReminder(id, dataToUpdate);
 
-        // Cascade invalidation
-        const keysToInvalidate = INVALIDATION_PATTERNS.onReminderChange();
-        await Promise.all(keysToInvalidate.map(k => {
-          if (typeof k === 'string') {
-            return globalMutate(k);
-          }
-          return globalMutate(
-            (key) => Array.isArray(key) && key[0] === 'reminders',
-            undefined,
-            { revalidate: true }
-          );
-        }));
+        // Direct exact-key invalidation — more reliable than filter function
+        await globalMutate(['reminders', 'pending'], undefined, { revalidate: true });
+        await globalMutate(['reminders', 'completed'], undefined, { revalidate: true });
+        await globalMutate('dashboard:overview', undefined, { revalidate: true });
+        await mutate();
 
         return updatedReminder;
       } catch (err) {
@@ -99,27 +85,20 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
         throw handleQueryError(err);
       }
     },
-    []
+    [mutate]
   );
 
   const deleteReminder = useCallback(async (id: string) => {
     try {
       await reminderQueries.deleteReminder(id);
 
-      // Cascade invalidation
-      const keysToInvalidate = INVALIDATION_PATTERNS.onReminderChange();
-      await Promise.all(keysToInvalidate.map(k => {
-        if (typeof k === 'string') {
-          return globalMutate(k);
-        }
-        return globalMutate(
-          (key) => Array.isArray(key) && key[0] === 'reminders',
-          undefined,
-          { revalidate: true }
-        );
-      }));
+        // Direct exact-key invalidation — more reliable than filter function
+        await globalMutate(['reminders', 'pending'], undefined, { revalidate: true });
+        await globalMutate(['reminders', 'completed'], undefined, { revalidate: true });
+        await globalMutate('dashboard:overview', undefined, { revalidate: true });
+        await mutate();
 
-      return true;
+        return true;
     } catch (err) {
       logError(err, 'useReminder.delete');
       throw handleQueryError(err);
@@ -130,20 +109,13 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
     try {
       const updatedReminder = await reminderQueries.completeReminder(id);
 
-      // Cascade invalidation: both pending and completed lists change
-      const keysToInvalidate = INVALIDATION_PATTERNS.onReminderChange();
-      await Promise.all(keysToInvalidate.map(k => {
-        if (typeof k === 'string') {
-          return globalMutate(k);
-        }
-        return globalMutate(
-          (key) => Array.isArray(key) && key[0] === 'reminders',
-          undefined,
-          { revalidate: true }
-        );
-      }));
+        // Direct exact-key invalidation — more reliable than filter function
+        await globalMutate(['reminders', 'pending'], undefined, { revalidate: true });
+        await globalMutate(['reminders', 'completed'], undefined, { revalidate: true });
+        await globalMutate('dashboard:overview', undefined, { revalidate: true });
+        await mutate();
 
-      return updatedReminder;
+        return updatedReminder;
     } catch (err) {
       logError(err, 'useReminder.complete');
       throw handleQueryError(err);

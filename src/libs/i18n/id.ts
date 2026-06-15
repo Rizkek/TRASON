@@ -191,6 +191,13 @@ export const id = {
     edit_reminder: 'Perbarui Pengingat',
     new_reminder_modal: 'Buat Pengingat Baru',
     save_reminder: 'Simpan Pengingat',
+    notif_push_active: 'Notifikasi push aktif (Server-Side VAPID).',
+    notif_push_active_sub: 'Pengingat akan dikirimkan langsung ke perangkat Anda melalui push service.',
+    notif_push_denied: 'Notifikasi diblokir — aktifkan di pengaturan browser untuk menerima pengingat.',
+    notif_push_request: 'Klik untuk mengaktifkan notifikasi reminder →',
+    notif_push_denied_alert: 'Browser memblokir notifikasi atau Anda membatalkan permintaan. Silakan izinkan dari pengaturan browser/URL bar.',
+    filter_active: 'Aktif',
+    filter_history: 'Riwayat',
     form: {
       title_label: 'Apa yang harus kami ingatkan?',
       title_placeholder: 'misal, Meditasi Malam',

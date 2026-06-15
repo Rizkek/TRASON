@@ -191,6 +191,13 @@ export const ja = {
     edit_reminder: 'リマインダーを調整',
     new_reminder_modal: '新しいリマインダーをキャプチャ',
     save_reminder: 'リマインダーを保存',
+    notif_push_active: 'プッシュ通知が有効です（サーバーサイドVAPID）。',
+    notif_push_active_sub: 'リマインダーはプッシュサービスを通じてデバイスに直接配信されます。',
+    notif_push_denied: '通知がブロックされています — ブラウザの設定で有効にしてリマインダーを受け取ってください。',
+    notif_push_request: 'クリックしてリマインダー通知を有効にする →',
+    notif_push_denied_alert: 'ブラウザが通知をブロックしたか、リクエストをキャンセルしました。ブラウザの設定/URLバーから許可してください。',
+    filter_active: 'アクティブ',
+    filter_history: '履歴',
     form: {
       title_label: '何をリマインドしましょうか？',
       title_placeholder: '例：夜の瞑想',

@@ -18,6 +18,18 @@ const urlBase64ToUint8Array = (base64String: string) => {
   return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
 };
 
+/**
+ * Safely converts an ArrayBuffer to a base64 string.
+ * Uses forEach instead of String.fromCharCode.apply to avoid
+ * RangeError: Maximum call stack size exceeded on large buffers.
+ */
+const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  bytes.forEach((b) => { binary += String.fromCharCode(b); });
+  return btoa(binary);
+};
+
 export const usePushNotification = () => {
   const [state, setState] = useState<PushNotificationState>(() => {
     const isSupported =
@@ -119,18 +131,9 @@ export const usePushNotification = () => {
           {
             user_id: user.id,
             endpoint: subscription.endpoint,
-            p256dh: btoa(
-              String.fromCharCode.apply(
-                null,
-                Array.from(new Uint8Array(subscription.getKey('p256dh')!))
-              )
-            ),
-            auth: btoa(
-              String.fromCharCode.apply(
-                null,
-                Array.from(new Uint8Array(subscription.getKey('auth')!))
-              )
-            ),
+            // Use forEach-based encoding to avoid RangeError on large buffers
+            p256dh: arrayBufferToBase64(subscription.getKey('p256dh')!),
+            auth: arrayBufferToBase64(subscription.getKey('auth')!),
             user_agent: navigator.userAgent,
             is_active: true,
             last_used_at: new Date().toISOString(),

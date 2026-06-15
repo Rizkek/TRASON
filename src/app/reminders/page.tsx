@@ -247,14 +247,14 @@ export default function RemindersPage() {
               <div>
                 {permission === 'granted' ? (
                   <span className="font-medium">
-                    Notifikasi push aktif (Server-Side VAPID).{' '}
+                    {t('reminders_page.notif_push_active')}{' '}
                     <span className="opacity-70 font-normal text-xs">
-                      Pengingat akan dikirimkan langsung ke perangkat Anda melalui push service.
+                      {t('reminders_page.notif_push_active_sub')}
                     </span>
                   </span>
                 ) : permission === 'denied' ? (
                   <span className="font-medium">
-                    Notifikasi diblokir â€” aktifkan di pengaturan browser untuk menerima pengingat.
+                    {t('reminders_page.notif_push_denied')}
                   </span>
                 ) : (
                   <button
@@ -263,13 +263,13 @@ export default function RemindersPage() {
                       if (granted) {
                         window.location.reload();
                       } else {
-                        alert('Browser memblokir notifikasi atau Anda membatalkan permintaan. Silakan izinkan dari pengaturan browser/URL bar.');
+                        alert(t('reminders_page.notif_push_denied_alert'));
                         window.location.reload();
                       }
                     }}
                     className="font-medium hover:underline text-left"
                   >
-                    Klik untuk mengaktifkan notifikasi reminder â†’
+                    {t('reminders_page.notif_push_request')}
                   </button>
                 )}
               </div>
@@ -279,7 +279,7 @@ export default function RemindersPage() {
               className="text-current opacity-40 hover:opacity-100 transition-opacity flex-shrink-0 text-lg leading-none"
               aria-label="Tutup banner"
             >
-              Ã—
+              ×
             </button>
           </div>
         )}
@@ -301,13 +301,13 @@ export default function RemindersPage() {
                     onClick={() => setFilter('active')}
                     className={`pb-2 px-1 border-b-2 transition-all ${filter === 'active' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
                   >
-                    Active
+                    {t('reminders_page.filter_active')}
                   </button>
                   <button
                     onClick={() => setFilter('history')}
                     className={`pb-2 px-1 border-b-2 transition-all ${filter === 'history' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
                   >
-                    History
+                    {t('reminders_page.filter_history')}
                   </button>
                 </div>
 

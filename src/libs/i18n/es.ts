@@ -125,7 +125,7 @@ export const es = {
     applied_on: 'Aplicado',
     interview_on: 'Entrevista:',
     edit: 'Editar',
-    edit_app: 'EDITAR SOLICICUTD',
+    edit_app: 'EDITAR SOLICITUD',
     new_app: 'NUEVA SOLICITUD',
     save: 'GUARDAR',
     form: {
@@ -191,6 +191,13 @@ export const es = {
     edit_reminder: 'Refinar Recordatorio',
     new_reminder_modal: 'Capturar Nuevo Recordatorio',
     save_reminder: 'Guardar Recordatorio',
+    notif_push_active: 'Notificaciones push activas (VAPID de servidor).',
+    notif_push_active_sub: 'Los recordatorios se entregarán directamente a tu dispositivo a través del servicio push.',
+    notif_push_denied: 'Notificaciones bloqueadas — actívalas en la configuración del navegador para recibir recordatorios.',
+    notif_push_request: 'Haz clic para activar las notificaciones de recordatorios →',
+    notif_push_denied_alert: 'El navegador bloqueó las notificaciones o cancelaste la solicitud. Por favor, permite desde la configuración del navegador/barra de URL.',
+    filter_active: 'Activo',
+    filter_history: 'Historial',
     form: {
       title_label: '¿Qué debemos recordarte?',
       title_placeholder: 'ej., Meditación Nocturna',
