@@ -43,6 +43,12 @@ self.addEventListener("push", (event) => {
       vibrate: [200, 100, 200],
       tag: payload.tag || "push-notification",
       data: { url: payload.url || "/dashboard" },
+      actions: [
+        {
+          action: "open",
+          title: "Open TRASON",
+        },
+      ],
     })
   );
 });
