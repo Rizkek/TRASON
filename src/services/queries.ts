@@ -694,7 +694,18 @@ export const reminderQueries = {
   // Complete reminder
   async completeReminder(id: string) {
     try {
-      return await reminderQueries.updateReminder(id, { status: 'completed' });
+      const user = await getCurrentUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const data = await reminderQueries.updateReminder(id, { status: 'completed' });
+      
+      // Log the completion
+      await supabase.from('reminder_logs').insert([{
+        user_id: user.id,
+        reminder_id: id,
+      }]);
+
+      return data;
     } catch (err) {
       logError(err, 'reminderQueries.completeReminder');
       throw handleQueryError(err);
@@ -847,6 +858,33 @@ export const habitQueries = {
 
     if (error) throw error;
   },
+
+  // Toggle habit completion for today
+  async toggleHabit(id: string, completed: boolean) {
+    try {
+      const user = await getCurrentUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const today = getTodayDateStr();
+
+      if (completed) {
+        await supabase.from('habit_logs').upsert([{
+          user_id: user.id,
+          habit_id: id,
+          completed_date: today,
+        }], { onConflict: 'user_id, habit_id, completed_date' });
+      } else {
+        await supabase.from('habit_logs')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('habit_id', id)
+          .eq('completed_date', today);
+      }
+    } catch (err) {
+      logError(err, 'habitQueries.toggleHabit');
+      throw handleQueryError(err);
+    }
+  },
 };
 
 /**
@@ -901,7 +939,13 @@ export const batchQueries = {
  * completed_today resets each day (lazy reset on first fetch).
  */
 
-const getTodayDateStr = () => new Date().toISOString().split('T')[0];
+const getTodayDateStr = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 export const dailyTaskQueries = {
   // Fetch all tasks and lazily reset if today is a new day
@@ -1014,6 +1058,22 @@ export const dailyTaskQueries = {
         .single();
 
       if (error) throw error;
+
+      // Log the completion
+      if (completed) {
+        await supabase.from('daily_task_logs').upsert([{
+          user_id: user.id,
+          task_id: id,
+          completed_date: today,
+        }], { onConflict: 'user_id, task_id, completed_date' });
+      } else {
+        await supabase.from('daily_task_logs')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('task_id', id)
+          .eq('completed_date', today);
+      }
+
       return data;
     } catch (err) {
       logError(err, 'dailyTaskQueries.toggleTask');

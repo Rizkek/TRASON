@@ -480,3 +480,30 @@ export interface PersonalRecord {
   notes?: string;
   created_at: string;
 }
+
+// ============================================================
+// LOGS & TRACKING SYSTEM
+// ============================================================
+
+export interface DailyTaskLog {
+  id: string;
+  user_id: string;
+  task_id: string;
+  completed_date: string;
+  created_at: string;
+}
+
+export interface HabitLog {
+  id: string;
+  user_id: string;
+  habit_id: string;
+  completed_date: string;
+  created_at: string;
+}
+
+export interface ReminderLog {
+  id: string;
+  user_id: string;
+  reminder_id: string;
+  completed_at: string;
+}
