@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS public.life_scores (
 CREATE UNIQUE INDEX IF NOT EXISTS life_scores_user_date ON public.life_scores(user_id, calculated_at);
 
 ALTER TABLE public.life_scores ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "life_scores_all" ON public.life_scores FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "life_scores_all" ON public.life_scores;
+CREATE POLICY "life_scores_all" ON public.life_scores FOR ALL USING (auth.uid() = user_id);
 
 -- =============================================
 -- TABLE: user_goals
@@ -47,7 +48,8 @@ CREATE TABLE IF NOT EXISTS public.user_goals (
 );
 
 ALTER TABLE public.user_goals ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "user_goals_all" ON public.user_goals FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "user_goals_all" ON public.user_goals;
+CREATE POLICY "user_goals_all" ON public.user_goals FOR ALL USING (auth.uid() = user_id);
 
 -- =============================================
 -- TABLE: achievements
@@ -64,7 +66,8 @@ CREATE TABLE IF NOT EXISTS public.achievements (
 );
 
 ALTER TABLE public.achievements ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "achievements_all" ON public.achievements FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "achievements_all" ON public.achievements;
+CREATE POLICY "achievements_all" ON public.achievements FOR ALL USING (auth.uid() = user_id);
 
 -- =============================================
 -- TABLE: budgets
@@ -82,7 +85,8 @@ CREATE TABLE IF NOT EXISTS public.budgets (
 );
 
 ALTER TABLE public.budgets ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "budgets_all" ON public.budgets FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "budgets_all" ON public.budgets;
+CREATE POLICY "budgets_all" ON public.budgets FOR ALL USING (auth.uid() = user_id);
 
 -- =============================================
 -- TABLE: weekly_reviews
@@ -98,7 +102,8 @@ CREATE TABLE IF NOT EXISTS public.weekly_reviews (
 );
 
 ALTER TABLE public.weekly_reviews ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "weekly_reviews_all" ON public.weekly_reviews FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "weekly_reviews_all" ON public.weekly_reviews;
+CREATE POLICY "weekly_reviews_all" ON public.weekly_reviews FOR ALL USING (auth.uid() = user_id);
 
 -- =============================================
 -- ALTER: transactions — add subscription flag
