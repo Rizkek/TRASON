@@ -102,7 +102,7 @@ export const FinancialChart = ({ transactions }: Props) => {
         </div>
       </div>
 
-      <div className="w-full h-[300px] relative z-10">
+      <div className="w-full h-[200px] relative z-10">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
             <defs>

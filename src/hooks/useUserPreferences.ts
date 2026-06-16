@@ -14,6 +14,7 @@ export interface AppPreferences {
   push_notifications_enabled: boolean;
   email_digest_enabled: boolean;
   digest_frequency: string;
+  module_features?: Record<string, boolean>;
 }
 
 const DEFAULT_PREFERENCES: AppPreferences = {

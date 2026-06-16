@@ -10,7 +10,7 @@ import { CACHE_KEYS } from '@/libs/cacheKeys';
 import { handleQueryError, getUserErrorMessage, logError } from '@/libs/apiErrors';
 
 // Partial type for preferences data returned from query (without id/user_id/timestamps)
-type PreferencesData = Pick<UserPreferences, 'theme' | 'language' | 'currency' | 'timezone' | 'notifications_enabled' | 'push_notifications_enabled' | 'email_digest_enabled' | 'digest_frequency'>;
+type PreferencesData = Pick<UserPreferences, 'theme' | 'language' | 'currency' | 'timezone' | 'notifications_enabled' | 'push_notifications_enabled' | 'email_digest_enabled' | 'digest_frequency' | 'module_features'>;
 
 export interface UsePreferencesReturn {
   preferences: PreferencesData | null;

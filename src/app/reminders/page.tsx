@@ -31,11 +31,12 @@ export default function RemindersPage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
-  const { reminders = [], isLoading: isRemindersLoading, createReminder, updateReminder, deleteReminder } = useReminder();
+  const { reminders = [], isLoading: isRemindersLoading, createReminder, updateReminder, deleteReminder, markReminderDone, unmarkReminderDone } = useReminder();
   const { t } = useTranslation();
   const { locale, timezone } = useUserPreferences();
   const { permission, isSupported, requestNotificationPermission } = useScheduleNotifications();
   const push = usePushNotification();
+  const { module_features } = useUserPreferences();
 
   const [view, setView] = useState<'calendar' | 'list'>('calendar');
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -131,7 +132,11 @@ export default function RemindersPage() {
     if (!form.title) return;
     
     setIsSaving(true);
-    const dueDate = new Date(`${form.dueDate}T${form.dueTime}:00`);
+    // Parse date in local timezone reliably
+    const [y, m, d] = form.dueDate.split('-').map(Number);
+    const [h, min] = form.dueTime.split(':').map(Number);
+    const dueDate = new Date(y, m - 1, d, h, min, 0);
+    
     const payload = {
       title: form.title,
       description: form.description,
@@ -177,8 +182,11 @@ export default function RemindersPage() {
   const toggleStatus = async (reminder: Reminder) => {
     try {
       setIsSaving(true);
-      const newStatus = reminder.status === 'completed' ? 'pending' : 'completed';
-      await updateReminder(reminder.id, { status: newStatus });
+      if (reminder.status === 'completed') {
+        await unmarkReminderDone(reminder.id);
+      } else {
+        await markReminderDone(reminder.id);
+      }
     } catch (err) {
       setError(sanitizeError(err));
     } finally {
@@ -314,18 +322,22 @@ export default function RemindersPage() {
               <div className="space-y-md">
                 {/* Tabs */}
                 <div className="flex items-center gap-md mb-xl pb-md border-b border-black/[0.05] dark:border-white/[0.05]">
-                  <button
-                    onClick={() => setFilter('active')}
-                    className={`pb-2 px-1 border-b-2 transition-all ${filter === 'active' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
-                  >
-                    {t('reminders_page.filter_active')}
-                  </button>
-                  <button
-                    onClick={() => setFilter('history')}
-                    className={`pb-2 px-1 border-b-2 transition-all ${filter === 'history' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
-                  >
-                    {t('reminders_page.filter_history')}
-                  </button>
+                  {module_features?.['reminders_active'] !== false && (
+                    <button
+                      onClick={() => setFilter('active')}
+                      className={`pb-2 px-1 border-b-2 transition-all ${filter === 'active' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
+                    >
+                      {t('reminders_page.filter_active')}
+                    </button>
+                  )}
+                  {module_features?.['reminders_history'] !== false && (
+                    <button
+                      onClick={() => setFilter('history')}
+                      className={`pb-2 px-1 border-b-2 transition-all ${filter === 'history' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
+                    >
+                      {t('reminders_page.filter_history')}
+                    </button>
+                  )}
                 </div>
 
                 {reminders.filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed').length === 0 ? (
@@ -342,7 +354,7 @@ export default function RemindersPage() {
                     <div key={reminder.id} className="glass-card p-xl flex items-center justify-between group">
                       <div className="flex items-center gap-xl">
                         <button 
-                          onClick={() => updateReminder(reminder.id, { status: reminder.status === 'completed' ? 'pending' : 'completed' })}
+                          onClick={() => toggleStatus(reminder)}
                           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
                             reminder.status === 'completed' ? 'bg-income border-income text-warm-black' : 'border-gray-medium hover:border-warm-gold'
                           }`}

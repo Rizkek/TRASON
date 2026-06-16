@@ -24,6 +24,7 @@ export interface UserPreferences {
   push_notifications_enabled: boolean;
   email_digest_enabled: boolean;
   digest_frequency: string;
+  module_features?: Record<string, boolean>;
   created_at: string;
   updated_at: string;
 }
@@ -65,6 +66,9 @@ export interface Transaction {
   receipt_image_url?: string;
   tags?: string[];
   metadata?: Record<string, unknown>;
+  original_amount?: number;
+  original_currency?: string;
+  exchange_rate_to_base?: number;
   created_at: string;
   updated_at: string;
   deleted_at?: string;

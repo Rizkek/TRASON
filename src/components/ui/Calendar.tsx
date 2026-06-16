@@ -68,14 +68,18 @@ export const Calendar: React.FC<CalendarProps> = ({
           }`}>
             {d}
           </span>
-          {dateEvents.length > 0 && (
+          {dateEvents.some(e => e.status !== 'completed') && (
             <div className="w-1.5 h-1.5 bg-warm-gold rounded-full shadow-[0_0_8px_rgba(212,165,116,0.6)]" />
           )}
         </div>
         
         <div className="mt-2 space-y-1 overflow-hidden hidden md:block">
           {dateEvents.slice(0, 2).map((e, i) => (
-            <div key={i} className="text-[10px] truncate bg-deep-sage/10 text-soft-cream px-1.5 py-0.5 rounded border border-deep-sage/20 font-light">
+            <div key={i} className={`text-[10px] truncate px-1.5 py-0.5 rounded border font-light ${
+              e.status === 'completed'
+                ? 'bg-black/5 dark:bg-white/5 text-gray-light border-black/10 dark:border-white/10 line-through opacity-60'
+                : 'bg-deep-sage/10 text-soft-cream border-deep-sage/20'
+            }`}>
               {e.title}
             </div>
           ))}

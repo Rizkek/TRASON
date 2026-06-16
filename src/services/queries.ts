@@ -712,6 +712,34 @@ export const reminderQueries = {
     }
   },
 
+  // Uncomplete reminder
+  async uncompleteReminder(id: string) {
+    try {
+      const user = await getCurrentUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const data = await reminderQueries.updateReminder(id, { status: 'pending' });
+      
+      // Remove the latest log for this reminder
+      const { data: latestLog } = await supabase.from('reminder_logs')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('reminder_id', id)
+        .order('completed_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (latestLog) {
+        await supabase.from('reminder_logs').delete().eq('id', latestLog.id);
+      }
+
+      return data;
+    } catch (err) {
+      logError(err, 'reminderQueries.uncompleteReminder');
+      throw handleQueryError(err);
+    }
+  },
+
   // Delete reminder
   async deleteReminder(id: string) {
     try {

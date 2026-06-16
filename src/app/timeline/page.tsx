@@ -9,6 +9,7 @@ import { useDailyTasks } from '@/hooks/useDailyTasks';
 import { validateActivity, sanitizeError } from '@/libs/validation';
 import { Activity } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import {
   Plus,
   Trash2,
@@ -115,6 +116,7 @@ export default function TimelinePage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
+  const { module_features } = useUserPreferences();
   const { t } = useTranslation();
 
   const { start: weekStart, end: weekEnd } = getCurrentWeekBounds();
@@ -390,36 +392,40 @@ export default function TimelinePage() {
           </div>
 
           {/* Tab Switcher */}
-          <div className="flex items-center gap-0 bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-lg border border-black/[0.05] dark:border-white/[0.05] w-fit">
-            <button
-              onClick={() => setActiveTab('weekly-log')}
-              className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === 'weekly-log'
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'text-gray-light hover:text-soft-cream'
-              }`}
-            >
-              <CalendarDays size={14} />
-              Weekly Log
-            </button>
-            <button
-              onClick={() => setActiveTab('daily-checklist')}
-              className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === 'daily-checklist'
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'text-gray-light hover:text-soft-cream'
-              }`}
-            >
-              <ListChecks size={14} />
-              Daily Checklist
-              {totalCount > 0 && (
-                <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
-                  completedCount === totalCount ? 'bg-income/20 text-income' : 'bg-black/10 dark:bg-white/10 text-gray-light'
-                }`}>
-                  {completedCount}
-                </span>
-              )}
-            </button>
+          <div className="flex items-center gap-lg bg-black/[0.02] dark:bg-white/[0.02] p-md rounded-lg mb-xl w-max border border-black/[0.05] dark:border-white/[0.05]">
+            {module_features?.['timeline_weekly_log'] !== false && (
+              <button
+                onClick={() => setActiveTab('weekly-log')}
+                className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+                  activeTab === 'weekly-log'
+                    ? 'bg-primary text-white shadow-lg'
+                    : 'text-gray-light hover:text-soft-cream'
+                }`}
+              >
+                <CalendarDays size={14} />
+                Weekly Log
+              </button>
+            )}
+            {module_features?.['timeline_daily_checklist'] !== false && (
+              <button
+                onClick={() => setActiveTab('daily-checklist')}
+                className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+                  activeTab === 'daily-checklist'
+                    ? 'bg-primary text-white shadow-lg'
+                    : 'text-gray-light hover:text-soft-cream'
+                }`}
+              >
+                <ListChecks size={14} />
+                Daily Checklist
+                {totalCount > 0 && (
+                  <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
+                    completedCount === totalCount ? 'bg-income/20 text-income' : 'bg-black/10 dark:bg-white/10 text-gray-light'
+                  }`}>
+                    {completedCount}
+                  </span>
+                )}
+              </button>
+            )}
           </div>
 
           {/* Daily Checklist Panel */}

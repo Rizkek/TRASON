@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useTransaction } from '@/hooks/useTransaction';
+import { useCategory } from '@/hooks/useCategory';
 import { validateTransaction, sanitizeError } from '@/libs/validation';
 import { Transaction } from '@/types/database';
 import { 
@@ -22,6 +23,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
+import { fetchExchangeRates } from '@/libs/exchange';
 import { getDateRange } from '@/libs/date';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -36,6 +38,7 @@ export default function FinancePage() {
   const { start, end } = getDateRange(now.getMonth(), now.getFullYear());
   
   const { transactions, isLoading: isTransactionsLoading, createTransaction, updateTransaction, deleteTransaction } = useTransaction(start, end);
+  const { categories } = useCategory();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -52,7 +55,8 @@ export default function FinancePage() {
     type: 'expense' as 'income' | 'expense',
     category_id: '',
     date: getLocalISODate(new Date(), timezone),
-    description: ''
+    description: '',
+    original_currency: currency || 'USD',
   });
 
   useEffect(() => {
@@ -72,6 +76,18 @@ export default function FinancePage() {
     setError(null);
     setIsSaving(true);
     
+    let exchangeRate = 1.0;
+    const ratesData = await fetchExchangeRates();
+    if (ratesData && ratesData.rates[form.original_currency]) {
+      // Exchange rate to USD (base)
+      exchangeRate = 1 / ratesData.rates[form.original_currency];
+    }
+    
+    // We store the base amount in USD by default if you want amount to be base currency,
+    // OR we store amount as original amount and handle display in Dashboard.
+    // The instructions: "Semua nominal transaksi yang diinput akan disimpan dalam mata uang aslinya, beserta exchange rate saat transaksi terjadi, dan otomatis dikonversi ke Base Currency di Dashboard."
+    // So 'amount' remains the original amount, but we save original_currency and exchange_rate_to_base.
+    
     const payload = {
       title: form.title,
       amount: parseFloat(form.amount),
@@ -79,6 +95,9 @@ export default function FinancePage() {
       date: form.date,
       category_id: form.category_id || null,
       description: form.description || undefined,
+      original_amount: parseFloat(form.amount),
+      original_currency: form.original_currency,
+      exchange_rate_to_base: exchangeRate,
     };
 
     try {
@@ -118,7 +137,8 @@ export default function FinancePage() {
       type: 'expense' as const,
       category_id: '',
       date: getLocalISODate(new Date(), timezone),
-      description: ''
+      description: '',
+      original_currency: currency || 'USD',
     });
     setIsModalOpen(true);
   };
@@ -131,7 +151,8 @@ export default function FinancePage() {
       type: t.type,
       category_id: t.category_id || '',
       date: new Date(t.date).toISOString().split('T')[0],
-      description: t.description || ''
+      description: t.description || '',
+      original_currency: t.original_currency || currency || 'USD',
     });
     setIsModalOpen(true);
   };
@@ -287,7 +308,7 @@ export default function FinancePage() {
                       </td>
                       <td className="px-xl py-xl text-right">
                         <p className={`text-sm font-bold ${t.type === 'income' ? 'text-success' : 'text-soft-cream'}`}>
-                          {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount, currency, locale)}
+                          {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount, t.original_currency || currency, locale)}
                         </p>
                       </td>
                       <td className="px-xl py-xl text-right">
@@ -399,6 +420,27 @@ export default function FinancePage() {
                 className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm px-md text-sm text-soft-cream focus:border-primary focus:outline-none"
               />
               {formErrors.date && <p className="text-xs text-danger">{formErrors.date}</p>}
+            </div>
+          </div>
+
+          <div className="space-y-sm">
+            <label className="text-[10px] font-bold text-gray-light tracking-widest block">CATEGORY</label>
+            <div className="grid grid-cols-3 gap-sm">
+              {categories.filter(c => c.type === form.type).map(cat => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, category_id: cat.id }))}
+                  className={`flex flex-col items-center gap-xs p-md rounded-md border transition-all ${
+                    form.category_id === cat.id
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-black/5 dark:border-white/5 bg-gray-strong/40 text-gray-light hover:text-soft-cream hover:bg-black/5 dark:hover:bg-white/5'
+                  }`}
+                >
+                  <span className="text-lg">{cat.icon}</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider truncate w-full text-center">{cat.name}</span>
+                </button>
+              ))}
             </div>
           </div>
 

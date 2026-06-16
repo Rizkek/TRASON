@@ -17,6 +17,7 @@ export interface UseReminderReturn {
   updateReminder: (id: string, data: Partial<Omit<Reminder, 'id' | 'created_at' | 'updated_at'>>) => Promise<Reminder | null>;
   deleteReminder: (id: string) => Promise<boolean>;
   markReminderDone: (id: string) => Promise<Reminder | null>;
+  unmarkReminderDone: (id: string) => Promise<Reminder | null>;
   mutate: () => Promise<Reminder[] | undefined>;
   refresh: () => Promise<Reminder[] | undefined>;
 }
@@ -122,6 +123,23 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
     }
   }, []);
 
+  const unmarkReminderDone = useCallback(async (id: string) => {
+    try {
+      const updatedReminder = await reminderQueries.uncompleteReminder(id);
+
+        // Direct exact-key invalidation — more reliable than filter function
+        await globalMutate(['reminders', 'pending'], undefined, { revalidate: true });
+        await globalMutate(['reminders', 'completed'], undefined, { revalidate: true });
+        await globalMutate('dashboard:overview', undefined, { revalidate: true });
+        await mutate();
+
+        return updatedReminder;
+    } catch (err) {
+      logError(err, 'useReminder.uncomplete');
+      throw handleQueryError(err);
+    }
+  }, []);
+
   // User-friendly error message
   const userErrorMessage = error ? getUserErrorMessage(error) : null;
 
@@ -134,6 +152,7 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
     updateReminder,
     deleteReminder,
     markReminderDone,
+    unmarkReminderDone,
     mutate,
     refresh: mutate
   };

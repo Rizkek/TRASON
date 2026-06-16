@@ -25,8 +25,8 @@ import {
 
 // Extracted Components
 import { DashboardHeader } from './components/DashboardHeader';
-import { FinancialSummary } from './components/FinancialSummary';
 import { FinancialChart } from './components/FinancialChart';
+import { DailyTasksSummary } from './components/DailyTasksSummary';
 import { ActivitiesList } from './components/ActivitiesList';
 import { TransactionsList } from './components/TransactionsList';
 import { RemindersSidebar } from './components/RemindersSidebar';
@@ -108,11 +108,11 @@ export default function DashboardPage() {
         {/* Narrative Summary Card */}
         <DashboardHeader user={user} activities={activities} transactions={transactions} />
 
-        {/* Financial Flow */}
-        <FinancialSummary transactions={transactions} />
-
-        {/* Financial Analytics Chart */}
-        <FinancialChart transactions={transactions} />
+        {/* Financial Flow and Daily Tasks - Compact Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-md md:gap-xl">
+          <FinancialChart transactions={transactions} />
+          <DailyTasksSummary />
+        </div>
 
         <InvestmentSummary summary={investmentSummary} />
 

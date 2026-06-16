@@ -8,9 +8,10 @@ import { User, supabase } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { userQueries } from '@/services/queries';
 import { sanitizeError, validateEmail } from '@/libs/validation';
-import { useAllModuleStatus, useModuleStatus } from '@/hooks/useModuleStatus';
+import { useModuleStatus, useAllModuleStatus } from '@/hooks/useModuleStatus';
 import { usePushNotification } from '@/hooks/usePushNotification';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { usePreferences } from '@/hooks/usePreferences';
 import { ModuleId } from '@/modules/types';
 import {
   User as UserIcon,
@@ -76,8 +77,8 @@ const TIMEZONE_OPTIONS = [
 const LANGUAGE_OPTIONS = [
   { value: 'en', label: 'English' },
   { value: 'id', label: 'Bahasa Indonesia' },
-  { value: 'ja', label: 'æ—¥æœ¬èªž' },
-  { value: 'es', label: 'EspaÃ±ol' },
+  { value: 'ja', label: '日本語' },
+  { value: 'es', label: 'Español' },
 ];
 
 // Module Item Component to handle its own hook logic
@@ -85,9 +86,10 @@ const ModuleItem: React.FC<{
   id: ModuleId;
   isEnabled: boolean;
   metadata: any;
-  userId?: string
+  userId?: string;
 }> = ({ id, isEnabled, metadata, userId }) => {
   const { toggle, isLoading: isHookLoading } = useModuleStatus(id, userId);
+  const { preferences, updatePreferences } = usePreferences(userId);
   const [isLocalLoading, setIsLocalLoading] = useState(false);
 
   const handleToggle = async () => {
@@ -101,46 +103,144 @@ const ModuleItem: React.FC<{
     }
   };
 
+  const handleSubToggle = async (featureId: string) => {
+    try {
+      setIsLocalLoading(true);
+      const currentFeatures = preferences?.module_features || {};
+      const currentValue = currentFeatures[featureId] !== false; // default true
+      await updatePreferences({
+        module_features: {
+          ...currentFeatures,
+          [featureId]: !currentValue,
+        }
+      });
+    } catch (err) {
+      console.error('Failed to toggle sub-feature:', err);
+    } finally {
+      setIsLocalLoading(false);
+    }
+  };
+
   const Icon = MODULE_ICONS[metadata.icon] || Grid3X3;
   const isPending = isHookLoading || isLocalLoading;
 
   return (
-    <div
-      className={`flex items-center justify-between p-lg rounded-md border transition-all ${
-        isEnabled
-          ? 'bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]'
-          : 'bg-transparent border-black/[0.02] dark:border-white/[0.02] opacity-60'
-      }`}
-    >
-      <div className="flex items-center gap-md">
-        <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center"
-          style={{ backgroundColor: `${metadata.color}15` }}
+    <div className="space-y-sm">
+      <div
+        className={`flex items-center justify-between p-lg rounded-md border transition-all ${
+          isEnabled
+            ? 'bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]'
+            : 'bg-transparent border-black/[0.02] dark:border-white/[0.02] opacity-60'
+        }`}
+      >
+        <div className="flex items-center gap-md">
+          <div
+            className="w-10 h-10 rounded-lg flex items-center justify-center"
+            style={{ backgroundColor: `${metadata.color}15` }}
+          >
+            <Icon size={20} style={{ color: metadata.color }} />
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-soft-cream">{metadata.name}</h4>
+            <p className="text-[10px] text-gray-light">{metadata.description}</p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleToggle}
+          disabled={isPending}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+            isEnabled
+              ? 'bg-primary'
+              : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
+          } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
         >
-          <Icon size={20} style={{ color: metadata.color }} />
-        </div>
-        <div>
-          <h4 className="text-sm font-medium text-soft-cream">{metadata.name}</h4>
-          <p className="text-[10px] text-gray-light">{metadata.description}</p>
-        </div>
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+              isEnabled ? 'translate-x-6' : 'translate-x-1'
+            }`}
+          />
+        </button>
       </div>
 
-      <button
-        type="button"
-        onClick={handleToggle}
-        disabled={isPending}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-          isEnabled
-            ? 'bg-primary'
-            : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
-        } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
-      >
-        <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-            isEnabled ? 'translate-x-6' : 'translate-x-1'
-          }`}
-        />
-      </button>
+      {/* Sub-toggles for Timeline and Reminders */}
+      {isEnabled && (id === 'timeline' || id === 'reminders') && (
+        <div className="ml-12 pl-4 border-l border-black/10 dark:border-white/10 space-y-md">
+          {id === 'timeline' && (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-light">Weekly Log Tab</span>
+                <button
+                  type="button"
+                  onClick={() => handleSubToggle('timeline_weekly_log')}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                    preferences?.module_features?.['timeline_weekly_log'] !== false
+                      ? 'bg-primary'
+                      : 'bg-gray-strong'
+                  }`}
+                >
+                  <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                    preferences?.module_features?.['timeline_weekly_log'] !== false ? 'translate-x-5' : 'translate-x-1'
+                  }`} />
+                </button>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-light">Daily Checklist Tab</span>
+                <button
+                  type="button"
+                  onClick={() => handleSubToggle('timeline_daily_checklist')}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                    preferences?.module_features?.['timeline_daily_checklist'] !== false
+                      ? 'bg-primary'
+                      : 'bg-gray-strong'
+                  }`}
+                >
+                  <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                    preferences?.module_features?.['timeline_daily_checklist'] !== false ? 'translate-x-5' : 'translate-x-1'
+                  }`} />
+                </button>
+              </div>
+            </>
+          )}
+          {id === 'reminders' && (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-light">Active Tab</span>
+                <button
+                  type="button"
+                  onClick={() => handleSubToggle('reminders_active')}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                    preferences?.module_features?.['reminders_active'] !== false
+                      ? 'bg-primary'
+                      : 'bg-gray-strong'
+                  }`}
+                >
+                  <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                    preferences?.module_features?.['reminders_active'] !== false ? 'translate-x-5' : 'translate-x-1'
+                  }`} />
+                </button>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-light">History Tab</span>
+                <button
+                  type="button"
+                  onClick={() => handleSubToggle('reminders_history')}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                    preferences?.module_features?.['reminders_history'] !== false
+                      ? 'bg-primary'
+                      : 'bg-gray-strong'
+                  }`}
+                >
+                  <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                    preferences?.module_features?.['reminders_history'] !== false ? 'translate-x-5' : 'translate-x-1'
+                  }`} />
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };

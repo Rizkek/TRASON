@@ -96,7 +96,7 @@ export default function CareerPage() {
     offer:      { label: t('career_page.form.options.status_offer'),      color: 'text-income', badgeVariant: 'income' },
     accepted:   { label: t('career_page.form.options.status_accepted'),   color: 'text-income', badgeVariant: 'success' },
     rejected:   { label: t('career_page.form.options.status_rejected'),   color: 'text-expense', badgeVariant: 'expense' },
-    withdrawn:  { label: t('career_page.form.options.status_withdrawn'),  color: 'text-gray-light', badgeVariant: undefined },
+    withdrawn:  { label: t('career_page.form.options.status_withdrawn'),  color: 'text-gray-light', badgeVariant: 'default' },
   };
 
   const TYPE_CONFIG: Record<CareerApplication['application_type'], { label: string; emoji: string }> = {
@@ -423,9 +423,16 @@ export default function CareerPage() {
                   onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as any }))}
                   className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
-                  {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
-                    <option key={val} value={val}>{cfg.label}</option>
-                  ))}
+                  <optgroup label="In Progress">
+                    {ACTIVE_STATUSES.map((val) => (
+                      <option key={val} value={val}>{STATUS_CONFIG[val].label}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Closed">
+                    {CLOSED_STATUSES.map((val) => (
+                      <option key={val} value={val}>{STATUS_CONFIG[val].label}</option>
+                    ))}
+                  </optgroup>
                 </select>
               </div>
               <div>
