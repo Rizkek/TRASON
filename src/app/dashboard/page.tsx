@@ -34,6 +34,7 @@ import { InvestmentSummary } from './components/InvestmentSummary';
 import { SportSummary } from './components/SportSummary';
 import { CareerSummary } from './components/CareerSummary';
 import { LifeScoreCard } from './components/LifeScoreCard';
+import { DailyBriefingCard } from './components/DailyBriefingCard';
 import { FinancialHealthWidget } from './components/FinancialHealthWidget';
 import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useCareer } from '@/hooks/useCareer';
@@ -109,6 +110,9 @@ export default function DashboardPage() {
 
         {/* Narrative Summary Card */}
         <DashboardHeader user={user} activities={activities} transactions={transactions} />
+
+        {/* Daily Briefing */}
+        <DailyBriefingCard />
 
         {/* Life Score — Primary Intelligence Widget */}
         <LifeScoreCard />
