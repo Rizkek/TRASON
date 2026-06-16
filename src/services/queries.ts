@@ -70,7 +70,7 @@ export const userQueries = {
         id, email, first_name, last_name, avatar_url, email_verified, phone, bio,
         created_at, updated_at,
         user_preferences(theme, language, currency, timezone, notifications_enabled, 
-                        push_notifications_enabled, email_digest_enabled, digest_frequency)
+                        push_notifications_enabled, email_digest_enabled, digest_frequency, module_features)
       `
       )
       .maybeSingle();
@@ -105,7 +105,7 @@ export const userQueries = {
           id, email, first_name, last_name, avatar_url, email_verified, phone, bio,
           created_at, updated_at,
           user_preferences(theme, language, currency, timezone, notifications_enabled, 
-                          push_notifications_enabled, email_digest_enabled, digest_frequency)
+                          push_notifications_enabled, email_digest_enabled, digest_frequency, module_features)
         `
         )
         .eq('id', user.id)
@@ -160,7 +160,7 @@ export const userQueries = {
       // returned shape matches what useUserPreferences expects.
       const { theme, language, currency, timezone,
               notifications_enabled, push_notifications_enabled,
-              email_digest_enabled, digest_frequency } = updates as any;
+              email_digest_enabled, digest_frequency, module_features } = updates as any;
 
       const payload: Record<string, unknown> = {
         user_id: user.id,
@@ -174,6 +174,7 @@ export const userQueries = {
       if (push_notifications_enabled !== undefined)  payload.push_notifications_enabled = push_notifications_enabled;
       if (email_digest_enabled !== undefined)        payload.email_digest_enabled = email_digest_enabled;
       if (digest_frequency !== undefined)            payload.digest_frequency = digest_frequency;
+      if (module_features !== undefined)             payload.module_features = module_features;
 
       // Safely check if a row exists first to avoid unique constraint issues
       const { data: existingRow } = await supabase
@@ -189,14 +190,14 @@ export const userQueries = {
           .from('user_preferences')
           .update(payload)
           .eq('id', existingRow.id)
-          .select('theme, language, currency, timezone, notifications_enabled, push_notifications_enabled, email_digest_enabled, digest_frequency')
+          .select('theme, language, currency, timezone, notifications_enabled, push_notifications_enabled, email_digest_enabled, digest_frequency, module_features')
           .single();
       } else {
         // Insert new
         result = await supabase
           .from('user_preferences')
           .insert([payload])
-          .select('theme, language, currency, timezone, notifications_enabled, push_notifications_enabled, email_digest_enabled, digest_frequency')
+          .select('theme, language, currency, timezone, notifications_enabled, push_notifications_enabled, email_digest_enabled, digest_frequency, module_features')
           .single();
       }
 
