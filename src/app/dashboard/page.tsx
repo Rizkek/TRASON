@@ -33,6 +33,8 @@ import { RemindersSidebar } from './components/RemindersSidebar';
 import { InvestmentSummary } from './components/InvestmentSummary';
 import { SportSummary } from './components/SportSummary';
 import { CareerSummary } from './components/CareerSummary';
+import { LifeScoreCard } from './components/LifeScoreCard';
+import { FinancialHealthWidget } from './components/FinancialHealthWidget';
 import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useCareer } from '@/hooks/useCareer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -108,6 +110,9 @@ export default function DashboardPage() {
         {/* Narrative Summary Card */}
         <DashboardHeader user={user} activities={activities} transactions={transactions} />
 
+        {/* Life Score — Primary Intelligence Widget */}
+        <LifeScoreCard />
+
         {/* Financial Flow and Daily Tasks - Compact Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-md md:gap-xl">
           <FinancialChart transactions={transactions} />
@@ -144,6 +149,7 @@ export default function DashboardPage() {
 
           {/* Right Sidebar */}
           <div className="space-y-md md:space-y-xl">
+            <FinancialHealthWidget />
             <RemindersSidebar reminders={reminders} />
             <SportSummary summary={sportSummary} isLoading={sportLoading} />
             <CareerSummary stats={careerStats} nextInterview={nextInterview} isLoading={careerLoading} />

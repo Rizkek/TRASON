@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useCareer } from '@/hooks/useCareer';
+import { useCareerAnalytics } from '@/hooks/useCareerAnalytics';
 import { CareerApplication } from '@/types/database';
 import { getLocalISODate } from '@/libs/format';
 import { sanitizeError } from '@/libs/validation';
@@ -75,6 +76,7 @@ export default function CareerPage() {
   const { t } = useTranslation();
 
   const { applications, stats, isLoading, error, createApplication, updateApplication, deleteApplication } = useCareer();
+  const { analytics } = useCareerAnalytics();
 
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -235,6 +237,46 @@ export default function CareerPage() {
                 </Card>
               ))}
             </div>
+          )}
+
+          {/* Analytics Bar — Rule-based Intelligence */}
+          {!isLoading && analytics && analytics.totalApplications > 0 && (
+            <Card className="p-lg border border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02]">
+              <div className="flex flex-wrap items-center gap-xl">
+                <div className="text-center">
+                  <p className="text-lg font-bold text-white">{analytics.responseRate.toFixed(0)}%</p>
+                  <p className="text-[10px] text-gray-light uppercase tracking-widest">Response Rate</p>
+                </div>
+                <div className="w-px h-8 bg-white/10 hidden sm:block" />
+                <div className="text-center">
+                  <p className="text-lg font-bold text-white">{analytics.interviewRate.toFixed(0)}%</p>
+                  <p className="text-[10px] text-gray-light uppercase tracking-widest">Interview Rate</p>
+                </div>
+                <div className="w-px h-8 bg-white/10 hidden sm:block" />
+                <div className="text-center">
+                  <p className="text-lg font-bold text-white">{analytics.offerRate.toFixed(0)}%</p>
+                  <p className="text-[10px] text-gray-light uppercase tracking-widest">Offer Rate</p>
+                </div>
+                {analytics.avgDaysToInterview !== null && (
+                  <>
+                    <div className="w-px h-8 bg-white/10 hidden sm:block" />
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-white">{analytics.avgDaysToInterview}h</p>
+                      <p className="text-[10px] text-gray-light uppercase tracking-widest">Avg. to Interview</p>
+                    </div>
+                  </>
+                )}
+                {analytics.insights.length > 0 && (
+                  <div className="flex-1 min-w-0 ml-auto">
+                    <div className="space-y-1">
+                      {analytics.insights.slice(0, 2).map((insight, i) => (
+                        <p key={i} className="text-xs text-amber-400 truncate">{insight}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
           )}
 
           {/* Filter Tabs */}
