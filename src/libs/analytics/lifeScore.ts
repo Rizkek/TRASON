@@ -223,16 +223,16 @@ export function calculateLifeScore(params: {
   const insights: string[] = [];
 
   if (finance.score < 40) {
-    insights.push('💰 Keuangan perlu perhatian: cek pengeluaran dan tingkatkan saving rate.');
+    insights.push('Keuangan perlu perhatian: cek pengeluaran dan tingkatkan saving rate.');
   }
   if (productivity.score < 40) {
-    insights.push('✅ Mulai hari ini dengan menyelesaikan minimal 1 task untuk membangun momentum.');
+    insights.push('Mulai hari ini dengan menyelesaikan minimal 1 task untuk membangun momentum.');
   }
   if (health.score < 40) {
-    insights.push('🏃 Sudah lama tidak olahraga. Sesi 20 menit sudah cukup untuk memulai.');
+    insights.push('Sudah lama tidak olahraga. Sesi 20 menit sudah cukup untuk memulai.');
   }
   if (career.score < 40) {
-    insights.push('💼 Karier memerlukan aktivitas. Pertimbangkan mengirim lamaran baru hari ini.');
+    insights.push('Karier memerlukan aktivitas. Pertimbangkan mengirim lamaran baru hari ini.');
   }
 
   const lowestDimension = [
@@ -243,10 +243,10 @@ export function calculateLifeScore(params: {
   ].sort((a, b) => a.score - b.score)[0];
 
   if (overall >= 70 && lowestDimension.score < 50) {
-    insights.push(`📊 ${lowestDimension.name} adalah area yang paling perlu ditingkatkan saat ini.`);
+    insights.push(`${lowestDimension.name} adalah area yang paling perlu ditingkatkan saat ini.`);
   }
   if (overall >= 80) {
-    insights.push('🌟 Life Score Anda sangat baik. Pertahankan konsistensi!');
+    insights.push('Life Score Anda sangat baik. Pertahankan konsistensi!');
   }
 
   return {

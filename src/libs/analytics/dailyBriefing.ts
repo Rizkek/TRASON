@@ -41,9 +41,9 @@ export function generateDailyBriefing(params: {
   if (healthScore && healthScore.score < 50) {
     highlightInsight = 'Perhatikan pengeluaran hari ini. Saving rate Anda perlu ditingkatkan.';
   } else if (streakData && streakData.currentStreak >= 3) {
-    highlightInsight = `🔥 Pertahankan momentum! Anda sudah konsisten ${streakData.currentStreak} hari berturut-turut.`;
+    highlightInsight = `Pertahankan momentum! Anda sudah konsisten ${streakData.currentStreak} hari berturut-turut.`;
   } else if (careerStats && careerStats.daysSinceLastApplication !== null && careerStats.daysSinceLastApplication > 7) {
-    highlightInsight = `💼 Sudah ${careerStats.daysSinceLastApplication} hari tidak ada aktivitas lamaran kerja.`;
+    highlightInsight = `Sudah ${careerStats.daysSinceLastApplication} hari tidak ada aktivitas lamaran kerja.`;
   } else if (tasksRemaining > 0) {
     highlightInsight = `Fokus selesaikan ${tasksRemaining} tugas utama hari ini.`;
   } else {

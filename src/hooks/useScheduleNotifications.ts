@@ -46,7 +46,7 @@ async function postMessageToSW(message: Record<string, unknown>): Promise<boolea
 function showFallbackNotification(reminder: Reminder): void {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
-  new Notification(`🔔 ${reminder.title}`, {
+  new Notification(reminder.title, {
     body: reminder.description || 'Tap to open TRASON',
     icon: '/icon-192x192.png',
     tag: `reminder-${reminder.id}`,

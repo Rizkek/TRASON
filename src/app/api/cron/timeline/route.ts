@@ -118,7 +118,7 @@ export async function GET(request: Request) {
       : `You have ${missingTasks.length} tasks left today. Keep going!`;
 
     const payload = JSON.stringify({
-      title: `⏳ Timeline Reminder`,
+      title: `Timeline Reminder`,
       body: bodyText,
       url: '/timeline'
     });

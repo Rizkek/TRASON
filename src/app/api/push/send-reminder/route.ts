@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     }
 
     const payload = JSON.stringify({
-      title: `🔔 ${title}`,
+      title: `${title}`,
       body: notifBody || 'Tap to open TRASON',
       url: url || '/reminders',
       tag: tag || `push-${Date.now()}`,

@@ -52,22 +52,28 @@ export default function AboutPage() {
       
       <main className="pt-32 md:pt-48 pb-24 px-lg max-w-4xl mx-auto space-y-32">
         
-        {/* Creator Story */}
+        {/* The Philosophy */}
         <section className="space-y-lg">
-           <h1 className="text-5xl md:text-7xl font-serif mb-xl">Why TRASON?</h1>
-           <div className="prose prose-invert prose-lg max-w-none text-gray-light/90">
-             <p>
-               Like many ambitious people, I found myself managing my life across five different applications. 
-               I used a spreadsheet for my finances, a dedicated app for my habits, Apple Calendar for my schedule, 
-               and a Notion board for tracking my career applications.
+           <h1 className="text-5xl md:text-7xl font-serif mb-xl">The Philosophy of TRASON</h1>
+           <div className="prose prose-invert prose-lg max-w-none text-gray-light/90 space-y-6">
+             <p className="text-2xl font-serif text-warm-gold italic">
+               "Your life is an interconnected system, but your tools are fragmented."
              </p>
              <p>
-               Every Sunday, I spent an hour just copying data between these apps to understand where I stood. 
-               If I had a bad week financially, it usually correlated with poor habits and high stress, but none of my tools could show me that connection.
+               Every day, ambitious individuals waste time jumping between five different applications. 
+               You use a banking app or spreadsheet for finances, a dedicated habit tracker for health, a calendar for your schedule, 
+               and a Notion board for tracking career applications.
              </p>
              <p>
-               <strong>TRASON was born out of frustration.</strong> I didn't want another blank canvas tool where I had to build complex databases. 
-               I wanted an opinionated, interconnected command center that just worked.
+               This fragmentation causes <strong>App Fatigue</strong>. More importantly, it hides the correlation between your actions. 
+               When you have a bad week financially, it usually correlates with poor habits, skipped workouts, and high stress—but none of your isolated tools can show you that connection.
+             </p>
+             <p>
+               <strong>TRASON is a Personal Operating System.</strong> It is not just another blank canvas where you have to build complex databases from scratch. 
+               We provide a highly opinionated, beautifully designed command center that connects your Capital (Finance), Vitality (Health & Habits), and Ambition (Career) into a single unified <strong>Life Score</strong>.
+             </p>
+             <p>
+               We believe that by centralizing your data, reducing friction, and giving you an objective score of your daily momentum, you can achieve your goals with unprecedented clarity.
              </p>
            </div>
         </section>
@@ -105,18 +111,7 @@ export default function AboutPage() {
            </div>
         </section>
 
-        {/* Tech Stack */}
-        <section className="space-y-xl">
-           <h2 className="text-3xl md:text-4xl font-serif">Tech Architecture</h2>
-           <p className="text-gray-light">Built for speed, security, and scalability.</p>
-           <div className="flex flex-wrap gap-md">
-              {['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Supabase', 'Framer Motion'].map((tech) => (
-                 <div key={tech} className="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium">
-                   {tech}
-                 </div>
-              ))}
-           </div>
-        </section>
+        {/* Removed Tech Stack */}
 
         {/* FAQ */}
         <section className="space-y-xl">

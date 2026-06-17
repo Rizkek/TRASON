@@ -18,6 +18,8 @@ import {
   Calendar,
   MapPin,
   Clock,
+  GraduationCap,
+  Rocket
 } from 'lucide-react';
 
 const FILTER_TABS = [
@@ -101,10 +103,10 @@ export default function CareerPage() {
     withdrawn:  { label: t('career_page.form.options.status_withdrawn'),  color: 'text-gray-light', badgeVariant: 'default' },
   };
 
-  const TYPE_CONFIG: Record<CareerApplication['application_type'], { label: string; emoji: string }> = {
-    job:        { label: t('career_page.form.options.job'),        emoji: '💼' },
-    internship: { label: t('career_page.form.options.internship'), emoji: '🎓' },
-    freelance:  { label: t('career_page.form.options.freelance'),  emoji: '🚀' },
+  const TYPE_CONFIG: Record<CareerApplication['application_type'], { label: string; icon: React.ReactNode }> = {
+    job:        { label: t('career_page.form.options.job'),        icon: <Briefcase size={12} className="inline mr-1" /> },
+    internship: { label: t('career_page.form.options.internship'), icon: <GraduationCap size={12} className="inline mr-1" /> },
+    freelance:  { label: t('career_page.form.options.freelance'),  icon: <Rocket size={12} className="inline mr-1" /> },
   };
 
   useEffect(() => {
@@ -331,8 +333,8 @@ export default function CareerPage() {
                         >
                           {status.label}
                         </Badge>
-                        <span className="text-[10px] text-gray-light uppercase tracking-widest">
-                          {type.emoji} {type.label}
+                        <span className="text-[10px] text-gray-light uppercase tracking-widest flex items-center">
+                          {type.icon} {type.label}
                         </span>
                         {app.priority === 'high' && (
                           <span className="text-[9px] text-expense font-bold uppercase tracking-widest">
@@ -453,7 +455,7 @@ export default function CareerPage() {
                   className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
                 >
                   {Object.entries(TYPE_CONFIG).map(([val, cfg]) => (
-                    <option key={val} value={val}>{cfg.emoji} {cfg.label}</option>
+                    <option key={val} value={val}>{cfg.label}</option>
                   ))}
                 </select>
               </div>

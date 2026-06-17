@@ -74,25 +74,25 @@ export function calculateCareerAnalytics(applications: CareerApplication[]): Car
   const insights: string[] = [];
 
   if (daysSinceLastApplication !== null && daysSinceLastApplication > 14) {
-    insights.push(`⚠️ Sudah ${daysSinceLastApplication} hari tidak ada lamaran baru. Saatnya aktif kembali.`);
+    insights.push(`Sudah ${daysSinceLastApplication} hari tidak ada lamaran baru. Saatnya aktif kembali.`);
   }
 
   const responseRateVal = total > 0 ? (responded / total) * 100 : 0;
   if (total >= 5 && responseRateVal < 15) {
-    insights.push(`📄 Response rate hanya ${responseRateVal.toFixed(0)}%. Pertimbangkan untuk memperbarui resume atau cover letter.`);
+    insights.push(`Response rate hanya ${responseRateVal.toFixed(0)}%. Pertimbangkan untuk memperbarui resume atau cover letter.`);
   }
 
   const interviewRateVal = total > 0 ? (interviewed / total) * 100 : 0;
   if (total >= 10 && interviewRateVal < 10) {
-    insights.push(`🎯 Interview rate ${interviewRateVal.toFixed(0)}% — coba fokus pada posisi yang lebih sesuai dengan skillset Anda.`);
+    insights.push(`Interview rate ${interviewRateVal.toFixed(0)}% — coba fokus pada posisi yang lebih sesuai dengan skillset Anda.`);
   }
 
   if (active === 0 && total > 0) {
-    insights.push('📬 Tidak ada lamaran yang sedang aktif. Mulai lagi dengan posisi baru.');
+    insights.push('Tidak ada lamaran yang sedang aktif. Mulai lagi dengan posisi baru.');
   }
 
   if (offered > 0) {
-    insights.push(`🎉 Selamat! Anda memiliki ${offered} penawaran kerja yang perlu ditindaklanjuti.`);
+    insights.push(`Selamat! Anda memiliki ${offered} penawaran kerja yang perlu ditindaklanjuti.`);
   }
 
   return {

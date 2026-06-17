@@ -3,27 +3,81 @@
 import React from 'react';
 import Link from 'next/link';
 import { RiCompass3Line } from 'react-icons/ri';
+import { Github, Twitter, Linkedin, Mail, MapPin } from 'lucide-react';
 
 export function LandingFooter() {
   return (
-    <footer className="py-12 px-lg border-t border-black/[0.05] dark:border-white/[0.05] bg-black/20">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-xl">
-        <div className="flex items-center gap-sm">
-          <RiCompass3Line size={24} className="text-warm-gold" />
-          <span className="font-serif text-xl font-bold tracking-tight">TRASON</span>
-        </div>
+    <footer className="py-20 px-lg border-t border-black/[0.05] dark:border-white/[0.05] bg-black/20">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-xl">
         
-        <div className="flex gap-lg flex-wrap justify-center">
-          <Link href="/features" className="text-sm font-medium text-gray-light hover:text-warm-gold transition-colors">Features</Link>
-          <Link href="/preview" className="text-sm font-medium text-gray-light hover:text-warm-gold transition-colors">Preview</Link>
-          <Link href="/about" className="text-sm font-medium text-gray-light hover:text-warm-gold transition-colors">About</Link>
-          <Link href="/privacy" className="text-sm font-medium text-gray-light hover:text-warm-gold transition-colors">Privacy</Link>
-          <Link href="/terms" className="text-sm font-medium text-gray-light hover:text-warm-gold transition-colors">Terms</Link>
+        {/* Brand & Description */}
+        <div className="space-y-md col-span-1 md:col-span-1">
+          <div className="flex items-center gap-sm">
+            <RiCompass3Line size={28} className="text-warm-gold" />
+            <span className="font-serif text-2xl font-bold tracking-tight text-soft-cream">TRASON</span>
+          </div>
+          <p className="text-sm text-gray-light font-light leading-relaxed">
+            The unified personal operating system designed to eliminate app fatigue and centralize your financial, career, and vitality data.
+          </p>
+          <div className="flex items-center gap-md pt-sm">
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-light hover:text-warm-gold transition-colors">
+              <Twitter size={18} />
+            </a>
+            <a href="https://github.com/Rizkek/TRASON" target="_blank" rel="noopener noreferrer" className="text-gray-light hover:text-warm-gold transition-colors">
+              <Github size={18} />
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-light hover:text-warm-gold transition-colors">
+              <Linkedin size={18} />
+            </a>
+          </div>
         </div>
-        
-        <p className="text-[10px] uppercase tracking-[0.2em] text-gray-light/40 text-center md:text-right">
-          © 2026 TRASON OS
+
+        {/* Product Links */}
+        <div className="space-y-md">
+          <h4 className="text-xs font-bold uppercase tracking-widest text-soft-cream">Product</h4>
+          <ul className="space-y-sm">
+            <li><Link href="/features" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Features</Link></li>
+            <li><Link href="/preview" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Preview Dashboard</Link></li>
+            <li><Link href="/pricing" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Pricing</Link></li>
+            <li><Link href="/changelog" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Changelog</Link></li>
+          </ul>
+        </div>
+
+        {/* Company Links */}
+        <div className="space-y-md">
+          <h4 className="text-xs font-bold uppercase tracking-widest text-soft-cream">Company</h4>
+          <ul className="space-y-sm">
+            <li><Link href="/about" className="text-sm text-gray-light hover:text-warm-gold transition-colors">About Us</Link></li>
+            <li><Link href="/contact" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Contact</Link></li>
+            <li className="flex items-center gap-2 text-sm text-gray-light mt-4">
+              <Mail size={14} /> hello@trason.app
+            </li>
+            <li className="flex items-start gap-2 text-sm text-gray-light">
+              <MapPin size={14} className="mt-1 flex-shrink-0" />
+              <span>123 Innovation Drive<br />Tech District, Jakarta 12190</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Legal Links */}
+        <div className="space-y-md">
+          <h4 className="text-xs font-bold uppercase tracking-widest text-soft-cream">Legal</h4>
+          <ul className="space-y-sm">
+            <li><Link href="/privacy" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Privacy Policy</Link></li>
+            <li><Link href="/terms" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Terms of Service</Link></li>
+            <li><Link href="/cookies" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Cookie Policy</Link></li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto mt-2xl pt-lg border-t border-black/10 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-md">
+        <p className="text-xs text-gray-light/60">
+          © {new Date().getFullYear()} TRASON OS. All rights reserved.
         </p>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span className="text-xs text-gray-light">All systems operational</span>
+        </div>
       </div>
     </footer>
   );

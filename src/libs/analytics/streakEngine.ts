@@ -90,20 +90,11 @@ export function calculateStreak(
   };
 }
 
-export function getStreakEmoji(streak: number): string {
-  if (streak === 0) return '😴';
-  if (streak < 3) return '🌱';
-  if (streak < 7) return '🔥';
-  if (streak < 14) return '⚡';
-  if (streak < 30) return '🚀';
-  return '💎';
-}
-
 export function getStreakLabel(streak: number): string {
   if (streak === 0) return 'Mulai hari ini!';
   if (streak === 1) return '1 hari';
   if (streak < 7) return `${streak} hari`;
-  if (streak === 7) return '1 minggu penuh! 🎉';
+  if (streak === 7) return '1 minggu penuh!';
   if (streak < 30) return `${streak} hari berturut-turut`;
-  return `${streak} hari — Luar biasa! 🏆`;
+  return `${streak} hari — Luar biasa!`;
 }

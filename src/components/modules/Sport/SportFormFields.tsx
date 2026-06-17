@@ -50,12 +50,12 @@ export const SportFormFields: React.FC<SportFormFieldsProps> = ({
             className="w-full h-12 px-lg bg-gray-strong/70 border border-gray-light/25 rounded-md focus:ring-2 focus:ring-secondary/40 text-soft-cream outline-none transition-all appearance-none cursor-pointer"
             style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23a0aec0\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1em' }}
           >
-            <option value="run" className="bg-gray-strong">🏃 Running</option>
-            <option value="lift" className="bg-gray-strong">🏋️ Weight Lifting</option>
-            <option value="cycle" className="bg-gray-strong">🚴 Cycling</option>
-            <option value="swim" className="bg-gray-strong">🏊 Swimming</option>
-            <option value="yoga" className="bg-gray-strong">🧘 Yoga</option>
-            <option value="other" className="bg-gray-strong">✨ Other</option>
+            <option value="run" className="bg-gray-strong">Running</option>
+            <option value="lift" className="bg-gray-strong">Weight Lifting</option>
+            <option value="cycle" className="bg-gray-strong">Cycling</option>
+            <option value="swim" className="bg-gray-strong">Swimming</option>
+            <option value="yoga" className="bg-gray-strong">Yoga</option>
+            <option value="other" className="bg-gray-strong">Other</option>
           </select>
         </div>
         

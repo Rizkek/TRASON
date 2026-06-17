@@ -3,7 +3,7 @@
 import React from 'react';
 import { useFinancialHealth } from '@/hooks/useFinancialHealth';
 import { Card } from '@/components';
-import { TrendingUp, TrendingDown, AlertTriangle, RefreshCcw } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, RefreshCcw, CircleDollarSign } from 'lucide-react';
 import { formatCurrency } from '@/libs/format';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 
@@ -28,7 +28,7 @@ export function FinancialHealthWidget() {
     <Card className={`p-xl border ${colors.border} ${colors.bg}`}>
       <div className="flex items-start justify-between mb-lg">
         <div>
-          <h3 className="text-sm font-bold text-white mb-0.5">💰 Financial Health</h3>
+          <h3 className="text-sm font-bold text-white mb-0.5 flex items-center gap-2"><CircleDollarSign size={16} className="text-warm-gold" /> Financial Health</h3>
           <p className="text-[10px] text-gray-light uppercase tracking-widest">Bulan ini</p>
         </div>
         <div className="flex items-center gap-sm">

@@ -101,7 +101,7 @@ export async function GET(request: Request) {
         if (subs && subs.length > 0) {
           const minsBeforeText = mins >= 60 ? `${mins/60}h` : `${mins}m`;
           const payload = JSON.stringify({
-            title: `🔔 ${r.title} — ${minsBeforeText} before`,
+            title: `${r.title} — ${minsBeforeText} before`,
             body: r.description || 'Tap to open TRASON',
             url: '/reminders'
           });
