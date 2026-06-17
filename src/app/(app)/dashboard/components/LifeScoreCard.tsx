@@ -8,31 +8,15 @@ import { TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
 const DIMENSION_CONFIG = {
   finance: {
     label: 'Finance',
-    color: '#10B981',
-    bgColor: 'bg-emerald-500/10',
-    textColor: 'text-emerald-400',
-    icon: '💰',
   },
   productivity: {
     label: 'Produktivitas',
-    color: '#8B5CF6',
-    bgColor: 'bg-violet-500/10',
-    textColor: 'text-violet-400',
-    icon: '✅',
   },
   health: {
     label: 'Kesehatan',
-    color: '#F59E0B',
-    bgColor: 'bg-amber-500/10',
-    textColor: 'text-amber-400',
-    icon: '🏃',
   },
   career: {
     label: 'Karier',
-    color: '#3B82F6',
-    bgColor: 'bg-blue-500/10',
-    textColor: 'text-blue-400',
-    icon: '💼',
   },
 };
 
@@ -75,27 +59,22 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
   );
 }
 
-function DimensionBar({ label, score, icon, color, bgColor, textColor }: {
+function DimensionBar({ label, score }: {
   label: string;
   score: number;
-  icon: string;
-  color: string;
-  bgColor: string;
-  textColor: string;
 }) {
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <span className="flex items-center gap-1.5 text-xs text-gray-light">
-          <span>{icon}</span>
           <span>{label}</span>
         </span>
-        <span className={`text-xs font-bold ${textColor}`}>{score}</span>
+        <span className="text-xs font-bold text-primary">{score}</span>
       </div>
       <div className="h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
         <div
-          className="h-full rounded-full transition-all duration-1000 ease-out"
-          style={{ width: `${score}%`, backgroundColor: color }}
+          className="h-full rounded-full bg-primary transition-all duration-1000 ease-out"
+          style={{ width: `${score}%` }}
         />
       </div>
     </div>
@@ -163,10 +142,6 @@ export function LifeScoreCard() {
               key={key}
               label={config.label}
               score={lifeScore[key]}
-              icon={config.icon}
-              color={config.color}
-              bgColor={config.bgColor}
-              textColor={config.textColor}
             />
           ))}
         </div>
@@ -187,7 +162,7 @@ export function LifeScoreCard() {
 
           {showInsights && (
             <div className="mt-md space-y-sm">
-              {lifeScore.insights.map((insight, i) => (
+              {lifeScore.insights.map((insight: string, i: number) => (
                 <p key={i} className="text-xs text-gray-light leading-relaxed pl-sm border-l-2 border-primary/30">
                   {insight}
                 </p>
