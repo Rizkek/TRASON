@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { ConfirmModal } from '@/components';
+import { ConfirmModal, Logo } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useAllModuleStatus } from '@/hooks/useModuleStatus';
 import { useReminder } from '@/hooks/useReminder';
@@ -133,8 +133,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           }`}
       >
         <div className="px-lg py-xl flex flex-col items-center">
-          <div className="w-12 h-12 bg-gradient-primary rounded-md flex items-center justify-center mb-md glow-primary">
-            <span className="text-2xl font-serif font-bold text-white italic">T</span>
+          <div className="w-12 h-12 flex items-center justify-center mb-md">
+            <Logo size={48} variant="gold" />
           </div>
           <h1 className="text-2xl font-serif font-bold tracking-tight text-gradient">
             TRASON

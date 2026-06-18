@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button, Input, Alert } from '@/components';
+import { Button, Input, Alert, Logo } from '@/components';
 import { supabase } from '@/services/supabaseClient';
 import { userQueries } from '@/services/queries';
 import { validateEmail, validatePassword, sanitizeError } from '@/libs/validation';
@@ -174,7 +174,7 @@ export default function SignupPage() {
          </div>
 
          <div className="absolute bottom-12 left-12 flex items-center gap-sm opacity-40">
-            <Compass size={20} />
+            <Logo size={24} variant="gold" />
             <span className="font-serif text-lg tracking-tight">TRASON</span>
          </div>
       </div>

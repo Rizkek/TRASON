@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button, Input, Alert, Loading } from '@/components';
+import { Button, Input, Alert, Loading, Logo } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { sanitizeError, validateEmail } from '@/libs/validation';
@@ -113,7 +113,7 @@ export default function LoginPage() {
 
          {/* Bottom Brand Label */}
          <div className="absolute bottom-12 left-12 flex items-center gap-sm opacity-40">
-            <Compass size={20} />
+            <Logo size={24} variant="gold" />
             <span className="font-serif text-lg tracking-tight">TRASON</span>
          </div>
       </div>

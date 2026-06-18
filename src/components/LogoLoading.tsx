@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Logo } from '@/components';
 
 export const LogoLoading: React.FC = () => {
   return (
@@ -16,8 +17,8 @@ export const LogoLoading: React.FC = () => {
           <div className="absolute -inset-2 rounded-full border-b border-l border-primary/30 animate-spin" style={{ animationDuration: '2s', animationDirection: 'reverse' }} />
           
           {/* Logo container */}
-          <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-[0_0_30px_rgba(244,201,93,0.3)] animate-pulse">
-            <span className="text-3xl font-serif font-bold text-warm-black italic drop-shadow-md">T</span>
+          <div className="flex items-center justify-center animate-pulse">
+            <Logo size={64} variant="gold" className="drop-shadow-[0_0_15px_rgba(244,201,93,0.5)]" />
           </div>
         </div>
 

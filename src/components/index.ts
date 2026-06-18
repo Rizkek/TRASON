@@ -12,3 +12,4 @@ export * from './ErrorAlert';
 export * from './ErrorBoundary';
 export * from './layout/Layout';
 export * from './LogoLoading';
+export * from './Logo';
