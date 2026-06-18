@@ -12,8 +12,7 @@ export const en = {
     settings: 'System Settings',
     logout: 'Exit Sanctuary',
     logoutConfirmTitle: 'Exit Sanctuary',
-    logoutConfirmDesc: 'Are you sure you want to end your current session?',
-    logoutConfirmBtn: 'Yes, Logout',
+    logoutConfirmBtn: 'Logout',
     cancel: 'Cancel'
   },
   sport_page: {
@@ -45,9 +44,9 @@ export const en = {
     refresh_prices: 'Refresh Prices',
     add_position: 'Add Position',
     portfolio_value: 'PORTFOLIO VALUE',
-    unrealized_pl: 'UNREALIZED P/L',
-    allocation_mix: 'ALLOCATION MIX',
-    portfolio_tracker: 'PORTFOLIO TRACKER',
+    unrealized_pl: 'P/L',
+    allocation_mix: 'ALLOCATION',
+    portfolio_tracker: 'PORTFOLIO',
     portfolio_tracker_desc: 'Simple cost-basis tracking with daily pricing and narrative insights.',
     top_performer: 'Top performer:',
     asset: 'Asset',
@@ -67,11 +66,11 @@ export const en = {
     crypto_upper: 'CRYPTO',
     gold_upper: 'GOLD',
     edit_position: 'EDIT POSITION',
-    add_position_title: 'ADD POSITION',
+    add_position_title: 'ADD',
     cancel_upper: 'CANCEL',
     saving_upper: 'SAVING...',
-    update_position_upper: 'UPDATE POSITION',
-    save_position_upper: 'SAVE POSITION',
+    update_position_upper: 'UPDATE',
+    save_position_upper: 'SAVE',
     asset_type: 'Asset Type',
     symbol: 'SYMBOL',
     display_name: 'DISPLAY NAME',
@@ -125,8 +124,8 @@ export const en = {
     applied_on: 'Applied',
     interview_on: 'Interview:',
     edit: 'Edit',
-    edit_app: 'EDIT APPLICATION',
-    new_app: 'NEW APPLICATION',
+    edit_app: 'EDIT',
+    new_app: 'NEW',
     save: 'SAVE',
     form: {
       company: 'COMPANY NAME',
@@ -137,12 +136,12 @@ export const en = {
       status: 'STATUS',
       priority: 'PRIORITY',
       applied_date: 'APPLIED DATE',
-      interview_date: 'INTERVIEW DATE (optional)',
-      location: 'LOCATION (optional)',
+      interview_date: 'INTERVIEW DATE',
+      location: 'LOCATION',
       location_placeholder: 'Remote, Jakarta...',
-      salary: 'SALARY RANGE (optional)',
+      salary: 'SALARY RANGE',
       salary_placeholder: 'Rp 8-12jt / $3-5k',
-      url: 'JOB POSTING URL (optional)',
+      url: 'JOB POSTING URL',
       url_placeholder: 'https://...',
       notes_placeholder: 'Notes, contacts, impressions...',
       options: {
@@ -161,7 +160,7 @@ export const en = {
         status_withdrawn: 'Withdrawn'
       }
     },
-    remove_app: 'REMOVE APPLICATION',
+    remove_app: 'REMOVE',
     remove_desc: 'Are you sure you want to remove this job application? This action cannot be undone.',
     remove_btn: 'REMOVE'
   },
@@ -189,8 +188,8 @@ export const en = {
     weekly_focus: 'Weekly Focus',
     weekly_focus_desc: 'You have {count} pending reminders this week. Staying organized helps maintain your mental clarity.',
     edit_reminder: 'Refine Reminder',
-    new_reminder_modal: 'Capture New Reminder',
-    save_reminder: 'Save Reminder',
+    new_reminder_modal: 'New Reminder',
+    save_reminder: 'Save',
     notif_push_active: 'Push notifications active (Server-Side VAPID).',
     notif_push_active_sub: 'Reminders will be delivered directly to your device via push service.',
     notif_push_denied: 'Notifications blocked — enable in browser settings to receive reminders.',
@@ -223,19 +222,19 @@ export const en = {
     desc: 'Weekly activity log',
     logs_upper: 'LOGS',
     logged_upper: 'LOGGED',
-    log_activity_btn: 'Log Activity',
+    log_activity_btn: 'Log',
     edit_log: 'EDIT LOG',
-    log_activity_modal: 'LOG ACTIVITY',
+    log_activity_modal: 'LOG',
     form: {
       title: 'ACTIVITY TITLE',
       title_placeholder: 'What are you doing...',
       day: 'DAY',
-      repeat_everyday: 'Repeat Everyday',
+      repeat_everyday: 'Daily',
       hour: 'HOUR',
       min: 'MIN',
       duration: 'DURATION',
       category: 'CATEGORY',
-      uncategorized: 'UNCATEGORIZED',
+      uncategorized: 'GENERAL',
       mood: 'MOOD',
       none: 'NONE',
       rating: 'RATING',
@@ -261,7 +260,7 @@ export const en = {
         calm: 'Calm'
       }
     },
-    delete_activity: 'DELETE ACTIVITY',
+    delete_activity: 'DELETE',
     delete_desc: 'Are you sure you want to delete this activity? This action cannot be undone.',
     delete_btn: 'DELETE'
   },
@@ -282,8 +281,8 @@ export const en = {
       bio: 'PERSONAL MANIFESTO',
       bioPlaceholder: 'What is your current mission?',
       syncing: 'Syncing Identity...',
-      updateBtn: 'UPDATE IDENTITY',
-      savingBtn: 'PERSISTING...'
+      updateBtn: 'SAVE',
+      savingBtn: 'SAVING...'
     },
     interface: {
       sectionTitle: 'VISUAL EXPERIENCE',
@@ -295,7 +294,7 @@ export const en = {
       language: 'REGIONAL DIALECT',
       currency: 'BASE CURRENCY',
       timezone: 'TEMPORAL OFFSET',
-      persistBtn: 'PERSIST PREFERENCES',
+      persistBtn: 'SAVE',
       savingBtn: 'SYNCING...'
     },
     alerts: {
@@ -308,7 +307,7 @@ export const en = {
       daily: 'Daily',
       weekly: 'Weekly',
       monthly: 'Monthly',
-      persistBtn: 'PERSIST SIGNALS'
+      persistBtn: 'SAVE'
     },
     modules: {
       sectionTitle: 'CORE MODULES',
@@ -319,11 +318,11 @@ export const en = {
       currentPass: 'CURRENT ACCESS KEY',
       newPass: 'NEW ACCESS KEY',
       confirmPass: 'CONFIRM ACCESS KEY',
-      updateBtn: 'ROTATE ACCESS KEYS',
-      updatingBtn: 'ROTATING...',
+      updateBtn: 'SAVE',
+      updatingBtn: 'SAVING...',
       deleteAccount: 'DISSOLVE SANCTUARY',
       deleteDesc: 'This action is irreversible. All personal data, logs, and identity records will be permanently erased.',
-      deleteBtn: 'DISSOLVE SANCTUARY',
+      deleteBtn: 'DELETE ACCOUNT',
       deleteConfirmTitle: 'Dissolve Sanctuary',
       deleteConfirmDesc: 'Are you absolutely sure? This will permanently erase your digital footprint within TRASON.',
       confirmDeleteBtn: 'Yes, Dissolve My Sanctuary'
@@ -350,8 +349,8 @@ export const en = {
     modal: {
       addTitle: 'Log Financial Flow',
       editTitle: 'Refine Entry',
-      saveBtn: 'Persist Entry',
-      savingBtn: 'Syncing...',
+      saveBtn: 'Save',
+      savingBtn: 'Saving...',
       deleteConfirmTitle: 'Remove Entry',
       deleteConfirmDesc: 'Are you sure you want to remove this financial record?',
       type: {
@@ -378,7 +377,7 @@ export const en = {
     capture_btn: 'CAPTURE',
     daily_insight: 'Daily Insight',
     default_insight: 'Your dashboard gets sharper as you log more of the day. Start with one small signal, then let the pattern emerge.',
-    open_insights: 'Open Insights',
+    open_insights: 'Insights',
     checking_session: 'Checking your session...',
     
     // Components
@@ -396,12 +395,12 @@ export const en = {
     balance: 'BALANCE',
     
     recent_moments: 'RECENT MOMENTS',
-    open_timeline: 'OPEN TIMELINE',
+    open_timeline: 'TIMELINE',
     timeline_quiet: 'Your timeline is quiet. Capture one thing worth remembering.',
     done: 'Done',
     
     cash_flow: 'CASH FLOW',
-    log_new: 'LOG NEW',
+    log_new: 'LOG',
     no_transactions: 'No transactions found.',
     
     next_signals: 'NEXT SIGNALS',
@@ -444,14 +443,14 @@ export const en = {
     loginSubtitle: 'Authenticate to enter your sanctuary',
     email: 'DIGITAL IDENTITY (EMAIL)',
     password: 'ACCESS KEY',
-    loginBtn: 'AUTHENTICATE',
+    loginBtn: 'LOGIN',
     noAccount: 'Need a sanctuary?',
     signupLink: 'Initialize Here',
     signupTitle: 'Initialize TRASON',
     signupSubtitle: 'Commence your digital architecture',
     firstName: 'GIVEN NAME',
     lastName: 'FAMILY NAME',
-    signupBtn: 'COMMENCE INITIALIZATION',
+    signupBtn: 'SIGN UP',
     hasAccount: 'Already initialized?',
     loginLink: 'Authenticate'
   },

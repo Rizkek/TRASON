@@ -38,8 +38,6 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               {suffix}
             </div>
           )}
-          {/* Bottom highlight beam on focus */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-primary group-focus-within:w-full transition-all duration-500 rounded-full" />
         </div>
         {error && <p className="text-xs font-medium text-danger">{error}</p>}
         {helpText && !error && (

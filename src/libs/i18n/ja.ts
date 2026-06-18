@@ -12,8 +12,7 @@ export const ja = {
     settings: '設定',
     logout: 'ログアウト',
     logoutConfirmTitle: 'ログアウト',
-    logoutConfirmDesc: 'アカウントからログアウトしてもよろしいですか？',
-    logoutConfirmBtn: 'はい、ログアウトします',
+    logoutConfirmBtn: 'ログアウト',
     cancel: 'キャンセル'
   },
   sport_page: {
@@ -45,9 +44,9 @@ export const ja = {
     refresh_prices: '価格を更新',
     add_position: 'ポジションを追加',
     portfolio_value: 'ポートフォリオ価値',
-    unrealized_pl: '未実現損益',
-    allocation_mix: 'アロケーションミックス',
-    portfolio_tracker: 'ポートフォリオトラッカー',
+    unrealized_pl: '損益',
+    allocation_mix: 'アロケーション',
+    portfolio_tracker: 'ポートフォリオ',
     portfolio_tracker_desc: '日々の価格設定と有益な洞察を伴うシンプルな取得原価追跡。',
     top_performer: 'トップパフォーマー:',
     asset: '資産',
@@ -67,11 +66,11 @@ export const ja = {
     crypto_upper: '暗号資産',
     gold_upper: '金',
     edit_position: 'ポジションを編集',
-    add_position_title: 'ポジションを追加',
+    add_position_title: '追加',
     cancel_upper: 'キャンセル',
     saving_upper: '保存中...',
-    update_position_upper: 'ポジションを更新',
-    save_position_upper: 'ポジションを保存',
+    update_position_upper: '更新',
+    save_position_upper: '保存',
     asset_type: '資産タイプ',
     symbol: 'シンボル',
     display_name: '表示名',
@@ -125,8 +124,8 @@ export const ja = {
     applied_on: '応募日',
     interview_on: '面接:',
     edit: '編集',
-    edit_app: '応募を編集',
-    new_app: '新しい応募',
+    edit_app: '編集',
+    new_app: '新規',
     save: '保存',
     form: {
       company: '会社名',
@@ -137,12 +136,12 @@ export const ja = {
       status: 'ステータス',
       priority: '優先度',
       applied_date: '応募日',
-      interview_date: '面接日 (任意)',
-      location: '場所 (任意)',
+      interview_date: '面接日',
+      location: '場所',
       location_placeholder: 'リモート, ジャカルタ...',
-      salary: '給与範囲 (任意)',
+      salary: '給与範囲',
       salary_placeholder: 'Rp 8-12jt / $3-5k',
-      url: '求人URL (任意)',
+      url: '求人URL',
       url_placeholder: 'https://...',
       notes_placeholder: 'メモ、連絡先、印象...',
       options: {
@@ -161,7 +160,7 @@ export const ja = {
         status_withdrawn: '辞退'
       }
     },
-    remove_app: '応募を削除',
+    remove_app: '削除',
     remove_desc: 'この求人応募を削除してもよろしいですか？この操作は元に戻せません。',
     remove_btn: '削除'
   },
@@ -189,8 +188,8 @@ export const ja = {
     weekly_focus: '今週のフォーカス',
     weekly_focus_desc: '今週は{count}個の保留中のリマインダーがあります。整理整頓を保つことで、精神的な明晰さを維持できます。',
     edit_reminder: 'リマインダーを調整',
-    new_reminder_modal: '新しいリマインダーをキャプチャ',
-    save_reminder: 'リマインダーを保存',
+    new_reminder_modal: '新しいリマインダー',
+    save_reminder: '保存',
     notif_push_active: 'プッシュ通知が有効です（サーバーサイドVAPID）。',
     notif_push_active_sub: 'リマインダーはプッシュサービスを通じてデバイスに直接配信されます。',
     notif_push_denied: '通知がブロックされています — ブラウザの設定で有効にしてリマインダーを受け取ってください。',
@@ -223,19 +222,19 @@ export const ja = {
     desc: '週次活動ログ',
     logs_upper: 'ログ',
     logged_upper: '記録済み',
-    log_activity_btn: '活動を記録',
+    log_activity_btn: '記録',
     edit_log: 'ログを編集',
-    log_activity_modal: '活動を記録',
+    log_activity_modal: '記録',
     form: {
       title: '活動のタイトル',
       title_placeholder: '何をしていますか...',
       day: '日',
-      repeat_everyday: '毎日繰り返す',
+      repeat_everyday: '毎日',
       hour: '時',
       min: '分',
       duration: '期間',
       category: 'カテゴリ',
-      uncategorized: '未分類',
+      uncategorized: '一般',
       mood: '気分',
       none: 'なし',
       rating: '評価',
@@ -261,7 +260,7 @@ export const ja = {
         calm: '落ち着いた'
       }
     },
-    delete_activity: '活動を削除',
+    delete_activity: '削除',
     delete_desc: 'この活動を削除してもよろしいですか？この操作は元に戻せません。',
     delete_btn: '削除'
   },
@@ -282,7 +281,7 @@ export const ja = {
       bio: '自己紹介',
       bioPlaceholder: 'あなたのミッションについて教えてください...',
       syncing: 'アイデンティティを同期中...',
-      updateBtn: 'プロフィールを更新',
+      updateBtn: '保存',
       savingBtn: '保存中...'
     },
     interface: {
@@ -295,7 +294,7 @@ export const ja = {
       language: '地域言語',
       currency: '現地通貨',
       timezone: 'タイムゾーン',
-      persistBtn: '設定を保存',
+      persistBtn: '保存',
       savingBtn: '同期中...'
     },
     alerts: {
@@ -308,7 +307,7 @@ export const ja = {
       daily: '毎日',
       weekly: '毎週',
       monthly: '毎月',
-      persistBtn: '通知設定を保存'
+      persistBtn: '保存'
     },
     modules: {
       sectionTitle: 'アクティブモジュール',
@@ -319,11 +318,11 @@ export const ja = {
       currentPass: '現在のパスワード',
       newPass: '新しいパスワード',
       confirmPass: '新しいパスワード (確認)',
-      updateBtn: 'パスワードを更新',
+      updateBtn: '保存',
       updatingBtn: '更新中...',
       deleteAccount: 'アカウントを削除',
       deleteDesc: 'この操作は取り消せません。すべてのデータが完全に消去されます。',
-      deleteBtn: '自爆プロセスを開始',
+      deleteBtn: 'アカウント削除',
       deleteConfirmTitle: 'アカウント削除',
       deleteConfirmDesc: '本当にアカウントを削除してもよろしいですか？この操作は元に戻せません。',
       confirmDeleteBtn: 'はい、アカウントを削除します'
@@ -350,7 +349,7 @@ export const ja = {
     modal: {
       addTitle: 'トランザクションを追加',
       editTitle: 'トランザクションを編集',
-      saveBtn: 'エントリを保存',
+      saveBtn: '保存',
       savingBtn: '保存中...',
       deleteConfirmTitle: '取引を削除',
       deleteConfirmDesc: 'この取引を削除してもよろしいですか？',
@@ -378,7 +377,7 @@ export const ja = {
     capture_btn: '記録',
     daily_insight: '毎日のインサイト',
     default_insight: '一日の記録を増やすほど、ダッシュボードはより鋭くなります。小さなシグナルから始めて、パターンを浮かび上がらせましょう。',
-    open_insights: 'インサイトを開く',
+    open_insights: 'インサイト',
     checking_session: 'セッションを確認中...',
     
     // Components
@@ -396,12 +395,12 @@ export const ja = {
     balance: '残高',
     
     recent_moments: '最近の瞬間',
-    open_timeline: 'タイムラインを開く',
+    open_timeline: 'タイムライン',
     timeline_quiet: 'タイムラインは静かです。記憶に残ることを一つ記録しましょう。',
     done: '完了',
     
     cash_flow: 'キャッシュフロー',
-    log_new: '新しく記録',
+    log_new: '記録',
     no_transactions: '取引は見つかりませんでした。',
     
     next_signals: '次のシグナル',
@@ -444,14 +443,14 @@ export const ja = {
     loginSubtitle: '続行するには認証情報を入力してください',
     email: 'Eメールアドレス',
     password: 'パスワード',
-    loginBtn: '認証',
+    loginBtn: 'ログイン',
     noAccount: 'まだアクセス権がありませんか？',
     signupLink: 'アクセスをリクエスト',
     signupTitle: 'TRASONを初期化',
     signupSubtitle: 'デジタルの聖域を作成する',
     firstName: '名',
     lastName: '姓',
-    signupBtn: '初期化',
+    signupBtn: '登録',
     hasAccount: 'すでに初期化済みですか？',
     loginLink: '認証'
   },

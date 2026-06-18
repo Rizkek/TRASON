@@ -12,8 +12,7 @@ export const id = {
     settings: 'Pengaturan',
     logout: 'Keluar',
     logoutConfirmTitle: 'Konfirmasi Keluar',
-    logoutConfirmDesc: 'Apakah Anda yakin ingin keluar dari akun Anda?',
-    logoutConfirmBtn: 'Ya, Keluar',
+    logoutConfirmBtn: 'Keluar',
     cancel: 'Batal'
   },
   sport_page: {
@@ -45,9 +44,9 @@ export const id = {
     refresh_prices: 'Perbarui Harga',
     add_position: 'Tambah Posisi',
     portfolio_value: 'NILAI PORTOFOLIO',
-    unrealized_pl: 'P/L BELUM TEREALISASI',
-    allocation_mix: 'CAMPURAN ALOKASI',
-    portfolio_tracker: 'PELACAK PORTOFOLIO',
+    unrealized_pl: 'P/L',
+    allocation_mix: 'ALOKASI',
+    portfolio_tracker: 'PORTOFOLIO',
     portfolio_tracker_desc: 'Pelacakan basis biaya sederhana dengan harga harian dan wawasan naratif.',
     top_performer: 'Berkinerja terbaik:',
     asset: 'Aset',
@@ -67,11 +66,11 @@ export const id = {
     crypto_upper: 'KRIPTO',
     gold_upper: 'EMAS',
     edit_position: 'UBAH POSISI',
-    add_position_title: 'TAMBAH POSISI',
+    add_position_title: 'TAMBAH',
     cancel_upper: 'BATAL',
     saving_upper: 'MENYIMPAN...',
-    update_position_upper: 'PERBARUI POSISI',
-    save_position_upper: 'SIMPAN POSISI',
+    update_position_upper: 'PERBARUI',
+    save_position_upper: 'SIMPAN',
     asset_type: 'Tipe Aset',
     symbol: 'SIMBOL',
     display_name: 'NAMA TAMPILAN',
@@ -125,8 +124,8 @@ export const id = {
     applied_on: 'Dilamar',
     interview_on: 'Wawancara:',
     edit: 'Ubah',
-    edit_app: 'UBAH LAMARAN',
-    new_app: 'LAMARAN BARU',
+    edit_app: 'UBAH',
+    new_app: 'BARU',
     save: 'SIMPAN',
     form: {
       company: 'NAMA PERUSAHAAN',
@@ -137,12 +136,12 @@ export const id = {
       status: 'STATUS',
       priority: 'PRIORITAS',
       applied_date: 'TANGGAL MELAMAR',
-      interview_date: 'TANGGAL WAWANCARA (opsional)',
-      location: 'LOKASI (opsional)',
+      interview_date: 'TANGGAL WAWANCARA',
+      location: 'LOKASI',
       location_placeholder: 'Remote, Jakarta...',
-      salary: 'RENTANG GAJI (opsional)',
+      salary: 'RENTANG GAJI',
       salary_placeholder: 'Rp 8-12jt / $3-5k',
-      url: 'URL LOWONGAN (opsional)',
+      url: 'URL LOWONGAN',
       url_placeholder: 'https://...',
       notes_placeholder: 'Catatan, kontak, kesan...',
       options: {
@@ -161,7 +160,7 @@ export const id = {
         status_withdrawn: 'Ditarik'
       }
     },
-    remove_app: 'HAPUS LAMARAN',
+    remove_app: 'HAPUS',
     remove_desc: 'Anda yakin ingin menghapus lamaran pekerjaan ini? Tindakan ini tidak dapat dibatalkan.',
     remove_btn: 'HAPUS'
   },
@@ -189,8 +188,8 @@ export const id = {
     weekly_focus: 'Fokus Mingguan',
     weekly_focus_desc: 'Anda memiliki {count} pengingat tertunda minggu ini. Tetap terorganisir membantu menjaga kejernihan mental Anda.',
     edit_reminder: 'Perbarui Pengingat',
-    new_reminder_modal: 'Buat Pengingat Baru',
-    save_reminder: 'Simpan Pengingat',
+    new_reminder_modal: 'Pengingat Baru',
+    save_reminder: 'Simpan',
     notif_push_active: 'Notifikasi push aktif (Server-Side VAPID).',
     notif_push_active_sub: 'Pengingat akan dikirimkan langsung ke perangkat Anda melalui push service.',
     notif_push_denied: 'Notifikasi diblokir — aktifkan di pengaturan browser untuk menerima pengingat.',
@@ -223,19 +222,19 @@ export const id = {
     desc: 'Log aktivitas mingguan',
     logs_upper: 'LOG',
     logged_upper: 'DICATAT',
-    log_activity_btn: 'Catat Aktivitas',
+    log_activity_btn: 'Catat',
     edit_log: 'UBAH LOG',
-    log_activity_modal: 'CATAT AKTIVITAS',
+    log_activity_modal: 'CATAT',
     form: {
       title: 'JUDUL AKTIVITAS',
       title_placeholder: 'Apa yang sedang Anda lakukan...',
       day: 'HARI',
-      repeat_everyday: 'Ulangi Setiap Hari',
+      repeat_everyday: 'Tiap Hari',
       hour: 'JAM',
       min: 'MENIT',
       duration: 'DURASI',
       category: 'KATEGORI',
-      uncategorized: 'TIDAK BERKATEGORI',
+      uncategorized: 'UMUM',
       mood: 'SUASANA HATI',
       none: 'TIDAK ADA',
       rating: 'PERINGKAT',
@@ -261,7 +260,7 @@ export const id = {
         calm: 'Tenang'
       }
     },
-    delete_activity: 'HAPUS AKTIVITAS',
+    delete_activity: 'HAPUS',
     delete_desc: 'Anda yakin ingin menghapus aktivitas ini? Tindakan ini tidak dapat dibatalkan.',
     delete_btn: 'HAPUS'
   },
@@ -282,8 +281,8 @@ export const id = {
       bio: 'BIO SINGKAT',
       bioPlaceholder: 'Ceritakan tentang misi Anda...',
       syncing: 'Menyinkronkan Identitas...',
-      updateBtn: 'PERBARUI PROFIL',
-      savingBtn: 'MENYIMPAN...'
+      updateBtn: 'SIMPAN',
+      savingBtn: 'SIMPAN...'
     },
     interface: {
       sectionTitle: 'TAMPILAN & ANTARMUKA',
@@ -295,8 +294,8 @@ export const id = {
       language: 'BAHASA REGIONAL',
       currency: 'MATA UANG LOKAL',
       timezone: 'ZONA WAKTU',
-      persistBtn: 'SIMPAN PREFERENSI',
-      savingBtn: 'MENYINKRONKAN...'
+      persistBtn: 'SIMPAN',
+      savingBtn: 'SINKRON...'
     },
     alerts: {
       sectionTitle: 'PREFERENSI NOTIFIKASI',
@@ -308,7 +307,7 @@ export const id = {
       daily: 'Harian',
       weekly: 'Mingguan',
       monthly: 'Bulanan',
-      persistBtn: 'SIMPAN NOTIFIKASI'
+      persistBtn: 'SIMPAN'
     },
     modules: {
       sectionTitle: 'MODUL AKTIF',
@@ -319,11 +318,11 @@ export const id = {
       currentPass: 'KATA SANDI SAAT INI',
       newPass: 'KATA SANDI BARU',
       confirmPass: 'KONFIRMASI KATA SANDI BARU',
-      updateBtn: 'PERBARUI KATA SANDI',
-      updatingBtn: 'MEMPERBARUI...',
+      updateBtn: 'SIMPAN',
+      updatingBtn: 'PROSES...',
       deleteAccount: 'HAPUS AKUN',
       deleteDesc: 'Tindakan ini tidak dapat dibatalkan. Semua data Anda akan dihapus secara permanen.',
-      deleteBtn: 'INISIASI PENGHAPUSAN DIRI',
+      deleteBtn: 'HAPUS AKUN',
       deleteConfirmTitle: 'Hapus Akun',
       deleteConfirmDesc: 'Apakah Anda benar-benar yakin ingin menghapus akun Anda? Tindakan ini tidak dapat dibatalkan.',
       confirmDeleteBtn: 'Ya, Hapus Akun Saya'
@@ -350,8 +349,8 @@ export const id = {
     modal: {
       addTitle: 'Tambah Transaksi',
       editTitle: 'Edit Transaksi',
-      saveBtn: 'Simpan Entri',
-      savingBtn: 'Menyimpan...',
+      saveBtn: 'Simpan',
+      savingBtn: 'Proses...',
       deleteConfirmTitle: 'Hapus Transaksi',
       deleteConfirmDesc: 'Apakah Anda yakin ingin menghapus transaksi ini?',
       type: {
@@ -378,7 +377,7 @@ export const id = {
     capture_btn: 'CATAT',
     daily_insight: 'Wawasan Harian',
     default_insight: 'Dasbor Anda menjadi lebih tajam saat Anda mencatat lebih banyak hari ini. Mulai dengan satu sinyal kecil, lalu biarkan polanya muncul.',
-    open_insights: 'Buka Wawasan',
+    open_insights: 'Wawasan',
     checking_session: 'Memeriksa sesi Anda...',
     
     // Components
@@ -396,12 +395,12 @@ export const id = {
     balance: 'SALDO',
     
     recent_moments: 'MOMEN TERBARU',
-    open_timeline: 'BUKA LINIMASA',
+    open_timeline: 'LINIMASA',
     timeline_quiet: 'Linimasa Anda sepi. Catat satu hal yang patut diingat.',
     done: 'Selesai',
     
     cash_flow: 'ARUS KAS',
-    log_new: 'CATAT BARU',
+    log_new: 'CATAT',
     no_transactions: 'Tidak ada transaksi.',
     
     next_signals: 'SINYAL BERIKUTNYA',
@@ -444,14 +443,14 @@ export const id = {
     loginSubtitle: 'Masukkan kredensial Anda untuk melanjutkan',
     email: 'ALAMAT EMAIL',
     password: 'KATA SANDI',
-    loginBtn: 'OTENTIKASI',
+    loginBtn: 'MASUK',
     noAccount: 'Belum punya akses?',
     signupLink: 'Minta Akses',
     signupTitle: 'Inisialisasi TRASON',
     signupSubtitle: 'Buat tempat perlindungan digital Anda',
     firstName: 'NAMA DEPAN',
     lastName: 'NAMA BELAKANG',
-    signupBtn: 'INISIALISASI',
+    signupBtn: 'DAFTAR',
     hasAccount: 'Sudah diinisialisasi?',
     loginLink: 'Otentikasi'
   },

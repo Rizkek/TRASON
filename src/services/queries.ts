@@ -1103,6 +1103,50 @@ export const dailyTaskQueries = {
           .eq('completed_date', today);
       }
 
+      // --- Smart Timeline Sync ---
+      try {
+        const { count } = await supabase
+          .from('daily_task_logs')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('completed_date', today);
+
+        const completedCount = count || 0;
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const { data: existingActivity } = await supabase
+          .from('activities')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('category', 'daily_tasks')
+          .gte('start_time', startOfDay.toISOString())
+          .lte('start_time', endOfDay.toISOString())
+          .maybeSingle();
+
+        if (completedCount > 0) {
+          const title = `${completedCount} Daily Task${completedCount > 1 ? 's' : ''} Completed`;
+          if (existingActivity) {
+            await supabase.from('activities').update({ title, updated_at: new Date().toISOString() }).eq('id', existingActivity.id);
+          } else {
+            await supabase.from('activities').insert([{
+              user_id: user.id,
+              title,
+              category: 'daily_tasks',
+              start_time: new Date().toISOString(),
+              duration_minutes: 0,
+            }]);
+          }
+        } else if (existingActivity) {
+          await supabase.from('activities').delete().eq('id', existingActivity.id);
+        }
+      } catch (syncErr) {
+        console.error('Failed to sync timeline:', syncErr);
+      }
+      // ---------------------------
+
       return data;
     } catch (err) {
       logError(err, 'dailyTaskQueries.toggleTask');

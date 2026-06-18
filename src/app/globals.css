@@ -262,3 +262,19 @@ a {
 .glow-secondary {
   box-shadow: 0 0 20px -5px var(--color-secondary);
 }
+
+/* Remove autocomplete background for Chrome/Webkit */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    transition: background-color 5000s ease-in-out 0s;
+    -webkit-text-fill-color: rgba(248, 250, 252, 1) !important; /* soft-cream */
+}
+
+.light input:-webkit-autofill,
+.light input:-webkit-autofill:hover, 
+.light input:-webkit-autofill:focus, 
+.light input:-webkit-autofill:active{
+    -webkit-text-fill-color: rgba(31, 26, 23, 1) !important; /* soft-cream for light mode (dark text) */
+}

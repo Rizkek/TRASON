@@ -12,8 +12,7 @@ export const es = {
     settings: 'Ajustes',
     logout: 'Cerrar sesión',
     logoutConfirmTitle: 'Cerrar sesión',
-    logoutConfirmDesc: '¿Estás seguro de que deseas cerrar sesión de tu cuenta?',
-    logoutConfirmBtn: 'Sí, Cerrar sesión',
+    logoutConfirmBtn: 'Cerrar sesión',
     cancel: 'Cancelar'
   },
   sport_page: {
@@ -45,9 +44,9 @@ export const es = {
     refresh_prices: 'Actualizar Precios',
     add_position: 'Añadir Posición',
     portfolio_value: 'VALOR DE CARTERA',
-    unrealized_pl: 'P/G NO REALIZADO',
-    allocation_mix: 'MEZCLA DE ASIGNACIÓN',
-    portfolio_tracker: 'RASTREADOR DE CARTERA',
+    unrealized_pl: 'P/G',
+    allocation_mix: 'ASIGNACIÓN',
+    portfolio_tracker: 'CARTERA',
     portfolio_tracker_desc: 'Seguimiento simple de base de costos con precios diarios y perspectivas narrativas.',
     top_performer: 'Mejor rendimiento:',
     asset: 'Activo',
@@ -67,11 +66,11 @@ export const es = {
     crypto_upper: 'CRIPTO',
     gold_upper: 'ORO',
     edit_position: 'EDITAR POSICIÓN',
-    add_position_title: 'AÑADIR POSICIÓN',
+    add_position_title: 'AÑADIR',
     cancel_upper: 'CANCELAR',
     saving_upper: 'GUARDANDO...',
-    update_position_upper: 'ACTUALIZAR POSICIÓN',
-    save_position_upper: 'GUARDAR POSICIÓN',
+    update_position_upper: 'ACTUALIZAR',
+    save_position_upper: 'GUARDAR',
     asset_type: 'Tipo de Activo',
     symbol: 'SÍMBOLO',
     display_name: 'NOMBRE PARA MOSTRAR',
@@ -125,8 +124,8 @@ export const es = {
     applied_on: 'Aplicado',
     interview_on: 'Entrevista:',
     edit: 'Editar',
-    edit_app: 'EDITAR SOLICITUD',
-    new_app: 'NUEVA SOLICITUD',
+    edit_app: 'EDITAR',
+    new_app: 'NUEVA',
     save: 'GUARDAR',
     form: {
       company: 'NOMBRE DE LA EMPRESA',
@@ -137,12 +136,12 @@ export const es = {
       status: 'ESTADO',
       priority: 'PRIORIDAD',
       applied_date: 'FECHA DE APLICACIÓN',
-      interview_date: 'FECHA DE ENTREVISTA (opcional)',
-      location: 'UBICACIÓN (opcional)',
+      interview_date: 'FECHA DE ENTREVISTA',
+      location: 'UBICACIÓN',
       location_placeholder: 'Remoto, Yakarta...',
-      salary: 'RANGO SALARIAL (opcional)',
+      salary: 'RANGO SALARIAL',
       salary_placeholder: 'Rp 8-12jt / $3-5k',
-      url: 'URL DE PUBLICACIÓN (opcional)',
+      url: 'URL DE PUBLICACIÓN',
       url_placeholder: 'https://...',
       notes_placeholder: 'Notas, contactos, impresiones...',
       options: {
@@ -161,7 +160,7 @@ export const es = {
         status_withdrawn: 'Retirado'
       }
     },
-    remove_app: 'ELIMINAR SOLICITUD',
+    remove_app: 'ELIMINAR',
     remove_desc: '¿Estás seguro de que quieres eliminar esta solicitud de empleo? Esta acción no se puede deshacer.',
     remove_btn: 'ELIMINAR'
   },
@@ -189,8 +188,8 @@ export const es = {
     weekly_focus: 'Enfoque Semanal',
     weekly_focus_desc: 'Tienes {count} recordatorios pendientes esta semana. Mantenerte organizado ayuda a mantener tu claridad mental.',
     edit_reminder: 'Refinar Recordatorio',
-    new_reminder_modal: 'Capturar Nuevo Recordatorio',
-    save_reminder: 'Guardar Recordatorio',
+    new_reminder_modal: 'Nuevo Recordatorio',
+    save_reminder: 'Guardar',
     notif_push_active: 'Notificaciones push activas (VAPID de servidor).',
     notif_push_active_sub: 'Los recordatorios se entregarán directamente a tu dispositivo a través del servicio push.',
     notif_push_denied: 'Notificaciones bloqueadas — actívalas en la configuración del navegador para recibir recordatorios.',
@@ -223,19 +222,19 @@ export const es = {
     desc: 'Registro de actividad semanal',
     logs_upper: 'REGISTROS',
     logged_upper: 'REGISTRADO',
-    log_activity_btn: 'Registrar Actividad',
+    log_activity_btn: 'Registrar',
     edit_log: 'EDITAR REGISTRO',
-    log_activity_modal: 'REGISTRAR ACTIVIDAD',
+    log_activity_modal: 'REGISTRAR',
     form: {
       title: 'TÍTULO DE LA ACTIVIDAD',
       title_placeholder: '¿Qué estás haciendo...',
       day: 'DÍA',
-      repeat_everyday: 'Repetir todos los días',
+      repeat_everyday: 'Diario',
       hour: 'HORA',
       min: 'MIN',
       duration: 'DURACIÓN',
       category: 'CATEGORÍA',
-      uncategorized: 'SIN CATEGORÍA',
+      uncategorized: 'GENERAL',
       mood: 'ESTADO DE ÁNIMO',
       none: 'NINGUNO',
       rating: 'CALIFICACIÓN',
@@ -261,7 +260,7 @@ export const es = {
         calm: 'Tranquilo'
       }
     },
-    delete_activity: 'ELIMINAR ACTIVIDAD',
+    delete_activity: 'ELIMINAR',
     delete_desc: '¿Estás seguro de que quieres eliminar esta actividad? Esta acción no se puede deshacer.',
     delete_btn: 'ELIMINAR'
   },
@@ -282,7 +281,7 @@ export const es = {
       bio: 'BIOGRAFÍA CORTA',
       bioPlaceholder: 'Cuéntanos sobre tu misión...',
       syncing: 'Sincronizando identidad...',
-      updateBtn: 'ACTUALIZAR PERFIL',
+      updateBtn: 'GUARDAR',
       savingBtn: 'GUARDANDO...'
     },
     interface: {
@@ -295,7 +294,7 @@ export const es = {
       language: 'IDIOMA REGIONAL',
       currency: 'MONEDA LOCAL',
       timezone: 'ZONA HORARIA',
-      persistBtn: 'GUARDAR PREFERENCIAS',
+      persistBtn: 'GUARDAR',
       savingBtn: 'SINCRONIZANDO...'
     },
     alerts: {
@@ -308,7 +307,7 @@ export const es = {
       daily: 'Diario',
       weekly: 'Semanal',
       monthly: 'Mensual',
-      persistBtn: 'GUARDAR ALERTAS'
+      persistBtn: 'GUARDAR'
     },
     modules: {
       sectionTitle: 'MÓDULOS ACTIVOS',
@@ -319,11 +318,11 @@ export const es = {
       currentPass: 'CONTRASEÑA ACTUAL',
       newPass: 'NUEVA CONTRASEÑA',
       confirmPass: 'CONFIRMAR NUEVA CONTRASEÑA',
-      updateBtn: 'ROTAR CLAVES DE SEGURIDAD',
-      updatingBtn: 'ROTANDO...',
+      updateBtn: 'GUARDAR',
+      updatingBtn: 'GUARDANDO...',
       deleteAccount: 'ELIMINAR CUENTA',
       deleteDesc: 'Esta acción es irreversible. Todos tus datos se borrarán permanentemente.',
-      deleteBtn: 'INICIAR AUTODESTRUCCIÓN',
+      deleteBtn: 'ELIMINAR CUENTA',
       deleteConfirmTitle: 'Eliminar Cuenta',
       deleteConfirmDesc: '¿Estás absolutamente seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
       confirmDeleteBtn: 'Sí, Eliminar Mi Cuenta'
@@ -350,7 +349,7 @@ export const es = {
     modal: {
       addTitle: 'Añadir Transacción',
       editTitle: 'Editar Transacción',
-      saveBtn: 'Guardar Entrada',
+      saveBtn: 'Guardar',
       savingBtn: 'Guardando...',
       deleteConfirmTitle: 'Eliminar Transacción',
       deleteConfirmDesc: '¿Estás seguro de que deseas eliminar esta transacción?',
@@ -378,7 +377,7 @@ export const es = {
     capture_btn: 'REGISTRAR',
     daily_insight: 'Perspectiva Diaria',
     default_insight: 'Tu panel se vuelve más nítido a medida que registras más de tu día. Comienza con una pequeña señal y deja que surja el patrón.',
-    open_insights: 'Abrir Perspectivas',
+    open_insights: 'Perspectivas',
     checking_session: 'Verificando tu sesión...',
     
     // Components
@@ -396,12 +395,12 @@ export const es = {
     balance: 'SALDO',
     
     recent_moments: 'MOMENTOS RECIENTES',
-    open_timeline: 'ABRIR LÍNEA DE TIEMPO',
+    open_timeline: 'LÍNEA DE TIEMPO',
     timeline_quiet: 'Tu línea de tiempo está vacía. Registra algo que valga la pena recordar.',
     done: 'Hecho',
     
     cash_flow: 'FLUJO DE CAJA',
-    log_new: 'REGISTRAR NUEVO',
+    log_new: 'REGISTRAR',
     no_transactions: 'No se encontraron transacciones.',
     
     next_signals: 'PRÓXIMAS SEÑALES',
@@ -444,14 +443,14 @@ export const es = {
     loginSubtitle: 'Ingresa tus credenciales para continuar',
     email: 'DIRECCIÓN DE CORREO',
     password: 'CONTRASEÑA',
-    loginBtn: 'AUTENTICAR',
+    loginBtn: 'ENTRAR',
     noAccount: '¿Aún no tienes acceso?',
     signupLink: 'Solicitar Acceso',
     signupTitle: 'Inicializar TRASON',
     signupSubtitle: 'Crea tu santuario digital',
     firstName: 'NOMBRE',
     lastName: 'APELLIDO',
-    signupBtn: 'INICIALIZAR',
+    signupBtn: 'REGISTRO',
     hasAccount: '¿Ya estás inicializado?',
     loginLink: 'Autenticar'
   },

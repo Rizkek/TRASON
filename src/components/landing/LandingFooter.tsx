@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { RiCompass3Line } from 'react-icons/ri';
-import { Github, Twitter, Linkedin, Mail, MapPin } from 'lucide-react';
+import { Github, Linkedin, Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
 
 export function LandingFooter() {
   return (
@@ -20,8 +20,8 @@ export function LandingFooter() {
             The unified personal operating system designed to eliminate app fatigue and centralize your financial, career, and vitality data.
           </p>
           <div className="flex items-center gap-md pt-sm">
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-light hover:text-warm-gold transition-colors">
-              <Twitter size={18} />
+            <a href="https://wa.me/62895417240107" target="_blank" rel="noopener noreferrer" className="text-gray-light hover:text-warm-gold transition-colors">
+              <MessageCircle size={18} />
             </a>
             <a href="https://github.com/Rizkek/TRASON" target="_blank" rel="noopener noreferrer" className="text-gray-light hover:text-warm-gold transition-colors">
               <Github size={18} />
@@ -34,27 +34,27 @@ export function LandingFooter() {
 
         {/* Product Links */}
         <div className="space-y-md">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-soft-cream">Product</h4>
+          <h4 className="text-xs font-bold uppercase tracking-widest text-soft-cream">Ecosystem</h4>
           <ul className="space-y-sm">
-            <li><Link href="/features" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Features</Link></li>
-            <li><Link href="/preview" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Preview Dashboard</Link></li>
-            <li><Link href="/pricing" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Pricing</Link></li>
+            <li><Link href="/preview" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Live Preview</Link></li>
             <li><Link href="/changelog" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Changelog</Link></li>
+            <li><Link href="/contact" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Contact Support</Link></li>
           </ul>
         </div>
 
-        {/* Company Links */}
+        {/* Connect Info */}
         <div className="space-y-md">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-soft-cream">Company</h4>
+          <h4 className="text-xs font-bold uppercase tracking-widest text-soft-cream">Connect</h4>
           <ul className="space-y-sm">
-            <li><Link href="/about" className="text-sm text-gray-light hover:text-warm-gold transition-colors">About Us</Link></li>
-            <li><Link href="/contact" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Contact</Link></li>
-            <li className="flex items-center gap-2 text-sm text-gray-light mt-4">
-              <Mail size={14} /> hello@trason.app
+            <li className="flex items-center gap-2 text-sm text-gray-light">
+              <Mail size={14} className="text-warm-gold" /> hello@trason.app
+            </li>
+            <li className="flex items-center gap-2 text-sm text-gray-light">
+              <Phone size={14} className="text-warm-gold" /> 0895417240107
             </li>
             <li className="flex items-start gap-2 text-sm text-gray-light">
-              <MapPin size={14} className="mt-1 flex-shrink-0" />
-              <span>123 Innovation Drive<br />Tech District, Jakarta 12190</span>
+              <MapPin size={14} className="mt-0.5 flex-shrink-0 text-warm-gold" />
+              <span>Klaten<br />Jawa Tengah, Indonesia</span>
             </li>
           </ul>
         </div>
@@ -65,7 +65,6 @@ export function LandingFooter() {
           <ul className="space-y-sm">
             <li><Link href="/privacy" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Privacy Policy</Link></li>
             <li><Link href="/terms" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Terms of Service</Link></li>
-            <li><Link href="/cookies" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Cookie Policy</Link></li>
           </ul>
         </div>
       </div>
