@@ -18,7 +18,7 @@ const serif = Cormorant_Garamond({
 export const metadata: Metadata = {
   metadataBase: new URL('https://trason.vercel.app'),
   title: {
-    default: 'TRASON - Your Personal OS for Intentional Growth',
+    default: 'TRASON - Personal OS',
     template: '%s | TRASON',
   },
   description: 'A calm Personal OS for finance, routines, sport, reminders, career signals, and plain-language insights.',

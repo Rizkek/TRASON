@@ -47,7 +47,7 @@ export function LandingNavbar() {
       <div className="max-w-7xl mx-auto px-lg md:px-2xl flex justify-between items-center">
         <Link href="/" className="flex items-center gap-sm group cursor-pointer">
           <div className="w-10 h-10 flex items-center justify-center transform transition-transform duration-500 hover:scale-105">
-            <Logo size={32} variant="gold" />
+            <Logo size={28} variant="gold" />
           </div>
           <span className="text-2xl font-serif font-bold tracking-tight">TRASON</span>
         </Link>

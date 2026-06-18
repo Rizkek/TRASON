@@ -1,0 +1,10 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldGradient" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF5D6" />
+      <stop offset="0.5" stop-color="#F4C95D" />
+      <stop offset="1" stop-color="#D4A017" />
+    </linearGradient>
+  </defs>
+  <path d="M 25 25 L 75 25 L 75 35 L 55 35 L 55 75 L 45 75 L 45 35 L 25 35 Z" fill="url(#goldGradient)" />
+</svg>
