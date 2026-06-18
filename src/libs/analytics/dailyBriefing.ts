@@ -50,13 +50,16 @@ export function generateDailyBriefing(params: {
     highlightInsight = 'Semua metrik dalam kondisi baik. Pertahankan progres Anda!';
   }
 
+  const hour = new Date().getHours();
   let greetingInsight = '';
-  if (scoreDelta > 0) {
-    greetingInsight = `Skor Anda naik ${scoreDelta} poin! Kerja bagus.`;
-  } else if (scoreDelta < 0) {
-    greetingInsight = `Skor turun sedikit. Mari kejar target hari ini.`;
+  if (hour < 11) {
+    greetingInsight = 'Selamat Pagi! Mari mulai hari ini dengan fokus.';
+  } else if (hour < 15) {
+    greetingInsight = 'Selamat Siang! Tetap produktif dan jaga momentum.';
+  } else if (hour < 19) {
+    greetingInsight = 'Selamat Sore! Waktunya menyelesaikan tugas tersisa.';
   } else {
-    greetingInsight = 'Mari buat progres positif hari ini.';
+    greetingInsight = 'Selamat Malam! Saatnya istirahat dan mengevaluasi hari.';
   }
 
   return {
