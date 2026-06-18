@@ -47,7 +47,7 @@ export const usePreferences = (userId?: string): UsePreferencesReturn => {
   const updatePreferences = async (updates: Partial<UserPreferences>): Promise<PreferencesData | null> => {
     try {
       const updated = await userQueries.updateUserPreferences(updates);
-      await mutate();
+      await mutate(updated as PreferencesData, { revalidate: false });
       return updated as PreferencesData | null;
     } catch (err) {
       logError(err, 'usePreferences.update');

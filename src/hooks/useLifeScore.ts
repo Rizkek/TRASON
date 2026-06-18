@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 import { useCareer } from '@/hooks/useCareer';
 import { useTransaction } from '@/hooks/useTransaction';
 import { useDailyTasks } from '@/hooks/useDailyTasks';
-import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
+import { useActivity } from '@/hooks/useActivity';
 import { getDateRange } from '@/libs/date';
 import {
   calculateFinanceScore,
@@ -23,18 +23,25 @@ import {
 import { calculateCareerAnalytics } from '@/libs/analytics/careerAnalytics';
 
 const now = new Date();
-const { start, end } = getDateRange(now.getMonth(), now.getFullYear());
+const { start: monthStart, end: monthEnd } = getDateRange(now.getMonth(), now.getFullYear());
+
+const rollingStart = new Date(now);
+rollingStart.setDate(now.getDate() - 7);
+rollingStart.setHours(0, 0, 0, 0);
+
+const rollingEnd = new Date(now);
+rollingEnd.setHours(23, 59, 59, 999);
 
 export function useLifeScore(): {
   lifeScore: LifeScoreResult | null;
   isLoading: boolean;
 } {
-  const { transactions, isLoading: txLoading } = useTransaction(start, end);
-  const { tasks, completedCount, totalCount, isLoading: taskLoading } = useDailyTasks();
+  const { transactions, isLoading: txLoading } = useTransaction(monthStart, monthEnd);
+  const { totalCount, isLoading: taskLoading } = useDailyTasks();
   const { applications, isLoading: careerLoading } = useCareer();
-  const { summary: sportSummary, isLoading: sportLoading } = useWeeklySportSummary();
+  const { activities, isLoading: actLoading } = useActivity(rollingStart, rollingEnd);
 
-  const isLoading = txLoading || taskLoading || careerLoading || sportLoading;
+  const isLoading = txLoading || taskLoading || careerLoading || actLoading;
 
   const lifeScore = useMemo(() => {
     if (isLoading) return null;
@@ -51,17 +58,35 @@ export function useLifeScore(): {
       hasCategories,
     });
 
-    // Productivity metrics (streak from local data only for now)
+    // Productivity metrics (7-day rolling)
     const streak = 0; // Will be populated by useStreak hook later
+    
+    // Estimate total tasks in 7 days (current active tasks * 7)
+    const totalTasksLast7Days = totalCount * 7;
+    
+    // Count completed tasks from timeline activities
+    const completedLast7Days = activities
+      .filter(a => a.category === 'daily_tasks')
+      .reduce((sum, a) => {
+        const match = a.title.match(/^(\d+)\s+Daily Task/);
+        // If exact match fails, fallback to counting 1
+        return sum + (match ? parseInt(match[1]) : 1);
+      }, 0);
+
     const productivity = calculateProductivityScore({
-      completedToday: completedCount,
-      totalTasks: totalCount,
+      completedLast7Days,
+      totalTasksLast7Days,
       streak,
     });
 
-    // Health metrics
+    // Health metrics (7-day rolling)
+    const SPORT_CATEGORIES = ['sport', 'exercise'];
+    const sportSessionsLast7Days = activities.filter(
+      a => a.category && SPORT_CATEGORIES.includes(a.category.toLowerCase())
+    ).length;
+
     const health = calculateHealthScore({
-      sportSessionsThisWeek: sportSummary?.totalSessions ?? 0,
+      sportSessionsLast7Days,
       sportTargetPerWeek: 3,
     });
 
@@ -75,7 +100,7 @@ export function useLifeScore(): {
     });
 
     return calculateLifeScore({ finance, productivity, health, career });
-  }, [isLoading, transactions, completedCount, totalCount, sportSummary, applications]);
+  }, [isLoading, transactions, totalCount, activities, applications]);
 
   return { lifeScore, isLoading };
 }

@@ -110,7 +110,13 @@ const ModuleItem: React.FC<{
     console.log(`[Module Sub-Toggle] Attempting to toggle sub-feature: ${featureId}`);
     try {
       setIsLocalLoading(true);
-      const currentFeatures = preferences?.module_features || {};
+      
+      // Always fetch latest from Zustand store directly to avoid rapid-click closure stale state
+      const latestUserPrefs = Array.isArray((useAuthStore.getState().user as any)?.user_preferences)
+        ? (useAuthStore.getState().user as any)?.user_preferences[0]
+        : (useAuthStore.getState().user as any)?.user_preferences;
+        
+      const currentFeatures = latestUserPrefs?.module_features || preferences?.module_features || {};
       const currentValue = currentFeatures[featureId] !== false; // default true
       
       const newModuleFeatures = {

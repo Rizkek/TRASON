@@ -149,6 +149,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={false}
                 className={`flex items-center gap-md px-lg py-md rounded-md transition-all duration-300 relative group overflow-hidden ${isActive(item.href)
                     ? 'bg-primary/10 text-primary'
                     : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/5'

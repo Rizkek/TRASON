@@ -27,15 +27,12 @@ import {
 import { DashboardHeader } from './components/DashboardHeader';
 import { FinancialChart } from './components/FinancialChart';
 import { DailyTasksSummary } from './components/DailyTasksSummary';
-import { ActivitiesList } from './components/ActivitiesList';
-import { TransactionsList } from './components/TransactionsList';
 import { RemindersSidebar } from './components/RemindersSidebar';
 import { InvestmentSummary } from './components/InvestmentSummary';
 import { SportSummary } from './components/SportSummary';
 import { CareerSummary } from './components/CareerSummary';
 import { LifeScoreCard } from './components/LifeScoreCard';
 import { DailyBriefingCard } from './components/DailyBriefingCard';
-import { FinancialHealthWidget } from './components/FinancialHealthWidget';
 import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useCareer } from '@/hooks/useCareer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -128,79 +125,30 @@ export default function DashboardPage() {
 
         <InvestmentSummary summary={investmentSummary} />
 
-        {/* Dynamic Insight Card & Lists */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-md md:gap-xl">
-          <div className="lg:col-span-2 space-y-md md:space-y-xl">
-            {/* Quick Action Input */}
-            <Card className="p-md md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
-              <div className="flex flex-col md:flex-row gap-md">
-                <div className="flex-1 relative group">
-                  <div className="absolute left-md top-1/2 -translate-y-1/2 text-primary">
-                    <Lightbulb size={18} />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder={t('dashboard.capture_placeholder')}
-                    className="w-full pl-xl pr-lg py-md bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
-                  />
-                </div>
-                <Button variant="primary" size="md">{t('dashboard.capture_btn')}</Button>
+        {/* Quick Action Input */}
+        <Card className="p-md md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+          <div className="flex flex-col md:flex-row gap-md">
+            <div className="flex-1 relative group">
+              <div className="absolute left-md top-1/2 -translate-y-1/2 text-primary">
+                <Lightbulb size={18} />
               </div>
-            </Card>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-md md:gap-xl">
-              {preferences?.module_features?.['timeline_weekly_log'] !== false && (
-                <ActivitiesList activities={activities} />
-              )}
-              <TransactionsList transactions={transactions} />
+              <input
+                type="text"
+                placeholder={t('dashboard.capture_placeholder')}
+                className="w-full pl-xl pr-lg py-md bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
+              />
             </div>
+            <Button variant="primary" size="md">{t('dashboard.capture_btn')}</Button>
           </div>
+        </Card>
 
-          {/* Right Sidebar */}
-          <div className="space-y-md md:space-y-xl">
-            <FinancialHealthWidget />
-            {preferences?.module_features?.['reminders_active'] !== false && (
-              <RemindersSidebar reminders={reminders} />
-            )}
-            <SportSummary summary={sportSummary} isLoading={sportLoading} />
-            <CareerSummary stats={careerStats} nextInterview={nextInterview} isLoading={careerLoading} />
-
-            <Card className="p-md md:p-xl bg-gradient-to-br from-gray-strong to-black relative overflow-hidden group">
-              <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-secondary opacity-10 blur-3xl rounded-full" />
-              <div className="space-y-lg relative z-10">
-                <div className="flex items-center gap-md">
-                  <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center text-secondary glow-secondary">
-                    <Lightbulb size={20} />
-                  </div>
-                  <h3 className="font-serif italic text-lg text-white">{t('dashboard.daily_insight')}</h3>
-                </div>
-                <p className="text-caption leading-relaxed tracking-wide text-gray-very-light italic">
-                  &ldquo;{typedInsights?.headline || t('dashboard.default_insight')}&rdquo;
-                </p>
-                <div className="flex flex-wrap gap-2 pt-sm">
-                  {typedInsights?.scenario ? (
-                    <Badge variant="info" size="sm">{t(`investment_page.scenario_${typedInsights.scenario}`)}</Badge>
-                  ) : null}
-                  {typedInsights?.confidence ? (
-                    <Badge variant={typedInsights.confidence === 'low' ? 'danger' : typedInsights.confidence === 'moderate' ? 'warning' : 'success'} size="sm">
-                      {t(`investment_page.confidence_${typedInsights.confidence}`)}
-                    </Badge>
-                  ) : null}
-                </div>
-                {typedInsights?.riskWarning ? (
-                  <p className="text-xs text-warning mt-2">{typedInsights.riskWarning}</p>
-                ) : null}
-                {typedInsights?.recommendation ? (
-                  <p className="text-xs text-gray-light mt-2">{typedInsights.recommendation}</p>
-                ) : null}
-                <div className="pt-md">
-                  <Button variant="ghost" size="sm" className="w-full border-black/10 dark:border-white/10 hover:bg-black/5 dark:bg-white/5 h-10">
-                    <span className="text-[10px] font-bold tracking-[0.2em] uppercase">{t('dashboard.open_insights')}</span>
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          </div>
+        {/* Modules Summary Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md md:gap-xl">
+          {preferences?.module_features?.['reminders_active'] !== false && (
+            <RemindersSidebar reminders={reminders} />
+          )}
+          <SportSummary summary={sportSummary} isLoading={sportLoading} />
+          <CareerSummary stats={careerStats} nextInterview={nextInterview} isLoading={careerLoading} />
         </div>
       </div>
     </Layout>

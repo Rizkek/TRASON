@@ -74,22 +74,22 @@ export function calculateFinanceScore(params: {
 // PRODUCTIVITY SCORE (0-100)
 // ============================================================
 export function calculateProductivityScore(params: {
-  completedToday: number;
-  totalTasks: number;
+  completedLast7Days: number;
+  totalTasksLast7Days: number;
   streak: number;
 }): LifeScoreDetail {
-  const { completedToday, totalTasks, streak } = params;
-  const completionRate = totalTasks > 0 ? completedToday / totalTasks : 0;
+  const { completedLast7Days, totalTasksLast7Days, streak } = params;
+  const completionRate = totalTasksLast7Days > 0 ? completedLast7Days / totalTasksLast7Days : 0;
 
   const checks = [
     {
-      label: 'Completion rate hari ini ≥ 80%',
+      label: 'Rata-rata task diselesaikan (7 hari) ≥ 80%',
       passed: completionRate >= 0.80,
       value: 35,
     },
     {
-      label: 'Ada task yang dibuat',
-      passed: totalTasks > 0,
+      label: 'Ada task dalam 7 hari terakhir',
+      passed: totalTasksLast7Days > 0,
       value: 15,
     },
     {
@@ -117,27 +117,27 @@ export function calculateProductivityScore(params: {
 // HEALTH SCORE (0-100)
 // ============================================================
 export function calculateHealthScore(params: {
-  sportSessionsThisWeek: number;
+  sportSessionsLast7Days: number;
   sportTargetPerWeek: number;
 }): LifeScoreDetail {
-  const { sportSessionsThisWeek, sportTargetPerWeek } = params;
+  const { sportSessionsLast7Days, sportTargetPerWeek } = params;
   const target = sportTargetPerWeek || 3; // default target 3x/week
-  const ratio = sportSessionsThisWeek / target;
+  const ratio = sportSessionsLast7Days / target;
 
   const checks = [
     {
-      label: 'Olahraga minimal 1x minggu ini',
-      passed: sportSessionsThisWeek >= 1,
+      label: 'Olahraga minimal 1x (7 hari terakhir)',
+      passed: sportSessionsLast7Days >= 1,
       value: 20,
     },
     {
-      label: 'Olahraga minimal 2x minggu ini',
-      passed: sportSessionsThisWeek >= 2,
+      label: 'Olahraga minimal 2x (7 hari terakhir)',
+      passed: sportSessionsLast7Days >= 2,
       value: 20,
     },
     {
-      label: 'Olahraga minimal 3x minggu ini',
-      passed: sportSessionsThisWeek >= 3,
+      label: 'Olahraga minimal 3x (7 hari terakhir)',
+      passed: sportSessionsLast7Days >= 3,
       value: 25,
     },
     {
