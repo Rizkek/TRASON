@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Alert, Loading } from '@/components';
 import { useAuthStore } from '@/store/authStore';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { sanitizeError, validateEmail } from '@/libs/validation';
 import { supabase } from '@/services/supabaseClient';
 import { Compass, ArrowLeft, Quote, Eye, EyeOff } from 'lucide-react';
@@ -19,12 +20,18 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  const { isOnboarded } = useUserPreferences();
+
   useEffect(() => {
     // Redirect if already authenticated (skip if still loading)
     if (!authLoading && isAuthenticated) {
-      router.push('/dashboard');
+      if (!isOnboarded) {
+        router.push('/onboarding');
+      } else {
+        router.push('/dashboard');
+      }
     }
-  }, [authLoading, isAuthenticated, router]);
+  }, [authLoading, isAuthenticated, isOnboarded, router]);
 
   if (authLoading) {
     return (
@@ -151,7 +158,7 @@ export default function LoginPage() {
                 label="Password"
                 name="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="********"
                 value={formData.password}
                 onChange={handleInputChange}
                 className="bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.08] dark:border-white/[0.08] focus:border-warm-gold transition-all"

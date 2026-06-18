@@ -62,5 +62,6 @@ export function useUserPreferences() {
   return {
     ...preferences,
     locale,
+    isOnboarded: preferences.module_features?.['onboarding_done'] === true,
   };
 }

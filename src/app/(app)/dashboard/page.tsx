@@ -47,7 +47,7 @@ export default function DashboardPage() {
   const user = useAuthStore((s) => s.user);
   const { t } = useTranslation();
   const preferences = useUserPreferences();
-  const { locale, timezone, module_features } = preferences;
+  const { locale, timezone, module_features, isOnboarded } = preferences;
   
   // SWR automatically handles all data fetching in background
   const { transactions } = useTransaction(CURRENT_START, CURRENT_END);
@@ -74,8 +74,10 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login');
+    } else if (!authLoading && isAuthenticated && isOnboarded === false) {
+      router.push('/onboarding');
     }
-  }, [authLoading, isAuthenticated, router]);
+  }, [authLoading, isAuthenticated, isOnboarded, router]);
 
   if (authLoading) {
     return (

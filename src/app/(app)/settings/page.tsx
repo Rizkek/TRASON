@@ -94,9 +94,11 @@ const ModuleItem: React.FC<{
   const user = useAuthStore((s) => s.user);
 
   const handleToggle = async () => {
+    console.log(`[Module Toggle] Attempting to toggle module: ${id}. Current state: ${isEnabled}`);
     setIsLocalLoading(true);
     try {
       await toggle();
+      console.log(`[Module Toggle] Successfully toggled module: ${id}`);
     } catch (err) {
       console.error(`Failed to toggle module ${id}:`, err);
     } finally {
@@ -105,6 +107,7 @@ const ModuleItem: React.FC<{
   };
 
   const handleSubToggle = async (featureId: string) => {
+    console.log(`[Module Sub-Toggle] Attempting to toggle sub-feature: ${featureId}`);
     try {
       setIsLocalLoading(true);
       const currentFeatures = preferences?.module_features || {};
@@ -114,6 +117,8 @@ const ModuleItem: React.FC<{
         ...currentFeatures,
         [featureId]: !currentValue,
       };
+
+      console.log(`[Module Sub-Toggle] Submitting new state:`, newModuleFeatures);
 
       const updatedPrefs = await updatePreferences({
         module_features: newModuleFeatures

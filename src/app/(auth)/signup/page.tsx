@@ -140,7 +140,7 @@ export default function SignupPage() {
       if (data.user) {
         if (data.session) {
           await userQueries.ensureUserProfile();
-          router.push('/dashboard');
+          router.push('/onboarding');
         } else {
           setError('Success! Please check your email to confirm your account.');
           setTimeout(() => router.push('/login'), 3000);
@@ -262,7 +262,7 @@ export default function SignupPage() {
               label="Password"
               name="password"
               type={showPassword ? "text" : "password"}
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="********"
               value={formData.password}
               onChange={handleInputChange}
               error={validationErrors.password}
@@ -283,7 +283,7 @@ export default function SignupPage() {
               label="Confirm Password"
               name="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="********"
               value={formData.confirmPassword}
               onChange={handleInputChange}
               error={validationErrors.confirmPassword}
