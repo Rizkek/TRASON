@@ -56,8 +56,8 @@ export function PwaInstallPrompt() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-gray-strong border border-white/10 dark:border-white/5 rounded-xl p-4 shadow-2xl z-50 flex items-start gap-4">
-      <div className="w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 bg-black/20 border border-white/5">
-        <Logo size={64} variant="gold" />
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-black/20 border border-white/5">
+        <Logo size={40} variant="gold" />
       </div>
       <div className="flex-1">
         <h3 className="text-soft-cream font-medium text-sm">Install TRASON App</h3>

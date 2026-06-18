@@ -133,8 +133,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           }`}
       >
         <div className="px-lg py-xl flex flex-col items-center">
-          <div className="w-24 h-24 flex items-center justify-center mb-md">
-            <Logo size={96} variant="gold" />
+          <div className="w-12 h-12 flex items-center justify-center mb-md">
+            <Logo size={40} variant="gold" />
           </div>
           <h1 className="text-2xl font-serif font-bold tracking-tight text-gradient">
             TRASON

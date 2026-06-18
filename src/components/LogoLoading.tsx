@@ -18,7 +18,7 @@ export const LogoLoading: React.FC = () => {
           
           {/* Logo container */}
           <div className="flex items-center justify-center animate-pulse">
-            <Logo size={200} variant="gold" className="drop-shadow-[0_0_15px_rgba(244,201,93,0.5)]" />
+            <Logo size={80} variant="gold" className="drop-shadow-[0_0_15px_rgba(244,201,93,0.5)]" />
           </div>
         </div>
 

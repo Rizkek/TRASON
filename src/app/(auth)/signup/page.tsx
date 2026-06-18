@@ -174,7 +174,7 @@ export default function SignupPage() {
          </div>
 
          <div className="absolute bottom-12 left-12 flex items-center gap-sm opacity-40">
-            <Logo size={64} variant="gold" />
+            <Logo size={32} variant="gold" />
             <span className="font-serif text-lg tracking-tight">TRASON</span>
          </div>
       </div>
