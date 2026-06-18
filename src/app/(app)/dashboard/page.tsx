@@ -46,7 +46,8 @@ export default function DashboardPage() {
   const authLoading = useAuthStore((s) => s.isLoading);
   const user = useAuthStore((s) => s.user);
   const { t } = useTranslation();
-  const { locale, timezone } = useUserPreferences();
+  const preferences = useUserPreferences();
+  const { locale, timezone, module_features } = preferences;
   
   // SWR automatically handles all data fetching in background
   const { transactions } = useTransaction(CURRENT_START, CURRENT_END);
@@ -120,7 +121,9 @@ export default function DashboardPage() {
         {/* Financial Flow and Daily Tasks - Compact Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-md md:gap-xl">
           <FinancialChart transactions={transactions} />
-          <DailyTasksSummary />
+          {preferences?.module_features?.['timeline_daily_checklist'] !== false && (
+            <DailyTasksSummary />
+          )}
         </div>
 
         <InvestmentSummary summary={investmentSummary} />
@@ -146,7 +149,9 @@ export default function DashboardPage() {
             </Card>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-md md:gap-xl">
-              <ActivitiesList activities={activities} />
+              {preferences?.module_features?.['timeline_weekly_log'] !== false && (
+                <ActivitiesList activities={activities} />
+              )}
               <TransactionsList transactions={transactions} />
             </div>
           </div>
@@ -154,7 +159,9 @@ export default function DashboardPage() {
           {/* Right Sidebar */}
           <div className="space-y-md md:space-y-xl">
             <FinancialHealthWidget />
-            <RemindersSidebar reminders={reminders} />
+            {preferences?.module_features?.['reminders_active'] !== false && (
+              <RemindersSidebar reminders={reminders} />
+            )}
             <SportSummary summary={sportSummary} isLoading={sportLoading} />
             <CareerSummary stats={careerStats} nextInterview={nextInterview} isLoading={careerLoading} />
 

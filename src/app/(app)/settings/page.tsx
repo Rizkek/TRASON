@@ -81,7 +81,6 @@ const LANGUAGE_OPTIONS = [
   { value: 'es', label: 'Español' },
 ];
 
-// Module Item Component to handle its own hook logic
 const ModuleItem: React.FC<{
   id: ModuleId;
   isEnabled: boolean;
@@ -91,6 +90,8 @@ const ModuleItem: React.FC<{
   const { toggle, isLoading: isHookLoading } = useModuleStatus(id, userId);
   const { preferences, updatePreferences } = usePreferences(userId);
   const [isLocalLoading, setIsLocalLoading] = useState(false);
+  const setUser = useAuthStore((s) => s.setUser);
+  const user = useAuthStore((s) => s.user);
 
   const handleToggle = async () => {
     setIsLocalLoading(true);
@@ -108,12 +109,31 @@ const ModuleItem: React.FC<{
       setIsLocalLoading(true);
       const currentFeatures = preferences?.module_features || {};
       const currentValue = currentFeatures[featureId] !== false; // default true
-      await updatePreferences({
-        module_features: {
-          ...currentFeatures,
-          [featureId]: !currentValue,
-        }
+      
+      const newModuleFeatures = {
+        ...currentFeatures,
+        [featureId]: !currentValue,
+      };
+
+      const updatedPrefs = await updatePreferences({
+        module_features: newModuleFeatures
       });
+
+      // Synchronize the SWR update into the global Zustand store 
+      // so other pages immediately reflect the new preferences
+      if (user && updatedPrefs) {
+        const currentUserPrefs = Array.isArray((user as any).user_preferences) 
+          ? (user as any).user_preferences[0] 
+          : (user as any).user_preferences;
+        
+        setUser({
+          ...user,
+          user_preferences: [{
+            ...currentUserPrefs,
+            ...updatedPrefs
+          }]
+        } as any);
+      }
     } catch (err) {
       console.error('Failed to toggle sub-feature:', err);
     } finally {
@@ -166,18 +186,18 @@ const ModuleItem: React.FC<{
 
       {/* Sub-toggles for Timeline and Reminders */}
       {isEnabled && (id === 'timeline' || id === 'reminders') && (
-        <div className="ml-12 pl-4 border-l border-black/10 dark:border-white/10 space-y-md">
+        <div className="ml-4 md:ml-12 pl-3 md:pl-4 border-l border-black/10 dark:border-white/10 space-y-md mt-4">
           {id === 'timeline' && (
             <>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-light">Weekly Log Tab</span>
+                <span className="text-xs text-gray-light">Weekly Log Tab & Widget</span>
                 <button
                   type="button"
                   onClick={() => handleSubToggle('timeline_weekly_log')}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
                     preferences?.module_features?.['timeline_weekly_log'] !== false
                       ? 'bg-primary'
-                      : 'bg-gray-strong'
+                      : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
                   <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
@@ -186,14 +206,14 @@ const ModuleItem: React.FC<{
                 </button>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-light">Daily Checklist Tab</span>
+                <span className="text-xs text-gray-light">Daily Checklist Tab & Widget</span>
                 <button
                   type="button"
                   onClick={() => handleSubToggle('timeline_daily_checklist')}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
                     preferences?.module_features?.['timeline_daily_checklist'] !== false
                       ? 'bg-primary'
-                      : 'bg-gray-strong'
+                      : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
                   <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
@@ -206,14 +226,14 @@ const ModuleItem: React.FC<{
           {id === 'reminders' && (
             <>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-light">Active Tab</span>
+                <span className="text-xs text-gray-light">Active Reminders Tab & Widget</span>
                 <button
                   type="button"
                   onClick={() => handleSubToggle('reminders_active')}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
                     preferences?.module_features?.['reminders_active'] !== false
                       ? 'bg-primary'
-                      : 'bg-gray-strong'
+                      : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
                   <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
@@ -226,10 +246,10 @@ const ModuleItem: React.FC<{
                 <button
                   type="button"
                   onClick={() => handleSubToggle('reminders_history')}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
                     preferences?.module_features?.['reminders_history'] !== false
                       ? 'bg-primary'
-                      : 'bg-gray-strong'
+                      : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
                   <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
