@@ -74,10 +74,8 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login');
-    } else if (!authLoading && isAuthenticated && isOnboarded === false) {
-      router.push('/onboarding');
     }
-  }, [authLoading, isAuthenticated, isOnboarded, router]);
+  }, [authLoading, isAuthenticated, router]);
 
   if (authLoading) {
     return (

@@ -38,7 +38,7 @@ export const DailyTasksSummary = () => {
         ) : (
           <div className="space-y-sm">
             {tasks.map(task => (
-              <div key={task.id} className="flex items-center gap-md p-sm hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors cursor-pointer group" onClick={() => toggleTask(task.id, task.completed_today)}>
+              <div key={task.id} className="flex items-center gap-md p-sm hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors cursor-pointer group" onClick={() => toggleTask(task.id, !task.completed_today)}>
                 <div className={`w-4 h-4 rounded-sm border flex items-center justify-center flex-shrink-0 transition-colors ${task.completed_today ? 'bg-primary border-primary' : 'border-gray-light group-hover:border-primary'}`}>
                   {task.completed_today && <ListChecks size={10} className="text-white" />}
                 </div>
