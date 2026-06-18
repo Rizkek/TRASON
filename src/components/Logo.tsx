@@ -14,7 +14,7 @@ export function Logo({ size = 40, className = '' }: LogoProps) {
       style={{ width: size, height: size }}
     >
       <Image 
-        src="/Logo Trason.png"
+        src="/Logo Trason Cropped.png"
         alt="TRASON Logo"
         fill
         className="object-contain"

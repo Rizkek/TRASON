@@ -113,7 +113,7 @@ export default function LoginPage() {
 
          {/* Bottom Brand Label */}
          <div className="absolute bottom-12 left-12 flex items-center gap-sm opacity-40">
-            <Logo size={56} variant="gold" />
+            <Logo size={64} variant="gold" />
             <span className="font-serif text-lg tracking-tight">TRASON</span>
          </div>
       </div>
