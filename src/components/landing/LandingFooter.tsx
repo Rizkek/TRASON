@@ -13,7 +13,7 @@ export function LandingFooter() {
         {/* Brand & Description */}
         <div className="space-y-md col-span-1 md:col-span-1">
           <div className="flex items-center gap-sm">
-            <Logo size={28} variant="gold" />
+            <Logo size={48} variant="gold" />
             <span className="font-serif text-2xl font-bold tracking-tight text-soft-cream">TRASON</span>
           </div>
           <p className="text-sm text-gray-light font-light leading-relaxed">
