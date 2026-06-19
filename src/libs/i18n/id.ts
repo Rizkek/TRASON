@@ -495,5 +495,16 @@ export const id = {
       area_to_improve: '{area} adalah area yang paling perlu ditingkatkan saat ini.',
       excellent_score: 'Life Score Anda sangat baik. Pertahankan konsistensi!',
     }
+  },
+  modules: {
+    title: 'Modul Aktif',
+    description: 'Aktifkan atau nonaktifkan modul untuk menyesuaikan pengalaman Anda. Modul yang dinonaktifkan tidak akan muncul di navigasi atau dasbor.',
+    enabled_count: 'Modul aktif',
+    disabled_count: 'Modul nonaktif',
+    all_sub_off_warning: 'Semua sub-fitur dimatikan — modul tidak memiliki konten yang terlihat',
+    timeline_weekly_log: 'Log mingguan',
+    timeline_daily_checklist: 'Checklist harian',
+    reminders_active: 'Pengingat aktif',
+    reminders_history: 'Riwayat',
   }
 };

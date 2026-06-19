@@ -495,5 +495,16 @@ export const ja = {
       area_to_improve: '現在、最も改善が必要な領域は{area}です。',
       excellent_score: 'ライフスコアは優秀です。一貫性を保ちましょう！',
     }
+  },
+  modules: {
+    title: 'アクティブモジュール',
+    description: 'モジュールを有効または無効にして、エクスペリエンスをカスタマイズしてください。無効化されたモジュールはナビゲーションやダッシュボードに表示されません。',
+    enabled_count: '有効なモジュール',
+    disabled_count: '無効なモジュール',
+    all_sub_off_warning: 'すべてのサブ機能がオフです — モジュールに表示されるコンテンツがありません',
+    timeline_weekly_log: '週次ログ',
+    timeline_daily_checklist: 'デイリーチェックリスト',
+    reminders_active: 'アクティブなリマインダー',
+    reminders_history: '履歴',
   }
 };

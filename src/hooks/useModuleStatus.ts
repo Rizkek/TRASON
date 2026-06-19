@@ -41,7 +41,7 @@ export const useModuleStatus = (
   moduleId: ModuleId,
   userId?: string
 ): UseModuleStatusReturn => {
-  const cacheKey = userId ? CACHE_KEYS.settings.preferences(userId) : null;
+  const cacheKey = userId ? CACHE_KEYS.settings.moduleStatus(userId) : null;
 
   const {
     data: preferences,
@@ -138,7 +138,7 @@ export const useModuleStatus = (
  * Hook to get status of all modules
  */
 export const useAllModuleStatus = (userId?: string) => {
-  const cacheKey = userId ? CACHE_KEYS.settings.preferences(userId) : null;
+  const cacheKey = userId ? CACHE_KEYS.settings.moduleStatus(userId) : null;
 
   const { data: preferences, error, isLoading } = useSWR<
     Record<string, boolean> | null

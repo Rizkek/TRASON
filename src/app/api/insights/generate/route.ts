@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     }
 
     const { object } = await generateObject({
-      model: google('gemini-1.5-flash'),
+      model: google('gemini-1.5-pro'),
       schema: insightsSchema,
       prompt: `
         You are a highly analytical and empathetic lifestyle architect and coach AI for TRASON (Personal Life OS).

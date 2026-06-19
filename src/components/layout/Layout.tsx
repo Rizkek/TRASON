@@ -6,10 +6,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { ConfirmModal, Logo } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import { useAllModuleStatus } from '@/hooks/useModuleStatus';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useReminder } from '@/hooks/useReminder';
 import { useScheduleNotifications } from '@/hooks/useScheduleNotifications';
 import { ModuleId } from '@/modules/types';
+import { DEFAULT_MODULE_STATUS } from '@/modules/registry';
 import { FaDumbbell } from 'react-icons/fa6';
 import {
   RiDashboardLine,
@@ -88,7 +89,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
   const [isLoggingOut, setIsLoggingOut] = React.useState(false);
 
-  const { enabledModules } = useAllModuleStatus(user?.id);
+  const { module_features } = useUserPreferences();
+
+  // Derive enabled modules directly from Supabase-synced preferences (via Zustand)
+  // Falls back to DEFAULT_MODULE_STATUS if a key is absent
+  const enabledModules = useMemo(() => {
+    return (Object.keys(DEFAULT_MODULE_STATUS) as ModuleId[]).filter(
+      (id) => (module_features?.[id] ?? DEFAULT_MODULE_STATUS[id]) !== false
+    );
+  }, [module_features]);
 
   // Memoized menu items — only recompute when enabled modules change
   const menuItems: { label: string; href: string; icon: any; moduleId?: ModuleId }[] = useMemo(() => [

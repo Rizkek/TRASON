@@ -8,11 +8,12 @@ import { User, supabase } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { userQueries } from '@/services/queries';
 import { sanitizeError, validateEmail } from '@/libs/validation';
-import { useModuleStatus, useAllModuleStatus } from '@/hooks/useModuleStatus';
+import { useModuleStatus } from '@/hooks/useModuleStatus';
 import { usePushNotification } from '@/hooks/usePushNotification';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { usePreferences } from '@/hooks/usePreferences';
 import { ModuleId } from '@/modules/types';
+import { DEFAULT_MODULE_STATUS, MODULE_METADATA } from '@/modules/registry';
 import {
   User as UserIcon,
   Paintbrush,
@@ -190,7 +191,7 @@ const ModuleItem: React.FC<{
             <h4 className="text-sm font-medium text-soft-cream">{t(`nav.${id}`)}</h4>
             <p className="text-[10px] text-gray-light">
               {allSubFeaturesOff
-                ? <span className="text-orange-400">All sub-features are off — module has no visible content</span>
+                ? <span className="text-orange-400">{t('modules.all_sub_off_warning')}</span>
                 : metadata.description
               }
             </p>
@@ -221,7 +222,7 @@ const ModuleItem: React.FC<{
           {id === 'timeline' && (
             <>
               <div className="flex items-center justify-between gap-md py-sm">
-                <span className="text-xs text-gray-light flex-1 min-w-0">Weekly Log</span>
+                <span className="text-xs text-gray-light flex-1 min-w-0">{t('modules.timeline_weekly_log')}</span>
                 <button
                   type="button"
                   onClick={() => handleSubToggle('timeline_weekly_log')}
@@ -237,7 +238,7 @@ const ModuleItem: React.FC<{
                 </button>
               </div>
               <div className="flex items-center justify-between gap-md py-sm">
-                <span className="text-xs text-gray-light flex-1 min-w-0">Daily Checklist</span>
+                <span className="text-xs text-gray-light flex-1 min-w-0">{t('modules.timeline_daily_checklist')}</span>
                 <button
                   type="button"
                   onClick={() => handleSubToggle('timeline_daily_checklist')}
@@ -257,7 +258,7 @@ const ModuleItem: React.FC<{
           {id === 'reminders' && (
             <>
               <div className="flex items-center justify-between gap-md py-sm">
-                <span className="text-xs text-gray-light flex-1 min-w-0">Active reminders</span>
+                <span className="text-xs text-gray-light flex-1 min-w-0">{t('modules.reminders_active')}</span>
                 <button
                   type="button"
                   onClick={() => handleSubToggle('reminders_active')}
@@ -273,7 +274,7 @@ const ModuleItem: React.FC<{
                 </button>
               </div>
               <div className="flex items-center justify-between gap-md py-sm">
-                <span className="text-xs text-gray-light flex-1 min-w-0">History</span>
+                <span className="text-xs text-gray-light flex-1 min-w-0">{t('modules.reminders_history')}</span>
                 <button
                   type="button"
                   onClick={() => handleSubToggle('reminders_history')}
@@ -298,27 +299,27 @@ const ModuleItem: React.FC<{
 
 // Module Settings Tab Component
 const ModuleSettingsTab: React.FC<{ userId?: string; t: (key: string) => string }> = ({ userId, t }) => {
-  const { statuses, enabledModules, disabledModules, isLoading } = useAllModuleStatus(userId);
+  const { module_features } = useUserPreferences();
 
-  if (isLoading) {
-    return (
-      <Card className="glass border-none">
-        <div className="flex items-center justify-center py-xl">
-          <Loading text="Loading modules..." />
-        </div>
-      </Card>
-    );
-  }
+  // Compute statuses from Supabase-synced preferences via Zustand
+  const moduleIds = Object.keys(DEFAULT_MODULE_STATUS) as ModuleId[];
+  const statuses = moduleIds.map((id) => ({
+    id,
+    isEnabled: (module_features?.[id] ?? DEFAULT_MODULE_STATUS[id]) !== false,
+    metadata: MODULE_METADATA[id],
+  }));
+
+  const enabledCount = statuses.filter((s) => s.isEnabled).length;
+  const disabledCount = statuses.filter((s) => !s.isEnabled).length;
 
   return (
     <div className="space-y-xl">
-      <Card className="glass border-none" title="ACTIVE MODULES">
+      <Card className="glass border-none" title={t('modules.title')}>
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary opacity-[0.02] blur-3xl pointer-events-none" />
 
         <div className="space-y-lg relative z-10">
           <p className="text-xs text-gray-light leading-relaxed tracking-wide">
-            Enable or disable application modules to customize your experience.
-            Disabled modules will not appear in the navigation or dashboard.
+            {t('modules.description')}
           </p>
 
           <div className="grid gap-md">
@@ -339,12 +340,12 @@ const ModuleSettingsTab: React.FC<{ userId?: string; t: (key: string) => string 
       <Card className="glass border-none bg-black/[0.01] dark:bg-white/[0.01]" title="MODULE STATUS">
         <div className="grid grid-cols-2 gap-md">
           <div className="p-lg rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05]">
-            <div className="text-2xl font-bold text-primary">{enabledModules.length}</div>
-            <div className="text-[10px] text-gray-light tracking-widest">ENABLED MODULES</div>
+            <div className="text-2xl font-bold text-primary">{enabledCount}</div>
+            <div className="text-[10px] text-gray-light tracking-widest">{t('modules.enabled_count').toUpperCase()}</div>
           </div>
           <div className="p-lg rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05]">
-            <div className="text-2xl font-bold text-secondary">{disabledModules.length}</div>
-            <div className="text-[10px] text-gray-light tracking-widest">DISABLED MODULES</div>
+            <div className="text-2xl font-bold text-secondary">{disabledCount}</div>
+            <div className="text-[10px] text-gray-light tracking-widest">{t('modules.disabled_count').toUpperCase()}</div>
           </div>
         </div>
       </Card>

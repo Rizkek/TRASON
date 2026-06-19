@@ -100,7 +100,7 @@ export async function GET(request: Request) {
 
     // 1. Fetch Finance Stats
     const { data: transactions } = await supabase
-      .from('finance_transactions')
+      .from('transactions')
       .select('amount, type')
       .eq('user_id', pref.user_id)
       .gte('date', startIso.split('T')[0])

@@ -53,6 +53,7 @@ export const CACHE_KEYS = {
   settings: {
     profile: (userId: string) => ['settings', 'profile', userId],
     preferences: (userId: string) => ['settings', 'preferences', userId],
+    moduleStatus: (userId: string) => ['settings', 'moduleStatus', userId],
     notifications: (userId: string) => ['settings', 'notifications', userId],
   },
 

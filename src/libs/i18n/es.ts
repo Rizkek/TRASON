@@ -495,5 +495,16 @@ export const es = {
       area_to_improve: '{area} es el área que más necesita mejorar en este momento.',
       excellent_score: 'Tu Life Score es excelente. ¡Mantén la consistencia!',
     }
+  },
+  modules: {
+    title: 'Módulos activos',
+    description: 'Activa o desactiva módulos para personalizar tu experiencia. Los módulos desactivados no aparecerán en la navegación ni en el panel.',
+    enabled_count: 'Módulos activos',
+    disabled_count: 'Módulos inactivos',
+    all_sub_off_warning: 'Todas las sub-funciones están desactivadas — el módulo no tiene contenido visible',
+    timeline_weekly_log: 'Registro semanal',
+    timeline_daily_checklist: 'Lista diaria',
+    reminders_active: 'Recordatorios activos',
+    reminders_history: 'Historial',
   }
 };

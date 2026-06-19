@@ -495,6 +495,17 @@ export const en = {
       area_to_improve: '{area} is the area that needs the most improvement right now.',
       excellent_score: 'Your Life Score is excellent. Maintain consistency!',
     }
+  },
+  modules: {
+    title: 'Active Modules',
+    description: 'Enable or disable modules to customize your experience. Disabled modules will not appear in the navigation or dashboard.',
+    enabled_count: 'Enabled modules',
+    disabled_count: 'Disabled modules',
+    all_sub_off_warning: 'All sub-features are off — module has no visible content',
+    timeline_weekly_log: 'Weekly log',
+    timeline_daily_checklist: 'Daily checklist',
+    reminders_active: 'Active reminders',
+    reminders_history: 'History',
   }
 };
 

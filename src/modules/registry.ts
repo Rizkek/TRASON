@@ -185,7 +185,7 @@ export const MODULE_CONFIG: Record<ModuleId, ModuleConfig> = {
 // Default module status (all enabled)
 export const DEFAULT_MODULE_STATUS: Record<ModuleId, boolean> = {
   finance: true,
-  investments: false,
+  investments: true,
   timeline: true,
   reminders: true,
   insights: true,
