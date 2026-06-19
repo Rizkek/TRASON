@@ -36,6 +36,7 @@ import { DailyBriefingCard } from './components/DailyBriefingCard';
 import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useCareer } from '@/hooks/useCareer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useAllModuleStatus } from '@/hooks/useModuleStatus';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -54,6 +55,13 @@ export default function DashboardPage() {
   const typedInsights = investmentInsights as InvestmentInsightResponse | null;
   const { summary: sportSummary, isLoading: sportLoading } = useWeeklySportSummary();
   const { stats: careerStats, nextInterview, isLoading: careerLoading } = useCareer();
+  const { enabledModules } = useAllModuleStatus(user?.id);
+
+  const isFinanceEnabled = enabledModules.includes('finance');
+  const isSportEnabled = enabledModules.includes('sport');
+  const isCareerEnabled = enabledModules.includes('career');
+  const isTimelineEnabled = enabledModules.includes('timeline');
+  const isRemindersEnabled = enabledModules.includes('reminders');
 
   const greeting = useMemo(() => {
     const hours = new Date().getHours();
@@ -73,6 +81,11 @@ export default function DashboardPage() {
       router.push('/login');
     }
   }, [authLoading, isAuthenticated, router]);
+
+  useEffect(() => {
+    console.log('[Dashboard Page] timeline_daily_checklist enabled:', preferences?.module_features?.['timeline_daily_checklist'] !== false);
+    console.log('[Dashboard Page] reminders_active enabled:', preferences?.module_features?.['reminders_active'] !== false);
+  }, [preferences?.module_features]);
 
   if (authLoading) {
     return (
@@ -109,21 +122,20 @@ export default function DashboardPage() {
         {/* Narrative Summary Card */}
         <DashboardHeader user={user} activities={activities} transactions={transactions} />
 
-        {/* Daily Briefing */}
-        <DailyBriefingCard />
-
         {/* Life Score — Primary Intelligence Widget */}
         <LifeScoreCard />
 
         {/* Financial Flow and Daily Tasks - Compact Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-md md:gap-xl">
-          <FinancialChart transactions={transactions} />
-          {preferences?.module_features?.['timeline_daily_checklist'] !== false && (
-            <DailyTasksSummary />
-          )}
-        </div>
+        {(isFinanceEnabled || (isTimelineEnabled && preferences?.module_features?.['timeline_daily_checklist'] !== false)) && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-md md:gap-xl">
+            {isFinanceEnabled && <FinancialChart transactions={transactions} />}
+            {isTimelineEnabled && preferences?.module_features?.['timeline_daily_checklist'] !== false && (
+              <DailyTasksSummary />
+            )}
+          </div>
+        )}
 
-        <InvestmentSummary summary={investmentSummary} />
+        {isFinanceEnabled && <InvestmentSummary summary={investmentSummary} />}
 
         {/* Quick Action Input */}
         <Card className="p-md md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
@@ -135,7 +147,7 @@ export default function DashboardPage() {
               <input
                 type="text"
                 placeholder={t('dashboard.capture_placeholder')}
-                className="w-full pl-xl pr-lg py-md bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
+                className="w-full pl-2xl pr-lg py-lg bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
               />
             </div>
             <Button variant="primary" size="md">{t('dashboard.capture_btn')}</Button>
@@ -143,13 +155,15 @@ export default function DashboardPage() {
         </Card>
 
         {/* Modules Summary Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md md:gap-xl">
-          {preferences?.module_features?.['reminders_active'] !== false && (
-            <RemindersSidebar reminders={reminders} />
-          )}
-          <SportSummary summary={sportSummary} isLoading={sportLoading} />
-          <CareerSummary stats={careerStats} nextInterview={nextInterview} isLoading={careerLoading} />
-        </div>
+        {(isRemindersEnabled || isSportEnabled || isCareerEnabled) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md md:gap-xl">
+            {isRemindersEnabled && preferences?.module_features?.['reminders_active'] !== false && (
+              <RemindersSidebar reminders={reminders} />
+            )}
+            {isSportEnabled && <SportSummary summary={sportSummary} isLoading={sportLoading} />}
+            {isCareerEnabled && <CareerSummary stats={careerStats} nextInterview={nextInterview} isLoading={careerLoading} />}
+          </div>
+        )}
       </div>
     </Layout>
   );

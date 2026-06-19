@@ -142,6 +142,25 @@ export default function TimelinePage() {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [taskError, setTaskError] = useState<string | null>(null);
 
+  useEffect(() => {
+    console.log('[Timeline Page] activeTab:', activeTab);
+    console.log('[Timeline Page] timeline_weekly_log enabled:', module_features?.['timeline_weekly_log'] !== false);
+    console.log('[Timeline Page] timeline_daily_checklist enabled:', module_features?.['timeline_daily_checklist'] !== false);
+
+    // Auto-redirect if current tab is deactivated
+    if (activeTab === 'weekly-log' && module_features?.['timeline_weekly_log'] === false) {
+      if (module_features?.['timeline_daily_checklist'] !== false) {
+        console.log('[Timeline Page] redirecting from weekly-log to daily-checklist because weekly-log is disabled.');
+        setActiveTab('daily-checklist');
+      }
+    } else if (activeTab === 'daily-checklist' && module_features?.['timeline_daily_checklist'] === false) {
+      if (module_features?.['timeline_weekly_log'] !== false) {
+        console.log('[Timeline Page] redirecting from daily-checklist to weekly-log because daily-checklist is disabled.');
+        setActiveTab('weekly-log');
+      }
+    }
+  }, [module_features, activeTab]);
+
 
   const currentHour = new Date().getHours();
   const currentMinute = new Date().getMinutes();
@@ -361,7 +380,7 @@ export default function TimelinePage() {
               </p>
             </div>
             <div className="flex items-center gap-md">
-              {activeTab === 'weekly-log' && activities.length > 0 && (
+              {activeTab === 'weekly-log' && module_features?.['timeline_weekly_log'] !== false && activities.length > 0 && (
                 <div className="flex items-center gap-xl text-center">
                   <div>
                     <p className="text-2xl font-bold text-gradient">{activities.length}</p>
@@ -375,7 +394,7 @@ export default function TimelinePage() {
                   </div>
                 </div>
               )}
-              {activeTab === 'daily-checklist' && totalCount > 0 && (
+              {activeTab === 'daily-checklist' && module_features?.['timeline_daily_checklist'] !== false && totalCount > 0 && (
                 <div className="flex items-center gap-sm">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-gradient">{completedCount}<span className="text-gray-light opacity-50 text-lg">/{totalCount}</span></p>
@@ -383,7 +402,7 @@ export default function TimelinePage() {
                   </div>
                 </div>
               )}
-              {activeTab === 'weekly-log' && (
+              {activeTab === 'weekly-log' && module_features?.['timeline_weekly_log'] !== false && (
                 <Button variant="primary" size="md" onClick={() => openAddModal()} leftIcon={<Plus size={18} />}>
                   {t('timeline_page.log_activity_btn')}
                 </Button>
@@ -429,7 +448,7 @@ export default function TimelinePage() {
           </div>
 
           {/* Daily Checklist Panel */}
-          {activeTab === 'daily-checklist' && (
+          {activeTab === 'daily-checklist' && module_features?.['timeline_daily_checklist'] !== false && (
             <div className="glass rounded-xl border border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
               {/* Checklist Header */}
               <div className="flex items-center justify-between px-xl py-lg border-b border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/40">
@@ -563,11 +582,11 @@ export default function TimelinePage() {
           )}
 
           {/* Hour Grid â€” only shown on weekly-log tab */}
-          {activeTab === 'weekly-log' && isLoading ? (
+          {activeTab === 'weekly-log' && module_features?.['timeline_weekly_log'] !== false && isLoading ? (
             <div className="flex justify-center py-2xl">
               <Loading />
             </div>
-          ) : activeTab === 'weekly-log' && (
+          ) : activeTab === 'weekly-log' && module_features?.['timeline_weekly_log'] !== false && (
             <div className="glass rounded-xl border border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
               {/* Day Headers â€” sticky */}
               <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/60 sticky top-0 z-20">

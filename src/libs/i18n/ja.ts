@@ -12,6 +12,7 @@ export const ja = {
     settings: '設定',
     logout: 'ログアウト',
     logoutConfirmTitle: 'ログアウト',
+    logoutConfirmDesc: 'ログアウトしてもよろしいですか？ログインページにリダイレクトされます。',
     logoutConfirmBtn: 'ログアウト',
     cancel: 'キャンセル'
   },
@@ -77,7 +78,7 @@ export const ja = {
     buy_date: '購入日',
     amount_upper: '数量',
     buy_price_usd: '購入価格（USD）',
-    coingecko_id: 'COINGECKO ID',
+    coingecko_id: 'Coingecko ID',
     coingecko_help: 'CoinGeckoはティッカーではなくコインIDで資産を識別するため、暗号資産に推奨されます。',
     manual_price: '手動の現在価格（オプション）',
     manual_price_help: '金は、モジュールをシンプルかつ信頼できるものに保つために、手動のフォールバック価格を使用できます。',
@@ -464,7 +465,35 @@ export const ja = {
     error: 'エラー'
   },
   moduleCommon: {
-    emptyTitle: 'データが見つかりません',
-    emptyDesc: '最初のエントリを作成して開始してください。'
+    emptyTitle: 'データがありません',
+    emptyDesc: '最初のエントリを作成して開始します。'
+  },
+  life_score: {
+    dimensions: {
+      finance: '財務',
+      productivity: '生産性',
+      health: '健康',
+      career: 'キャリア',
+    },
+    labels: {
+      excellent: '優秀',
+      good: '良好',
+      needs_attention: '要注意',
+      critical: '危機的',
+    },
+    ui: {
+      title: 'ライフスコア',
+      subtitle: '今日の全体的なライフスコア',
+      calculating: 'ライフスコアを計算中...',
+      insights_today: '今日のインサイト',
+    },
+    insights: {
+      finance_attention: '財務に注意が必要です：支出を確認し、貯蓄率を上げてください。',
+      productivity_momentum: '勢いをつけるために、今日少なくとも1つのタスクを完了して始めてください。',
+      health_start: '運動から遠ざかっています。20分のセッションで十分です。',
+      career_activity: 'キャリアには活動が必要です。今日新しい応募を送信することを検討してください。',
+      area_to_improve: '現在、最も改善が必要な領域は{area}です。',
+      excellent_score: 'ライフスコアは優秀です。一貫性を保ちましょう！',
+    }
   }
 };

@@ -46,7 +46,35 @@ export default function RemindersPage() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [showNotifBanner, setShowNotifBanner] = useState(true);
-  const [filter, setFilter] = useState<'active' | 'history'>('active');
+
+  const remindersActiveEnabled = module_features?.['reminders_active'] !== false;
+  const remindersHistoryEnabled = module_features?.['reminders_history'] !== false;
+
+  // Default filter based on which sub-features are on
+  const defaultFilter: 'active' | 'history' = remindersActiveEnabled ? 'active' : 'history';
+  const [filter, setFilter] = useState<'active' | 'history'>(defaultFilter);
+
+  useEffect(() => {
+    console.log('[Reminders Page] filter:', filter);
+    console.log('[Reminders Page] reminders_active enabled:', remindersActiveEnabled);
+    console.log('[Reminders Page] reminders_history enabled:', remindersHistoryEnabled);
+
+    if (filter === 'active' && !remindersActiveEnabled) {
+      if (remindersHistoryEnabled) {
+        console.log('[Reminders Page] redirecting from active to history because active is disabled.');
+        setFilter('history');
+      }
+    } else if (filter === 'history' && !remindersHistoryEnabled) {
+      if (remindersActiveEnabled) {
+        console.log('[Reminders Page] redirecting from history to active because history is disabled.');
+        setFilter('active');
+      }
+    }
+    // If active is disabled, calendar view should switch to list
+    if (!remindersActiveEnabled && view === 'calendar') {
+      setView('list');
+    }
+  }, [remindersActiveEnabled, remindersHistoryEnabled, filter, view]);
 
   const [form, setForm] = useState({
     title: '',
@@ -218,20 +246,23 @@ export default function RemindersPage() {
             <p className="text-gray-light font-light">{t('reminders_page.desc')}</p>
           </div>
           <div className="flex items-center gap-md">
-            <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05]">
-              <button 
-                onClick={() => setView('calendar')}
-                className={`p-2 rounded-full transition-all ${view === 'calendar' ? 'bg-warm-gold text-warm-black shadow-lg' : 'text-gray-light hover:text-soft-cream'}`}
-              >
-                <CalendarIcon size={18} />
-              </button>
-              <button 
-                onClick={() => setView('list')}
-                className={`p-2 rounded-full transition-all ${view === 'list' ? 'bg-warm-gold text-warm-black shadow-lg' : 'text-gray-light hover:text-soft-cream'}`}
-              >
-                <List size={18} />
-              </button>
-            </div>
+            {/* Only show calendar/list toggle when active reminders is enabled */}
+            {remindersActiveEnabled && (
+              <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05]">
+                <button 
+                  onClick={() => setView('calendar')}
+                  className={`p-2 rounded-full transition-all ${view === 'calendar' ? 'bg-warm-gold text-warm-black shadow-lg' : 'text-gray-light hover:text-soft-cream'}`}
+                >
+                  <CalendarIcon size={18} />
+                </button>
+                <button 
+                  onClick={() => setView('list')}
+                  className={`p-2 rounded-full transition-all ${view === 'list' ? 'bg-warm-gold text-warm-black shadow-lg' : 'text-gray-light hover:text-soft-cream'}`}
+                >
+                  <List size={18} />
+                </button>
+              </div>
+            )}
             <Button variant="primary" onClick={openAddModal} className="rounded-full px-xl">
               <Plus size={18} className="mr-2" />
               {t('reminders_page.new_reminder')}
@@ -312,7 +343,8 @@ export default function RemindersPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-2xl">
           {/* Main View */}
           <div className="lg:col-span-8">
-            {view === 'calendar' ? (
+            {/* Calendar view only available when reminders_active is on */}
+            {view === 'calendar' && remindersActiveEnabled ? (
               <CalendarUI 
                 selectedDate={selectedDate} 
                 onDateSelect={handleDateSelect}
@@ -322,7 +354,7 @@ export default function RemindersPage() {
               <div className="space-y-md">
                 {/* Tabs */}
                 <div className="flex items-center gap-md mb-xl pb-md border-b border-black/[0.05] dark:border-white/[0.05]">
-                  {module_features?.['reminders_active'] !== false && (
+                  {remindersActiveEnabled && (
                     <button
                       onClick={() => setFilter('active')}
                       className={`pb-2 px-1 border-b-2 transition-all ${filter === 'active' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
@@ -330,7 +362,7 @@ export default function RemindersPage() {
                       {t('reminders_page.filter_active')}
                     </button>
                   )}
-                  {module_features?.['reminders_history'] !== false && (
+                  {remindersHistoryEnabled && (
                     <button
                       onClick={() => setFilter('history')}
                       className={`pb-2 px-1 border-b-2 transition-all ${filter === 'history' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
@@ -340,47 +372,54 @@ export default function RemindersPage() {
                   )}
                 </div>
 
-                {reminders.filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed').length === 0 ? (
+                {!remindersActiveEnabled && !remindersHistoryEnabled ? (
                   <div className="glass-card p-4xl text-center space-y-md">
-                    <Bell size={48} className="mx-auto text-deep-sage opacity-20" />
-                    <p className="text-gray-light font-light italic">
-                      {filter === 'active' ? t('reminders_page.empty_reminders') : 'No completed reminders yet.'}
-                    </p>
+                    <BellOff size={48} className="mx-auto text-gray-light opacity-20" />
+                    <p className="text-gray-light font-light italic">Reminders are disabled in settings.</p>
                   </div>
-                ) : (
-                  reminders
-                    .filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed')
-                    .map(reminder => (
-                    <div key={reminder.id} className="glass-card p-xl flex items-center justify-between group">
-                      <div className="flex items-center gap-xl">
-                        <button 
-                          onClick={() => toggleStatus(reminder)}
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-                            reminder.status === 'completed' ? 'bg-income border-income text-warm-black' : 'border-gray-medium hover:border-warm-gold'
-                          }`}
-                        >
-                          {reminder.status === 'completed' && <CheckCircle2 size={14} />}
-                        </button>
-                        <div>
-                          <h4 className={`text-lg font-medium ${reminder.status === 'completed' ? 'line-through opacity-40' : ''}`}>{reminder.title}</h4>
-                          <div className="flex items-center gap-md text-micro text-gray-light uppercase tracking-widest mt-1">
-                            <Clock size={12} />
-                            <span>{new Date(reminder.due_datetime || reminder.due_date || '').toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone })}</span>
-                            <span>•</span>
-                            <span className={reminder.priority === 'high' ? 'text-expense font-bold' : ''}>{t(`career_page.form.options.${reminder.priority}`)}</span>
+                ) : ((filter === 'active' && remindersActiveEnabled) || (filter === 'history' && remindersHistoryEnabled)) && (
+                  reminders.filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed').length === 0 ? (
+                    <div className="glass-card p-4xl text-center space-y-md">
+                      <Bell size={48} className="mx-auto text-deep-sage opacity-20" />
+                      <p className="text-gray-light font-light italic">
+                        {filter === 'active' ? t('reminders_page.empty_reminders') : 'No completed reminders yet.'}
+                      </p>
+                    </div>
+                  ) : (
+                    reminders
+                      .filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed')
+                      .map(reminder => (
+                      <div key={reminder.id} className="glass-card p-xl flex items-center justify-between group">
+                        <div className="flex items-center gap-xl">
+                          <button 
+                            onClick={() => toggleStatus(reminder)}
+                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                              reminder.status === 'completed' ? 'bg-income border-income text-warm-black' : 'border-gray-medium hover:border-warm-gold'
+                            }`}
+                          >
+                            {reminder.status === 'completed' && <CheckCircle2 size={14} />}
+                          </button>
+                          <div>
+                            <h4 className={`text-lg font-medium ${reminder.status === 'completed' ? 'line-through opacity-40' : ''}`}>{reminder.title}</h4>
+                            <div className="flex items-center gap-md text-micro text-gray-light uppercase tracking-widest mt-1">
+                              <Clock size={12} />
+                              <span>{new Date(reminder.due_datetime || reminder.due_date || '').toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone })}</span>
+                              <span>•</span>
+                              <span className={reminder.priority === 'high' ? 'text-expense font-bold' : ''}>{t(`career_page.form.options.${reminder.priority}`)}</span>
+                            </div>
                           </div>
                         </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-sm">
+                           <button onClick={() => openEditModal(reminder)} className="text-gray-light hover:text-warm-gold p-2">
+                             <Edit2 size={16} />
+                           </button>
+                           <button onClick={() => deleteReminder(reminder.id)} className="text-gray-light hover:text-expense p-2">
+                             <Trash2 size={18} />
+                           </button>
+                        </div>
                       </div>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-sm">
-                         <button onClick={() => openEditModal(reminder)} className="text-gray-light hover:text-warm-gold p-2">
-                           <Edit2 size={16} />
-                         </button>
-                         <button onClick={() => deleteReminder(reminder.id)} className="text-gray-light hover:text-expense p-2">
-                           <Trash2 size={18} />
-                         </button>
-                      </div>
-                    </div>
-                  ))
+                    ))
+                  )
                 )}
               </div>
             )}

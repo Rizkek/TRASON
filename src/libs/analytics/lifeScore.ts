@@ -208,7 +208,7 @@ export function calculateLifeScore(params: {
   productivity: LifeScoreDetail;
   health: LifeScoreDetail;
   career: LifeScoreDetail;
-}): LifeScoreResult {
+}, t: (key: string) => string): LifeScoreResult {
   const { finance, productivity, health, career } = params;
 
   // Weighted average
@@ -223,30 +223,31 @@ export function calculateLifeScore(params: {
   const insights: string[] = [];
 
   if (finance.score < 40) {
-    insights.push('Keuangan perlu perhatian: cek pengeluaran dan tingkatkan saving rate.');
+    insights.push(t('life_score.insights.finance_attention'));
   }
   if (productivity.score < 40) {
-    insights.push('Mulai hari ini dengan menyelesaikan minimal 1 task untuk membangun momentum.');
+    insights.push(t('life_score.insights.productivity_momentum'));
   }
   if (health.score < 40) {
-    insights.push('Sudah lama tidak olahraga. Sesi 20 menit sudah cukup untuk memulai.');
+    insights.push(t('life_score.insights.health_start'));
   }
   if (career.score < 40) {
-    insights.push('Karier memerlukan aktivitas. Pertimbangkan mengirim lamaran baru hari ini.');
+    insights.push(t('life_score.insights.career_activity'));
   }
 
   const lowestDimension = [
     { name: 'Finance', score: finance.score },
-    { name: 'Produktivitas', score: productivity.score },
-    { name: 'Kesehatan', score: health.score },
-    { name: 'Karier', score: career.score },
+    { name: 'Productivity', score: productivity.score },
+    { name: 'Health', score: health.score },
+    { name: 'Career', score: career.score },
   ].sort((a, b) => a.score - b.score)[0];
 
   if (overall >= 70 && lowestDimension.score < 50) {
-    insights.push(`${lowestDimension.name} adalah area yang paling perlu ditingkatkan saat ini.`);
+    const areaTrans = t(`life_score.dimensions.${lowestDimension.name.toLowerCase()}`);
+    insights.push(t('life_score.insights.area_to_improve').replace('{area}', areaTrans));
   }
   if (overall >= 80) {
-    insights.push('Life Score Anda sangat baik. Pertahankan konsistensi!');
+    insights.push(t('life_score.insights.excellent_score'));
   }
 
   return {

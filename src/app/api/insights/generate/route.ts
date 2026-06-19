@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { openai } from '@ai-sdk/openai';
+import { google } from '@ai-sdk/google';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { getAuthenticatedUser } from '@/utils/supabase/server';
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     }
 
     const { object } = await generateObject({
-      model: openai('gpt-4o-mini'),
+      model: google('gemini-1.5-flash'),
       schema: insightsSchema,
       prompt: `
         You are a highly analytical and empathetic lifestyle architect and coach AI for TRASON (Personal Life OS).
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
     // API key tidak dikonfigurasi
     if (error?.message?.includes('API key') || error?.status === 401) {
       return NextResponse.json(
-        { error: 'AI service not configured. Set OPENAI_API_KEY in environment.' },
+        { error: 'AI service not configured. Set GOOGLE_GENERATIVE_AI_API_KEY in environment.' },
         { status: 503 }
       );
     }

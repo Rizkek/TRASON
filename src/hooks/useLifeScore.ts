@@ -11,6 +11,7 @@ import { useCareer } from '@/hooks/useCareer';
 import { useTransaction } from '@/hooks/useTransaction';
 import { useDailyTasks } from '@/hooks/useDailyTasks';
 import { useActivity } from '@/hooks/useActivity';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import { getDateRange } from '@/libs/date';
 import {
   calculateFinanceScore,
@@ -40,6 +41,7 @@ export function useLifeScore(): {
   const { totalCount, isLoading: taskLoading } = useDailyTasks();
   const { applications, isLoading: careerLoading } = useCareer();
   const { activities, isLoading: actLoading } = useActivity(rollingStart, rollingEnd);
+  const { t } = useTranslation();
 
   const isLoading = txLoading || taskLoading || careerLoading || actLoading;
 
@@ -99,8 +101,8 @@ export function useLifeScore(): {
       responseRate: careerAnalytics.responseRate / 100,
     });
 
-    return calculateLifeScore({ finance, productivity, health, career });
-  }, [isLoading, transactions, totalCount, activities, applications]);
+    return calculateLifeScore({ finance, productivity, health, career }, t);
+  }, [isLoading, transactions, totalCount, activities, applications, t]);
 
   return { lifeScore, isLoading };
 }

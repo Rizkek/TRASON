@@ -3,22 +3,10 @@
 import React, { useState } from 'react';
 import { useLifeScore } from '@/hooks/useLifeScore';
 import { Card, Loading } from '@/components';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import { TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
 
-const DIMENSION_CONFIG = {
-  finance: {
-    label: 'Finance',
-  },
-  productivity: {
-    label: 'Produktivitas',
-  },
-  health: {
-    label: 'Kesehatan',
-  },
-  career: {
-    label: 'Karier',
-  },
-};
+const DIMENSION_KEYS = ['finance', 'productivity', 'health', 'career'] as const;
 
 function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
   const radius = (size - 16) / 2;
@@ -84,12 +72,13 @@ function DimensionBar({ label, score }: {
 export function LifeScoreCard() {
   const { lifeScore, isLoading } = useLifeScore();
   const [showInsights, setShowInsights] = useState(false);
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
       <Card className="p-xl">
         <div className="flex items-center justify-center py-2xl">
-          <Loading text="Menghitung Life Score..." />
+          <Loading text={t('life_score.ui.calculating')} />
         </div>
       </Card>
     );
@@ -103,9 +92,9 @@ export function LifeScoreCard() {
     lifeScore.overall >= 40 ? 'text-orange-400' : 'text-red-400';
 
   const scoreLabel =
-    lifeScore.overall >= 80 ? 'Sangat Baik' :
-    lifeScore.overall >= 60 ? 'Baik' :
-    lifeScore.overall >= 40 ? 'Perlu Perhatian' : 'Kritis';
+    lifeScore.overall >= 80 ? t('life_score.labels.excellent') :
+    lifeScore.overall >= 60 ? t('life_score.labels.good') :
+    lifeScore.overall >= 40 ? t('life_score.labels.needs_attention') : t('life_score.labels.critical');
 
   return (
     <Card className="p-xl bg-gradient-to-br from-gray-strong/80 to-black/60 border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden">
@@ -116,9 +105,9 @@ export function LifeScoreCard() {
         <div>
           <h3 className="font-serif italic text-lg text-white flex items-center gap-sm">
             <TrendingUp size={18} className="text-primary" />
-            Life Score
+            {t('life_score.ui.title')}
           </h3>
-          <p className="text-micro text-gray-light mt-1">Skor holistik kehidupan Anda hari ini</p>
+          <p className="text-micro text-gray-light mt-1">{t('life_score.ui.subtitle')}</p>
         </div>
         <div className={`text-xs font-bold px-sm py-xs rounded-full border ${
           lifeScore.overall >= 80 ? 'border-emerald-400/30 text-emerald-400 bg-emerald-400/10' :
@@ -137,10 +126,10 @@ export function LifeScoreCard() {
 
         {/* Dimension Bars */}
         <div className="flex-1 space-y-md">
-          {(Object.entries(DIMENSION_CONFIG) as [keyof typeof DIMENSION_CONFIG, typeof DIMENSION_CONFIG[keyof typeof DIMENSION_CONFIG]][]).map(([key, config]) => (
+          {DIMENSION_KEYS.map((key) => (
             <DimensionBar
               key={key}
-              label={config.label}
+              label={t(`life_score.dimensions.${key}`)}
               score={lifeScore[key]}
             />
           ))}
@@ -156,7 +145,7 @@ export function LifeScoreCard() {
           >
             {showInsights ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             <span className="font-bold uppercase tracking-wider">
-              {lifeScore.insights.length} Insight Hari Ini
+              {lifeScore.insights.length} {t('life_score.ui.insights_today')}
             </span>
           </button>
 

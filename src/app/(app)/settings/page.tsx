@@ -86,7 +86,8 @@ const ModuleItem: React.FC<{
   isEnabled: boolean;
   metadata: any;
   userId?: string;
-}> = ({ id, isEnabled, metadata, userId }) => {
+  t: (key: string) => string;
+}> = ({ id, isEnabled, metadata, userId, t }) => {
   const { toggle, isLoading: isHookLoading } = useModuleStatus(id, userId);
   const { preferences, updatePreferences } = usePreferences(userId);
   const [isLocalLoading, setIsLocalLoading] = useState(false);
@@ -155,12 +156,26 @@ const ModuleItem: React.FC<{
   const Icon = MODULE_ICONS[metadata.icon] || Grid3X3;
   const isPending = isHookLoading || isLocalLoading;
 
+  // For Timeline and Reminders: detect if all sub-features are turned off
+  const allSubFeaturesOff = isEnabled && (() => {
+    const f = preferences?.module_features || {};
+    if (id === 'timeline') {
+      return f['timeline_weekly_log'] === false && f['timeline_daily_checklist'] === false;
+    }
+    if (id === 'reminders') {
+      return f['reminders_active'] === false && f['reminders_history'] === false;
+    }
+    return false;
+  })();
+
   return (
     <div className="space-y-sm">
       <div
         className={`flex items-center justify-between p-lg rounded-md border transition-all ${
-          isEnabled
+          isEnabled && !allSubFeaturesOff
             ? 'bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]'
+            : allSubFeaturesOff
+            ? 'bg-orange-500/[0.04] border-orange-500/20'
             : 'bg-transparent border-black/[0.02] dark:border-white/[0.02] opacity-60'
         }`}
       >
@@ -169,11 +184,16 @@ const ModuleItem: React.FC<{
             className="w-10 h-10 rounded-lg flex items-center justify-center"
             style={{ backgroundColor: `${metadata.color}15` }}
           >
-            <Icon size={20} style={{ color: metadata.color }} />
+            <Icon size={20} style={{ color: allSubFeaturesOff ? '#f97316' : metadata.color }} />
           </div>
           <div>
-            <h4 className="text-sm font-medium text-soft-cream">{metadata.name}</h4>
-            <p className="text-[10px] text-gray-light">{metadata.description}</p>
+            <h4 className="text-sm font-medium text-soft-cream">{t(`nav.${id}`)}</h4>
+            <p className="text-[10px] text-gray-light">
+              {allSubFeaturesOff
+                ? <span className="text-orange-400">All sub-features are off — module has no visible content</span>
+                : metadata.description
+              }
+            </p>
           </div>
         </div>
 
@@ -197,38 +217,38 @@ const ModuleItem: React.FC<{
 
       {/* Sub-toggles for Timeline and Reminders */}
       {isEnabled && (id === 'timeline' || id === 'reminders') && (
-        <div className="ml-4 md:ml-12 pl-3 md:pl-4 border-l border-black/10 dark:border-white/10 space-y-md mt-4">
+        <div className="ml-4 pl-3 border-l border-black/10 dark:border-white/10 space-y-sm mt-sm">
           {id === 'timeline' && (
             <>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-light">Weekly Log Tab & Widget</span>
+              <div className="flex items-center justify-between gap-md py-sm">
+                <span className="text-xs text-gray-light flex-1 min-w-0">Weekly Log</span>
                 <button
                   type="button"
                   onClick={() => handleSubToggle('timeline_weekly_log')}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${
                     preferences?.module_features?.['timeline_weekly_log'] !== false
                       ? 'bg-primary'
                       : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
-                  <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                    preferences?.module_features?.['timeline_weekly_log'] !== false ? 'translate-x-5' : 'translate-x-1'
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    preferences?.module_features?.['timeline_weekly_log'] !== false ? 'translate-x-6' : 'translate-x-1'
                   }`} />
                 </button>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-light">Daily Checklist Tab & Widget</span>
+              <div className="flex items-center justify-between gap-md py-sm">
+                <span className="text-xs text-gray-light flex-1 min-w-0">Daily Checklist</span>
                 <button
                   type="button"
                   onClick={() => handleSubToggle('timeline_daily_checklist')}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${
                     preferences?.module_features?.['timeline_daily_checklist'] !== false
                       ? 'bg-primary'
                       : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
-                  <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                    preferences?.module_features?.['timeline_daily_checklist'] !== false ? 'translate-x-5' : 'translate-x-1'
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    preferences?.module_features?.['timeline_daily_checklist'] !== false ? 'translate-x-6' : 'translate-x-1'
                   }`} />
                 </button>
               </div>
@@ -236,35 +256,35 @@ const ModuleItem: React.FC<{
           )}
           {id === 'reminders' && (
             <>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-light">Active Reminders Tab & Widget</span>
+              <div className="flex items-center justify-between gap-md py-sm">
+                <span className="text-xs text-gray-light flex-1 min-w-0">Active reminders</span>
                 <button
                   type="button"
                   onClick={() => handleSubToggle('reminders_active')}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${
                     preferences?.module_features?.['reminders_active'] !== false
                       ? 'bg-primary'
                       : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
-                  <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                    preferences?.module_features?.['reminders_active'] !== false ? 'translate-x-5' : 'translate-x-1'
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    preferences?.module_features?.['reminders_active'] !== false ? 'translate-x-6' : 'translate-x-1'
                   }`} />
                 </button>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-light">History Tab</span>
+              <div className="flex items-center justify-between gap-md py-sm">
+                <span className="text-xs text-gray-light flex-1 min-w-0">History</span>
                 <button
                   type="button"
                   onClick={() => handleSubToggle('reminders_history')}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${
                     preferences?.module_features?.['reminders_history'] !== false
                       ? 'bg-primary'
                       : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
-                  <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                    preferences?.module_features?.['reminders_history'] !== false ? 'translate-x-5' : 'translate-x-1'
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    preferences?.module_features?.['reminders_history'] !== false ? 'translate-x-6' : 'translate-x-1'
                   }`} />
                 </button>
               </div>
@@ -277,7 +297,7 @@ const ModuleItem: React.FC<{
 };
 
 // Module Settings Tab Component
-const ModuleSettingsTab: React.FC<{ userId?: string }> = ({ userId }) => {
+const ModuleSettingsTab: React.FC<{ userId?: string; t: (key: string) => string }> = ({ userId, t }) => {
   const { statuses, enabledModules, disabledModules, isLoading } = useAllModuleStatus(userId);
 
   if (isLoading) {
@@ -309,6 +329,7 @@ const ModuleSettingsTab: React.FC<{ userId?: string }> = ({ userId }) => {
                 isEnabled={status.isEnabled}
                 metadata={status.metadata}
                 userId={userId}
+                t={t}
               />
             ))}
           </div>
@@ -933,7 +954,7 @@ export default function SettingsPage() {
                 <p className="text-sm text-gray-light mb-xl">
                   {t('settings.modules.description')}
                 </p>
-                <ModuleSettingsTab userId={user?.id} />
+                <ModuleSettingsTab userId={user?.id} t={t} />
               </Card>
             </div>
           )}
