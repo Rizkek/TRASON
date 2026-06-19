@@ -494,6 +494,9 @@ export default function InvestmentsPage() {
 
       >
         <div className="space-y-lg">
+          <Alert type="warning" title="Informasi API">
+            Saat ini auto-sync harga hanya optimal untuk <strong>Stock (Saham)</strong> dan <strong>Gold (Emas)</strong>. Sinkronisasi harga <strong>Crypto</strong> sedang dinonaktifkan karena limitasi API (CoinGecko berbayar). Anda tetap bisa memasukkan Crypto, namun harganya mungkin tidak terupdate otomatis.
+          </Alert>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
             <div className="space-y-sm">
               <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('investment_page.asset_type')}</label>
