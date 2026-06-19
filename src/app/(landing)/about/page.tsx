@@ -1,9 +1,7 @@
-'use client';
-
-import React, { useState } from 'react';
+import React from 'react';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FaqItem } from './FaqItem';
 
 const FAQS = [
   {
@@ -23,27 +21,6 @@ const FAQS = [
     a: "Notion and Excel are blank canvases. You have to build the systems yourself, which often break. TRASON provides opinionated, pre-built workflows specifically designed for personal finance, habits, and career tracking, completely interconnected out of the box."
   }
 ];
-
-function FaqItem({ q, a }: { q: string, a: string }) {
-  const [open, setOpen] = useState(false);
-  
-  return (
-    <div className="border border-white/5 rounded-xl bg-black/20 overflow-hidden">
-      <button 
-        className="w-full text-left px-lg py-md flex justify-between items-center font-bold text-gray-light hover:text-white transition-colors"
-        onClick={() => setOpen(!open)}
-      >
-        {q}
-        {open ? <FiChevronUp /> : <FiChevronDown />}
-      </button>
-      {open && (
-        <div className="px-lg pb-md text-gray-light/80 leading-relaxed text-sm">
-          {a}
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function AboutPage() {
   return (

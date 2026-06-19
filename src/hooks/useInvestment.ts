@@ -86,31 +86,32 @@ export const useInvestment = (): UseInvestmentReturn => {
       const pos = positions || await investmentQueries.getPositions();
       const quotes = await fetchInvestmentQuotes(pos);
       const { calculatedPositions: calcPos, summary: calcSummary } = calculatePortfolioSummary(pos, quotes);
-      await Promise.all(
-              calcPos.map(async (position) => {
-                const quote = quotes[position.id];
-                if (!quote || quote.error) return;
-                await executeMutation(
-                  (async () => {
-                    await investmentQueries.updatePositionMarketData(position.id, {
-                      last_price: quote.currentPrice,
-                      last_price_change_pct: quote.changePercent24h ?? 0,
-                      last_valued_at: quote.asOf,
-                    });
-                    await investmentQueries.upsertPriceSnapshot({
-                      position_id: position.id,
-                      snapshot_date: new Date().toISOString().split('T')[0],
-                      price: quote.currentPrice,
-                      change_percent: quote.changePercent24h ?? 0,
-                      source: quote.source,
-                      metadata: { symbol: quote.symbol, asset_type: quote.assetType, as_of: quote.asOf }
-                    });
-                  })(),
-                  `useInvestment.refreshPortfolio.position.${position.id}`,
-                  { throwOnError: false }
-                );
-              })
-            );
+      
+      await executeMutation(
+        (async () => {
+          await Promise.all(
+            calcPos.map(async (position) => {
+              const quote = quotes[position.id];
+              if (!quote || quote.error) return;
+              await investmentQueries.updatePositionMarketData(position.id, {
+                last_price: quote.currentPrice,
+                last_price_change_pct: quote.changePercent24h ?? 0,
+                last_valued_at: quote.asOf,
+              });
+              await investmentQueries.upsertPriceSnapshot({
+                position_id: position.id,
+                snapshot_date: new Date().toISOString().split('T')[0],
+                price: quote.currentPrice,
+                change_percent: quote.changePercent24h ?? 0,
+                source: quote.source,
+                metadata: { symbol: quote.symbol, asset_type: quote.assetType, as_of: quote.asOf }
+              });
+            })
+          );
+        })(),
+        'useInvestment.refreshPortfolio.batchUpdate',
+        { throwOnError: false }
+      );
       await mutatePositions();
         })(),
         'useInvestment.refreshPortfolio'

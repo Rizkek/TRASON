@@ -153,7 +153,7 @@ export function LifeScoreCard() {
             <div className="mt-md space-y-sm">
               {lifeScore.insights.map((insight: string, i: number) => (
                 <p key={i} className="text-xs text-gray-light leading-relaxed pl-sm border-l-2 border-primary/30">
-                  {insight}
+                  {t(insight)}
                 </p>
               ))}
             </div>

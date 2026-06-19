@@ -7,10 +7,15 @@ import { useSportHistory } from '@/hooks/useSportHistory';
 import { useWorkoutPlan } from '@/hooks/useWorkoutPlan';
 import { WorkoutPlanCard } from '@/components/modules/Sport/WorkoutPlanCard';
 import { PRBoard } from '@/components/modules/Sport/PRBoard';
-import { SportHistoryChart } from '@/components/modules/Sport/SportHistoryChart';
 import { QuickLogModal } from '@/components/modules/Sport/QuickLogModal';
 import { CreatePlanModal } from '@/components/modules/Sport/CreatePlanModal';
 import { Dumbbell, Plus, Flame, Timer, Activity } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const SportHistoryChart = dynamic(() => import('@/components/modules/Sport/SportHistoryChart').then(mod => mod.SportHistoryChart), {
+  ssr: false,
+  loading: () => <div className="h-64 w-full bg-slate-800 animate-pulse rounded-xl" />
+});
 import { useTranslation } from '@/libs/i18n/useTranslation';
 
 export const SportPageClient: React.FC = () => {
