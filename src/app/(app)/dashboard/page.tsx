@@ -82,10 +82,7 @@ export default function DashboardPage() {
     }
   }, [authLoading, isAuthenticated, router]);
 
-  useEffect(() => {
-    console.log('[Dashboard Page] timeline_daily_checklist enabled:', preferences?.module_features?.['timeline_daily_checklist'] !== false);
-    console.log('[Dashboard Page] reminders_active enabled:', preferences?.module_features?.['reminders_active'] !== false);
-  }, [preferences?.module_features]);
+
 
   if (authLoading) {
     return (

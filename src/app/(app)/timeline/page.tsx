@@ -143,19 +143,13 @@ export default function TimelinePage() {
   const [taskError, setTaskError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('[Timeline Page] activeTab:', activeTab);
-    console.log('[Timeline Page] timeline_weekly_log enabled:', module_features?.['timeline_weekly_log'] !== false);
-    console.log('[Timeline Page] timeline_daily_checklist enabled:', module_features?.['timeline_daily_checklist'] !== false);
-
     // Auto-redirect if current tab is deactivated
     if (activeTab === 'weekly-log' && module_features?.['timeline_weekly_log'] === false) {
       if (module_features?.['timeline_daily_checklist'] !== false) {
-        console.log('[Timeline Page] redirecting from weekly-log to daily-checklist because weekly-log is disabled.');
         setActiveTab('daily-checklist');
       }
     } else if (activeTab === 'daily-checklist' && module_features?.['timeline_daily_checklist'] === false) {
       if (module_features?.['timeline_weekly_log'] !== false) {
-        console.log('[Timeline Page] redirecting from daily-checklist to weekly-log because daily-checklist is disabled.');
         setActiveTab('weekly-log');
       }
     }

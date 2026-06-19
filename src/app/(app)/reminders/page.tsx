@@ -55,20 +55,10 @@ export default function RemindersPage() {
   const [filter, setFilter] = useState<'active' | 'history'>(defaultFilter);
 
   useEffect(() => {
-    console.log('[Reminders Page] filter:', filter);
-    console.log('[Reminders Page] reminders_active enabled:', remindersActiveEnabled);
-    console.log('[Reminders Page] reminders_history enabled:', remindersHistoryEnabled);
-
     if (filter === 'active' && !remindersActiveEnabled) {
-      if (remindersHistoryEnabled) {
-        console.log('[Reminders Page] redirecting from active to history because active is disabled.');
-        setFilter('history');
-      }
+      if (remindersHistoryEnabled) setFilter('history');
     } else if (filter === 'history' && !remindersHistoryEnabled) {
-      if (remindersActiveEnabled) {
-        console.log('[Reminders Page] redirecting from history to active because history is disabled.');
-        setFilter('active');
-      }
+      if (remindersActiveEnabled) setFilter('active');
     }
     // If active is disabled, calendar view should switch to list
     if (!remindersActiveEnabled && view === 'calendar') {
