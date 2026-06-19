@@ -358,7 +358,7 @@ User Context Profile (TRASON Unified Life OS):
                           <button
                             onClick={(e) => handleDeleteInsight(insight.id, e)}
                             className="p-sm text-gray-light hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
-                            title={t('insights_page.delete_insight', 'Delete Insight')}
+                            title={t('insights_page.delete_insight')}
                           >
                             <Trash2 size={16} />
                           </button>

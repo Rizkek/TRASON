@@ -176,7 +176,8 @@ export const ja = {
     no_insights_desc: '有意義な戦略的インサイトを生成するには、少なくとも数日分の運用データが必要です。タイムラインまたは財務トラッカーを使用してください。',
     system_idle: 'システムアイドル',
     architect_perspective_title: "アーキテクトの視点",
-    architect_perspective_desc: 'TRASONの核となる哲学は、リソース管理と物理的な存在を調和させることです。毎日のフローを記録し続けて、深いアーキテクチャパターンを解き明かしてください。'
+    architect_perspective_desc: 'TRASONの核となる哲学は、リソース管理と物理的な存在を調和させることです。毎日のフローを記録し続けて、深いアーキテクチャパターンを解き明かしてください。',
+    delete_insight: 'インサイトを削除'
   },
   reminders_page: {
     title: 'サンクチュアリ',

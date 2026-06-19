@@ -176,7 +176,8 @@ export const es = {
     no_insights_desc: 'Nuestro motor de análisis requiere al menos unos días de datos operativos para generar perspectivas estratégicas significativas. Por favor, usa la línea de tiempo o el rastreador financiero.',
     system_idle: 'Sistema inactivo',
     architect_perspective_title: "Perspectiva del Arquitecto",
-    architect_perspective_desc: 'La filosofía central de TRASON es armonizar la gestión de recursos con la presencia física. Sigue registrando tus flujos diarios para desbloquear profundos patrones arquitectónicos.'
+    architect_perspective_desc: 'La filosofía central de TRASON es armonizar la gestión de recursos con la presencia física. Sigue registrando tus flujos diarios para desbloquear profundos patrones arquitectónicos.',
+    delete_insight: 'Eliminar información',
   },
   reminders_page: {
     title: 'Santuario',

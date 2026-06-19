@@ -176,7 +176,8 @@ export const id = {
     no_insights_desc: 'Mesin analisis kami memerlukan setidaknya beberapa hari data operasional untuk menghasilkan wawasan strategis yang bermakna. Harap gunakan garis waktu atau pelacak keuangan.',
     system_idle: 'Sistem menganggur',
     architect_perspective_title: "Perspektif Arsitek",
-    architect_perspective_desc: 'Filosofi inti TRASON adalah menyelaraskan manajemen sumber daya dengan kehadiran fisik. Terus catat arus harian Anda untuk membuka pola arsitektur yang mendalam.'
+    architect_perspective_desc: 'Filosofi inti TRASON adalah menyelaraskan manajemen sumber daya dengan kehadiran fisik. Terus catat arus harian Anda untuk membuka pola arsitektur yang mendalam.',
+    delete_insight: 'Hapus Wawasan',
   },
   reminders_page: {
     title: 'Pengingat',

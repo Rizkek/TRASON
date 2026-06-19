@@ -176,7 +176,8 @@ export const en = {
     no_insights_desc: 'Our analysis engine requires at least a few days of operational data to generate meaningful strategic insights. Please use the timeline or financial tracker.',
     system_idle: 'System idle',
     architect_perspective_title: "Architect's Perspective",
-    architect_perspective_desc: 'The core philosophy of TRASON is to harmonize resource management with physical presence. Keep logging your daily flows to unlock deep architectural patterns.'
+    architect_perspective_desc: 'The core philosophy of TRASON is to harmonize resource management with physical presence. Keep logging your daily flows to unlock deep architectural patterns.',
+    delete_insight: 'Delete Insight',
   },
   reminders_page: {
     title: 'Sanctuary',
