@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 import useSWR from 'swr';
-import { careerQueries } from '@/services/careerQueries';
+import { careerQueries } from '@/services/analytics/careerQueries';
 import { CareerApplication } from '@/types/database';
 import { useAuthStore } from '@/store/authStore';
 import { sanitizeError } from '@/libs/validation';

@@ -4,11 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, Input, Loading, ErrorAlert } from '@/components';
 import { useAuthStore } from '@/store/authStore';
-import { usePreferences } from '@/hooks/usePreferences';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { ModuleSelectionCard } from './components/ModuleSelectionCard';
 import { 
-  Globe, Clock, Wallet, TrendingUp, BellRing, Briefcase, Activity, Sparkles, ChevronRight, Check
+  Globe, Clock, Wallet, TrendingUp, BellRing, Briefcase, Activity, Sparkles, ChevronRight, Check, Paintbrush
 } from 'lucide-react';
 
 const LANGUAGE_OPTIONS = [
@@ -38,7 +38,7 @@ const MODULE_OPTIONS = [
 export default function OnboardingPage() {
   const router = useRouter();
   const { user, setUser } = useAuthStore();
-  const { preferences, updatePreferences, isLoading: prefsLoading } = usePreferences(user?.id);
+  const { updatePreferences, isUpdating: prefsLoading, ...preferences } = useUserPreferences();
   const { t } = useTranslation();
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -49,6 +49,7 @@ export default function OnboardingPage() {
   const [language, setLanguage] = useState('en');
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC');
   const [currency, setCurrency] = useState('USD');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [selectedModules, setSelectedModules] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function OnboardingPage() {
       if (preferences.language) setLanguage(preferences.language);
       if (preferences.timezone) setTimezone(preferences.timezone);
       if (preferences.currency) setCurrency(preferences.currency);
+      if (preferences.theme) setTheme(preferences.theme as 'dark' | 'light');
       if (preferences.module_features) setSelectedModules(preferences.module_features);
     }
   }, [preferences]);
@@ -82,6 +84,7 @@ export default function OnboardingPage() {
         language,
         timezone,
         currency,
+        theme,
         module_features: {
           ...selectedModules,
           onboarding_done: true,
@@ -183,24 +186,47 @@ export default function OnboardingPage() {
                 </div>
               </div>
 
-              <div className="space-y-md">
-                <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
-                  <Wallet size={14} className="text-warm-gold" /> PRIMARY CURRENCY
-                </label>
-                <div className="flex flex-wrap gap-sm">
-                  {CURRENCY_OPTIONS.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => setCurrency(c)}
-                      className={`px-lg py-sm rounded-lg border text-sm font-bold transition-all ${
-                        currency === c 
-                          ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105' 
-                          : 'bg-black/10 border-white/5 text-gray-light hover:bg-black/20 hover:border-white/10'
-                      }`}
-                    >
-                      {c}
-                    </button>
-                  ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-lg pt-4 border-t border-white/5">
+                <div className="space-y-md">
+                  <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
+                    <Wallet size={14} className="text-warm-gold" /> PRIMARY CURRENCY
+                  </label>
+                  <div className="flex flex-wrap gap-sm">
+                    {CURRENCY_OPTIONS.map((c) => (
+                      <button
+                        key={c}
+                        onClick={() => setCurrency(c)}
+                        className={`px-lg py-sm rounded-lg border text-sm font-bold transition-all ${
+                          currency === c 
+                            ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105' 
+                            : 'bg-black/10 border-white/5 text-gray-light hover:bg-black/20 hover:border-white/10'
+                        }`}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-md">
+                  <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
+                    <Paintbrush size={14} className="text-primary" /> THEME
+                  </label>
+                  <div className="flex gap-sm">
+                    {['dark', 'light'].map((th) => (
+                      <button
+                        key={th}
+                        onClick={() => setTheme(th as 'dark' | 'light')}
+                        className={`px-lg py-sm rounded-lg border text-sm font-bold uppercase transition-all ${
+                          theme === th 
+                            ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105' 
+                            : 'bg-black/10 border-white/5 text-gray-light hover:bg-black/20 hover:border-white/10'
+                        }`}
+                      >
+                        {th}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 

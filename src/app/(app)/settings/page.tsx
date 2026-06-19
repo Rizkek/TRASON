@@ -6,12 +6,12 @@ import { Layout, Card, Button, Input, Loading, Alert, ErrorAlert, ConfirmModal }
 import { useAuthStore } from '@/store/authStore';
 import { User, supabase } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import { userQueries } from '@/services/queries';
+import { userQueries } from '@/services/core/userQueries';
 import { sanitizeError, validateEmail } from '@/libs/validation';
 import { useModuleStatus } from '@/hooks/useModuleStatus';
 import { usePushNotification } from '@/hooks/usePushNotification';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { usePreferences } from '@/hooks/usePreferences';
+
 import { ModuleId } from '@/modules/types';
 import { DEFAULT_MODULE_STATUS, MODULE_METADATA } from '@/modules/registry';
 import {
@@ -40,7 +40,7 @@ interface ProfileData {
 }
 
 interface PreferenceData {
-  theme: 'light' | 'dark' | 'auto';
+  theme: 'light' | 'dark';
   language: string;
   currency: string;
   timezone: string;
@@ -90,7 +90,7 @@ const ModuleItem: React.FC<{
   t: (key: string) => string;
 }> = ({ id, isEnabled, metadata, userId, t }) => {
   const { toggle, isLoading: isHookLoading } = useModuleStatus(id, userId);
-  const { preferences, updatePreferences } = usePreferences(userId);
+  const { updatePreferences, isUpdating: isHookLoadingPrefs, ...preferences } = useUserPreferences();
   const [isLocalLoading, setIsLocalLoading] = useState(false);
   const setUser = useAuthStore((s) => s.setUser);
   const user = useAuthStore((s) => s.user);
@@ -406,12 +406,8 @@ export default function SettingsPage() {
       root.classList.add('dark');
       root.classList.remove('light');
     } else if (prefs.theme === 'light') {
-      root.classList.remove('dark');
       root.classList.add('light');
-    } else {
-      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.classList.toggle('dark', isDark);
-      root.classList.toggle('light', !isDark);
+      root.classList.remove('dark');
     }
   }, [prefs.theme]);
 
@@ -793,12 +789,12 @@ export default function SettingsPage() {
                     <div className="space-y-sm">
                       <label className="text-[10px] font-bold text-gray-light tracking-widest">{t('settings.interface.themeEngine')}</label>
                       <div className="flex gap-md">
-                        {['light', 'dark', 'auto'].map((th) => (
+                        {['light', 'dark'].map((th) => (
                           <button
                             key={th}
                             type="button"
-                            onClick={() => setPrefs((p) => ({ ...p, theme: th as 'light' | 'dark' | 'auto' }))}
-                            className={`flex-1 py-md rounded-md border text-xs font-bold uppercase tracking-widest transition-all ${
+                            onClick={() => setPrefs((p) => ({ ...p, theme: th as 'light' | 'dark' }))}
+                            className={`px-lg py-sm rounded-md border text-xs font-bold uppercase tracking-widest transition-all ${
                               prefs.theme === th
                                 ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105'
                                 : 'bg-soft-cream/5 text-gray-light border-soft-cream/10 hover:bg-soft-cream/10 hover:border-soft-cream/20'

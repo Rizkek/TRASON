@@ -16,7 +16,7 @@ const serif = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://trason.vercel.app'),
+  metadataBase: new URL('https://www.trason.web.id'),
   title: {
     default: 'TRASON - Personal OS',
     template: '%s | TRASON',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'TRASON - Your Personal OS',
     description: 'A calm Personal OS for finance, routines, sport, reminders, and career signals.',
-    url: 'https://trason.vercel.app',
+    url: 'https://www.trason.web.id',
     siteName: 'TRASON',
     images: [
       {

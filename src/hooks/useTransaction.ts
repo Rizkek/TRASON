@@ -2,11 +2,12 @@
 
 import { useCallback } from 'react';
 import useSWR, { mutate as globalMutate } from 'swr';
-import { transactionQueries } from '@/services/queries';
+import { transactionQueries } from '@/services/finance/transactionQueries';
 import { Transaction } from '@/services/supabaseClient';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
-import { handleQueryError, getUserErrorMessage, logError } from '@/libs/apiErrors';
+import { executeMutation } from "@/libs/api/mutationBuilder";
+import { getUserErrorMessage } from "@/libs/apiErrors";
 
 export interface UseTransactionReturn {
   transactions: Transaction[];
@@ -30,114 +31,120 @@ export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income'
   // Append type filter to key if specified
   const swrKey = type && Array.isArray(key) ? [...key, type] : key;
 
-  const { data, error, isLoading, mutate } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR<Transaction[]>(
     swrKey,
     async () => {
-      try {
+      return await executeMutation(
+          (async () => {
         const res = await transactionQueries.getTransactions(
-          startDate,
-          endDate,
-          type,
-        );
+                  startDate,
+                  endDate,
+                  type,
+                );
         return res.data || [];
-      } catch (err) {
-        logError(err, 'useTransaction.fetch');
-        throw handleQueryError(err);
-      }
+          })(),
+          'useTransaction.fetch'
+        );
     },
     SWR_CONFIG_DASHBOARD
   );
 
   const createTransaction = useCallback(
-    async (data: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
-      try {
-        const result = await transactionQueries.createTransaction(data);
-
-        // Cascade invalidation: invalidate all related caches
-        const keysToInvalidate = INVALIDATION_PATTERNS.onTransactionChange();
-        await Promise.all(keysToInvalidate.map(k => {
-          if (typeof k === 'string') {
-            return globalMutate(k);
-          }
-          // Invalidate wildcard patterns
-          return globalMutate(
-            (key) => Array.isArray(key) && key[0] === 'transactions',
-            undefined,
-            { revalidate: true }
+    async (newData: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
+      return await executeMutation(
+            (async () => {
+          const optimisticTx: any = { ...newData, id: `temp-${Date.now()}`, created_at: new Date().toISOString() };
+          await mutate(
+                    (currentData: Transaction[] | undefined) => currentData ? [optimisticTx, ...currentData] : [optimisticTx],
+                    { revalidate: false }
+                  );
+          const result = await transactionQueries.createTransaction(newData);
+          const keysToInvalidate = INVALIDATION_PATTERNS.onTransactionChange();
+          await Promise.all(keysToInvalidate.map(k => {
+                    if (typeof k === 'string') {
+                      return globalMutate(k);
+                    }
+                    // Invalidate wildcard patterns
+                    return globalMutate(
+                      (key) => Array.isArray(key) && key[0] === 'transactions',
+                      undefined,
+                      { revalidate: true }
+                    );
+                  }));
+          return result;
+            })(),
+            'useTransaction.create', { onError: async (err) => { await mutate(); } }
           );
-        }));
-
-        return result;
-      } catch (err) {
-        logError(err, 'useTransaction.create');
-        throw handleQueryError(err);
-      }
     },
-    []
+    [mutate]
   );
 
   const updateTransaction = useCallback(
     async (
       id: string,
-      data: Partial<Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
+      updates: Partial<Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
     ) => {
-      try {
-        const result = await transactionQueries.updateTransaction(id, data);
-
-        // Cascade invalidation
-        const keysToInvalidate = INVALIDATION_PATTERNS.onTransactionChange();
-        await Promise.all(keysToInvalidate.map(k => {
-          if (typeof k === 'string') {
-            return globalMutate(k);
-          }
-          return globalMutate(
-            (key) => Array.isArray(key) && key[0] === 'transactions',
-            undefined,
-            { revalidate: true }
+      return await executeMutation(
+            (async () => {
+          await mutate(
+                    (currentData: Transaction[] | undefined) => 
+                      currentData ? currentData.map((t) => (t.id === id ? { ...t, ...updates } as Transaction : t)) : [],
+                    { revalidate: false }
+                  );
+          const result = await transactionQueries.updateTransaction(id, updates);
+          const keysToInvalidate = INVALIDATION_PATTERNS.onTransactionChange();
+          await Promise.all(keysToInvalidate.map(k => {
+                    if (typeof k === 'string') {
+                      return globalMutate(k);
+                    }
+                    return globalMutate(
+                      (key) => Array.isArray(key) && key[0] === 'transactions',
+                      undefined,
+                      { revalidate: true }
+                    );
+                  }));
+          return result;
+            })(),
+            'useTransaction.update', { onError: async (err) => { await mutate(); } }
           );
-        }));
-
-        return result;
-      } catch (err) {
-        logError(err, 'useTransaction.update');
-        throw handleQueryError(err);
-      }
     },
-    []
+    [mutate]
   );
 
   const deleteTransaction = useCallback(async (id: string) => {
-    try {
+    return await executeMutation(
+        (async () => {
+      await mutate(
+              (currentData: Transaction[] | undefined) => 
+                currentData ? currentData.filter((t) => t.id !== id) : [],
+              { revalidate: false }
+            );
       await transactionQueries.deleteTransaction(id);
-
-      // Cascade invalidation
       const keysToInvalidate = INVALIDATION_PATTERNS.onTransactionChange();
       await Promise.all(keysToInvalidate.map(k => {
-        if (typeof k === 'string') {
-          return globalMutate(k);
-        }
-        return globalMutate(
-          (key) => Array.isArray(key) && key[0] === 'transactions',
-          undefined,
-          { revalidate: true }
-        );
-      }));
-
+              if (typeof k === 'string') {
+                return globalMutate(k);
+              }
+              return globalMutate(
+                (key) => Array.isArray(key) && key[0] === 'transactions',
+                undefined,
+                { revalidate: true }
+              );
+            }));
       return true;
-    } catch (err) {
-      logError(err, 'useTransaction.delete');
-      throw handleQueryError(err);
-    }
-  }, []);
+        })(),
+        'useTransaction.delete', { onError: async (err) => { await mutate(); } }
+      );
+  }, [mutate]);
 
   const getAnalytics = useCallback(
     async (start: Date, end: Date) => {
-      try {
-        return await transactionQueries.getSummaryByCategory(start, end);
-      } catch (err) {
-        logError(err, 'useTransaction.analytics');
-        throw handleQueryError(err);
-      }
+      return await executeMutation(
+            (async () => {
+          return await transactionQueries.getSummaryByCategory(start, end);
+            })(),
+            'useTransaction.analytics'
+          );
     },
     []
   );

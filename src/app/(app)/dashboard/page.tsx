@@ -8,7 +8,7 @@ import { useTransaction } from '@/hooks/useTransaction';
 import { useActivity } from '@/hooks/useActivity';
 import { useReminder } from '@/hooks/useReminder';
 import { useInvestment } from '@/hooks/useInvestment';
-import { InvestmentInsightResponse } from '@/services/investmentService';
+import { InvestmentInsightResponse } from '@/services/finance/investmentService';
 import { getDateRange } from '@/libs/date';
 
 // Setup SWR Dates

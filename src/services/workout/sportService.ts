@@ -1,5 +1,5 @@
 
-import { Activity, SportLog } from './supabaseClient';
+import { Activity, SportLog } from '../supabase/supabaseClient';
 import { sportQueries } from './sportQueries';
 
 /**

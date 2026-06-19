@@ -8,7 +8,7 @@ import {
   getAllocationLabel,
   formatSignedCurrency,
   formatSignedPercent,
-} from '@/services/investmentService';
+} from '@/services/finance/investmentService';
 import { formatCurrency } from '@/libs/format';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';

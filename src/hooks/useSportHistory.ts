@@ -2,12 +2,13 @@
 
 import { useCallback } from 'react';
 import useSWR from 'swr';
-import { workoutSessionQueries, personalRecordQueries } from '@/services/workoutQueries';
-import { activityQueries } from '@/services/queries';
+import { workoutSessionQueries } from '@/services/workout/sessionQueries';
+import { personalRecordQueries } from '@/services/workout/prQueries';
+import { activityQueries } from '@/services/activity/activityQueries';
 import type { WorkoutSession, PersonalRecord, Activity } from '@/types/database';
 import { CACHE_KEYS } from '@/libs/cacheKeys';
 import { SWR_CONFIG } from '@/config/swr';
-import { handleQueryError, logError } from '@/libs/apiErrors';
+import { executeMutation } from "@/libs/api/mutationBuilder";
 
 /**
  * Derived sport statistics from a list of activities + sessions
@@ -66,12 +67,12 @@ export const useSportHistory = (startDate?: Date, endDate?: Date) => {
   const { data: sessions, isLoading: sessionsLoading, mutate: mutateSessions } = useSWR(
     sessionsKey,
     async () => {
-      try {
+      return await executeMutation(
+          (async () => {
         return await workoutSessionQueries.getSessions(start, end);
-      } catch (err) {
-        logError(err, 'useSportHistory.fetchSessions');
-        throw handleQueryError(err);
-      }
+          })(),
+          'useSportHistory.fetchSessions'
+        );
     },
     SWR_CONFIG
   );
@@ -81,12 +82,12 @@ export const useSportHistory = (startDate?: Date, endDate?: Date) => {
   const { data: recentSessions, isLoading: recentLoading, mutate: mutateRecent } = useSWR(
     recentKey,
     async () => {
-      try {
+      return await executeMutation(
+          (async () => {
         return await workoutSessionQueries.getRecentSessions(10);
-      } catch (err) {
-        logError(err, 'useSportHistory.fetchRecent');
-        throw handleQueryError(err);
-      }
+          })(),
+          'useSportHistory.fetchRecent'
+        );
     },
     SWR_CONFIG
   );
@@ -96,12 +97,12 @@ export const useSportHistory = (startDate?: Date, endDate?: Date) => {
   const { data: prBoard, isLoading: prLoading, mutate: mutatePR } = useSWR(
     prKey,
     async () => {
-      try {
+      return await executeMutation(
+          (async () => {
         return await personalRecordQueries.getPRBoard();
-      } catch (err) {
-        logError(err, 'useSportHistory.fetchPR');
-        throw handleQueryError(err);
-      }
+          })(),
+          'useSportHistory.fetchPR'
+        );
     },
     SWR_CONFIG
   );
@@ -116,27 +117,27 @@ export const useSportHistory = (startDate?: Date, endDate?: Date) => {
 
   const logSession = useCallback(
     async (sessionData: Omit<WorkoutSession, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
-      try {
-        const session = await workoutSessionQueries.logSession(sessionData);
-        await mutateAll();
-        return session;
-      } catch (err) {
-        logError(err, 'useSportHistory.logSession');
-        throw handleQueryError(err);
-      }
+      return await executeMutation(
+            (async () => {
+          const session = await workoutSessionQueries.logSession(sessionData);
+          await mutateAll();
+          return session;
+            })(),
+            'useSportHistory.logSession'
+          );
     },
     [mutateAll]
   );
 
   const deleteSession = useCallback(
     async (sessionId: string) => {
-      try {
-        await workoutSessionQueries.deleteSession(sessionId);
-        await mutateAll();
-      } catch (err) {
-        logError(err, 'useSportHistory.deleteSession');
-        throw handleQueryError(err);
-      }
+      return await executeMutation(
+            (async () => {
+          await workoutSessionQueries.deleteSession(sessionId);
+          await mutateAll();
+            })(),
+            'useSportHistory.deleteSession'
+          );
     },
     [mutateAll]
   );

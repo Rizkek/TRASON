@@ -2,23 +2,24 @@
 
 import { useCallback } from 'react';
 import useSWR, { mutate as globalMutate } from 'swr';
-import { investmentQueries } from '@/services/investmentQueries';
+import { investmentQueries } from '@/services/finance/investmentQueries';
 import {
   buildInvestmentTimelineText,
   calculatePortfolioSummary,
   fetchInvestmentQuotes,
   generateInvestmentInsights,
-} from '@/services/investmentService';
+} from '@/services/finance/investmentService';
 import { InvestmentPosition } from '@/services/supabaseClient';
 import {
   InvestmentInsightResponse,
   InvestmentPortfolioSummary,
   CalculatedInvestmentPosition,
-} from '@/services/investmentService';
-import { activityQueries } from '@/services/queries';
+} from '@/services/finance/investmentService';
+import { activityQueries } from '@/services/activity/activityQueries';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
-import { handleQueryError, getUserErrorMessage, logError } from '@/libs/apiErrors';
+import { getUserErrorMessage, logError } from '@/libs/apiErrors';
+import { executeMutation } from "@/libs/api/mutationBuilder";
 
 const buildTimelinePayload = (title: string, description: string) => ({
   title,
@@ -50,12 +51,12 @@ export const useInvestment = (): UseInvestmentReturn => {
   const { data: positions, error: positionsError, isLoading: positionsLoading, mutate: mutatePositions } = useSWR(
     CACHE_KEYS.investments.positions(),
     async () => {
-      try {
+      return await executeMutation(
+          (async () => {
         return await investmentQueries.getPositions();
-      } catch (err) {
-        logError(err, 'useInvestment.getPositions');
-        throw handleQueryError(err);
-      }
+          })(),
+          'useInvestment.getPositions'
+        );
     },
     SWR_CONFIG_DASHBOARD
   );
@@ -67,86 +68,77 @@ export const useInvestment = (): UseInvestmentReturn => {
   const { data: insights, error: insightsError, isLoading: insightsLoading } = useSWR<InvestmentInsightResponse | null>(
     positions && positions.length > 0 ? CACHE_KEYS.investments.insights : null,
     async () => {
-      try {
-        if (!calculatedData) return null;
-        return await generateInvestmentInsights(calculatedData.summary, calculatedData.calculatedPositions);
-      } catch (err) {
-        logError(err, 'useInvestment.getInsights');
-        // Insights failure should not block the whole hook
-        return null;
-      }
+      return await executeMutation(
+        (async () => {
+          if (!calculatedData) return null;
+          return await generateInvestmentInsights(calculatedData.summary, calculatedData.calculatedPositions);
+        })(),
+        'useInvestment.getInsights',
+        { throwOnError: false }
+      );
     },
     SWR_CONFIG_DASHBOARD
   );
 
   const refreshPortfolio = useCallback(async () => {
-    try {
-      // Force fetch latest external API data
+    return await executeMutation(
+        (async () => {
       const pos = positions || await investmentQueries.getPositions();
       const quotes = await fetchInvestmentQuotes(pos);
       const { calculatedPositions: calcPos, summary: calcSummary } = calculatePortfolioSummary(pos, quotes);
-
-      // Update latest values back to database
       await Promise.all(
-        calcPos.map(async (position) => {
-          const quote = quotes[position.id];
-          if (!quote || quote.error) return;
-          try {
-            await investmentQueries.updatePositionMarketData(position.id, {
-              last_price: quote.currentPrice,
-              last_price_change_pct: quote.changePercent24h ?? 0,
-              last_valued_at: quote.asOf,
-            });
-            await investmentQueries.upsertPriceSnapshot({
-              position_id: position.id,
-              snapshot_date: new Date().toISOString().split('T')[0],
-              price: quote.currentPrice,
-              change_percent: quote.changePercent24h ?? 0,
-              source: quote.source,
-              metadata: { symbol: quote.symbol, asset_type: quote.assetType, as_of: quote.asOf }
-            });
-          } catch (err) {
-            logError(err, `useInvestment.refreshPortfolio.position.${position.id}`);
-            // Continue even if one position update fails
-          }
-        })
-      );
-
-      // Revalidate positions cache
+              calcPos.map(async (position) => {
+                const quote = quotes[position.id];
+                if (!quote || quote.error) return;
+                await executeMutation(
+                  (async () => {
+                    await investmentQueries.updatePositionMarketData(position.id, {
+                      last_price: quote.currentPrice,
+                      last_price_change_pct: quote.changePercent24h ?? 0,
+                      last_valued_at: quote.asOf,
+                    });
+                    await investmentQueries.upsertPriceSnapshot({
+                      position_id: position.id,
+                      snapshot_date: new Date().toISOString().split('T')[0],
+                      price: quote.currentPrice,
+                      change_percent: quote.changePercent24h ?? 0,
+                      source: quote.source,
+                      metadata: { symbol: quote.symbol, asset_type: quote.assetType, as_of: quote.asOf }
+                    });
+                  })(),
+                  `useInvestment.refreshPortfolio.position.${position.id}`,
+                  { throwOnError: false }
+                );
+              })
+            );
       await mutatePositions();
-    } catch (err) {
-      logError(err, 'useInvestment.refreshPortfolio');
-      throw handleQueryError(err);
-    }
+        })(),
+        'useInvestment.refreshPortfolio'
+      );
   }, [positions, mutatePositions]);
 
   const createPosition = useCallback(
     async (
       dataToCreate: Omit<InvestmentPosition, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at' | 'last_price' | 'last_price_change_pct' | 'last_valued_at'>
     ) => {
-    try {
-      const position = await investmentQueries.createPosition(dataToCreate);
-
-      // Removed automatic timeline logging per user request
-
-      // Cascade invalidation
-      const keysToInvalidate = INVALIDATION_PATTERNS.onInvestmentChange();
-      await Promise.all(keysToInvalidate.map(k => {
-        if (typeof k === 'string') {
-          return globalMutate(k);
-        }
-        return globalMutate(
-          (key) => Array.isArray(key) && key[0] === 'investments',
-          undefined,
-          { revalidate: true }
-        );
-      }));
-
-      return position;
-    } catch (err) {
-      logError(err, 'useInvestment.createPosition');
-      throw handleQueryError(err);
-    }
+    return await executeMutation(
+            (async () => {
+          const position = await investmentQueries.createPosition(dataToCreate);
+          const keysToInvalidate = INVALIDATION_PATTERNS.onInvestmentChange();
+          await Promise.all(keysToInvalidate.map(k => {
+                  if (typeof k === 'string') {
+                    return globalMutate(k);
+                  }
+                  return globalMutate(
+                    (key) => Array.isArray(key) && key[0] === 'investments',
+                    undefined,
+                    { revalidate: true }
+                  );
+                }));
+          return position;
+            })(),
+            'useInvestment.createPosition'
+          );
   }, []);
 
   const updatePosition = useCallback(
@@ -154,58 +146,46 @@ export const useInvestment = (): UseInvestmentReturn => {
       id: string,
       updates: Partial<Omit<InvestmentPosition, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
     ) => {
-    try {
-      const updated = await investmentQueries.updatePosition(id, updates);
-
-      // Removed automatic timeline logging per user request
-
-      // Cascade invalidation
-      const keysToInvalidate = INVALIDATION_PATTERNS.onInvestmentChange();
-      await Promise.all(keysToInvalidate.map(k => {
-        if (typeof k === 'string') {
-          return globalMutate(k);
-        }
-        return globalMutate(
-          (key) => Array.isArray(key) && key[0] === 'investments',
-          undefined,
-          { revalidate: true }
-        );
-      }));
-
-      return updated;
-    } catch (err) {
-      logError(err, 'useInvestment.updatePosition');
-      throw handleQueryError(err);
-    }
+    return await executeMutation(
+            (async () => {
+          const updated = await investmentQueries.updatePosition(id, updates);
+          const keysToInvalidate = INVALIDATION_PATTERNS.onInvestmentChange();
+          await Promise.all(keysToInvalidate.map(k => {
+                  if (typeof k === 'string') {
+                    return globalMutate(k);
+                  }
+                  return globalMutate(
+                    (key) => Array.isArray(key) && key[0] === 'investments',
+                    undefined,
+                    { revalidate: true }
+                  );
+                }));
+          return updated;
+            })(),
+            'useInvestment.updatePosition'
+          );
   }, []);
 
   const deletePosition = useCallback(async (id: string) => {
-    try {
-      // Get position before deleting for timeline logging
+    return await executeMutation(
+        (async () => {
       const target = positions?.find(p => p.id === id);
-
       await investmentQueries.deletePosition(id);
-
-      // Removed automatic timeline logging per user request
-
-      // Cascade invalidation
       const keysToInvalidate = INVALIDATION_PATTERNS.onInvestmentChange();
       await Promise.all(keysToInvalidate.map(k => {
-        if (typeof k === 'string') {
-          return globalMutate(k);
-        }
-        return globalMutate(
-          (key) => Array.isArray(key) && key[0] === 'investments',
-          undefined,
-          { revalidate: true }
-        );
-      }));
-
+              if (typeof k === 'string') {
+                return globalMutate(k);
+              }
+              return globalMutate(
+                (key) => Array.isArray(key) && key[0] === 'investments',
+                undefined,
+                { revalidate: true }
+              );
+            }));
       return true;
-    } catch (err) {
-      logError(err, 'useInvestment.deletePosition');
-      throw handleQueryError(err);
-    }
+        })(),
+        'useInvestment.deletePosition'
+      );
   }, [positions]);
 
   // Combine loading states

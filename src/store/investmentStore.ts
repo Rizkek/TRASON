@@ -4,7 +4,7 @@ import {
   CalculatedInvestmentPosition,
   InvestmentInsightResponse,
   InvestmentPortfolioSummary,
-} from '@/services/investmentService';
+} from '@/services/finance/investmentService';
 
 interface InvestmentState {
   positions: InvestmentPosition[];

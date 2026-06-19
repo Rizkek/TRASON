@@ -11,7 +11,7 @@ import {
 } from '@/modules/registry';
 import { SWR_CONFIG_STABLE } from '@/config/swr';
 import { CACHE_KEYS } from '@/libs/cacheKeys';
-import { logError, handleQueryError } from '@/libs/apiErrors';
+import { executeMutation } from "@/libs/api/mutationBuilder";
 
 // Default module status for initial render
 const createDefaultStatus = (id: ModuleId): ModuleStatus => ({
@@ -79,29 +79,23 @@ export const useModuleStatus = (
   // Update module status
   const updateStatus = useCallback(
     async (enabled: boolean) => {
-      try {
-        // Optimistic update
-        const newPreferences = {
-          ...(preferences ?? {}),
-          [moduleId]: enabled,
-        };
-
-        await mutate(newPreferences, false);
-
-        // Persist to localStorage (in real app, this would be an API call)
-        if (typeof window !== 'undefined' && userId) {
-          localStorage.setItem(
-            `module_status_${userId}`,
-            JSON.stringify(newPreferences)
+      return await executeMutation(
+            (async () => {
+          const newPreferences = {
+                    ...(preferences ?? {}),
+                    [moduleId]: enabled,
+                  };
+          await mutate(newPreferences, false);
+          if (typeof window !== 'undefined' && userId) {
+                    localStorage.setItem(
+                      `module_status_${userId}`,
+                      JSON.stringify(newPreferences)
+                    );
+                  }
+          await mutate();
+            })(),
+            `useModuleStatus.updateStatus.${moduleId}`
           );
-        }
-
-        // Revalidate
-        await mutate();
-      } catch (err) {
-        logError(err, `useModuleStatus.updateStatus.${moduleId}`);
-        throw handleQueryError(err);
-      }
     },
     [moduleId, preferences, mutate, userId]
   );

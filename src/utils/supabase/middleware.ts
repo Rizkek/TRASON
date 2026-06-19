@@ -28,7 +28,6 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // Rute-rute yang HANYA boleh diakses oleh user yang sudah login
   const protectedPaths = [
     '/dashboard',
     '/finance',
@@ -39,6 +38,7 @@ export async function updateSession(request: NextRequest) {
     '/settings',
     '/sport',
     '/career',
+    '/onboarding',
   ];
 
   const url = request.nextUrl.clone();

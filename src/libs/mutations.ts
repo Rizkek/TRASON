@@ -13,8 +13,10 @@
  */
 
 import { mutate as globalMutate } from 'swr';
-import { transactionQueries, activityQueries, reminderQueries } from '@/services/queries';
-import { investmentQueries } from '@/services/investmentQueries';
+import { transactionQueries } from '@/services/finance/transactionQueries';
+import { activityQueries } from '@/services/activity/activityQueries';
+import { reminderQueries } from '@/services/core/reminderQueries';
+import { investmentQueries } from '@/services/finance/investmentQueries';
 import { Transaction, Activity, Reminder, InvestmentPosition } from '@/services/supabaseClient';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { handleQueryError, logError } from '@/libs/apiErrors';

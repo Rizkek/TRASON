@@ -21,7 +21,7 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { formatCurrency, formatNumber, getLocalISODate } from '@/libs/format';
-import { formatSignedCurrency, formatSignedPercent } from '@/services/investmentService';
+import { formatSignedCurrency, formatSignedPercent } from '@/services/finance/investmentService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 
@@ -265,7 +265,7 @@ export default function InvestmentsPage() {
             ) : null}
             {insights?.observations?.length ? (
               <div className="flex flex-wrap gap-sm pt-sm">
-                {insights.observations.map((item) => (
+                {insights.observations.map((item: string) => (
                   <Badge key={item} variant="insight" size="sm">{item}</Badge>
                 ))}
               </div>

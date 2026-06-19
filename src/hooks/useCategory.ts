@@ -1,11 +1,11 @@
 'use client';
 
 import useSWR from 'swr';
-import { categoryQueries } from '@/services/queries';
+import { categoryQueries } from '@/services/activity/categoryQueries';
 import { Category } from '@/types/database';
 import { CACHE_KEYS } from '@/libs/cacheKeys';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
-import { logError, handleQueryError } from '@/libs/apiErrors';
+import { executeMutation } from "@/libs/api/mutationBuilder";
 
 export const useCategory = (type?: 'income' | 'expense') => {
   const key = type ? ['categories', type] : ['categories', 'all'];
@@ -13,16 +13,16 @@ export const useCategory = (type?: 'income' | 'expense') => {
   const { data, error, isLoading, mutate } = useSWR<Category[]>(
     key,
     async () => {
-      try {
+      return await executeMutation(
+          (async () => {
         const allCategories = await categoryQueries.getCategories() || [];
         if (type) {
-          return allCategories.filter(c => c.type === type);
-        }
+                  return allCategories.filter(c => c.type === type);
+                }
         return allCategories;
-      } catch (err) {
-        logError(err, 'useCategory.fetch');
-        throw handleQueryError(err);
-      }
+          })(),
+          'useCategory.fetch'
+        );
     },
     SWR_CONFIG_DASHBOARD
   );

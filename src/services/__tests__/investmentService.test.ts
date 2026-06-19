@@ -1,4 +1,4 @@
-import { calculateInvestmentPosition, calculatePortfolioSummary } from '../investmentService';
+import { calculateInvestmentPosition, calculatePortfolioSummary } from '../finance/investmentService';
 import { InvestmentPosition } from '@/services/supabaseClient';
 
 describe('InvestmentService', () => {

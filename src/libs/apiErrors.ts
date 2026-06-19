@@ -141,7 +141,7 @@ export function getUserErrorMessage(error: any): string {
   }
 }
 
-import { logger } from '@/services/logger';
+import { logger } from '@/services/core/logger';
 
 /**
  * Log error for debugging (always in development, to DB in production if critical)

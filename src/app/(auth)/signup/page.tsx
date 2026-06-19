@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Alert, Logo } from '@/components';
 import { supabase } from '@/services/supabaseClient';
-import { userQueries } from '@/services/queries';
+import { userQueries } from '@/services/core/userQueries';
 import { validateEmail, validatePassword, sanitizeError } from '@/libs/validation';
 import { Compass, ArrowLeft, Layers, CheckCircle, AlertTriangle, Loader2, XCircle, Eye, EyeOff } from 'lucide-react';
 
@@ -306,6 +306,7 @@ export default function SignupPage() {
               variant="primary" 
               fullWidth 
               isLoading={isLoading}
+              loadingText="Initializing Workspace... (this might take up to a minute)"
               className="py-lg rounded-full font-bold shadow-xl shadow-warm-gold/10 mt-xl"
             >
               Create Account

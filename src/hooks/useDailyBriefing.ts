@@ -7,7 +7,7 @@ import { useFinancialHealth } from './useFinancialHealth';
 import { useCareerAnalytics } from './useCareerAnalytics';
 import { useReminder } from './useReminder';
 import { useDailyTasks } from './useDailyTasks';
-import { analyticsQueries } from '@/services/analyticsQueries';
+import { analyticsQueries } from '@/services/analytics/analyticsQueries';
 import { generateDailyBriefing, DailyBriefing } from '@/libs/analytics/dailyBriefing';
 
 export function useDailyBriefing(): {

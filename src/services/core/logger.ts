@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import { supabase } from '../supabase/supabaseClient';
 import { handleQueryError } from '@/libs/apiErrors';
 
 export const logger = {

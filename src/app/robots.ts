@@ -18,6 +18,6 @@ export default function robots(): MetadataRoute.Robots {
         '/api/',
       ],
     },
-    sitemap: 'https://trason.vercel.app/sitemap.xml',
+    sitemap: 'https://www.trason.web.id/sitemap.xml',
   };
 }

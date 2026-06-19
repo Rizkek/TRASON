@@ -2,7 +2,7 @@
 
 import useSWR from 'swr';
 import { useMemo } from 'react';
-import { analyticsQueries } from '@/services/analyticsQueries';
+import { analyticsQueries } from '@/services/analytics/analyticsQueries';
 import { useDailyTasks } from '@/hooks/useDailyTasks';
 import { calculateStreak, StreakData } from '@/libs/analytics/streakEngine';
 

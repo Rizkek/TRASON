@@ -2,11 +2,12 @@
 
 import { useCallback } from 'react';
 import useSWR, { mutate as globalMutate } from 'swr';
-import { activityQueries } from '@/services/queries';
+import { activityQueries } from '@/services/activity/activityQueries';
 import { Activity } from '@/services/supabaseClient';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
-import { handleQueryError, getUserErrorMessage, logError } from '@/libs/apiErrors';
+import { executeMutation } from "@/libs/api/mutationBuilder";
+import { getUserErrorMessage } from "@/libs/apiErrors";
 
 export interface UseActivityReturn {
   activities: Activity[];
@@ -33,47 +34,49 @@ export const useActivity = (startDate?: Date, endDate?: Date): UseActivityReturn
   const { data, error, isLoading, mutate } = useSWR(
     key,
     async () => {
-      try {
+      return await executeMutation(
+          (async () => {
         if (startDate && endDate) {
-            const res = await activityQueries.getActivities(startDate, endDate, 1000); // fetch up to 1000 for week view
-            return res.data || [];
-        } else {
-            const res = await activityQueries.getActivitiesByDate(targetStartDate);
-            return res || [];
-        }
-      } catch (err) {
-        logError(err, 'useActivity.fetch');
-        throw handleQueryError(err);
-      }
+                    const res = await activityQueries.getActivities(startDate, endDate, 1000); // fetch up to 1000 for week view
+                    return res.data || [];
+                } else {
+                    const res = await activityQueries.getActivitiesByDate(targetStartDate);
+                    return res || [];
+                }
+          })(),
+          'useActivity.fetch'
+        );
     },
     SWR_CONFIG_DASHBOARD
   );
 
   const createActivity = useCallback(
     async (dataToCreate: Omit<Activity, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
-      try {
-        const newActivity = await activityQueries.createActivity(dataToCreate);
-
-        // Cascade invalidation: invalidate all related caches
-        const keysToInvalidate = INVALIDATION_PATTERNS.onActivityChange(startStr);
-        await Promise.all(keysToInvalidate.map(k => {
-          if (typeof k === 'string') {
-            return globalMutate(k);
-          }
-          return globalMutate(
-            (key) => Array.isArray(key) && key[0] === 'activities',
-            undefined,
-            { revalidate: true }
+      return await executeMutation(
+            (async () => {
+          const optimisticActivity: any = { ...dataToCreate, id: `temp-${Date.now()}`, created_at: new Date().toISOString() };
+          await mutate(
+                    (currentData: Activity[] | undefined) => currentData ? [optimisticActivity, ...currentData] : [optimisticActivity],
+                    { revalidate: false }
+                  );
+          const newActivity = await activityQueries.createActivity(dataToCreate);
+          const keysToInvalidate = INVALIDATION_PATTERNS.onActivityChange(startStr);
+          await Promise.all(keysToInvalidate.map(k => {
+                    if (typeof k === 'string') {
+                      return globalMutate(k);
+                    }
+                    return globalMutate(
+                      (key) => Array.isArray(key) && key[0] === 'activities',
+                      undefined,
+                      { revalidate: true }
+                    );
+                  }));
+          return newActivity;
+            })(),
+            'useActivity.create', { onError: async (err) => { await mutate(); } }
           );
-        }));
-
-        return newActivity;
-      } catch (err) {
-        logError(err, 'useActivity.create');
-        throw handleQueryError(err);
-      }
     },
-    [startStr]
+    [startStr, mutate]
   );
 
   const updateActivity = useCallback(
@@ -81,54 +84,58 @@ export const useActivity = (startDate?: Date, endDate?: Date): UseActivityReturn
       id: string,
       dataToUpdate: Partial<Omit<Activity, 'id' | 'created_at' | 'updated_at'>>
     ) => {
-      try {
-        const updatedActivity = await activityQueries.updateActivity(id, dataToUpdate);
-
-        // Cascade invalidation
-        const keysToInvalidate = INVALIDATION_PATTERNS.onActivityChange(startStr);
-        await Promise.all(keysToInvalidate.map(k => {
-          if (typeof k === 'string') {
-            return globalMutate(k);
-          }
-          return globalMutate(
-            (key) => Array.isArray(key) && key[0] === 'activities',
-            undefined,
-            { revalidate: true }
+      return await executeMutation(
+            (async () => {
+          await mutate(
+                    (currentData: Activity[] | undefined) => 
+                      currentData ? currentData.map((a) => (a.id === id ? { ...a, ...dataToUpdate } : a)) : [],
+                    { revalidate: false }
+                  );
+          const updatedActivity = await activityQueries.updateActivity(id, dataToUpdate);
+          const keysToInvalidate = INVALIDATION_PATTERNS.onActivityChange(startStr);
+          await Promise.all(keysToInvalidate.map(k => {
+                    if (typeof k === 'string') {
+                      return globalMutate(k);
+                    }
+                    return globalMutate(
+                      (key) => Array.isArray(key) && key[0] === 'activities',
+                      undefined,
+                      { revalidate: true }
+                    );
+                  }));
+          return updatedActivity;
+            })(),
+            'useActivity.update', { onError: async (err) => { await mutate(); } }
           );
-        }));
-
-        return updatedActivity;
-      } catch (err) {
-        logError(err, 'useActivity.update');
-        throw handleQueryError(err);
-      }
     },
-    [startStr]
+    [startStr, mutate]
   );
 
   const deleteActivity = useCallback(async (id: string) => {
-    try {
+    return await executeMutation(
+        (async () => {
+      await mutate(
+              (currentData: Activity[] | undefined) => 
+                currentData ? currentData.filter((a) => a.id !== id) : [],
+              { revalidate: false }
+            );
       await activityQueries.deleteActivity(id);
-
-      // Cascade invalidation
       const keysToInvalidate = INVALIDATION_PATTERNS.onActivityChange(startStr);
       await Promise.all(keysToInvalidate.map(k => {
-        if (typeof k === 'string') {
-          return globalMutate(k);
-        }
-        return globalMutate(
-          (key) => Array.isArray(key) && key[0] === 'activities',
-          undefined,
-          { revalidate: true }
-        );
-      }));
-
+              if (typeof k === 'string') {
+                return globalMutate(k);
+              }
+              return globalMutate(
+                (key) => Array.isArray(key) && key[0] === 'activities',
+                undefined,
+                { revalidate: true }
+              );
+            }));
       return true;
-    } catch (err) {
-      logError(err, 'useActivity.delete');
-      throw handleQueryError(err);
-    }
-  }, [startStr]);
+        })(),
+        'useActivity.delete', { onError: async (err) => { await mutate(); } }
+      );
+  }, [startStr, mutate]);
 
   // User-friendly error message
   const userErrorMessage = error ? getUserErrorMessage(error) : null;

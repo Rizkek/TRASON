@@ -1,9 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
+import { userQueries } from '@/services/core/userQueries';
+import type { UserPreferences } from '@/types/database';
+import { executeMutation } from "@/libs/api/mutationBuilder";
 
-export type AppTheme = 'light' | 'dark' | 'auto';
+export type AppTheme = 'light' | 'dark';
 
 export interface AppPreferences {
   theme: AppTheme;
@@ -36,22 +39,22 @@ const LANGUAGE_LOCALES: Record<string, string> = {
 };
 
 export function useUserPreferences() {
-  // Read the rest of the preferences (theme, currency, timezone, etc.) from user object
+  const [isUpdating, setIsUpdating] = useState(false);
+  const user = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
+  
   const userPrefs = useAuthStore((s) => {
     const prefs = (s.user as any)?.user_preferences;
     return Array.isArray(prefs) ? prefs[0] : prefs;
   });
 
-  // Use dedicated string primitive for language — this is the reliable single source of truth.
-  // Zustand's strict equality check works perfectly on strings, so any language change
-  // from setUser() or setActiveLanguage() will immediately trigger a re-render.
   const activeLanguage = useAuthStore((s) => s.activeLanguage);
+  const setActiveLanguage = useAuthStore((s) => s.setActiveLanguage);
 
   const preferences = useMemo<AppPreferences>(
     () => ({
       ...DEFAULT_PREFERENCES,
       ...userPrefs,
-      // Override language with the dedicated field — always authoritative
       language: activeLanguage,
     }),
     [userPrefs, activeLanguage]
@@ -59,9 +62,32 @@ export function useUserPreferences() {
 
   const locale = LANGUAGE_LOCALES[preferences.language] || 'en-US';
 
+  const updatePreferences = async (updates: Partial<UserPreferences>) => {
+    return await executeMutation(
+        (async () => {
+      setIsUpdating(true);
+      const updated = await userQueries.updateUserPreferences(updates);
+      if (user) {
+              const updatedUser = {
+                ...user,
+                user_preferences: [updated]
+              };
+              setUser(updatedUser as any);
+            }
+      if (updates.language) {
+              setActiveLanguage(updates.language);
+            }
+      return updated;
+        })(),
+        'useUserPreferences.update'
+      );
+  };
+
   return {
     ...preferences,
     locale,
     isOnboarded: preferences.module_features?.['onboarding_done'] === true,
+    updatePreferences,
+    isUpdating
   };
 }
