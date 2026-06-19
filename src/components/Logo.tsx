@@ -19,7 +19,6 @@ export function Logo({ size = 40, className = '' }: LogoProps) {
         fill
         className="object-contain"
         sizes={`${size}px`}
-        priority
       />
     </div>
   );

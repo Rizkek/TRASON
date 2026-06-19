@@ -48,6 +48,9 @@ const CustomTooltip = ({ active, payload, label, currency, locale }: any) => {
 export const FinancialChart = ({ transactions }: Props) => {
   const { t } = useTranslation();
   const { currency, locale, timezone } = useUserPreferences();
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => { setIsMounted(true); }, []);
 
   const chartData = useMemo(() => {
     // Group transactions by date
@@ -103,6 +106,9 @@ export const FinancialChart = ({ transactions }: Props) => {
       </div>
 
       <div className="w-full h-[200px] relative z-10">
+        {!isMounted ? (
+          <div className="w-full h-full bg-white/[0.02] rounded-lg animate-pulse" />
+        ) : (
         <ResponsiveContainer width="100%" height="100%" minHeight={200} minWidth={0}>
           <AreaChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
             <defs>
@@ -156,6 +162,7 @@ export const FinancialChart = ({ transactions }: Props) => {
             />
           </AreaChart>
         </ResponsiveContainer>
+        )}
       </div>
     </Card>
   );
