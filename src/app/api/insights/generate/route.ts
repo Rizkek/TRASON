@@ -31,7 +31,7 @@ export async function POST(req: Request) {
   const timeoutId = setTimeout(() => controller.abort(), 22000);
 
   try {
-    const { userContextText } = await req.json();
+    const { userContextText, language } = await req.json();
 
     if (!userContextText) {
       return NextResponse.json({ error: 'Context data is required' }, { status: 400 });
@@ -49,6 +49,8 @@ export async function POST(req: Request) {
         
         Be concise — each insight max 2 sentences for description and actionable advice.
         
+        CRITICAL: You MUST write your response (title, description, actionable_advice) entirely in the language code: "${language || 'en'}". Translate naturally.
+
         Data Context:
         ${userContextText}
       `,

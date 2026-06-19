@@ -814,6 +814,25 @@ export const insightQueries = {
       throw handleQueryError(err);
     }
   },
+
+  // Delete insight
+  async deleteInsight(id: string) {
+    try {
+      const user = await getCurrentUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('insights')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    } catch (err) {
+      logError(err, 'insightQueries.deleteInsight');
+      throw handleQueryError(err);
+    }
+  },
 };
 
 /**

@@ -18,11 +18,13 @@ import {
   Target, 
   BarChart3,
   Calendar,
-  Layers
+  Layers,
+  Trash2
 } from 'lucide-react';
 import { Sparkles } from 'lucide-react';
 import { formatDate } from '@/libs/format';
 import { useTranslation } from '@/libs/i18n/useTranslation';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 export default function InsightsPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -30,6 +32,7 @@ export default function InsightsPage() {
   const authLoading = isLoading;
   const userId = useAuthStore((s) => s.user?.id);
   const { t } = useTranslation();
+  const { language } = useUserPreferences();
 
   const [dbInsights, setDbInsights] = useState<any[]>([]);
   const [isFetching, setIsFetching] = useState(true);
@@ -170,7 +173,7 @@ User Context Profile (TRASON Unified Life OS):
       const res = await fetch('/api/insights/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userContextText }),
+        body: JSON.stringify({ userContextText, language }),
         signal: controller.signal,
       });
 
@@ -231,6 +234,16 @@ User Context Profile (TRASON Unified Life OS):
       console.error('[handleGenerateAI]', err);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleDeleteInsight = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await insightQueries.deleteInsight(id);
+      setDbInsights(prev => prev.filter(i => i.id !== id));
+    } catch (err) {
+      console.error('Failed to delete insight:', err);
     }
   };
 
@@ -332,13 +345,24 @@ User Context Profile (TRASON Unified Life OS):
                     </div>
                     
                     <div className="space-y-md flex-1 min-w-0">
-                      <div className="flex items-center gap-md">
-                        <Badge variant={insight.type === 'finance' || insight.type === 'investment' ? 'success' : insight.type === 'productivity' || insight.type === 'career' ? 'insight' : 'activity'} size="sm">
-                          {insight.type.toUpperCase()}
-                        </Badge>
-                        <span className="text-[10px] font-bold text-gray-light uppercase tracking-widest flex items-center gap-sm">
-                          <Calendar size={10} /> {formatDate(insight.date)}
-                        </span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-md">
+                          <Badge variant={insight.type === 'finance' || insight.type === 'investment' ? 'success' : insight.type === 'productivity' || insight.type === 'career' ? 'insight' : 'activity'} size="sm">
+                            {insight.type.toUpperCase()}
+                          </Badge>
+                          <span className="text-[10px] font-bold text-gray-light uppercase tracking-widest flex items-center gap-sm">
+                            <Calendar size={10} /> {formatDate(insight.date)}
+                          </span>
+                        </div>
+                        {insight.id && !insight.id.startsWith('live-') && (
+                          <button
+                            onClick={(e) => handleDeleteInsight(insight.id, e)}
+                            className="p-sm text-gray-light hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
+                            title={t('insights_page.delete_insight', 'Delete Insight')}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
                       </div>
                       
                       <h3 className="text-xl font-bold text-soft-cream leading-tight truncate">
