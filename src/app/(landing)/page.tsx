@@ -66,8 +66,8 @@ export default function Home() {
   if (showSplash) {
     return (
       <div className="fixed inset-0 z-[100] bg-warm-black flex flex-col items-center justify-center font-sans overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 border border-warm-gold/10 rounded-full animate-[spin_10s_linear_infinite]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 border border-warm-gold/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
+        <div className="hidden md:block absolute top-1/4 left-1/4 w-64 h-64 border border-warm-gold/10 rounded-full animate-[spin_10s_linear_infinite]" />
+        <div className="hidden md:block absolute bottom-1/4 right-1/4 w-96 h-96 border border-warm-gold/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
         <div className="text-center space-y-md z-10 px-lg max-w-2xl">
           <h2 key={motionStep} className="text-2xl md:text-4xl font-serif text-warm-gold animate-fade-in italic">
             {mounted ? motionTexts[motionStep] : ' '}
@@ -82,8 +82,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-warm-black text-soft-cream font-sans selection:bg-warm-gold/30 selection:text-soft-cream relative overflow-x-hidden">
       {/* Dynamic Background Elements */}
-      <div className="fixed top-[-20%] right-[-10%] w-[800px] h-[800px] bg-warm-gold/5 blur-[160px] rounded-full pointer-events-none" />
-      <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-deep-sage/5 blur-[140px] rounded-full pointer-events-none" />
+      <div className="fixed top-[-20%] right-[-10%] w-[800px] h-[800px] bg-warm-gold/5 blur-3xl md:blur-[160px] rounded-full pointer-events-none" />
+      <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-deep-sage/5 blur-3xl md:blur-[140px] rounded-full pointer-events-none" />
 
       <LandingNavbar />
 

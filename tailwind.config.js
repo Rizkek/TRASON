@@ -29,6 +29,7 @@ module.exports = {
         'gray-medium': 'rgb(var(--color-gray-medium) / <alpha-value>)',
         'gray-light': 'rgb(var(--color-gray-light) / <alpha-value>)',
         'gray-very-light': 'rgb(var(--color-gray-very-light) / <alpha-value>)',
+        'accent-purple': '#8B5CF6',  // Static — for avatar gradient
       },
       fontFamily: {
         serif: ['var(--font-cormorant)', 'serif'],
@@ -65,7 +66,7 @@ module.exports = {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '0%': { transform: 'translateY(100%)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
         subtlePulse: {

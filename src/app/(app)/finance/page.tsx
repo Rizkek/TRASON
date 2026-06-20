@@ -194,13 +194,15 @@ export default function FinancePage() {
               {t('finance.subtitle')}
             </p>
           </div>
-          <Button variant="primary" size="md" onClick={openAddModal} leftIcon={<Plus size={18} />}>
-            {t('finance.newEntry')}
-          </Button>
+          <div className="hidden md:flex gap-md">
+            <Button variant="primary" size="md" onClick={openAddModal} leftIcon={<Plus size={18} />}>
+              {t('finance.newEntry')}
+            </Button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
-          <Card className="p-xl relative overflow-hidden group">
+        <div className="flex md:grid md:grid-cols-3 gap-md md:gap-lg overflow-x-auto snap-x no-scrollbar pb-2">
+          <Card className="p-xl relative overflow-hidden group min-w-[280px] md:min-w-0 snap-center shrink-0">
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-all" />
             <p className="text-micro text-gray-light mb-md tracking-widest">{t('finance.totalIncome')}</p>
             <div className="flex items-end justify-between">
@@ -209,7 +211,7 @@ export default function FinancePage() {
             </div>
           </Card>
           
-          <Card className="p-xl relative overflow-hidden group">
+          <Card className="p-xl relative overflow-hidden group min-w-[280px] md:min-w-0 snap-center shrink-0">
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-danger/5 rounded-full blur-2xl group-hover:bg-danger/10 transition-all" />
             <p className="text-micro text-gray-light mb-md tracking-widest">{t('finance.totalExpense')}</p>
             <div className="flex items-end justify-between">
@@ -218,7 +220,7 @@ export default function FinancePage() {
             </div>
           </Card>
 
-          <Card className="p-xl relative overflow-hidden group border-b-2 border-primary/20">
+          <Card className="p-xl relative overflow-hidden group border-b-2 border-primary/20 min-w-[280px] md:min-w-0 snap-center shrink-0">
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
             <p className="text-micro text-gray-light mb-md tracking-widest">{t('finance.netBalance')}</p>
             <div className="flex items-end justify-between">
@@ -333,6 +335,18 @@ export default function FinancePage() {
             </table>
           </div>
         </Card>
+      </div>
+
+      {/* Mobile-only FAB for New Entry */}
+      <div className="md:hidden fixed bottom-24 right-4 z-40">
+        <Button 
+          variant="primary" 
+          onClick={openAddModal} 
+          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(78,79,235,0.4)]"
+          aria-label={t('finance.newEntry')}
+        >
+          <Plus size={24} />
+        </Button>
       </div>
 
       <Modal

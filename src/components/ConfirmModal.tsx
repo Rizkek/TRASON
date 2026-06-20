@@ -73,7 +73,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       }
     >
       <div className="space-y-md">
-        <p className="text-sm text-soft-cream whitespace-pre-wrap">{description}</p>
+        <p className="text-sm text-soft-cream whitespace-pre-wrap break-words">{description}</p>
         
         {requireInput && (
           <div className="space-y-sm pt-sm">

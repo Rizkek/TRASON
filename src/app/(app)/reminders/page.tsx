@@ -253,16 +253,18 @@ export default function RemindersPage() {
                 </button>
               </div>
             )}
-            <Button variant="primary" onClick={openAddModal} className="rounded-full px-xl">
-              <Plus size={18} className="mr-2" />
-              {t('reminders_page.new_reminder')}
-            </Button>
+            <div className="hidden md:block">
+              <Button variant="primary" onClick={openAddModal} className="rounded-full px-xl">
+                <Plus size={18} className="mr-2" />
+                {t('reminders_page.new_reminder')}
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Notification Status Banner */}
         {showNotifBanner && push.isSupported && (
-          <div className={`flex items-center justify-between gap-md px-lg py-md rounded-xl border text-sm transition-all ${
+          <div className={`flex items-start md:items-center justify-between gap-sm md:gap-md px-md py-sm md:px-lg md:py-md rounded-xl border text-xs md:text-sm transition-all ${
             push.isSubscribed
               ? 'bg-income/5 border-income/20 text-income'
               : (typeof window !== 'undefined' && Notification.permission === 'denied')
@@ -549,6 +551,18 @@ export default function RemindersPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Mobile-only FAB for New Reminder */}
+      <div className="md:hidden fixed bottom-24 right-4 z-40">
+        <Button 
+          variant="primary" 
+          onClick={openAddModal} 
+          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(78,79,235,0.4)]"
+          aria-label={t('reminders_page.new_reminder')}
+        >
+          <Plus size={24} />
+        </Button>
+      </div>
     </Layout>
   );
 }

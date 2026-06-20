@@ -84,13 +84,15 @@ export const SportPageClient: React.FC = () => {
                 {t('sport_page.sport_fitness_desc')}
               </p>
             </div>
-            <Button
-              variant="primary"
-              onClick={() => setIsLogModalOpen(true)}
-              className="w-full sm:w-auto shadow-[0_0_20px_rgba(78,79,235,0.3)] hover:shadow-[0_0_30px_rgba(78,79,235,0.5)]"
-            >
-              <Dumbbell size={18} className="mr-2" /> {t('sport_page.quick_log_workout')}
-            </Button>
+            <div className="hidden md:block">
+              <Button
+                variant="primary"
+                onClick={() => setIsLogModalOpen(true)}
+                className="w-full sm:w-auto shadow-[0_0_20px_rgba(78,79,235,0.3)] hover:shadow-[0_0_30px_rgba(78,79,235,0.5)]"
+              >
+                <Dumbbell size={18} className="mr-2" /> {t('sport_page.quick_log_workout')}
+              </Button>
+            </div>
           </div>
 
           {isLoading ? (
@@ -99,6 +101,35 @@ export const SportPageClient: React.FC = () => {
             </div>
           ) : (
             <>
+              {/* Workout Plans */}
+              <div className="space-y-md">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-serif font-bold text-white">{t('sport_page.workout_plans')}</h2>
+                  <Button variant="ghost" size="sm" className="text-xs" onClick={() => setIsCreatePlanModalOpen(true)}>
+                    <Plus size={14} className="mr-1" /> {t('sport_page.new_plan')}
+                  </Button>
+                </div>
+
+                {plans.length === 0 ? (
+                  <div className="text-center p-xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl">
+                    <Dumbbell size={32} className="mx-auto text-gray-light mb-md opacity-50" />
+                    <h4 className="text-white font-bold mb-1">{t('sport_page.no_active_plans')}</h4>
+                    <p className="text-sm text-gray-light mb-md">{t('sport_page.create_workout_desc')}</p>
+                    <Button variant="outline" size="sm" onClick={() => setIsCreatePlanModalOpen(true)}>{t('sport_page.create_plan_btn')}</Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                    {plans.map((plan) => (
+                      <WorkoutPlanCard
+                        key={plan.id}
+                        plan={plan}
+                        onActivate={() => handleActivatePlan(plan.id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Top Stats Row */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-md">
                 <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-md">
@@ -137,35 +168,6 @@ export const SportPageClient: React.FC = () => {
               {/* Chart */}
               <SportHistoryChart sessions={sessions} />
 
-              {/* Workout Plans */}
-              <div className="space-y-md">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-serif font-bold text-white">{t('sport_page.workout_plans')}</h2>
-                  <Button variant="ghost" size="sm" className="text-xs" onClick={() => setIsCreatePlanModalOpen(true)}>
-                    <Plus size={14} className="mr-1" /> {t('sport_page.new_plan')}
-                  </Button>
-                </div>
-
-                {plans.length === 0 ? (
-                  <div className="text-center p-xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl">
-                    <Dumbbell size={32} className="mx-auto text-gray-light mb-md opacity-50" />
-                    <h4 className="text-white font-bold mb-1">{t('sport_page.no_active_plans')}</h4>
-                    <p className="text-sm text-gray-light mb-md">{t('sport_page.create_workout_desc')}</p>
-                    <Button variant="outline" size="sm" onClick={() => setIsCreatePlanModalOpen(true)}>{t('sport_page.create_plan_btn')}</Button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-                    {plans.map((plan) => (
-                      <WorkoutPlanCard
-                        key={plan.id}
-                        plan={plan}
-                        onActivate={() => handleActivatePlan(plan.id)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-
               {/* PR Board */}
               <div className="space-y-md">
                 <h2 className="text-xl font-serif font-bold text-white flex items-center gap-2">
@@ -200,6 +202,18 @@ export const SportPageClient: React.FC = () => {
           )}
         </div>
       </Layout>
+
+      {/* Mobile-only FAB for Quick Log */}
+      <div className="md:hidden fixed bottom-24 right-4 z-40">
+        <Button 
+          variant="primary" 
+          onClick={() => setIsLogModalOpen(true)} 
+          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(78,79,235,0.4)]"
+          aria-label={t('sport_page.quick_log_workout')}
+        >
+          <Dumbbell size={24} />
+        </Button>
+      </div>
 
       <QuickLogModal
         isOpen={isLogModalOpen}

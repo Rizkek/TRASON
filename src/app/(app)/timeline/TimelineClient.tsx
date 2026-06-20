@@ -342,6 +342,9 @@ export default function TimelinePage() {
     for (let h = 0; h < 24; h++) grid[d][h] = [];
   }
   activities.forEach((act) => {
+    // Hide auto-generated daily_tasks summaries from the visual grid
+    if (act.category === 'daily_tasks') return;
+
     const start = new Date(act.start_time);
     const dayDate = start.toDateString();
     const dayIdx = daysOfWeek.findIndex((d) => d.toDateString() === dayDate);
@@ -582,8 +585,9 @@ export default function TimelinePage() {
             </div>
           ) : activeTab === 'weekly-log' && module_features?.['timeline_weekly_log'] !== false && (
             <div className="glass rounded-xl border border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
-              {/* Day Headers â€” sticky */}
-              <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/60 sticky top-0 z-20">
+              <div className="overflow-x-auto custom-scrollbar">
+                <div className="min-w-[700px] md:min-w-0">
+                  <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/60 sticky top-0 z-20">
                 <div className="border-r border-black/[0.03] dark:border-white/[0.03]" />
                 {daysOfWeek.map((day, idx) => {
                   const isToday = day.toDateString() === new Date().toDateString();
@@ -715,6 +719,8 @@ export default function TimelinePage() {
                       </div>
                     );
                   })}
+                </div>
+              </div>
                 </div>
               </div>
             </div>

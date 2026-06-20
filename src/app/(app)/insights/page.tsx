@@ -304,13 +304,15 @@ User Context Profile (TRASON Unified Life OS):
               {t('insights_page.desc')}
             </p>
           </div>
-          <button 
-            onClick={handleGenerateAI}
-            disabled={isGenerating}
-            className="px-lg py-md bg-primary text-black font-bold rounded-lg flex items-center gap-sm hover:opacity-90 disabled:opacity-50 transition-all"
-          >
-            {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkles size={16} /> {t('insights_page.ask_ai')}</>}
-          </button>
+          <div className="hidden md:block">
+            <button 
+              onClick={handleGenerateAI}
+              disabled={isGenerating}
+              className="px-lg py-md bg-primary text-black font-bold rounded-lg flex items-center gap-sm hover:opacity-90 disabled:opacity-50 transition-all"
+            >
+              {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkles size={16} /> {t('insights_page.ask_ai')}</>}
+            </button>
+          </div>
         </div>
 
         {/* Error banner jika AI gagal */}
@@ -426,7 +428,17 @@ User Context Profile (TRASON Unified Life OS):
            </Card>
         </div>
       </div>
+
+      {/* Mobile-only Ask AI Floating Button */}
+      <div className="md:hidden fixed bottom-20 left-4 right-4 z-40">
+        <button 
+          onClick={handleGenerateAI}
+          disabled={isGenerating}
+          className="w-full py-lg bg-primary text-black font-bold rounded-xl flex items-center justify-center gap-sm shadow-[0_4px_20px_rgba(78,79,235,0.4)] disabled:opacity-50 transition-all"
+        >
+          {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkles size={20} /> {t('insights_page.ask_ai')}</>}
+        </button>
+      </div>
     </Layout>
   );
 }
-

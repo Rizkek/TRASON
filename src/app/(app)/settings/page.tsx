@@ -37,6 +37,7 @@ interface ProfileData {
   last_name: string;
   phone: string;
   bio: string;
+  avatar_url?: string;
 }
 
 interface PreferenceData {
@@ -57,6 +58,7 @@ interface UserData {
   last_name?: string;
   phone?: string;
   bio?: string;
+  avatar_url?: string;
   user_preferences?: PreferenceData[];
 }
 
@@ -175,15 +177,15 @@ const ModuleItem: React.FC<{
             : 'bg-transparent border-black/[0.02] dark:border-white/[0.02] opacity-60'
         }`}
       >
-        <div className="flex items-center gap-md">
+        <div className="flex items-center gap-md flex-1 min-w-0">
           <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center"
+            className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
             style={{ backgroundColor: `${metadata.color}15` }}
           >
             <Icon size={20} style={{ color: allSubFeaturesOff ? '#f97316' : metadata.color }} />
           </div>
-          <div>
-            <h4 className="text-sm font-medium text-soft-cream">{t(`nav.${id}`)}</h4>
+          <div className="min-w-0">
+            <h4 className="text-sm font-medium text-soft-cream truncate">{t(`nav.${id}`)}</h4>
             <p className="text-[10px] text-gray-light">
               {allSubFeaturesOff
                 ? <span className="text-orange-400">{t('modules.all_sub_off_warning')}</span>
@@ -197,7 +199,7 @@ const ModuleItem: React.FC<{
           type="button"
           onClick={handleToggle}
           disabled={isPending}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+          className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
             isEnabled
               ? 'bg-primary'
               : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
@@ -383,7 +385,11 @@ export default function SettingsPage() {
     last_name: '',
     phone: '',
     bio: '',
+    avatar_url: '',
   });
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Preferences form
   const [prefs, setPrefs] = useState<PreferenceData>({
@@ -471,6 +477,7 @@ export default function SettingsPage() {
           last_name: user.last_name || '',
           phone: user.phone || '',
           bio: user.bio || '',
+          avatar_url: user.avatar_url || '',
         });
         return;
       }
@@ -482,6 +489,7 @@ export default function SettingsPage() {
         last_name: user.last_name || '',
         phone: user.phone || '',
         bio: user.bio || '',
+        avatar_url: user.avatar_url || '',
       });
       const loaded: PreferenceData = {
         theme: userPrefs.theme || 'dark',
@@ -502,6 +510,33 @@ export default function SettingsPage() {
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
     setTimeout(() => setMessage(null), 5000);
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      showMessage('error', 'Image must be smaller than 5MB');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      const { storageQueries } = await import('@/services/core/storageQueries');
+      const publicUrl = await storageQueries.uploadAvatar(user.id, file);
+
+      setProfile((p) => ({ ...p, avatar_url: publicUrl }));
+      await userQueries.updateUserProfile({ avatar_url: publicUrl });
+      setUser({ ...user, avatar_url: publicUrl } as any);
+      
+      showMessage('success', 'Avatar updated successfully!');
+    } catch (err) {
+      showMessage('error', sanitizeError(err));
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   const handleSaveProfile = async () => {
@@ -710,13 +745,32 @@ export default function SettingsPage() {
               <div className="p-xl space-y-xl relative z-10">
                 <div className="flex flex-col md:flex-row items-center gap-xl pb-xl border-b border-black/[0.05] dark:border-white/[0.05]">
                   <div className="relative group">
-                    <div className="w-24 h-24 rounded-2xl bg-gradient-primary p-[2px]">
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg, image/webp"
+                      className="hidden"
+                      ref={fileInputRef}
+                      onChange={handleAvatarChange}
+                      disabled={isUploadingAvatar}
+                    />
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-primary p-[2px] cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                       <div className="w-full h-full rounded-2xl bg-gray-strong flex items-center justify-center text-3xl font-serif font-bold text-white relative overflow-hidden">
-                        {profile.first_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
-                        <div className="absolute inset-0 bg-primary opacity-5 group-hover:opacity-20 transition-opacity" />
+                        {isUploadingAvatar ? (
+                          <Loading />
+                        ) : profile.avatar_url ? (
+                          <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                          profile.first_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'
+                        )}
+                        {!isUploadingAvatar && <div className="absolute inset-0 bg-primary opacity-5 group-hover:opacity-20 transition-opacity" />}
                       </div>
                     </div>
-                    <button type="button" className="absolute -bottom-2 -right-2 p-sm bg-secondary text-white rounded-md shadow-lg border border-black/20 dark:border-white/20 hover:scale-110 transition-transform">
+                    <button 
+                      type="button" 
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploadingAvatar}
+                      className="absolute -bottom-2 -right-2 p-sm bg-secondary text-white rounded-md shadow-lg border border-black/20 dark:border-white/20 hover:scale-110 transition-transform disabled:opacity-50"
+                    >
                       <Camera size={14} />
                     </button>
                   </div>

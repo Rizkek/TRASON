@@ -225,7 +225,7 @@ export default function InvestmentsPage() {
               {t('investment_page.investment_analyst_desc')}
             </p>
           </div>
-          <div className="flex gap-md">
+          <div className="hidden md:flex gap-md">
             <Button variant="ghost" size="md" onClick={() => refreshPortfolio()} disabled={isRefreshing}>
               <RefreshCcw size={16} className={`mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
               {t('investment_page.refresh_prices')}
@@ -273,7 +273,7 @@ export default function InvestmentsPage() {
           </div>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-lg">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-md md:gap-lg">
           <Card className="p-xl">
             <p className="text-micro text-gray-light mb-sm">{t('investment_page.portfolio_value')}</p>
             <p className="text-2xl font-bold text-white">{formatCurrency(summary?.totalValue || 0, currency, locale)}</p>
@@ -477,6 +477,27 @@ export default function InvestmentsPage() {
             </Card>
           </div>
         )}
+      </div>
+
+      {/* Mobile-only FAB for Add Position */}
+      <div className="md:hidden fixed bottom-24 right-4 z-40 flex flex-col gap-sm">
+        <Button 
+          variant="ghost" 
+          onClick={() => refreshPortfolio()} 
+          disabled={isRefreshing}
+          className="rounded-full w-12 h-12 flex items-center justify-center shadow-lg bg-black/80 dark:bg-white/10 text-white"
+          aria-label={t('investment_page.refresh_prices')}
+        >
+          <RefreshCcw size={20} className={isRefreshing ? 'animate-spin' : ''} />
+        </Button>
+        <Button 
+          variant="primary" 
+          onClick={openNewModal} 
+          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(78,79,235,0.4)]"
+          aria-label={t('investment_page.add_position')}
+        >
+          <Plus size={24} />
+        </Button>
       </div>
 
       <Modal

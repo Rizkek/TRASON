@@ -41,7 +41,7 @@ const FinancialChart = dynamic(() => import('./components/FinancialChart').then(
 import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useCareer } from '@/hooks/useCareer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useAllModuleStatus } from '@/hooks/useModuleStatus';
+
 
 export function DashboardClient() {
   const router = useRouter();
@@ -60,13 +60,13 @@ export function DashboardClient() {
   const typedInsights = investmentInsights as InvestmentInsightResponse | null;
   const { summary: sportSummary, isLoading: sportLoading } = useWeeklySportSummary();
   const { stats: careerStats, nextInterview, isLoading: careerLoading } = useCareer();
-  const { enabledModules } = useAllModuleStatus(user?.id);
-
-  const isFinanceEnabled = enabledModules.includes('finance');
-  const isSportEnabled = enabledModules.includes('sport');
-  const isCareerEnabled = enabledModules.includes('career');
-  const isTimelineEnabled = enabledModules.includes('timeline');
-  const isRemindersEnabled = enabledModules.includes('reminders');
+  // Use module_features from Supabase-synced preferences (same source as sidebar)
+  // Defaults to true if key is absent (matching DEFAULT_MODULE_STATUS behavior)
+  const isFinanceEnabled = module_features?.['finance'] !== false;
+  const isSportEnabled = module_features?.['sport'] !== false;
+  const isCareerEnabled = module_features?.['career'] !== false;
+  const isTimelineEnabled = module_features?.['timeline'] !== false;
+  const isRemindersEnabled = module_features?.['reminders'] !== false;
 
   const greeting = useMemo(() => {
     const hours = new Date().getHours();
@@ -124,22 +124,7 @@ export function DashboardClient() {
         {/* Narrative Summary Card */}
         <DashboardHeader user={user} activities={activities} transactions={transactions} />
 
-        {/* Life Score — Primary Intelligence Widget */}
-        <LifeScoreCard />
-
-        {/* Financial Flow and Daily Tasks - Compact Grid */}
-        {(isFinanceEnabled || (isTimelineEnabled && preferences?.module_features?.['timeline_daily_checklist'] !== false)) && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-md md:gap-xl">
-            {isFinanceEnabled && <FinancialChart transactions={transactions} />}
-            {isTimelineEnabled && preferences?.module_features?.['timeline_daily_checklist'] !== false && (
-              <DailyTasksSummary />
-            )}
-          </div>
-        )}
-
-        {isFinanceEnabled && <InvestmentSummary summary={investmentSummary} />}
-
-        {/* Quick Action Input */}
+        {/* Quick Action Input - Moved to top for thumb reachability & immediate capture */}
         <Card className="p-md md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
           <div className="flex flex-col md:flex-row gap-md">
             <div className="flex-1 relative group">
@@ -155,6 +140,21 @@ export function DashboardClient() {
             <Button variant="primary" size="md">{t('dashboard.capture_btn')}</Button>
           </div>
         </Card>
+
+        {/* Life Score — Primary Intelligence Widget */}
+        <LifeScoreCard />
+
+        {/* Financial Flow and Daily Tasks - Compact Grid */}
+        {(isFinanceEnabled || (isTimelineEnabled && preferences?.module_features?.['timeline_daily_checklist'] !== false)) && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-md md:gap-xl">
+            {isFinanceEnabled && <FinancialChart transactions={transactions} />}
+            {isTimelineEnabled && preferences?.module_features?.['timeline_daily_checklist'] !== false && (
+              <DailyTasksSummary />
+            )}
+          </div>
+        )}
+
+        {isFinanceEnabled && <InvestmentSummary summary={investmentSummary} />}
 
         {/* Modules Summary Grid */}
         {(isRemindersEnabled || isSportEnabled || isCareerEnabled) && (

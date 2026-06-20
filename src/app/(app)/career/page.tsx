@@ -218,10 +218,12 @@ export default function CareerPage() {
               </h1>
               <p className="text-gray-light font-light">{t('career_page.desc')}</p>
             </div>
-            <Button variant="primary" onClick={openAddModal} className="rounded-full px-xl" aria-label="Add new application">
-              <Plus size={18} className="mr-2" />
-              {t('career_page.new_application')}
-            </Button>
+            <div className="hidden md:block">
+              <Button variant="primary" onClick={openAddModal} className="rounded-full px-xl" aria-label="Add new application">
+                <Plus size={18} className="mr-2" />
+                {t('career_page.new_application')}
+              </Button>
+            </div>
           </div>
 
           {/* Stats Row */}
@@ -235,7 +237,7 @@ export default function CareerPage() {
               ].map((s) => (
                 <Card key={s.label} className="glass border-none p-xl text-center">
                   <p className={`text-3xl font-bold ${s.color}`}>{s.value}</p>
-                  <p className="text-[10px] text-gray-light uppercase tracking-widest mt-xs">{s.label}</p>
+                  <p className="text-xs text-gray-light uppercase tracking-widest mt-xs">{s.label}</p>
                 </Card>
               ))}
             </div>
@@ -244,32 +246,32 @@ export default function CareerPage() {
           {/* Analytics Bar — Rule-based Intelligence */}
           {!isLoading && analytics && analytics.totalApplications > 0 && (
             <Card className="p-lg border border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02]">
-              <div className="flex flex-wrap items-center gap-xl">
-                <div className="text-center">
+              <div className="flex items-center gap-md sm:gap-xl overflow-x-auto snap-x no-scrollbar flex-nowrap pb-1">
+                <div className="text-center shrink-0 snap-center">
                   <p className="text-lg font-bold text-white">{analytics.responseRate.toFixed(0)}%</p>
                   <p className="text-[10px] text-gray-light uppercase tracking-widest">Response Rate</p>
                 </div>
                 <div className="w-px h-8 bg-white/10 hidden sm:block" />
-                <div className="text-center">
+                <div className="text-center shrink-0 snap-center">
                   <p className="text-lg font-bold text-white">{analytics.interviewRate.toFixed(0)}%</p>
                   <p className="text-[10px] text-gray-light uppercase tracking-widest">Interview Rate</p>
                 </div>
                 <div className="w-px h-8 bg-white/10 hidden sm:block" />
-                <div className="text-center">
+                <div className="text-center shrink-0 snap-center">
                   <p className="text-lg font-bold text-white">{analytics.offerRate.toFixed(0)}%</p>
                   <p className="text-[10px] text-gray-light uppercase tracking-widest">Offer Rate</p>
                 </div>
                 {analytics.avgDaysToInterview !== null && (
                   <>
                     <div className="w-px h-8 bg-white/10 hidden sm:block" />
-                    <div className="text-center">
+                    <div className="text-center shrink-0 snap-center">
                       <p className="text-lg font-bold text-white">{analytics.avgDaysToInterview}h</p>
                       <p className="text-[10px] text-gray-light uppercase tracking-widest">Avg. to Interview</p>
                     </div>
                   </>
                 )}
                 {analytics.insights.length > 0 && (
-                  <div className="flex-1 min-w-0 ml-auto">
+                  <div className="flex-1 min-w-[200px] shrink-0 ml-auto snap-center">
                     <div className="space-y-1">
                       {analytics.insights.slice(0, 2).map((insight, i) => (
                         <p key={i} className="text-xs text-amber-400 truncate">{insight}</p>
@@ -282,14 +284,14 @@ export default function CareerPage() {
           )}
 
           {/* Filter Tabs */}
-          <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] w-fit gap-0.5" role="tablist" aria-label="Application filter">
+          <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-full gap-0.5" role="tablist" aria-label="Application filter">
             {FILTER_TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveFilter(tab.id)}
                 role="tab"
                 aria-selected={activeFilter === tab.id}
-                className={`px-xl py-sm rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                className={`px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                   activeFilter === tab.id
                     ? 'bg-warm-gold text-warm-black shadow-md'
                     : 'text-gray-light hover:text-soft-cream'
@@ -348,7 +350,7 @@ export default function CareerPage() {
                         <p className="text-sm text-gray-light">{app.role_title}</p>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-md text-[10px] text-gray-light opacity-60">
+                      <div className="flex flex-wrap items-center gap-md text-[10px] text-gray-light opacity-80">
                         <span className="flex items-center gap-1">
                           <Calendar size={10} />
                           {t('career_page.applied_on')} {new Date(app.applied_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
@@ -371,7 +373,7 @@ export default function CareerPage() {
                       </div>
 
                       {app.notes && (
-                        <p className="text-xs text-gray-light italic line-clamp-1 opacity-60">
+                        <p className="text-xs text-gray-light italic line-clamp-1 opacity-80">
                           {app.notes}
                         </p>
                       )}
@@ -384,7 +386,7 @@ export default function CareerPage() {
                           href={app.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-sm text-gray-light hover:text-primary transition-colors rounded-md hover:bg-black/5 dark:bg-white/5"
+                          className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-light hover:text-primary transition-colors rounded-md hover:bg-black/5 dark:bg-white/5"
                           aria-label={`Open ${app.company_name} job posting`}
                         >
                           <ExternalLink size={16} />
@@ -392,14 +394,14 @@ export default function CareerPage() {
                       )}
                       <button
                         onClick={() => openEditModal(app)}
-                        className="px-md py-sm text-[10px] font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 rounded-md transition-all"
+                        className="px-md py-3 min-h-[44px] flex items-center justify-center text-xs font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 rounded-md transition-all"
                         aria-label={`Edit ${app.company_name} application`}
                       >
                         {t('career_page.edit')}
                       </button>
                       <button
                         onClick={() => setDeleteConfirmId(app.id)}
-                        className="p-sm text-gray-light hover:text-expense transition-colors rounded-md hover:bg-black/5 dark:bg-white/5"
+                        className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-light hover:text-expense transition-colors rounded-md hover:bg-black/5 dark:bg-white/5"
                         aria-label={`Delete ${app.company_name} application`}
                       >
                         <Trash2 size={16} />
@@ -561,6 +563,18 @@ export default function CareerPage() {
           isDangerous={true}
           onConfirm={handleConfirmDelete}
         />
+        
+        {/* Mobile-only FAB for Add Application */}
+        <div className="md:hidden fixed bottom-24 right-4 z-40">
+          <Button 
+            variant="primary" 
+            onClick={openAddModal} 
+            className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(78,79,235,0.4)]"
+            aria-label={t('career_page.new_application')}
+          >
+            <Plus size={24} />
+          </Button>
+        </div>
       </Layout>
     </>
   );

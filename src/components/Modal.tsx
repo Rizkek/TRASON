@@ -31,12 +31,15 @@ export const Modal: React.FC<ModalProps> = ({
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
     };
   }, [isOpen, onClose]);
 
@@ -44,16 +47,16 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <>
-      {/* Backdrop with extreme blur */}
+      {/* Backdrop with lighter blur for mobile performance */}
       <div
-        className="fixed inset-0 bg-warm-black/60 backdrop-blur-md z-[60] animate-fade-in"
+        className="fixed inset-0 bg-warm-black/60 backdrop-blur-sm z-[60] animate-fade-in"
         onClick={onClose}
       />
 
       {/* Modal Container */}
       <div className="fixed inset-0 z-[70] flex items-center justify-center p-md pointer-events-none">
         <div
-          className="bg-gray-strong border border-black/10 dark:border-white/10 rounded-md shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] max-w-lg w-full max-h-[90vh] overflow-auto pointer-events-auto animate-slide-up relative"
+          className="bg-gray-strong border border-black/10 dark:border-white/10 rounded-md shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] max-w-lg w-full max-h-[85dvh] overflow-auto pointer-events-auto animate-slide-up relative"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top highlight glow */}
