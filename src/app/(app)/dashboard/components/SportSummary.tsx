@@ -34,7 +34,7 @@ export const SportSummary = ({ summary, isLoading }: Props) => {
 
   return (
     <Card className="overflow-hidden bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
-      <div className="px-lg py-md border-b border-black/[0.05] dark:border-white/[0.05] flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01]">
+      <div className="px-md md:px-lg py-sm md:py-md border-b border-black/[0.05] dark:border-white/[0.05] flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01]">
         <div className="flex items-center gap-sm">
           <Dumbbell size={16} className="text-secondary" />
           <h3 className="text-sm font-bold tracking-tight">{t('dashboard.vitality_this_week')}</h3>
@@ -47,20 +47,20 @@ export const SportSummary = ({ summary, isLoading }: Props) => {
         )}
       </div>
 
-      <div className="p-lg space-y-lg">
+      <div className="p-md md:p-lg">
         {totalSessions === 0 ? (
-          <p className="text-xs text-gray-light italic text-center py-md">{t('dashboard.sport_empty_desc')}</p>
+          <p className="text-xs text-gray-light italic text-center py-sm md:py-md">{t('dashboard.sport_empty_desc')}</p>
         ) : (
-          <>
+          <div className="flex items-center justify-between gap-md">
             {/* Stats */}
-            <div className="flex items-center gap-xl">
+            <div className="flex items-center gap-md md:gap-xl">
               <div>
-                <p className="text-2xl font-bold text-gradient">{totalSessions}</p>
+                <p className="text-xl md:text-2xl font-bold text-gradient">{totalSessions}</p>
                 <p className="text-[10px] text-gray-light uppercase tracking-widest">{t('dashboard.sessions')}</p>
               </div>
               {totalMinutes > 0 && (
                 <div>
-                  <p className="text-2xl font-bold text-secondary">
+                  <p className="text-xl md:text-2xl font-bold text-secondary">
                     {totalHours > 0 ? `${totalHours}h${remMin > 0 ? ` ${remMin}m` : ''}` : `${remMin}m`}
                   </p>
                   <p className="text-[10px] text-gray-light uppercase tracking-widest">{t('dashboard.moved')}</p>
@@ -70,7 +70,7 @@ export const SportSummary = ({ summary, isLoading }: Props) => {
 
             {/* Mini bar chart: Mon-Sun */}
             <div
-              className="flex items-end gap-1"
+              className="flex items-end gap-[2px] md:gap-1 opacity-70 md:opacity-100"
               role="img"
               aria-label={`Sport activity this week: ${dayActivity.map((m, i) => `${DAY_LABELS[i]}: ${m}min`).join(', ')}`}
             >
@@ -81,29 +81,29 @@ export const SportSummary = ({ summary, isLoading }: Props) => {
                 return (
                   <div key={idx} className="flex-1 flex flex-col items-center gap-0.5">
                     <div
-                      className={`w-full rounded-sm transition-all ${
+                      className={`w-3 md:w-full rounded-sm transition-all ${
                         isActive
                           ? isToday
                             ? 'bg-primary'
                             : 'bg-secondary/70'
                           : 'bg-black/[0.05] dark:bg-white/[0.05]'
                       }`}
-                      style={{ height: `${Math.max(heightPct * 0.32, 4)}px` }}
+                      style={{ height: `${Math.max(heightPct * 0.25, 4)}px` }}
                       title={`${DAY_LABELS[idx]}: ${mins}min`}
                     />
-                    <span className={`text-[8px] ${isToday ? 'text-primary font-bold' : 'text-gray-light opacity-50'}`}>
+                    <span className={`hidden md:block text-[8px] ${isToday ? 'text-primary font-bold' : 'text-gray-light opacity-50'}`}>
                       {DAY_LABELS[idx]}
                     </span>
                   </div>
                 );
               })}
             </div>
-          </>
+          </div>
         )}
 
         <Link
           href="/sport"
-          className="block text-center text-[10px] font-bold uppercase tracking-widest text-gray-light hover:text-primary transition-colors"
+          className="block text-center text-[10px] font-bold uppercase tracking-widest text-gray-light hover:text-primary transition-colors mt-md"
           aria-label="Go to Sport page to log workouts"
         >
           {totalSessions === 0 ? t('dashboard.log_first_session') : t('dashboard.review_rhythm')}

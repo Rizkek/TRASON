@@ -24,7 +24,7 @@ export const CareerSummary = ({ stats, nextInterview, isLoading }: Props) => {
 
   return (
     <Card className="overflow-hidden bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
-      <div className="px-lg py-md border-b border-black/[0.05] dark:border-white/[0.05] flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01]">
+      <div className="px-md md:px-lg py-sm md:py-md border-b border-black/[0.05] dark:border-white/[0.05] flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01]">
         <div className="flex items-center gap-sm">
           <Briefcase size={16} className="text-warm-gold" />
           <h3 className="text-sm font-bold tracking-tight">{t('dashboard.career_pipeline')}</h3>
@@ -36,23 +36,24 @@ export const CareerSummary = ({ stats, nextInterview, isLoading }: Props) => {
         )}
       </div>
 
-      <div className="p-lg space-y-lg">
+      <div className="p-md md:p-lg space-y-md md:space-y-lg">
         {stats.total === 0 ? (
-          <p className="text-xs text-gray-light italic text-center py-md">
+          <p className="text-xs text-gray-light italic text-center py-sm md:py-md">
             {t('dashboard.career_empty_desc')}
           </p>
         ) : (
-          <>
+          <div className="flex flex-col md:flex-col gap-sm md:gap-md">
             {/* Quick stats */}
-            <div className="grid grid-cols-3 gap-sm">
+            <div className="flex flex-row justify-around md:grid md:grid-cols-3 gap-sm">
               {[
                 { label: t('dashboard.applied'),   value: stats.applied,   color: 'text-primary' },
                 { label: t('dashboard.interview'), value: stats.interview,  color: 'text-purple-400' },
                 { label: t('dashboard.offer'),     value: stats.offer,     color: 'text-income' },
               ].map((s) => (
                 <div key={s.label} className="text-center">
-                  <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
-                  <p className="text-[9px] text-gray-light uppercase tracking-widest">{s.label}</p>
+                  <p className={`text-lg md:text-xl font-bold ${s.color}`}>{s.value}</p>
+                  <p className="text-[9px] text-gray-light uppercase tracking-widest hidden md:block">{s.label}</p>
+                  <p className="text-[8px] text-gray-light uppercase tracking-widest md:hidden">{s.label.substring(0,3)}</p>
                 </div>
               ))}
             </div>
@@ -78,7 +79,7 @@ export const CareerSummary = ({ stats, nextInterview, isLoading }: Props) => {
                 </div>
               </div>
             )}
-          </>
+          </div>
         )}
 
         <Link

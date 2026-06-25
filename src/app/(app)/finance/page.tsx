@@ -201,31 +201,40 @@ export default function FinancePage() {
           </div>
         </div>
 
-        <div className="flex md:grid md:grid-cols-3 gap-md md:gap-lg overflow-x-auto snap-x no-scrollbar pb-2">
-          <Card className="p-xl relative overflow-hidden group min-w-[280px] md:min-w-0 snap-center shrink-0">
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-all" />
-            <p className="text-micro text-gray-light mb-md tracking-widest">{t('finance.totalIncome')}</p>
+        <div className="flex md:grid md:grid-cols-3 gap-sm md:gap-lg overflow-x-auto snap-x no-scrollbar pb-2">
+          <Card className="p-md md:p-xl relative overflow-hidden group min-w-[200px] md:min-w-0 snap-center shrink-0">
+            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-all" />
+            <div className="flex items-center gap-xs mb-1 md:mb-md text-gray-light">
+               <ArrowUpRight size={14} className="text-success md:hidden" />
+               <p className="text-[10px] md:text-micro tracking-widest hidden md:block">{t('finance.totalIncome')}</p>
+            </div>
             <div className="flex items-end justify-between">
-              <p className="text-3xl font-bold text-success">{formatCurrency(totalIncome, currency, locale)}</p>
-              <div className="p-sm bg-success/10 rounded-md text-success"><ArrowUpRight size={20} /></div>
+              <p className="text-xl md:text-3xl font-bold text-success">{formatCurrency(totalIncome, currency, locale)}</p>
+              <div className="p-sm bg-success/10 rounded-md text-success hidden md:block"><ArrowUpRight size={20} /></div>
             </div>
           </Card>
           
-          <Card className="p-xl relative overflow-hidden group min-w-[280px] md:min-w-0 snap-center shrink-0">
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-danger/5 rounded-full blur-2xl group-hover:bg-danger/10 transition-all" />
-            <p className="text-micro text-gray-light mb-md tracking-widest">{t('finance.totalExpense')}</p>
+          <Card className="p-md md:p-xl relative overflow-hidden group min-w-[200px] md:min-w-0 snap-center shrink-0">
+            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-danger/5 rounded-full blur-2xl group-hover:bg-danger/10 transition-all" />
+            <div className="flex items-center gap-xs mb-1 md:mb-md text-gray-light">
+               <ArrowDownLeft size={14} className="text-danger md:hidden" />
+               <p className="text-[10px] md:text-micro tracking-widest hidden md:block">{t('finance.totalExpense')}</p>
+            </div>
             <div className="flex items-end justify-between">
-              <p className="text-3xl font-bold text-danger">{formatCurrency(totalExpense, currency, locale)}</p>
-              <div className="p-sm bg-danger/10 rounded-md text-danger"><ArrowDownLeft size={20} /></div>
+              <p className="text-xl md:text-3xl font-bold text-danger">{formatCurrency(totalExpense, currency, locale)}</p>
+              <div className="p-sm bg-danger/10 rounded-md text-danger hidden md:block"><ArrowDownLeft size={20} /></div>
             </div>
           </Card>
 
-          <Card className="p-xl relative overflow-hidden group border-b-2 border-primary/20 min-w-[280px] md:min-w-0 snap-center shrink-0">
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
-            <p className="text-micro text-gray-light mb-md tracking-widest">{t('finance.netBalance')}</p>
+          <Card className="p-md md:p-xl relative overflow-hidden group border-b-2 border-primary/20 min-w-[200px] md:min-w-0 snap-center shrink-0">
+            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
+            <div className="flex items-center gap-xs mb-1 md:mb-md text-gray-light">
+               <TrendingUp size={14} className="text-primary md:hidden" />
+               <p className="text-[10px] md:text-micro tracking-widest hidden md:block">{t('finance.netBalance')}</p>
+            </div>
             <div className="flex items-end justify-between">
-              <p className="text-3xl font-bold text-white">{formatCurrency(totalIncome - totalExpense, currency, locale)}</p>
-              <div className="p-sm bg-primary/10 rounded-md text-primary"><TrendingUp size={20} /></div>
+              <p className="text-xl md:text-3xl font-bold text-white">{formatCurrency(totalIncome - totalExpense, currency, locale)}</p>
+              <div className="p-sm bg-primary/10 rounded-md text-primary hidden md:block"><TrendingUp size={20} /></div>
             </div>
           </Card>
         </div>

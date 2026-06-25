@@ -20,7 +20,8 @@ import {
   RiCalendarLine as CalendarIcon, 
   RiNotification3Line as Bell, 
   RiLightbulbLine as Lightbulb, 
-  RiTimeLine as Clock 
+  RiTimeLine as Clock,
+  RiAddLine
 } from 'react-icons/ri';
 
 // Extracted Components
@@ -103,7 +104,7 @@ export function DashboardClient() {
 
   return (
     <Layout>
-      <div className="space-y-md md:space-y-xl animate-fade-in">
+      <div className="space-y-sm md:space-y-xl animate-fade-in">
         {/* Hero Greeting */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg md:mb-xl">
           <div className="space-y-sm">
@@ -125,19 +126,20 @@ export function DashboardClient() {
         <DashboardHeader user={user} activities={activities} transactions={transactions} />
 
         {/* Quick Action Input - Moved to top for thumb reachability & immediate capture */}
-        <Card className="p-md md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
-          <div className="flex flex-col md:flex-row gap-md">
+        <Card className="p-sm md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+          <div className="flex flex-row gap-sm md:gap-md">
             <div className="flex-1 relative group">
               <div className="absolute left-md top-1/2 -translate-y-1/2 text-primary">
-                <Lightbulb size={18} />
+                <Lightbulb size={16} className="md:w-[18px] md:h-[18px]" />
               </div>
               <input
                 type="text"
                 placeholder={t('dashboard.capture_placeholder')}
-                className="w-full pl-2xl pr-lg py-lg bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
+                className="w-full pl-xl md:pl-2xl pr-md md:pr-lg py-sm md:py-lg bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
               />
             </div>
-            <Button variant="primary" size="md">{t('dashboard.capture_btn')}</Button>
+            <Button variant="primary" size="md" className="hidden md:flex">{t('dashboard.capture_btn')}</Button>
+            <Button variant="primary" size="sm" className="md:hidden px-3"><RiAddLine size={20} /></Button>
           </div>
         </Card>
 

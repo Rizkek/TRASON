@@ -228,16 +228,16 @@ export default function CareerPage() {
 
           {/* Stats Row */}
           {!isLoading && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-md">
+            <div className="flex flex-row justify-between gap-sm md:gap-md overflow-x-auto snap-x no-scrollbar pb-2">
               {[
                 { label: t('career_page.stats.applied'), value: stats.applied, color: 'text-primary' },
                 { label: t('career_page.stats.reviewing'), value: stats.reviewing, color: 'text-amber-400' },
                 { label: t('career_page.stats.interview'), value: stats.interview, color: 'text-purple-400' },
                 { label: t('career_page.stats.offer'), value: stats.offer, color: 'text-income' },
               ].map((s) => (
-                <Card key={s.label} className="glass border-none p-xl text-center">
-                  <p className={`text-3xl font-bold ${s.color}`}>{s.value}</p>
-                  <p className="text-xs text-gray-light uppercase tracking-widest mt-xs">{s.label}</p>
+                <Card key={s.label} className="glass border-none p-sm md:p-xl text-center flex-1 min-w-[70px] snap-center">
+                  <p className={`text-xl md:text-3xl font-bold ${s.color}`}>{s.value}</p>
+                  <p className="text-[8px] md:text-xs text-gray-light uppercase tracking-widest mt-1 md:mt-xs">{s.label}</p>
                 </Card>
               ))}
             </div>
@@ -245,28 +245,32 @@ export default function CareerPage() {
 
           {/* Analytics Bar — Rule-based Intelligence */}
           {!isLoading && analytics && analytics.totalApplications > 0 && (
-            <Card className="p-lg border border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02]">
+            <Card className="p-sm md:p-lg border border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02]">
               <div className="flex items-center gap-md sm:gap-xl overflow-x-auto snap-x no-scrollbar flex-nowrap pb-1">
                 <div className="text-center shrink-0 snap-center">
-                  <p className="text-lg font-bold text-white">{analytics.responseRate.toFixed(0)}%</p>
-                  <p className="text-[10px] text-gray-light uppercase tracking-widest">Response Rate</p>
+                  <p className="text-md md:text-lg font-bold text-white">{analytics.responseRate.toFixed(0)}%</p>
+                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">Response Rate</p>
+                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">Resp.</p>
                 </div>
-                <div className="w-px h-8 bg-white/10 hidden sm:block" />
+                <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
                 <div className="text-center shrink-0 snap-center">
-                  <p className="text-lg font-bold text-white">{analytics.interviewRate.toFixed(0)}%</p>
-                  <p className="text-[10px] text-gray-light uppercase tracking-widest">Interview Rate</p>
+                  <p className="text-md md:text-lg font-bold text-white">{analytics.interviewRate.toFixed(0)}%</p>
+                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">Interview Rate</p>
+                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">Intv.</p>
                 </div>
-                <div className="w-px h-8 bg-white/10 hidden sm:block" />
+                <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
                 <div className="text-center shrink-0 snap-center">
-                  <p className="text-lg font-bold text-white">{analytics.offerRate.toFixed(0)}%</p>
-                  <p className="text-[10px] text-gray-light uppercase tracking-widest">Offer Rate</p>
+                  <p className="text-md md:text-lg font-bold text-white">{analytics.offerRate.toFixed(0)}%</p>
+                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">Offer Rate</p>
+                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">Offer</p>
                 </div>
                 {analytics.avgDaysToInterview !== null && (
                   <>
-                    <div className="w-px h-8 bg-white/10 hidden sm:block" />
+                    <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
                     <div className="text-center shrink-0 snap-center">
-                      <p className="text-lg font-bold text-white">{analytics.avgDaysToInterview}h</p>
-                      <p className="text-[10px] text-gray-light uppercase tracking-widest">Avg. to Interview</p>
+                      <p className="text-md md:text-lg font-bold text-white">{analytics.avgDaysToInterview}h</p>
+                      <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">Avg. to Interview</p>
+                      <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">Avg.</p>
                     </div>
                   </>
                 )}

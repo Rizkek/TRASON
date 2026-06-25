@@ -94,22 +94,22 @@ export const FinancialChart = ({ transactions }: Props) => {
 
 
   return (
-    <Card className="p-xl bg-gradient-to-br from-[#0F172A]/80 to-[#020617]/80 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
+    <Card className="p-md md:p-xl bg-gradient-to-br from-[#0F172A]/80 to-[#020617]/80 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
       {/* Glow Effect Behind Chart */}
       <div className="absolute top-0 left-1/4 w-1/2 h-full bg-primary/5 blur-3xl rounded-full pointer-events-none" />
 
-      <div className="flex items-center justify-between mb-xl relative z-10">
+      <div className="flex items-center justify-between mb-md md:mb-xl relative z-10">
         <div>
-          <h3 className="font-serif italic text-lg text-white">{t('dashboard.financial_analytics')}</h3>
-          <p className="text-micro text-gray-light mt-1">{t('dashboard.monthly_overview')}</p>
+          <h3 className="font-serif italic text-md md:text-lg text-white">{t('dashboard.financial_analytics')}</h3>
+          <p className="text-[10px] md:text-micro text-gray-light mt-1">{t('dashboard.monthly_overview')}</p>
         </div>
       </div>
 
-      <div className="w-full h-[200px] relative z-10">
+      <div className="w-full h-[120px] md:h-[200px] relative z-10">
         {!isMounted ? (
           <div className="w-full h-full bg-white/[0.02] rounded-lg animate-pulse" />
         ) : (
-        <ResponsiveContainer width="100%" height="100%" minHeight={200} minWidth={0}>
+        <ResponsiveContainer width="100%" height="100%" minHeight={120} minWidth={0}>
           <AreaChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
             <defs>
               {/* Income Gradient */}

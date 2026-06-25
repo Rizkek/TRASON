@@ -12,15 +12,15 @@ export const DailyTasksSummary = () => {
   const completedCount = tasks.filter(t => t.completed_today).length;
 
   return (
-    <Card className="p-xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] h-full flex flex-col">
-      <div className="flex items-center justify-between mb-xl">
+    <Card className="p-md md:p-xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] h-full flex flex-col">
+      <div className="flex items-center justify-between mb-md md:mb-xl">
         <div className="flex items-center gap-md">
-          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-            <ListChecks size={20} />
+          <div className="w-8 h-8 md:w-10 md:h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+            <ListChecks size={18} className="md:w-5 md:h-5" />
           </div>
           <div>
-            <h3 className="font-serif italic text-lg text-white">Daily Tasks</h3>
-            <p className="text-micro text-gray-light mt-1">Today's checklist</p>
+            <h3 className="font-serif italic text-md md:text-lg text-white">Daily Tasks</h3>
+            <p className="hidden md:block text-micro text-gray-light mt-1">Today's checklist</p>
           </div>
         </div>
         {totalCount > 0 && (

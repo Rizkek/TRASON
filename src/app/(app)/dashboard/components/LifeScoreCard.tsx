@@ -97,11 +97,11 @@ export function LifeScoreCard() {
     lifeScore.overall >= 40 ? t('life_score.labels.needs_attention') : t('life_score.labels.critical');
 
   return (
-    <Card className="p-xl bg-gradient-to-br from-gray-strong/80 to-black/60 border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden">
+    <Card className="p-md md:p-xl bg-gradient-to-br from-gray-strong/80 to-black/60 border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden">
       {/* Glow */}
       <div className="absolute -top-8 -right-8 w-40 h-40 bg-primary/10 blur-3xl rounded-full pointer-events-none" />
 
-      <div className="flex items-center justify-between mb-xl">
+      <div className="flex items-center justify-between mb-md md:mb-xl">
         <div>
           <h3 className="font-serif italic text-lg text-white flex items-center gap-sm">
             <TrendingUp size={18} className="text-primary" />
@@ -118,14 +118,17 @@ export function LifeScoreCard() {
         </div>
       </div>
 
-      <div className="flex items-center gap-xl">
+      <div className="flex flex-col md:flex-row items-center gap-md md:gap-xl">
         {/* Score Ring */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 hidden md:block">
           <ScoreRing score={lifeScore.overall} size={120} />
+        </div>
+        <div className="flex-shrink-0 md:hidden">
+          <ScoreRing score={lifeScore.overall} size={80} />
         </div>
 
         {/* Dimension Bars */}
-        <div className="flex-1 space-y-md">
+        <div className="flex-1 space-y-sm md:space-y-md w-full">
           {DIMENSION_KEYS.map((key) => (
             <DimensionBar
               key={key}
@@ -138,7 +141,7 @@ export function LifeScoreCard() {
 
       {/* Insights */}
       {lifeScore.insights.length > 0 && (
-        <div className="mt-xl pt-md border-t border-black/[0.05] dark:border-white/[0.05]">
+        <div className="mt-md md:mt-xl pt-sm md:pt-md border-t border-black/[0.05] dark:border-white/[0.05]">
           <button
             onClick={() => setShowInsights(!showInsights)}
             className="flex items-center gap-sm text-[11px] text-gray-light hover:text-soft-cream transition-colors w-full"

@@ -430,13 +430,13 @@ User Context Profile (TRASON Unified Life OS):
       </div>
 
       {/* Mobile-only Ask AI Floating Button */}
-      <div className="md:hidden fixed bottom-20 left-4 right-4 z-40">
+      <div className="md:hidden fixed bottom-4 left-4 right-4 z-40">
         <button 
           onClick={handleGenerateAI}
           disabled={isGenerating}
-          className="w-full py-lg bg-primary text-black font-bold rounded-xl flex items-center justify-center gap-sm shadow-[0_4px_20px_rgba(78,79,235,0.4)] disabled:opacity-50 transition-all"
+          className="w-full py-sm  bg-primary text-black font-bold rounded-xl flex items-center justify-center gap-sm shadow-[0_4px_20px_rgba(78,79,235,0.4)] disabled:opacity-50 transition-all"
         >
-          {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkles size={20} /> {t('insights_page.ask_ai')}</>}
+          {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkles size={18} /> <span className="text-sm">{t('insights_page.ask_ai')}</span></>}
         </button>
       </div>
     </Layout>
