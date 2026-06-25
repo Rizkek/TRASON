@@ -23,12 +23,12 @@ export default function Home() {
  
   const { t } = useTranslation();
 
-  const motionTexts = [
+  const motionTexts = React.useMemo(() => [
     t('dashboard.splash.line1'),
     t('dashboard.splash.line2'),
     t('dashboard.splash.line3'),
     t('dashboard.splash.line4')
-  ];
+  ], [t]);
  
   useEffect(() => {
     setMounted(true);
@@ -53,7 +53,7 @@ export default function Home() {
         }
         setShowSplash(false);
       }
-    }, 1000);
+    }, 800);
     return () => clearInterval(interval);
   }, [motionTexts.length, showSplash]);
 
@@ -70,7 +70,7 @@ export default function Home() {
         <div className="hidden md:block absolute bottom-1/4 right-1/4 w-96 h-96 border border-warm-gold/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
         <div className="text-center space-y-md z-10 px-lg max-w-2xl">
           <h2 key={motionStep} className="text-2xl md:text-4xl font-serif text-warm-gold animate-fade-in italic">
-            {mounted ? motionTexts[motionStep] : ' '}
+            {mounted ? motionTexts[motionStep] : motionTexts[0]}
           </h2>
         </div>
       </div>
@@ -82,8 +82,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-warm-black text-soft-cream font-sans selection:bg-warm-gold/30 selection:text-soft-cream relative overflow-x-hidden">
       {/* Dynamic Background Elements */}
-      <div className="fixed top-[-20%] right-[-10%] w-[800px] h-[800px] bg-warm-gold/5 blur-3xl md:blur-[160px] rounded-full pointer-events-none" />
-      <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-deep-sage/5 blur-3xl md:blur-[140px] rounded-full pointer-events-none" />
+      <div className="fixed top-[-20%] right-[-10%] w-[800px] h-[800px] bg-warm-gold/5 md:blur-[160px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
+      <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-deep-sage/5 md:blur-[140px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
 
       <LandingNavbar />
 
@@ -94,7 +94,7 @@ export default function Home() {
             <FiCommand size={14} /> The Personal Operating System
           </div>
 
-          <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-serif leading-[1.1] md:leading-[1] tracking-tighter animate-slide-up [animation-delay:0.1s]">
+          <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-serif leading-[1.1] md:leading-[1] tracking-tighter">
             Your Life's <br className="hidden md:block" />
             <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-warm-gold via-soft-cream to-warm-gold">Command Center.</span>
           </h1>
