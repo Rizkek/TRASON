@@ -96,7 +96,7 @@ export default function Home() {
 
           <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-serif leading-[1.1] md:leading-[1] tracking-tighter">
             Your Life's <br className="hidden md:block" />
-            <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-warm-gold via-soft-cream to-warm-gold">Command Center.</span>
+            <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-warm-gold via-soft-cream to-warm-gold bg-[length:200%_auto] animate-shimmer">Command Center.</span>
           </h1>
 
           <p className="text-lg md:text-2xl text-gray-light/80 max-w-2xl mx-auto leading-relaxed font-light animate-slide-up [animation-delay:0.2s]">

@@ -59,6 +59,7 @@ module.exports = {
         'fade-in': 'fadeIn 0.3s ease-in',
         'slide-up': 'slideUp 0.3s ease-out',
         'subtle-pulse': 'subtlePulse 2s ease-in-out infinite',
+        'shimmer': 'shimmer 4s infinite linear',
       },
       keyframes: {
         fadeIn: {
@@ -72,6 +73,10 @@ module.exports = {
         subtlePulse: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.8' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '200% center' },
+          '100%': { backgroundPosition: '-200% center' },
         },
       },
       maxWidth: {
