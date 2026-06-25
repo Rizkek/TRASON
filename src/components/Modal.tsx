@@ -22,10 +22,15 @@ export const Modal: React.FC<ModalProps> = ({
   footer,
   closeButton = true,
 }) => {
+  const modalRef = React.useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        const modals = Array.from(document.querySelectorAll('.trason-modal'));
+        if (modals.length > 0 && modals[modals.length - 1] === modalRef.current) {
+          onClose();
+        }
       }
     };
 
@@ -54,9 +59,12 @@ export const Modal: React.FC<ModalProps> = ({
       />
 
       {/* Modal Container */}
-      <div className="fixed inset-0 z-[70] flex items-center justify-center p-md pointer-events-none">
+      <div 
+        ref={modalRef}
+        className="fixed inset-0 z-[70] flex items-center justify-center p-md pointer-events-none trason-modal"
+      >
         <div
-          className="bg-gray-strong border border-black/10 dark:border-white/10 rounded-md shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] max-w-lg w-full max-h-[85dvh] overflow-auto pointer-events-auto animate-slide-up relative"
+          className="bg-gray-strong border border-black/10 dark:border-white/10 rounded-md shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] max-w-lg w-full max-h-[85dvh] flex flex-col pointer-events-auto animate-slide-up relative"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top highlight glow */}
@@ -64,7 +72,7 @@ export const Modal: React.FC<ModalProps> = ({
           
           {/* Header */}
           {(title || closeButton) && (
-            <div className="flex items-center justify-between px-xl py-xl border-b border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none flex items-center justify-between px-xl py-xl border-b border-black/[0.05] dark:border-white/[0.05]">
               {title && (
                 <h2 className="text-xl font-bold tracking-tight text-white uppercase italic">
                    {title}
@@ -93,11 +101,11 @@ export const Modal: React.FC<ModalProps> = ({
           )}
 
           {/* Content */}
-          <div className="px-xl py-xl">{children}</div>
+          <div className="flex-1 overflow-y-auto px-xl py-xl">{children}</div>
 
           {/* Footer */}
           {footer && (
-            <div className="px-xl py-xl bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none px-xl py-xl bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
               {footer}
             </div>
           )}

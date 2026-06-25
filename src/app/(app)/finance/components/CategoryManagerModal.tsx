@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Modal, Button, Input, ErrorAlert } from '@/components';
 import { useCategory } from '@/hooks/useCategory';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import { Plus, Trash2, Edit2, X } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Smile } from 'lucide-react';
 import { Category } from '@/types/database';
+import { CategoryIcon, CATEGORY_ICONS } from '@/components';
 
 interface CategoryManagerModalProps {
   isOpen: boolean;
@@ -20,17 +21,19 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
   
   const [form, setForm] = useState({
     name: '',
-    icon: '📦',
+    icon: 'ShoppingCart',
   });
+  const [showIconPicker, setShowIconPicker] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const filteredCategories = categories.filter(c => c.type === typeFilter);
 
   const resetForm = () => {
-    setForm({ name: '', icon: '📦' });
+    setForm({ name: '', icon: 'ShoppingCart' });
     setIsAdding(false);
     setEditingId(null);
     setError(null);
+    setShowIconPicker(false);
   };
 
   const handleSave = async () => {
@@ -70,7 +73,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
 
   const startEdit = (cat: Category) => {
     setEditingId(cat.id);
-    setForm({ name: cat.name, icon: cat.icon || '📦' });
+    setForm({ name: cat.name, icon: cat.icon || 'ShoppingCart' });
     setIsAdding(true);
   };
 
@@ -92,7 +95,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
               {filteredCategories.map(cat => (
                 <div key={cat.id} className="flex items-center justify-between p-sm bg-gray-strong/40 rounded-md border border-black/5 dark:border-white/5">
                   <div className="flex items-center gap-sm overflow-hidden">
-                    <span className="text-xl">{cat.icon}</span>
+                    <CategoryIcon name={cat.icon || 'ShoppingCart'} className="text-gray-light" />
                     <span className="text-sm font-bold truncate">{cat.name}</span>
                   </div>
                   <div className="flex gap-xs">
@@ -126,16 +129,16 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
               </button>
             </div>
             
-            <div className="flex gap-md">
-              <div className="w-20">
-                <Input
-                  label="ICON"
-                  value={form.icon}
-                  onChange={(e) => setForm({ ...form, icon: e.target.value })}
-                  placeholder="📦"
-                  maxLength={2}
-                  className="text-center text-xl"
-                />
+            <div className="flex gap-md relative">
+              <div className="w-20 flex flex-col items-center gap-xs">
+                <label className="text-[10px] font-bold text-gray-light tracking-widest self-start">ICON</label>
+                <button
+                  type="button"
+                  onClick={() => setShowIconPicker(!showIconPicker)}
+                  className="w-12 h-12 flex items-center justify-center bg-gray-strong border border-black/5 dark:border-white/5 rounded-md text-2xl hover:border-primary transition-colors focus:outline-none focus:ring-1 focus:ring-primary/30"
+                >
+                  <CategoryIcon name={form.icon} />
+                </button>
               </div>
               <div className="flex-1">
                 <Input
@@ -146,6 +149,24 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
                 />
               </div>
             </div>
+
+            {showIconPicker && (
+              <div className="bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md p-sm max-h-[150px] overflow-y-auto grid grid-cols-5 sm:grid-cols-7 gap-xs">
+                {CATEGORY_ICONS.map(iconName => (
+                  <button
+                    key={iconName}
+                    type="button"
+                    onClick={() => {
+                      setForm({ ...form, icon: iconName });
+                      setShowIconPicker(false);
+                    }}
+                    className={`p-2 rounded-md flex items-center justify-center transition-colors ${form.icon === iconName ? 'bg-primary/20 text-primary' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-light hover:text-white'}`}
+                  >
+                    <CategoryIcon name={iconName} />
+                  </button>
+                ))}
+              </div>
+            )}
             
             <div className="flex justify-end gap-sm mt-md">
               <Button variant="ghost" size="sm" onClick={resetForm}>Cancel</Button>

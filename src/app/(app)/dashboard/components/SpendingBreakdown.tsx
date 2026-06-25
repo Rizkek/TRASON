@@ -12,7 +12,16 @@ interface Props {
   transactions: Transaction[];
 }
 
-const COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#14B8A6', '#6366F1'];
+const COLORS = [
+  '#4E4FEB', // Primary
+  '#7B7DF1', // Primary light
+  '#2C2DA5', // Primary dark
+  '#A8A9F7', // Primary lighter
+  '#10B981', // Success
+  '#F59E0B', // Warning
+  '#EF4444', // Danger
+  '#8B5CF6'  // Purple
+];
 
 export const SpendingBreakdown = ({ transactions }: Props) => {
   const { t } = useTranslation();
@@ -22,7 +31,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
   React.useEffect(() => { setIsMounted(true); }, []);
 
   const chartData = useMemo(() => {
-    const categoryTotals: Record<string, number> = {};
+    const categoryData: Record<string, { value: number, color?: string }> = {};
     let totalExpense = 0;
 
     transactions.forEach(t => {
@@ -30,14 +39,19 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
         totalExpense += t.amount;
         const cat = Array.isArray(t.categories) ? t.categories[0] : (t.categories as any);
         const catName = cat?.name || 'Uncategorized';
-        categoryTotals[catName] = (categoryTotals[catName] || 0) + t.amount;
+        
+        if (!categoryData[catName]) {
+          categoryData[catName] = { value: 0, color: cat?.color };
+        }
+        categoryData[catName].value += t.amount;
       }
     });
 
-    const data = Object.keys(categoryTotals).map((key, index) => ({
+    const data = Object.keys(categoryData).map((key, index) => ({
       name: key,
-      value: categoryTotals[key],
-      color: COLORS[index % COLORS.length]
+      value: categoryData[key].value,
+      // Use category color if exists, else fallback to COLORS palette
+      color: categoryData[key].color || COLORS[index % COLORS.length]
     })).sort((a, b) => b.value - a.value);
 
     return { data, totalExpense };
@@ -86,8 +100,8 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
                   data={chartData.data}
                   cx="50%"
                   cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
+                  innerRadius="60%"
+                  outerRadius="80%"
                   paddingAngle={5}
                   dataKey="value"
                   stroke="none"

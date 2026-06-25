@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal } from '@/components';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useCategory } from '@/hooks/useCategory';
@@ -28,7 +28,7 @@ export default function SubscriptionsPage() {
   const { t } = useTranslation();
   const { currency, locale, timezone } = useUserPreferences();
   
-  const { subscriptions, isLoading: isSubscriptionsLoading, createSubscription, updateSubscription, deleteSubscription } = useSubscription();
+  const { subscriptions, isLoading: isSubscriptionsLoading, createSubscription, updateSubscription, deleteSubscription, markAsPaid, cancelSubscription } = useSubscription();
   const { categories } = useCategory();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -154,20 +154,20 @@ export default function SubscriptionsPage() {
       <div className="space-y-xl animate-fade-in">
         
         <Link href="/finance" className="flex items-center gap-sm text-xs font-bold text-gray-light hover:text-white uppercase tracking-widest transition-colors w-fit">
-          <ArrowLeft size={14} /> Back to Finance
+          <ArrowLeft size={14} /> {t('finance.backToFinance') || 'Back to Finance'}
         </Link>
 
         <div className="flex items-start justify-between flex-wrap gap-md">
           <div className="space-y-sm">
-            <h1 className="text-display font-serif text-gradient">Subscriptions</h1>
+            <h1 className="text-display font-serif text-gradient">{t('finance.subscriptions') || 'Subscriptions'}</h1>
             <p className="text-subtext flex items-center gap-sm">
               <CreditCard size={14} className="text-primary" />
-              Manage your recurring payments.
+              {t('finance.manageSubscriptions') || 'Manage your recurring payments.'}
             </p>
           </div>
           <div className="hidden md:flex gap-md">
             <Button variant="primary" size="md" onClick={openAddModal} leftIcon={<Plus size={18} />}>
-              Add Subscription
+              {t('finance.addSubscription') || 'Add Subscription'}
             </Button>
           </div>
         </div>
@@ -176,7 +176,7 @@ export default function SubscriptionsPage() {
           <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all" />
           <div className="flex items-center gap-xs mb-md text-gray-light">
              <Repeat size={16} className="text-primary" />
-             <p className="text-xs font-bold uppercase tracking-widest">Estimated Monthly Cost</p>
+             <p className="text-xs font-bold uppercase tracking-widest">{t('finance.estimatedMonthlyCost') || 'Estimated Monthly Cost'}</p>
           </div>
           <div className="flex items-end justify-between">
             <p className="text-4xl font-bold text-white">{formatCurrency(totalMonthlyCost, currency, locale)}</p>
@@ -188,10 +188,10 @@ export default function SubscriptionsPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-black/[0.02] dark:bg-white/[0.02] border-b border-black/[0.05] dark:border-white/[0.05]">
-                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">Service</th>
-                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">Next Billing</th>
-                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">Cycle</th>
-                  <th className="px-xl py-lg text-right text-[10px] font-bold text-gray-light tracking-widest uppercase">Amount</th>
+                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.service') || 'Service'}</th>
+                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.nextBilling') || 'Next Billing'}</th>
+                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.cycle') || 'Cycle'}</th>
+                  <th className="px-xl py-lg text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.amount') || 'Amount'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white divide-opacity-[0.03]">
@@ -225,10 +225,25 @@ export default function SubscriptionsPage() {
                           {s.billing_cycle}
                         </Badge>
                       </td>
-                      <td className="px-xl py-xl text-right">
-                        <p className="text-sm font-bold text-soft-cream">
-                          {formatCurrency(s.amount, s.currency, locale)}
-                        </p>
+                      <td className="px-xl py-xl">
+                        <div className="flex items-center justify-end gap-md">
+                          <p className="text-sm font-bold text-soft-cream">
+                            {formatCurrency(s.amount, s.currency, locale)}
+                          </p>
+                          {s.is_active && (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={(e) => { 
+                                e.stopPropagation(); 
+                                markAsPaid(s); 
+                              }}
+                              className="whitespace-nowrap"
+                            >
+                              {t('finance.markAsPaid') || 'Mark as Paid'}
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -237,8 +252,8 @@ export default function SubscriptionsPage() {
                     <td colSpan={4} className="py-2xl text-center">
                       <div className="flex flex-col items-center justify-center opacity-50">
                         <Sparkles size={32} className="text-gray-light mb-md" />
-                        <p className="text-sm text-soft-cream">No subscriptions yet</p>
-                        <p className="text-xs text-gray-light">Track your recurring payments here.</p>
+                        <p className="text-sm text-soft-cream">{t('finance.noSubscriptions') || 'No subscriptions yet'}</p>
+                        <p className="text-xs text-gray-light">{t('finance.trackSubscriptions') || 'Track your recurring payments here.'}</p>
                       </div>
                     </td>
                   </tr>
@@ -263,12 +278,12 @@ export default function SubscriptionsPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingSub ? 'Edit Subscription' : 'Add Subscription'}
+        title={editingSub ? (t('finance.editSubscription') || 'Edit Subscription') : (t('finance.addSubscription') || 'Add Subscription')}
         footer={
           <div className="flex gap-md justify-end">
-            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)} disabled={isSaving}>Cancel</Button>
+            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)} disabled={isSaving}>{t('common.cancel') || 'Cancel'}</Button>
             <Button variant="primary" onClick={handleSave} disabled={isSaving} className="w-full">
-              {isSaving ? 'Saving...' : 'Save Subscription'}
+              {isSaving ? (t('common.saving') || 'Saving...') : (t('finance.saveSubscription') || 'Save Subscription')}
             </Button>
           </div>
         }
@@ -341,7 +356,7 @@ export default function SubscriptionsPage() {
                       : 'border-black/5 dark:border-white/5 bg-gray-strong/40 text-gray-light hover:text-soft-cream'
                   }`}
                 >
-                  <span className="text-lg">{cat.icon}</span>
+                  <CategoryIcon name={cat.icon || 'ShoppingCart'} />
                   <span className="text-[10px] uppercase font-bold tracking-wider truncate w-full text-center">{cat.name}</span>
                 </button>
               ))}
@@ -360,13 +375,27 @@ export default function SubscriptionsPage() {
           </div>
 
           {editingSub && (
-            <button 
-              type="button"
-              onClick={() => setDeleteConfirmId(editingSub.id)}
-              className="w-full py-md text-danger text-[10px] font-bold uppercase tracking-widest border border-danger/20 hover:bg-danger/5 rounded-md transition-all"
-            >
-              DELETE THIS SUBSCRIPTION
-            </button>
+            <div className="flex flex-col gap-sm">
+              {editingSub.is_active && (
+                <button 
+                  type="button"
+                  onClick={async () => {
+                    await cancelSubscription(editingSub.id);
+                    setIsModalOpen(false);
+                  }}
+                  className="w-full py-md text-warning text-[10px] font-bold uppercase tracking-widest border border-warning/20 hover:bg-warning/5 rounded-md transition-all"
+                >
+                  {t('finance.cancelSubscription') || 'CANCEL SUBSCRIPTION'}
+                </button>
+              )}
+              <button 
+                type="button"
+                onClick={() => setDeleteConfirmId(editingSub.id)}
+                className="w-full py-md text-danger text-[10px] font-bold uppercase tracking-widest border border-danger/20 hover:bg-danger/5 rounded-md transition-all"
+              >
+                {t('finance.deleteSubscription') || 'DELETE THIS SUBSCRIPTION'}
+              </button>
+            </div>
           )}
         </div>
       </Modal>
@@ -374,10 +403,10 @@ export default function SubscriptionsPage() {
       <ConfirmModal
         isOpen={!!deleteConfirmId}
         onClose={() => setDeleteConfirmId(null)}
-        title="Delete Subscription?"
-        description="Are you sure you want to delete this subscription? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('finance.deleteSubscriptionTitle') || 'Delete Subscription?'}
+        description={t('finance.deleteSubscriptionDesc') || 'Are you sure you want to delete this subscription? This action cannot be undone.'}
+        confirmText={t('common.delete') || 'Delete'}
+        cancelText={t('common.cancel') || 'Cancel'}
         isDangerous={true}
         onConfirm={handleConfirmDelete}
       />

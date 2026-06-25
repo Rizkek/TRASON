@@ -8,6 +8,7 @@ import { useTransaction } from '@/hooks/useTransaction';
 import { useActivity } from '@/hooks/useActivity';
 import { useReminder } from '@/hooks/useReminder';
 import { useInvestment } from '@/hooks/useInvestment';
+import { useSubscription } from '@/hooks/useSubscription';
 import { InvestmentInsightResponse } from '@/services/finance/investmentService';
 import { getDateRange } from '@/libs/date';
 
@@ -21,7 +22,8 @@ import {
   RiNotification3Line as Bell, 
   RiLightbulbLine as Lightbulb, 
   RiTimeLine as Clock,
-  RiAddLine
+  RiAddLine,
+  RiErrorWarningLine
 } from 'react-icons/ri';
 
 // Extracted Components
@@ -72,6 +74,14 @@ export function DashboardClient() {
   const isCareerEnabled = module_features?.['career'] !== false;
   const isTimelineEnabled = module_features?.['timeline'] !== false;
   const isRemindersEnabled = module_features?.['reminders'] !== false;
+
+  const { subscriptions } = useSubscription();
+
+  const dueSubscriptions = useMemo(() => {
+    if (!subscriptions || subscriptions.length === 0) return [];
+    const today = new Date().toISOString().split('T')[0];
+    return subscriptions.filter(sub => sub.is_active && sub.next_billing_date <= today);
+  }, [subscriptions]);
 
   const greeting = useMemo(() => {
     const hours = new Date().getHours();
@@ -146,6 +156,31 @@ export function DashboardClient() {
             <Button variant="primary" size="sm" className="md:hidden px-3"><RiAddLine size={20} /></Button>
           </div>
         </Card>
+
+        {/* Due Subscriptions Alert */}
+        {isFinanceEnabled && dueSubscriptions.length > 0 && (
+          <div className="bg-warning/10 border border-warning/30 rounded-xl p-md flex items-start sm:items-center gap-md">
+            <div className="bg-warning/20 p-sm rounded-full text-warning shrink-0">
+              <RiErrorWarningLine size={20} />
+            </div>
+            <div className="flex-1">
+              <p className="text-warning text-sm font-bold">
+                You have {dueSubscriptions.length} subscription{dueSubscriptions.length > 1 ? 's' : ''} due for payment.
+              </p>
+              <p className="text-xs text-warning/80 mt-1">
+                {dueSubscriptions.map(s => s.name).join(', ')}
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => router.push('/finance/subscriptions')}
+              className="shrink-0 border-warning/30 text-warning hover:bg-warning/10"
+            >
+              Review
+            </Button>
+          </div>
+        )}
 
         {/* Life Score — Primary Intelligence Widget */}
         <LifeScoreCard />

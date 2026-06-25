@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal } from '@/components';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon } from '@/components';
 import { CategoryManagerModal } from './components/CategoryManagerModal';
 import { useAuthStore } from '@/store/authStore';
 import { useTransaction } from '@/hooks/useTransaction';
@@ -201,12 +201,19 @@ export default function FinancePage() {
       <Layout>
       <div className="space-y-xl animate-fade-in">
         <div className="flex items-start justify-between flex-wrap gap-md">
-          <div className="space-y-sm">
+          <div className="space-y-sm w-full md:w-auto flex-1">
             <h1 className="text-display font-serif text-gradient">{t('finance.title')}</h1>
             <p className="text-subtext flex items-center gap-sm">
               <Wallet size={14} className="text-primary" />
               {t('finance.subtitle')}
             </p>
+            <div className="md:hidden pt-sm">
+              <Link href="/finance/subscriptions">
+                <Button variant="outline" size="sm" leftIcon={<Calendar size={14} />} className="w-full justify-center">
+                  Subscriptions
+                </Button>
+              </Link>
+            </div>
           </div>
           <div className="hidden md:flex gap-md">
             <Link href="/finance/subscriptions">
@@ -488,7 +495,7 @@ export default function FinancePage() {
                       : 'border-black/5 dark:border-white/5 bg-gray-strong/40 text-gray-light hover:text-soft-cream hover:bg-black/5 dark:hover:bg-white/5'
                   }`}
                 >
-                  <span className="text-lg">{cat.icon}</span>
+                  <CategoryIcon name={cat.icon || 'ShoppingCart'} className="text-gray-light" />
                   <span className="text-[10px] uppercase font-bold tracking-wider truncate w-full text-center">{cat.name}</span>
                 </button>
               ))}
