@@ -27,10 +27,37 @@ export const useCategory = (type?: 'income' | 'expense') => {
     SWR_CONFIG_DASHBOARD
   );
 
+  const createCategory = async (category: Omit<Category, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
+    return await executeMutation(
+      categoryQueries.createCategory(category),
+      'useCategory.create',
+      { onSuccess: () => mutate() }
+    );
+  };
+
+  const updateCategory = async (id: string, updates: Partial<Omit<Category, 'id' | 'user_id' | 'created_at'>>) => {
+    return await executeMutation(
+      categoryQueries.updateCategory(id, updates),
+      'useCategory.update',
+      { onSuccess: () => mutate() }
+    );
+  };
+
+  const deleteCategory = async (id: string) => {
+    return await executeMutation(
+      categoryQueries.deleteCategory(id),
+      'useCategory.delete',
+      { onSuccess: () => mutate() }
+    );
+  };
+
   return {
     categories: data || [],
     isLoading,
     error: error as Error | null,
     mutate,
+    createCategory,
+    updateCategory,
+    deleteCategory,
   };
 };

@@ -44,6 +44,18 @@ export const categoryQueries = {
       });
   },
 
+  // Seed default categories
+  async seedDefaultCategories(categories: Omit<Category, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>[]) {
+    return withAuthQuery(async (userId) => {
+      const { data, error } = await supabase
+        .from('categories')
+        .insert(categories.map(c => ({ ...c, user_id: userId })))
+        .select();
+      if (error) throw error;
+      return data;
+    });
+  },
+
   // Update category
   async updateCategory(
     id: string,

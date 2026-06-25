@@ -39,6 +39,10 @@ const FinancialChart = dynamic(() => import('./components/FinancialChart').then(
   ssr: false,
   loading: () => <div className="h-64 w-full bg-slate-800 animate-pulse rounded-xl" />
 });
+const SpendingBreakdown = dynamic(() => import('./components/SpendingBreakdown').then(mod => mod.SpendingBreakdown), {
+  ssr: false,
+  loading: () => <div className="h-64 w-full bg-slate-800 animate-pulse rounded-xl" />
+});
 import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useCareer } from '@/hooks/useCareer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -148,10 +152,21 @@ export function DashboardClient() {
 
         {/* Financial Flow and Daily Tasks - Compact Grid */}
         {(isFinanceEnabled || (isTimelineEnabled && preferences?.module_features?.['timeline_daily_checklist'] !== false)) && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-md md:gap-xl">
-            {isFinanceEnabled && <FinancialChart transactions={transactions} />}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-md md:gap-xl">
+            {isFinanceEnabled && (
+              <>
+                <div className="lg:col-span-2">
+                  <FinancialChart transactions={transactions} />
+                </div>
+                <div>
+                  <SpendingBreakdown transactions={transactions} />
+                </div>
+              </>
+            )}
             {isTimelineEnabled && preferences?.module_features?.['timeline_daily_checklist'] !== false && (
-              <DailyTasksSummary />
+              <div className="lg:col-span-3">
+                <DailyTasksSummary />
+              </div>
             )}
           </div>
         )}

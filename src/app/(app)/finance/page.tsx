@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal } from '@/components';
+import { CategoryManagerModal } from './components/CategoryManagerModal';
 import { useAuthStore } from '@/store/authStore';
 import { useTransaction } from '@/hooks/useTransaction';
 import { useCategory } from '@/hooks/useCategory';
@@ -41,6 +43,7 @@ export default function FinancePage() {
   const { categories } = useCategory();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,6 +60,8 @@ export default function FinancePage() {
     date: getLocalISODate(new Date(), timezone),
     description: '',
     original_currency: currency || 'USD',
+    decision_notes: '',
+    expected_impact: '',
   });
 
   useEffect(() => {
@@ -98,6 +103,11 @@ export default function FinancePage() {
       original_amount: parseFloat(form.amount),
       original_currency: form.original_currency,
       exchange_rate_to_base: exchangeRate,
+      metadata: {
+        ...(editingTransaction?.metadata || {}),
+        decision_notes: form.decision_notes || undefined,
+        expected_impact: form.expected_impact || undefined,
+      }
     };
 
     try {
@@ -139,6 +149,8 @@ export default function FinancePage() {
       date: getLocalISODate(new Date(), timezone),
       description: '',
       original_currency: currency || 'USD',
+      decision_notes: '',
+      expected_impact: '',
     });
     setIsModalOpen(true);
   };
@@ -153,6 +165,8 @@ export default function FinancePage() {
       date: new Date(t.date).toISOString().split('T')[0],
       description: t.description || '',
       original_currency: t.original_currency || currency || 'USD',
+      decision_notes: (t.metadata?.decision_notes as string) || '',
+      expected_impact: (t.metadata?.expected_impact as string) || '',
     });
     setIsModalOpen(true);
   };
@@ -195,6 +209,11 @@ export default function FinancePage() {
             </p>
           </div>
           <div className="hidden md:flex gap-md">
+            <Link href="/finance/subscriptions">
+              <Button variant="outline" size="md" leftIcon={<Calendar size={18} />}>
+                Subscriptions
+              </Button>
+            </Link>
             <Button variant="primary" size="md" onClick={openAddModal} leftIcon={<Plus size={18} />}>
               {t('finance.newEntry')}
             </Button>
@@ -447,7 +466,16 @@ export default function FinancePage() {
           </div>
 
           <div className="space-y-sm">
-            <label className="text-[10px] font-bold text-gray-light tracking-widest block">CATEGORY</label>
+            <div className="flex justify-between items-center">
+              <label className="text-[10px] font-bold text-gray-light tracking-widest block">CATEGORY</label>
+              <button 
+                type="button" 
+                onClick={() => setIsCategoryManagerOpen(true)}
+                className="text-[10px] text-primary hover:underline font-bold uppercase tracking-widest"
+              >
+                Manage
+              </button>
+            </div>
             <div className="grid grid-cols-3 gap-sm">
               {categories.filter(c => c.type === form.type).map(cat => (
                 <button
@@ -471,11 +499,41 @@ export default function FinancePage() {
             <label className="text-[10px] font-bold text-gray-light tracking-widest block">DESCRIPTION / NOTES</label>
             <textarea
               placeholder="Context or tags..."
-              rows={4}
+              rows={2}
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
               className="w-full bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
+          </div>
+
+          <div className="bg-primary/5 border border-primary/10 rounded-lg p-md space-y-md">
+            <div className="flex items-center gap-sm text-primary">
+              <Sparkles size={16} />
+              <h4 className="text-sm font-bold">Financial Decision Journal</h4>
+            </div>
+            <p className="text-xs text-gray-light">Optional: Document the reasoning behind large or meaningful transactions.</p>
+            
+            <div className="space-y-sm">
+              <label className="text-[10px] font-bold text-gray-light tracking-widest block">WHY IS THIS IMPORTANT?</label>
+              <textarea
+                placeholder="e.g. Buying a new laptop for frontend development..."
+                rows={2}
+                value={form.decision_notes}
+                onChange={(e) => setForm(f => ({ ...f, decision_notes: e.target.value }))}
+                className="w-full bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md p-md text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              />
+            </div>
+
+            <div className="space-y-sm">
+              <label className="text-[10px] font-bold text-gray-light tracking-widest block">EXPECTED IMPACT</label>
+              <textarea
+                placeholder="e.g. Expected to increase my productivity by 20%..."
+                rows={2}
+                value={form.expected_impact}
+                onChange={(e) => setForm(f => ({ ...f, expected_impact: e.target.value }))}
+                className="w-full bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md p-md text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              />
+            </div>
           </div>
 
           {editingTransaction && (
@@ -499,6 +557,11 @@ export default function FinancePage() {
         cancelText={t('common.cancel')}
         isDangerous={true}
         onConfirm={handleConfirmDelete}
+      />
+      <CategoryManagerModal
+        isOpen={isCategoryManagerOpen}
+        onClose={() => setIsCategoryManagerOpen(false)}
+        typeFilter={form.type}
       />
       </Layout>
     </>

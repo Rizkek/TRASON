@@ -56,6 +56,7 @@ export interface Transaction {
   id: string;
   user_id: string;
   category_id: string | null;
+  goal_id?: string | null;
   title: string;
   description?: string;
   amount: number;
@@ -65,7 +66,7 @@ export interface Transaction {
   payment_method?: string;
   receipt_image_url?: string;
   tags?: string[];
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, unknown>; // Will store decision_notes, expected_impact, timeline_event_id, etc.
   original_amount?: number;
   original_currency?: string;
   exchange_rate_to_base?: number;
@@ -74,6 +75,37 @@ export interface Transaction {
   deleted_at?: string;
   /** Populated by Supabase join when selecting categories:category_id(...) — Supabase returns an array even for single-row joins */
   categories?: CategoryJoin[] | null;
+}
+
+export interface Subscription {
+  id: string;
+  user_id: string;
+  name: string;
+  amount: number;
+  currency: string;
+  billing_cycle: 'monthly' | 'yearly' | 'weekly';
+  next_billing_date: string;
+  category_id?: string | null;
+  is_active: boolean;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Goal {
+  id: string;
+  user_id: string;
+  title: string;
+  description?: string;
+  target_amount: number;
+  target_date?: string;
+  currency: string;
+  status: 'active' | 'completed' | 'cancelled';
+  icon?: string;
+  color?: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
 }
 
 export interface Activity {

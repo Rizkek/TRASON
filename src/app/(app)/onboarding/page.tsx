@@ -107,6 +107,29 @@ export default function OnboardingPage() {
         } as any);
       }
 
+      // Seed default categories if finance module is enabled
+      if (selectedModules['finance']) {
+        try {
+          const { categoryQueries } = await import('@/services/activity/categoryQueries');
+          const existing = await categoryQueries.getCategories();
+          if (!existing || existing.length === 0) {
+            await categoryQueries.seedDefaultCategories([
+              { name: 'Food & Dining', type: 'expense', icon: '🍔', is_default: true, sort_order: 1 },
+              { name: 'Transportation', type: 'expense', icon: '🚗', is_default: true, sort_order: 2 },
+              { name: 'Housing & Utilities', type: 'expense', icon: '🏠', is_default: true, sort_order: 3 },
+              { name: 'Subscriptions', type: 'expense', icon: '💳', is_default: true, sort_order: 4 },
+              { name: 'Shopping', type: 'expense', icon: '🛍️', is_default: true, sort_order: 5 },
+              { name: 'Health & Fitness', type: 'expense', icon: '💪', is_default: true, sort_order: 6 },
+              { name: 'Salary', type: 'income', icon: '💰', is_default: true, sort_order: 1 },
+              { name: 'Freelance', type: 'income', icon: '💻', is_default: true, sort_order: 2 },
+              { name: 'Investments', type: 'income', icon: '📈', is_default: true, sort_order: 3 },
+            ]);
+          }
+        } catch (err) {
+          console.error('Failed to seed categories:', err);
+        }
+      }
+
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Failed to complete onboarding. Please try again.');
