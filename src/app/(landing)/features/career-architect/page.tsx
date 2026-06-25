@@ -10,8 +10,8 @@ export default function CareerArchitectPage() {
   return (
     <div className="min-h-screen bg-warm-black text-soft-cream font-sans relative overflow-x-hidden">
       {/* Background Gradients */}
-      <div className="fixed top-[-20%] left-[-10%] w-[800px] h-[800px] bg-warm-gold/5 blur-[160px] rounded-full pointer-events-none" />
-      <div className="fixed bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-warm-gold/5 blur-[140px] rounded-full pointer-events-none" />
+      <div className="fixed top-[-20%] left-[-10%] w-[800px] h-[800px] bg-warm-gold/5 md:blur-[160px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
+      <div className="fixed bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-warm-gold/5 md:blur-[140px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
 
       <LandingNavbar />
 
@@ -38,7 +38,7 @@ export default function CareerArchitectPage() {
 
         {/* Complex UI Mockup Section */}
         <div className="relative z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-warm-gold/20 to-transparent blur-3xl opacity-30 rounded-[3rem]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-warm-gold/20 to-transparent md:blur-3xl opacity-30 rounded-[3rem]" style={{ transform: 'translateZ(0)' }} />
           <div className="relative bg-black/60 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-6 md:p-12 shadow-2xl overflow-hidden">
              
              {/* Mock Header */}
@@ -138,7 +138,7 @@ export default function CareerArchitectPage() {
                  </div>
                  {/* Card */}
                  <div className="bg-warm-gold/10 border border-warm-gold/30 rounded-2xl p-5 hover:border-warm-gold/50 transition-colors cursor-pointer group relative overflow-hidden">
-                   <div className="absolute top-0 right-0 w-16 h-16 bg-warm-gold/20 blur-xl rounded-full" />
+                   <div className="absolute top-0 right-0 w-16 h-16 bg-warm-gold/20 md:blur-xl rounded-full" style={{ transform: 'translateZ(0)' }} />
                    <div className="flex justify-between items-start mb-3 relative z-10">
                      <div className="w-10 h-10 rounded-lg bg-warm-gold/20 border border-warm-gold/30 flex items-center justify-center font-bold text-yellow-500 text-lg">
                        G
@@ -227,7 +227,7 @@ export default function CareerArchitectPage() {
 
         {/* CTA */}
         <div className="py-24 text-center space-y-8 bg-white/5 border border-white/5 rounded-[3rem] relative overflow-hidden">
-          <div className="absolute inset-0 bg-warm-gold/10 blur-[100px]" />
+          <div className="absolute inset-0 bg-warm-gold/10 md:blur-[100px]" style={{ transform: 'translateZ(0)' }} />
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">Build the career you deserve.</h2>
             <p className="text-gray-light max-w-xl mx-auto mb-10">

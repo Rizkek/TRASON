@@ -10,8 +10,8 @@ export default function SignalRemindersPage() {
   return (
     <div className="min-h-screen bg-warm-black text-soft-cream font-sans relative overflow-x-hidden">
       {/* Background Gradients */}
-      <div className="fixed top-[-20%] left-[50%] -translate-x-1/2 w-[800px] h-[800px] bg-warm-gold/5 blur-[160px] rounded-full pointer-events-none" />
-      <div className="fixed bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-yellow-500/5 blur-[140px] rounded-full pointer-events-none" />
+      <div className="fixed top-[-20%] left-[50%] -translate-x-1/2 w-[800px] h-[800px] bg-warm-gold/5 md:blur-[160px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
+      <div className="fixed bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-yellow-500/5 md:blur-[140px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
 
       <LandingNavbar />
 
@@ -38,7 +38,7 @@ export default function SignalRemindersPage() {
 
         {/* Complex UI Mockup Section */}
         <div className="relative z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-warm-gold/20 to-transparent blur-3xl opacity-30 rounded-[3rem]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-warm-gold/20 to-transparent md:blur-3xl opacity-30 rounded-[3rem]" style={{ transform: 'translateZ(0)' }} />
           <div className="relative bg-black/60 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-6 md:p-12 shadow-2xl overflow-hidden flex flex-col items-center">
              
              {/* Mock Header */}
@@ -135,7 +135,7 @@ export default function SignalRemindersPage() {
 
         {/* CTA */}
         <div className="py-24 text-center space-y-8 bg-white/5 border border-white/5 rounded-[3rem] relative overflow-hidden">
-          <div className="absolute inset-0 bg-warm-gold/10 blur-[100px]" />
+          <div className="absolute inset-0 bg-warm-gold/10 md:blur-[100px]" style={{ transform: 'translateZ(0)' }} />
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">Reclaim your focus.</h2>
             <p className="text-gray-light max-w-xl mx-auto mb-10">
