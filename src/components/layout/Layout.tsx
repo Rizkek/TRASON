@@ -12,6 +12,7 @@ import { useScheduleNotifications } from '@/hooks/useScheduleNotifications';
 import { ModuleId } from '@/modules/types';
 import { DEFAULT_MODULE_STATUS } from '@/modules/registry';
 import { FaDumbbell } from 'react-icons/fa6';
+import { WifiOff } from 'lucide-react';
 import {
   RiDashboardLine,
   RiWallet3Line,
@@ -73,6 +74,71 @@ function ReminderSchedulerInner() {
   return null;
 }
 
+/**
+ * useOnlineStatus — tracks browser online/offline state.
+ * Returns { isOnline, justReconnected } for UI feedback.
+ */
+function useOnlineStatus() {
+  const [isOnline, setIsOnline] = React.useState(true);
+  const [justReconnected, setJustReconnected] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setIsOnline(navigator.onLine);
+
+    const handleOnline = () => {
+      setIsOnline(true);
+      setJustReconnected(true);
+      // Auto-hide "back online" after 3s
+      setTimeout(() => setJustReconnected(false), 3000);
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      setJustReconnected(false);
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  return { isOnline, justReconnected };
+}
+
+/**
+ * OfflineBanner — subtle status bar matching TRASON's glass design.
+ * Shows when offline, confirms reconnection, auto-hides.
+ */
+function OfflineBanner() {
+  const { isOnline, justReconnected } = useOnlineStatus();
+
+  if (isOnline && !justReconnected) return null;
+
+  return (
+    <div
+      className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-sm px-lg py-sm animate-fade-in backdrop-blur-md border-b text-[10px] font-bold tracking-[0.15em] uppercase ${
+        justReconnected
+          ? 'bg-success/10 border-success/20 text-soft-cream'
+          : 'bg-warning/[0.08] border-warning/20 text-soft-cream'
+      }`}
+    >
+      {justReconnected ? (
+        <>
+          <span className="w-1.5 h-1.5 rounded-full bg-success shadow-[0_0_6px_rgba(16,185,129,0.8)] animate-pulse" />
+          <span className="text-success/90">Connection restored</span>
+        </>
+      ) : (
+        <>
+          <WifiOff size={11} className="text-warning opacity-80" />
+          <span className="text-warning/90">Offline — changes will sync when connected</span>
+        </>
+      )}
+    </div>
+  );
+}
 
 
 interface LayoutProps {
@@ -150,6 +216,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="flex h-screen bg-warm-black text-soft-cream font-sans">
+      <OfflineBanner />
 
       {/* ── Desktop Sidebar (md+) — hidden on mobile ─────────────────── */}
       <aside className="hidden md:flex fixed inset-y-0 left-0 z-50 w-72 shrink-0 bg-gray-strong border-r border-soft-cream/10 flex-col glass h-screen overflow-y-auto">

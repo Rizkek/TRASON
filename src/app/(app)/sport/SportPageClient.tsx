@@ -215,16 +215,20 @@ export const SportPageClient: React.FC = () => {
         </Button>
       </div>
 
-      <QuickLogModal
-        isOpen={isLogModalOpen}
-        onClose={() => setIsLogModalOpen(false)}
-        onSubmit={handleQuickLog}
-      />
-      <CreatePlanModal
-        isOpen={isCreatePlanModalOpen}
-        onClose={() => setIsCreatePlanModalOpen(false)}
-        onSubmit={handleCreatePlan}
-      />
+      {isLogModalOpen && (
+        <QuickLogModal
+          isOpen={isLogModalOpen}
+          onClose={() => setIsLogModalOpen(false)}
+          onSubmit={handleQuickLog}
+        />
+      )}
+      {isCreatePlanModalOpen && (
+        <CreatePlanModal
+          isOpen={isCreatePlanModalOpen}
+          onClose={() => setIsCreatePlanModalOpen(false)}
+          onSubmit={handleCreatePlan}
+        />
+      )}
     </>
   );
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import useSWR from 'swr';
+import useSWR, { mutate as globalMutate } from 'swr';
 import { categoryQueries } from '@/services/activity/categoryQueries';
 import { Category } from '@/types/database';
 import { CACHE_KEYS } from '@/libs/cacheKeys';
@@ -27,11 +27,18 @@ export const useCategory = (type?: 'income' | 'expense') => {
     SWR_CONFIG_DASHBOARD
   );
 
+  const invalidateCategories = () => {
+    // Invalidate all category cache keys globally
+    globalMutate((k: any) => Array.isArray(k) && k[0] === 'categories');
+    // Also invalidate transactions because they join with categories
+    globalMutate((k: any) => Array.isArray(k) && k[0] === 'transactions');
+  };
+
   const createCategory = async (category: Omit<Category, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
     return await executeMutation(
       categoryQueries.createCategory(category),
       'useCategory.create',
-      { onSuccess: () => mutate() }
+      { onSuccess: invalidateCategories }
     );
   };
 
@@ -39,7 +46,7 @@ export const useCategory = (type?: 'income' | 'expense') => {
     return await executeMutation(
       categoryQueries.updateCategory(id, updates),
       'useCategory.update',
-      { onSuccess: () => mutate() }
+      { onSuccess: invalidateCategories }
     );
   };
 
@@ -47,7 +54,7 @@ export const useCategory = (type?: 'income' | 'expense') => {
     return await executeMutation(
       categoryQueries.deleteCategory(id),
       'useCategory.delete',
-      { onSuccess: () => mutate() }
+      { onSuccess: invalidateCategories }
     );
   };
 

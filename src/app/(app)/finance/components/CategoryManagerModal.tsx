@@ -25,6 +25,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
   });
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const filteredCategories = categories.filter(c => c.type === typeFilter);
 
@@ -42,6 +43,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
       return;
     }
     
+    setIsSaving(true);
     try {
       if (editingId) {
         await updateCategory(editingId, {
@@ -60,6 +62,8 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
       resetForm();
     } catch (err: any) {
       setError(err.message || 'Failed to save category');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -169,8 +173,10 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
             )}
             
             <div className="flex justify-end gap-sm mt-md">
-              <Button variant="ghost" size="sm" onClick={resetForm}>Cancel</Button>
-              <Button variant="primary" size="sm" onClick={handleSave}>Save Category</Button>
+              <Button variant="ghost" size="sm" onClick={resetForm} disabled={isSaving}>Cancel</Button>
+              <Button variant="primary" size="sm" onClick={handleSave} disabled={isSaving}>
+                {isSaving ? 'Saving...' : 'Save Category'}
+              </Button>
             </div>
           </div>
         )}

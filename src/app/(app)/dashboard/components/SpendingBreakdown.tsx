@@ -1,26 +1,29 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
 import { Card } from '@/components';
 import { Transaction } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { formatCurrency } from '@/libs/format';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface Props {
   transactions: Transaction[];
 }
 
 const COLORS = [
-  '#4E4FEB', // Primary
-  '#7B7DF1', // Primary light
-  '#2C2DA5', // Primary dark
-  '#A8A9F7', // Primary lighter
-  '#10B981', // Success
-  '#F59E0B', // Warning
-  '#EF4444', // Danger
-  '#8B5CF6'  // Purple
+  '#F4C95D', // Gold/Primary
+  '#10B981', // Emerald/Success
+  '#3B82F6', // Blue/Info
+  '#8B5CF6', // Purple/Timeline
+  '#EC4899', // Pink/Insights
+  '#F59E0B', // Amber/Warning
+  '#EF4444', // Red/Danger
+  '#14B8A6'  // Teal
 ];
 
 export const SpendingBreakdown = ({ transactions }: Props) => {
@@ -41,7 +44,10 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
         const catName = cat?.name || 'Uncategorized';
         
         if (!categoryData[catName]) {
-          categoryData[catName] = { value: 0, color: cat?.color };
+          categoryData[catName] = { 
+            value: 0, 
+            color: cat?.color || (catName === 'Uncategorized' ? '#64748B' : undefined) 
+          };
         }
         categoryData[catName].value += t.amount;
       }
@@ -50,34 +56,53 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
     const data = Object.keys(categoryData).map((key, index) => ({
       name: key,
       value: categoryData[key].value,
-      // Use category color if exists, else fallback to COLORS palette
       color: categoryData[key].color || COLORS[index % COLORS.length]
     })).sort((a, b) => b.value - a.value);
 
     return { data, totalExpense };
   }, [transactions]);
 
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      const percentage = chartData.totalExpense > 0 ? ((data.value / chartData.totalExpense) * 100).toFixed(1) : '0';
-      return (
-        <div className="bg-black/90 border border-black/10 dark:border-white/10 p-md rounded-xl shadow-2xl backdrop-blur-xl">
-          <div className="flex items-center gap-md justify-between">
-            <span style={{ color: data.color }} className="text-sm font-bold">
-              {data.name}
-            </span>
-            <span className="text-white text-sm font-bold">
-              {percentage}%
-            </span>
-          </div>
-          <p className="text-gray-light text-xs mt-1">
-            {formatCurrency(data.value, currency, locale)}
-          </p>
-        </div>
-      );
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '70%',
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        titleColor: '#FFFFFF',
+        bodyColor: '#94A3B8',
+        bodyFont: { size: 12 },
+        titleFont: { size: 14, weight: 'bold' as const },
+        padding: 12,
+        cornerRadius: 12,
+        boxPadding: 6,
+        usePointStyle: true,
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        callbacks: {
+          label: (context: any) => {
+            const val = context.raw || 0;
+            const percentage = chartData.totalExpense > 0 ? ((val / chartData.totalExpense) * 100).toFixed(1) : '0';
+            return ` ${percentage}% (${formatCurrency(val, currency, locale)})`;
+          }
+        }
+      }
     }
-    return null;
+  };
+
+  const doughnutData = {
+    labels: chartData.data.map(d => d.name),
+    datasets: [
+      {
+        data: chartData.data.map(d => d.value),
+        backgroundColor: chartData.data.map(d => d.color),
+        borderWidth: 0,
+        hoverOffset: 4
+      }
+    ]
   };
 
   return (
@@ -93,26 +118,8 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
         <div className="w-full h-48 bg-white/[0.02] rounded-lg animate-pulse" />
       ) : chartData.data.length > 0 ? (
         <div className="flex flex-col md:flex-row items-center gap-xl h-[200px] md:h-[240px]">
-          <div className="w-1/2 h-full relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={chartData.data}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius="60%"
-                  outerRadius="80%"
-                  paddingAngle={5}
-                  dataKey="value"
-                  stroke="none"
-                >
-                  {chartData.data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <RechartsTooltip content={<CustomTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="w-[45%] md:w-[40%] h-full relative shrink-0">
+            <Doughnut data={doughnutData} options={options} />
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span className="text-[10px] text-gray-light uppercase tracking-widest">Total</span>
               <span className="text-sm font-bold text-white">
@@ -120,7 +127,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
               </span>
             </div>
           </div>
-          <div className="w-1/2 h-full overflow-y-auto pr-2 custom-scrollbar">
+          <div className="flex-1 h-full overflow-y-auto pr-2 custom-scrollbar">
             <div className="space-y-sm">
               {chartData.data.map((item, i) => (
                 <div key={i} className="flex justify-between items-center text-sm">

@@ -139,6 +139,13 @@ export default function FinancePage() {
     }
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingTransaction(null);
+    setFormErrors({});
+    setError(null);
+  };
+
   const openAddModal = () => {
     setEditingTransaction(null);
     setForm({
@@ -384,19 +391,20 @@ export default function FinancePage() {
         </Button>
       </div>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingTransaction ? t('finance.modal.editTitle') : t('finance.modal.addTitle')}
-        footer={
-          <div className="flex gap-md justify-end">
-            <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)} disabled={isSaving}>{t('common.cancel')}</Button>
-            <Button variant="primary" onClick={handleSave} disabled={isSaving} className="w-full">
-              {isSaving ? t('finance.modal.savingBtn') : t('finance.modal.saveBtn')}
-            </Button>
-          </div>
-        }
-      >
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          title={editingTransaction ? t('finance.modal.editTitle') : t('finance.modal.addTitle')}
+          footer={
+            <div className="flex gap-md justify-end">
+              <Button variant="ghost" size="md" onClick={handleCloseModal} disabled={isSaving}>{t('common.cancel')}</Button>
+              <Button variant="primary" onClick={handleSave} disabled={isSaving} className="w-full">
+                {isSaving ? t('finance.modal.savingBtn') : t('finance.modal.saveBtn')}
+              </Button>
+            </div>
+          }
+        >
         <div className="space-y-xl">
           <div className="flex bg-gray-strong p-1 rounded-md border border-black/[0.05] dark:border-white/[0.05]">
             {(['income', 'expense'] as const).map((type) => (
@@ -514,14 +522,11 @@ export default function FinancePage() {
           </div>
 
           <div className="bg-primary/5 border border-primary/10 rounded-lg p-md space-y-md">
-            <div className="flex items-center gap-sm text-primary">
-              <Sparkles size={16} />
-              <h4 className="text-sm font-bold">Financial Decision Journal</h4>
-            </div>
-            <p className="text-xs text-gray-light">Optional: Document the reasoning behind large or meaningful transactions.</p>
+            <h4 className="text-sm font-bold text-primary">Transaction Reflection</h4>
+            <p className="text-xs text-gray-light">Optional: Document your reasoning for this transaction to evaluate your financial habits later.</p>
             
             <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">WHY IS THIS IMPORTANT?</label>
+              <label className="text-[10px] font-bold text-gray-light tracking-widest block">REASONING & CONTEXT</label>
               <textarea
                 placeholder="e.g. Buying a new laptop for frontend development..."
                 rows={2}
@@ -532,7 +537,7 @@ export default function FinancePage() {
             </div>
 
             <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">EXPECTED IMPACT</label>
+              <label className="text-[10px] font-bold text-gray-light tracking-widest block">EXPECTED VALUE / ROI</label>
               <textarea
                 placeholder="e.g. Expected to increase my productivity by 20%..."
                 rows={2}
@@ -554,6 +559,7 @@ export default function FinancePage() {
           )}
         </div>
       </Modal>
+      )}
 
       <ConfirmModal
         isOpen={!!deleteConfirmId}
@@ -565,11 +571,13 @@ export default function FinancePage() {
         isDangerous={true}
         onConfirm={handleConfirmDelete}
       />
-      <CategoryManagerModal
-        isOpen={isCategoryManagerOpen}
-        onClose={() => setIsCategoryManagerOpen(false)}
-        typeFilter={form.type}
-      />
+      {isCategoryManagerOpen && (
+        <CategoryManagerModal
+          isOpen={isCategoryManagerOpen}
+          onClose={() => setIsCategoryManagerOpen(false)}
+          typeFilter={form.type}
+        />
+      )}
       </Layout>
     </>
   );

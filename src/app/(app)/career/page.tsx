@@ -19,8 +19,13 @@ import {
   MapPin,
   Clock,
   GraduationCap,
-  Rocket
+  Rocket,
+  BookOpen,
+  Star,
+  Target,
+  MessageSquare
 } from 'lucide-react';
+import { useInterviewJournal } from '@/hooks/useInterviewJournal';
 
 const FILTER_TABS = [
   { id: 'all',      labelKey: 'all' },
@@ -89,6 +94,23 @@ export default function CareerPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [pageError, setPageError] = useState<string | null>(null);
 
+  const [mainTab, setMainTab] = useState<'applications' | 'journal'>('applications');
+
+  const { journals, isLoading: journalLoading, createJournal, updateJournal, deleteJournal } = useInterviewJournal();
+  const [isJournalModalOpen, setIsJournalModalOpen] = useState(false);
+  const [editingJournal, setEditingJournal] = useState<any>(null);
+  const [journalForm, setJournalForm] = useState<any>({
+    company_name: '',
+    role_title: '',
+    interview_date: getLocalISODate(),
+    questions_asked: '',
+    difficulty: 'medium',
+    outcome: 'pending',
+    lessons_learned: '',
+    notes: ''
+  });
+  const [deleteJournalConfirmId, setDeleteJournalConfirmId] = useState<string | null>(null);
+
   // Status and Type configurations using translation hook
   const STATUS_CONFIG: Record<
     CareerApplication['status'],
@@ -147,6 +169,36 @@ export default function CareerPage() {
     setIsModalOpen(true);
   }, []);
 
+  const openAddJournalModal = useCallback(() => {
+    setEditingJournal(null);
+    setJournalForm({
+      company_name: '',
+      role_title: '',
+      interview_date: getLocalISODate(),
+      questions_asked: '',
+      difficulty: 'medium',
+      outcome: 'pending',
+      lessons_learned: '',
+      notes: ''
+    });
+    setIsJournalModalOpen(true);
+  }, []);
+
+  const openEditJournalModal = useCallback((j: any) => {
+    setEditingJournal(j);
+    setJournalForm({
+      company_name: j.company_name,
+      role_title: j.role_title,
+      interview_date: j.interview_date,
+      questions_asked: j.questions_asked || '',
+      difficulty: j.difficulty || 'medium',
+      outcome: j.outcome || 'pending',
+      lessons_learned: j.lessons_learned || '',
+      notes: j.notes || ''
+    });
+    setIsJournalModalOpen(true);
+  }, []);
+
   const handleSave = async () => {
     const errors = validateCareerForm(form);
     if (Object.keys(errors).length > 0) {
@@ -195,6 +247,45 @@ export default function CareerPage() {
     }
   };
 
+  const handleSaveJournal = async () => {
+    setIsSaving(true);
+    setPageError(null);
+    try {
+      const payload = {
+        company_name: journalForm.company_name.trim(),
+        role_title: journalForm.role_title.trim(),
+        interview_date: journalForm.interview_date,
+        questions_asked: journalForm.questions_asked?.trim() || undefined,
+        difficulty: journalForm.difficulty,
+        outcome: journalForm.outcome,
+        lessons_learned: journalForm.lessons_learned?.trim() || undefined,
+        notes: journalForm.notes?.trim() || undefined
+      };
+
+      if (editingJournal) {
+        await updateJournal(editingJournal.id, payload);
+      } else {
+        await createJournal(payload);
+      }
+      setIsJournalModalOpen(false);
+    } catch (err) {
+      setPageError(sanitizeError(err));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleConfirmDeleteJournal = async () => {
+    if (!deleteJournalConfirmId) return;
+    try {
+      await deleteJournal(deleteJournalConfirmId);
+    } catch (err) {
+      setPageError(sanitizeError(err));
+    } finally {
+      setDeleteJournalConfirmId(null);
+    }
+  };
+
   if (authLoading) {
     return (
       <Layout>
@@ -219,9 +310,16 @@ export default function CareerPage() {
               <p className="text-gray-light font-light">{t('career_page.desc')}</p>
             </div>
             <div className="hidden md:block">
-              <Button variant="primary" onClick={openAddModal} className="rounded-full px-xl" aria-label="Add new application">
+              <Button 
+                variant="primary" 
+                onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal} 
+                className="rounded-full px-xl" 
+                aria-label={mainTab === 'applications' ? "Add new application" : "Add new journal entry"}
+              >
                 <Plus size={18} className="mr-2" />
-                {t('career_page.new_application')}
+                {mainTab === 'applications' 
+                  ? t('career_page.new_application') 
+                  : (t('career_page.interview_journal.new_entry') as string) || 'New Entry'}
               </Button>
             </div>
           </div>
@@ -268,7 +366,7 @@ export default function CareerPage() {
                   <>
                     <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
                     <div className="text-center shrink-0 snap-center">
-                      <p className="text-md md:text-lg font-bold text-white">{analytics.avgDaysToInterview}h</p>
+                      <p className="text-md md:text-lg font-bold text-white">{analytics.avgDaysToInterview}d</p>
                       <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">Avg. to Interview</p>
                       <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">Avg.</p>
                     </div>
@@ -287,7 +385,33 @@ export default function CareerPage() {
             </Card>
           )}
 
-          {/* Filter Tabs */}
+          {/* Main Tabs */}
+          <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-fit gap-0.5">
+            <button
+              onClick={() => setMainTab('applications')}
+              className={`px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                mainTab === 'applications'
+                  ? 'bg-warm-gold text-warm-black shadow-md'
+                  : 'text-gray-light hover:text-soft-cream'
+              }`}
+            >
+              {t('career_page.tabs.all').replace('All', 'Applications').replace('Semua', 'Lamaran')}
+            </button>
+            <button
+              onClick={() => setMainTab('journal')}
+              className={`px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                mainTab === 'journal'
+                  ? 'bg-warm-gold text-warm-black shadow-md'
+                  : 'text-gray-light hover:text-soft-cream'
+              }`}
+            >
+              {(t('career_page.interview_journal.tab') as string) || 'Journal'}
+            </button>
+          </div>
+
+          {mainTab === 'applications' ? (
+            <>
+              {/* Filter Tabs */}
           <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-full gap-0.5" role="tablist" aria-label="Application filter">
             {FILTER_TABS.map((tab) => (
               <button
@@ -416,9 +540,110 @@ export default function CareerPage() {
               })}
             </div>
           )}
+          </>
+          ) : (
+          <>
+            {/* Journal UI */}
+            {journalLoading ? (
+              <div className="flex justify-center py-2xl"><Loading /></div>
+            ) : journals.length === 0 ? (
+              <div className="glass-card p-4xl text-center space-y-md">
+                <BookOpen size={48} className="mx-auto text-deep-sage opacity-20" />
+                <p className="text-gray-light font-light italic">
+                  {(t('career_page.interview_journal.empty') as string) || 'No interview notes yet.'}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-md">
+                {journals.map((journal: any) => {
+                  const difficultyColor = 
+                    journal.difficulty === 'hard' ? 'text-expense' : 
+                    journal.difficulty === 'medium' ? 'text-amber-400' : 'text-income';
+                  
+                  return (
+                    <div
+                      key={journal.id}
+                      className="glass-card p-xl flex flex-col gap-md group transition-all hover:border-black/10 dark:border-white/10"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-lg font-bold text-soft-cream">{journal.company_name}</h3>
+                          <p className="text-sm text-gray-light">{journal.role_title}</p>
+                          <div className="flex flex-wrap items-center gap-md text-[10px] text-gray-light opacity-80 mt-1">
+                            <span className="flex items-center gap-1">
+                              <Calendar size={10} />
+                              {new Date(journal.interview_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                            </span>
+                            <span className={`flex items-center gap-1 ${difficultyColor} opacity-100 font-bold`}>
+                              <Target size={10} />
+                              {(t(`career_page.interview_journal.options.difficulty_${journal.difficulty}`) as string) || journal.difficulty}
+                            </span>
+                            <Badge variant={
+                              journal.outcome === 'pass' ? 'success' : 
+                              journal.outcome === 'fail' ? 'expense' : 'default'
+                            }>
+                              {(t(`career_page.interview_journal.options.outcome_${journal.outcome}`) as string) || journal.outcome}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        {/* Right: Actions */}
+                        <div className="flex items-center gap-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => openEditJournalModal(journal)}
+                            className="px-md py-2 flex items-center justify-center text-xs font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 rounded-md transition-all"
+                            aria-label={`Edit journal entry`}
+                          >
+                            {t('career_page.edit')}
+                          </button>
+                          <button
+                            onClick={() => setDeleteJournalConfirmId(journal.id)}
+                            className="p-2 flex items-center justify-center text-gray-light hover:text-expense transition-colors rounded-md hover:bg-black/5 dark:bg-white/5"
+                            aria-label={`Delete journal entry`}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {journal.questions_asked && (
+                        <div className="bg-black/5 dark:bg-white/5 p-md rounded-md">
+                          <p className="text-[10px] font-bold text-gray-light mb-1 flex items-center gap-1">
+                            <MessageSquare size={10} />
+                            {(t('career_page.interview_journal.questions') as string) || 'Questions Asked'}
+                          </p>
+                          <p className="text-sm text-soft-cream whitespace-pre-wrap font-light">{journal.questions_asked}</p>
+                        </div>
+                      )}
+
+                      {journal.lessons_learned && (
+                        <div className="bg-primary/5 p-md rounded-md border border-primary/10">
+                          <p className="text-[10px] font-bold text-primary mb-1 flex items-center gap-1">
+                            <Star size={10} />
+                            {(t('career_page.interview_journal.lessons') as string) || 'Lessons Learned'}
+                          </p>
+                          <p className="text-sm text-soft-cream whitespace-pre-wrap font-light">{journal.lessons_learned}</p>
+                        </div>
+                      )}
+                      
+                      {journal.notes && (
+                        <div>
+                          <p className="text-xs text-gray-light italic opacity-80 whitespace-pre-wrap">
+                            {journal.notes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
+          )}
         </div>
 
         {/* Add / Edit Modal */}
+        {isModalOpen && (
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -557,6 +782,7 @@ export default function CareerPage() {
             />
           </div>
         </Modal>
+        )}
 
         <ConfirmModal
           isOpen={!!deleteConfirmId}
@@ -567,14 +793,139 @@ export default function CareerPage() {
           isDangerous={true}
           onConfirm={handleConfirmDelete}
         />
+
+        {/* Add / Edit Journal Modal */}
+        {isJournalModalOpen && (
+        <Modal
+          isOpen={isJournalModalOpen}
+          onClose={() => setIsJournalModalOpen(false)}
+          title={(t('career_page.interview_journal.new_entry_modal') as string) || 'Interview Journal'}
+          footer={
+            <div className="flex gap-md justify-end">
+              <Button variant="ghost" size="md" onClick={() => setIsJournalModalOpen(false)}>{t('investment_page.cancel_upper')}</Button>
+              <Button variant="primary" size="md" onClick={handleSaveJournal} disabled={isSaving}>
+                {isSaving ? t('investment_page.saving_upper') : ((t('career_page.interview_journal.save') as string) || 'Save')}
+              </Button>
+            </div>
+          }
+        >
+          <div className="space-y-xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+              <Input
+                label={(t('career_page.interview_journal.company') as string) || 'Company'}
+                value={journalForm.company_name}
+                onChange={(e) => setJournalForm((f: any) => ({ ...f, company_name: e.target.value }))}
+                autoFocus
+              />
+              <Input
+                label={(t('career_page.interview_journal.role') as string) || 'Role'}
+                value={journalForm.role_title}
+                onChange={(e) => setJournalForm((f: any) => ({ ...f, role_title: e.target.value }))}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
+              <div>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block">
+                  {(t('career_page.interview_journal.date') as string) || 'Interview Date'}
+                </label>
+                <input
+                  type="date"
+                  value={journalForm.interview_date}
+                  onChange={(e) => setJournalForm((f: any) => ({ ...f, interview_date: e.target.value }))}
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block">
+                  {(t('career_page.interview_journal.difficulty') as string) || 'Difficulty'}
+                </label>
+                <select
+                  value={journalForm.difficulty}
+                  onChange={(e) => setJournalForm((f: any) => ({ ...f, difficulty: e.target.value }))}
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                >
+                  <option value="easy">{(t('career_page.interview_journal.options.difficulty_easy') as string) || 'Easy'}</option>
+                  <option value="medium">{(t('career_page.interview_journal.options.difficulty_medium') as string) || 'Medium'}</option>
+                  <option value="hard">{(t('career_page.interview_journal.options.difficulty_hard') as string) || 'Hard'}</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block">
+                  {(t('career_page.interview_journal.outcome') as string) || 'Outcome'}
+                </label>
+                <select
+                  value={journalForm.outcome}
+                  onChange={(e) => setJournalForm((f: any) => ({ ...f, outcome: e.target.value }))}
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                >
+                  <option value="pending">{(t('career_page.interview_journal.options.outcome_pending') as string) || 'Pending'}</option>
+                  <option value="pass">{(t('career_page.interview_journal.options.outcome_pass') as string) || 'Passed'}</option>
+                  <option value="fail">{(t('career_page.interview_journal.options.outcome_fail') as string) || 'Failed'}</option>
+                  <option value="unknown">{(t('career_page.interview_journal.options.outcome_unknown') as string) || 'Unknown'}</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold text-gray-light mb-1 block">
+                {(t('career_page.interview_journal.questions') as string) || 'Questions Asked'}
+              </label>
+              <textarea
+                value={journalForm.questions_asked}
+                onChange={(e) => setJournalForm((f: any) => ({ ...f, questions_asked: e.target.value }))}
+                placeholder={(t('career_page.interview_journal.questions_placeholder') as string) || 'What did they ask?'}
+                rows={4}
+                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold text-gray-light mb-1 block">
+                {(t('career_page.interview_journal.lessons') as string) || 'Lessons Learned'}
+              </label>
+              <textarea
+                value={journalForm.lessons_learned}
+                onChange={(e) => setJournalForm((f: any) => ({ ...f, lessons_learned: e.target.value }))}
+                placeholder={(t('career_page.interview_journal.lessons_placeholder') as string) || 'What would you do differently?'}
+                rows={3}
+                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold text-gray-light mb-1 block">
+                {(t('career_page.interview_journal.notes') as string) || 'Notes'}
+              </label>
+              <textarea
+                value={journalForm.notes}
+                onChange={(e) => setJournalForm((f: any) => ({ ...f, notes: e.target.value }))}
+                placeholder={(t('career_page.interview_journal.notes_placeholder') as string) || 'Additional context...'}
+                rows={2}
+                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              />
+            </div>
+          </div>
+        </Modal>
+        )}
+
+        <ConfirmModal
+          isOpen={!!deleteJournalConfirmId}
+          onClose={() => setDeleteJournalConfirmId(null)}
+          title={(t('career_page.interview_journal.remove_entry') as string) || 'Remove Entry'}
+          description={(t('career_page.interview_journal.remove_desc') as string) || 'Are you sure you want to remove this journal entry?'}
+          confirmText={(t('career_page.interview_journal.remove_btn') as string) || 'Remove'}
+          isDangerous={true}
+          onConfirm={handleConfirmDeleteJournal}
+        />
         
-        {/* Mobile-only FAB for Add Application */}
+        {/* Mobile-only FAB for Add */}
         <div className="md:hidden fixed bottom-24 right-4 z-40">
           <Button 
             variant="primary" 
-            onClick={openAddModal} 
+            onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal} 
             className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(78,79,235,0.4)]"
-            aria-label={t('career_page.new_application')}
+            aria-label={mainTab === 'applications' ? t('career_page.new_application') : 'New Journal Entry'}
           >
             <Plus size={24} />
           </Button>

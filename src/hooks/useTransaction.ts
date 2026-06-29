@@ -71,6 +71,8 @@ export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income'
                       { revalidate: true }
                     );
                   }));
+          // Force local re-fetch to replace optimistic data (which lacks joined categories) with real DB data
+          await mutate();
           return result;
             })(),
             'useTransaction.create', { onError: async (err) => { await mutate(); } }
@@ -103,6 +105,8 @@ export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income'
                       { revalidate: true }
                     );
                   }));
+          // Force local re-fetch to get real DB data with joins
+          await mutate();
           return result;
             })(),
             'useTransaction.update', { onError: async (err) => { await mutate(); } }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Layout, Card, Button, Input, Loading, Alert, ErrorAlert, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
@@ -8,7 +8,6 @@ import { User, supabase } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { userQueries } from '@/services/core/userQueries';
 import { sanitizeError, validateEmail } from '@/libs/validation';
-import { useModuleStatus } from '@/hooks/useModuleStatus';
 import { usePushNotification } from '@/hooks/usePushNotification';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 
@@ -22,7 +21,6 @@ import {
   Camera,
   Globe,
   Save,
-  Lock,
   Grid3X3,
   Wallet,
   TrendingUp,
@@ -84,79 +82,57 @@ const LANGUAGE_OPTIONS = [
   { value: 'es', label: 'Español' },
 ];
 
-const ModuleItem: React.FC<{
+/**
+ * ModuleItem — memoized to prevent re-render cascade.
+ * Receives toggle callbacks from parent (ModuleSettingsTab) so only
+ * ONE useUserPreferences() instance exists in the entire settings page.
+ */
+const ModuleItem = React.memo(function ModuleItem({
+  id,
+  isEnabled,
+  metadata,
+  moduleFeatures,
+  onToggle,
+  onSubToggle,
+  t,
+}: {
   id: ModuleId;
   isEnabled: boolean;
   metadata: any;
-  userId?: string;
+  moduleFeatures?: Record<string, boolean>;
+  onToggle: (id: ModuleId) => Promise<void>;
+  onSubToggle: (featureId: string) => Promise<void>;
   t: (key: string) => string;
-}> = ({ id, isEnabled, metadata, userId, t }) => {
-  const { toggle, isLoading: isHookLoading } = useModuleStatus(id, userId);
-  const { updatePreferences, isUpdating: isHookLoadingPrefs, ...preferences } = useUserPreferences();
+}) {
   const [isLocalLoading, setIsLocalLoading] = useState(false);
-  const setUser = useAuthStore((s) => s.setUser);
-  const user = useAuthStore((s) => s.user);
 
-  const handleToggle = async () => {
+  const handleToggle = useCallback(async () => {
     setIsLocalLoading(true);
     try {
-      await toggle();
+      await onToggle(id);
     } catch (err) {
       console.error(`Failed to toggle module ${id}:`, err);
     } finally {
       setIsLocalLoading(false);
     }
-  };
+  }, [id, onToggle]);
 
-  const handleSubToggle = async (featureId: string) => {
+  const handleSubToggle = useCallback(async (featureId: string) => {
+    setIsLocalLoading(true);
     try {
-      setIsLocalLoading(true);
-      
-      // Always fetch latest from Zustand store directly to avoid rapid-click closure stale state
-      const latestUserPrefs = Array.isArray((useAuthStore.getState().user as any)?.user_preferences)
-        ? (useAuthStore.getState().user as any)?.user_preferences[0]
-        : (useAuthStore.getState().user as any)?.user_preferences;
-        
-      const currentFeatures = latestUserPrefs?.module_features || preferences?.module_features || {};
-      const currentValue = currentFeatures[featureId] !== false; // default true
-      
-      const newModuleFeatures = {
-        ...currentFeatures,
-        [featureId]: !currentValue,
-      };
-
-      const updatedPrefs = await updatePreferences({
-        module_features: newModuleFeatures
-      });
-
-      // Synchronize the SWR update into the global Zustand store 
-      // so other pages immediately reflect the new preferences
-      if (user && updatedPrefs) {
-        const currentUserPrefs = Array.isArray((user as any).user_preferences) 
-          ? (user as any).user_preferences[0] 
-          : (user as any).user_preferences;
-        
-        setUser({
-          ...user,
-          user_preferences: [{
-            ...currentUserPrefs,
-            ...updatedPrefs
-          }]
-        } as any);
-      }
+      await onSubToggle(featureId);
     } catch (err) {
       console.error('Failed to toggle sub-feature:', err);
     } finally {
       setIsLocalLoading(false);
     }
-  };
+  }, [onSubToggle]);
 
   const Icon = MODULE_ICONS[metadata.icon] || Grid3X3;
-  const isPending = isHookLoading || isLocalLoading;
 
   // For Timeline and Reminders: detect if all sub-features are turned off
   const allSubFeaturesOff = isEnabled && (() => {
-    const f = preferences?.module_features || {};
+    const f = moduleFeatures || {};
     if (id === 'timeline') {
       return f['timeline_weekly_log'] === false && f['timeline_daily_checklist'] === false;
     }
@@ -198,12 +174,13 @@ const ModuleItem: React.FC<{
         <button
           type="button"
           onClick={handleToggle}
-          disabled={isPending}
-          className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+          disabled={isLocalLoading}
+          aria-label={`${isEnabled ? 'Disable' : 'Enable'} ${metadata.name}`}
+          className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors will-change-transform ${
             isEnabled
               ? 'bg-primary'
               : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
-          } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
+          } ${isLocalLoading ? 'opacity-50 cursor-wait' : ''}`}
         >
           <span
             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -223,14 +200,15 @@ const ModuleItem: React.FC<{
                 <button
                   type="button"
                   onClick={() => handleSubToggle('timeline_weekly_log')}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${
-                    preferences?.module_features?.['timeline_weekly_log'] !== false
+                  disabled={isLocalLoading}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 will-change-transform ${
+                    moduleFeatures?.['timeline_weekly_log'] !== false
                       ? 'bg-primary'
                       : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    preferences?.module_features?.['timeline_weekly_log'] !== false ? 'translate-x-6' : 'translate-x-1'
+                    moduleFeatures?.['timeline_weekly_log'] !== false ? 'translate-x-6' : 'translate-x-1'
                   }`} />
                 </button>
               </div>
@@ -239,14 +217,15 @@ const ModuleItem: React.FC<{
                 <button
                   type="button"
                   onClick={() => handleSubToggle('timeline_daily_checklist')}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${
-                    preferences?.module_features?.['timeline_daily_checklist'] !== false
+                  disabled={isLocalLoading}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 will-change-transform ${
+                    moduleFeatures?.['timeline_daily_checklist'] !== false
                       ? 'bg-primary'
                       : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    preferences?.module_features?.['timeline_daily_checklist'] !== false ? 'translate-x-6' : 'translate-x-1'
+                    moduleFeatures?.['timeline_daily_checklist'] !== false ? 'translate-x-6' : 'translate-x-1'
                   }`} />
                 </button>
               </div>
@@ -259,14 +238,15 @@ const ModuleItem: React.FC<{
                 <button
                   type="button"
                   onClick={() => handleSubToggle('reminders_active')}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${
-                    preferences?.module_features?.['reminders_active'] !== false
+                  disabled={isLocalLoading}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 will-change-transform ${
+                    moduleFeatures?.['reminders_active'] !== false
                       ? 'bg-primary'
                       : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    preferences?.module_features?.['reminders_active'] !== false ? 'translate-x-6' : 'translate-x-1'
+                    moduleFeatures?.['reminders_active'] !== false ? 'translate-x-6' : 'translate-x-1'
                   }`} />
                 </button>
               </div>
@@ -275,14 +255,15 @@ const ModuleItem: React.FC<{
                 <button
                   type="button"
                   onClick={() => handleSubToggle('reminders_history')}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${
-                    preferences?.module_features?.['reminders_history'] !== false
+                  disabled={isLocalLoading}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 will-change-transform ${
+                    moduleFeatures?.['reminders_history'] !== false
                       ? 'bg-primary'
                       : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
                   }`}
                 >
                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    preferences?.module_features?.['reminders_history'] !== false ? 'translate-x-6' : 'translate-x-1'
+                    moduleFeatures?.['reminders_history'] !== false ? 'translate-x-6' : 'translate-x-1'
                   }`} />
                 </button>
               </div>
@@ -292,11 +273,13 @@ const ModuleItem: React.FC<{
       )}
     </div>
   );
-};
+});
 
-// Module Settings Tab Component
+// Module Settings Tab Component — single useUserPreferences() for all modules
 const ModuleSettingsTab: React.FC<{ userId?: string; t: (key: string) => string }> = ({ userId, t }) => {
-  const { module_features } = useUserPreferences();
+  const { module_features, updatePreferences } = useUserPreferences();
+  const setUser = useAuthStore((s) => s.setUser);
+  const user = useAuthStore((s) => s.user);
 
   // Compute statuses from Supabase-synced preferences via Zustand
   const moduleIds = Object.keys(DEFAULT_MODULE_STATUS) as ModuleId[];
@@ -308,6 +291,49 @@ const ModuleSettingsTab: React.FC<{ userId?: string; t: (key: string) => string 
 
   const enabledCount = statuses.filter((s) => s.isEnabled).length;
   const disabledCount = statuses.filter((s) => !s.isEnabled).length;
+
+  /**
+   * Toggle module enabled/disabled — writes to Supabase via updatePreferences.
+   * Stable callback (useCallback) so React.memo on ModuleItem prevents re-renders.
+   */
+  const handleModuleToggle = useCallback(async (id: ModuleId) => {
+    const latestPrefs = Array.isArray((useAuthStore.getState().user as any)?.user_preferences)
+      ? (useAuthStore.getState().user as any)?.user_preferences[0]
+      : (useAuthStore.getState().user as any)?.user_preferences;
+
+    const currentFeatures: Record<string, boolean> = latestPrefs?.module_features || {};
+    const currentEnabled = currentFeatures[id] ?? DEFAULT_MODULE_STATUS[id];
+    const newFeatures = { ...currentFeatures, [id]: !currentEnabled };
+
+    await updatePreferences({ module_features: newFeatures });
+  }, [updatePreferences]);
+
+  /**
+   * Toggle a sub-feature (e.g. timeline_weekly_log) — writes to Supabase.
+   * Stable callback so ModuleItem memo works correctly.
+   */
+  const handleSubToggle = useCallback(async (featureId: string) => {
+    const latestPrefs = Array.isArray((useAuthStore.getState().user as any)?.user_preferences)
+      ? (useAuthStore.getState().user as any)?.user_preferences[0]
+      : (useAuthStore.getState().user as any)?.user_preferences;
+
+    const currentFeatures: Record<string, boolean> = latestPrefs?.module_features || {};
+    const currentValue = currentFeatures[featureId] !== false; // default true
+    const newFeatures = { ...currentFeatures, [featureId]: !currentValue };
+
+    const updatedPrefs = await updatePreferences({ module_features: newFeatures });
+
+    // Sync into Zustand so Layout nav re-filters instantly
+    if (user && updatedPrefs) {
+      const currentUserPrefs = Array.isArray((user as any).user_preferences)
+        ? (user as any).user_preferences[0]
+        : (user as any).user_preferences;
+      setUser({
+        ...user,
+        user_preferences: [{ ...currentUserPrefs, ...updatedPrefs }]
+      } as any);
+    }
+  }, [updatePreferences, user, setUser]);
 
   return (
     <div className="space-y-xl">
@@ -326,7 +352,9 @@ const ModuleSettingsTab: React.FC<{ userId?: string; t: (key: string) => string 
                 id={status.id}
                 isEnabled={status.isEnabled}
                 metadata={status.metadata}
-                userId={userId}
+                moduleFeatures={module_features}
+                onToggle={handleModuleToggle}
+                onSubToggle={handleSubToggle}
                 t={t}
               />
             ))}
@@ -716,7 +744,7 @@ export default function SettingsPage() {
             </Alert>
           )}
 
-          <div className="flex gap-md overflow-x-auto pb-md no-scrollbar">
+          <div className="flex gap-sm overflow-x-auto pb-md no-scrollbar">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -724,14 +752,16 @@ export default function SettingsPage() {
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-md px-xl py-md text-[10px] font-bold whitespace-nowrap rounded-md border transition-all ${
+                  title={tab.label}
+                  aria-label={tab.label}
+                  className={`flex items-center justify-center p-md md:px-xl md:py-md gap-md text-[10px] font-bold whitespace-nowrap rounded-md border transition-all shrink-0 ${
                     activeTab === tab.id
                       ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20'
-                      : 'bg-black/[0.02] dark:bg-white/[0.02] text-gray-light border-black/[0.05] dark:border-white/[0.05] hover:border-black/[0.1] dark:border-white/[0.1] hover:text-soft-cream'
+                      : 'bg-black/[0.02] dark:bg-white/[0.02] text-gray-light border-black/[0.05] dark:border-white/[0.05] hover:border-black/[0.1] dark:hover:border-white/[0.1] hover:text-soft-cream'
                   }`}
                 >
-                  <Icon size={14} />
-                  <span className="tracking-[0.2em]">{tab.label}</span>
+                  <Icon size={14} className="shrink-0" />
+                  <span className="hidden md:inline tracking-[0.2em]">{tab.label}</span>
                 </button>
               );
             })}

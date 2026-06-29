@@ -10,7 +10,7 @@ import {
 } from '@/libs/analytics/lifeScore';
 import { calculateCareerAnalytics } from '@/libs/analytics/careerAnalytics';
 
-export const revalidate = 300; // Cache for 5 minutes
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
@@ -36,7 +36,8 @@ export async function GET() {
       { data: transactions },
       { data: activities },
       { data: tasks },
-      { data: applications }
+      { data: applications },
+      { data: prefs }
     ] = await Promise.all([
       // 1. Transactions
       supabase
@@ -68,7 +69,14 @@ export async function GET() {
         .from('career_applications')
         .select('status, applied_date, salary_min')
         .eq('user_id', user.id)
-        .is('deleted_at', null)
+        .is('deleted_at', null),
+
+      // 5. User Preferences for Module Status Checking
+      supabase
+        .from('user_preferences')
+        .select('module_features')
+        .eq('user_id', user.id)
+        .maybeSingle()
     ]);
 
     // Finance metrics
@@ -122,13 +130,13 @@ export async function GET() {
       responseRate: careerAnalytics.responseRate / 100,
     });
 
-    // Calculate final score
+    // Calculate final score — dynamically adjusted based on user preferences modules
     const lifeScore = calculateLifeScore({
       finance: financeScore,
       productivity: productivityScore,
       health: healthScore,
       career: careerScore,
-    }, (key: string) => key);
+    }, (key: string) => key, prefs?.module_features || {});
 
     return NextResponse.json({ lifeScore });
 

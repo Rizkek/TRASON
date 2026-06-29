@@ -1,80 +1,66 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
-} from 'recharts';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
 import { Card } from '@/components';
 import { Transaction } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { formatCurrency } from '@/libs/format';
 
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend
+);
+
 interface Props {
   transactions: Transaction[];
 }
 
-// Custom Tooltip for premium aesthetics
-const CustomTooltip = ({ active, payload, label, currency, locale }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-black/90 border border-black/10 dark:border-white/10 p-md rounded-xl shadow-2xl backdrop-blur-xl">
-        <p className="text-gray-light text-xs font-semibold mb-sm">{label}</p>
-        <div className="space-y-xs">
-          {payload.map((entry: any, index: number) => (
-            <div key={index} className="flex items-center gap-md justify-between">
-              <span style={{ color: entry.color }} className="text-sm flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                {entry.name}
-              </span>
-              <span className="text-white font-mono text-sm font-bold">
-                {formatCurrency(entry.value, currency, locale)}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
-
 export const FinancialChart = ({ transactions }: Props) => {
   const { t } = useTranslation();
-  const { currency, locale, timezone } = useUserPreferences();
-  const [isMounted, setIsMounted] = React.useState(false);
+  const { currency, locale } = useUserPreferences();
+  const [isMounted, setIsMounted] = useState(false);
 
-  React.useEffect(() => { setIsMounted(true); }, []);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const chartData = useMemo(() => {
-    // Group transactions by date
     const dailyData: Record<string, { income: number; expense: number; dateStr: string }> = {};
 
-    // Get current month and year to generate all days in the current month
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    // Initialize all days of the month with 0
     for (let i = 1; i <= daysInMonth; i++) {
       const d = new Date(year, month, i);
-      const dayStr = d.toLocaleDateString('en-CA'); // YYYY-MM-DD
+      const dayStr = d.toLocaleDateString('en-CA');
       const displayDate = d.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
       dailyData[dayStr] = { income: 0, expense: 0, dateStr: displayDate };
     }
 
-    // Populate actual data
     transactions.forEach(t => {
-      // Parse transaction date in correct timezone
       const tDate = new Date(t.date);
-      const dayStr = tDate.toLocaleDateString('en-CA'); // Extract YYYY-MM-DD reliably
+      const dayStr = tDate.toLocaleDateString('en-CA');
       if (dailyData[dayStr]) {
         if (t.type === 'income') {
           dailyData[dayStr].income += t.amount;
@@ -84,18 +70,116 @@ export const FinancialChart = ({ transactions }: Props) => {
       }
     });
 
-    // Convert object back to sorted array
     return Object.keys(dailyData)
       .sort((a, b) => a.localeCompare(b))
       .map(key => dailyData[key]);
-
   }, [transactions, locale]);
 
+  const chartDataState = useMemo(() => {
+    return {
+      labels: chartData.map(d => d.dateStr),
+      datasets: [
+        {
+          label: t('dashboard.income'),
+          data: chartData.map(d => d.income),
+          borderColor: '#10B981',
+          backgroundColor: (context: any) => {
+            const chart = context.chart;
+            const { ctx, chartArea } = chart;
+            if (!chartArea) return 'transparent';
+            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+            gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+            return gradient;
+          },
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          fill: true,
+          tension: 0.4
+        },
+        {
+          label: t('dashboard.expenses'),
+          data: chartData.map(d => d.expense),
+          borderColor: '#EF4444',
+          backgroundColor: (context: any) => {
+            const chart = context.chart;
+            const { ctx, chartArea } = chart;
+            if (!chartArea) return 'transparent';
+            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
+            gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+            return gradient;
+          },
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          fill: true,
+          tension: 0.4
+        }
+      ]
+    };
+  }, [chartData, t]);
 
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: 'index' as const,
+      intersect: false,
+    },
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        titleColor: '#94A3B8',
+        titleFont: { size: 12, weight: 'bold' as const },
+        bodyFont: { size: 14, weight: 'bold' as const },
+        padding: 12,
+        cornerRadius: 12,
+        boxPadding: 6,
+        usePointStyle: true,
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        callbacks: {
+          label: (context: any) => {
+            let label = context.dataset.label || '';
+            if (label) label += ': ';
+            if (context.parsed.y !== null) {
+              label += formatCurrency(context.parsed.y, currency, locale);
+            }
+            return label;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+        border: {
+          display: false,
+        },
+        ticks: {
+          color: 'rgba(255,255,255,0.3)',
+          font: { size: 10 },
+          maxTicksLimit: 10
+        }
+      },
+      y: {
+        display: false,
+        grid: {
+          display: false
+        }
+      }
+    }
+  };
 
   return (
     <Card className="p-md md:p-xl bg-gradient-to-br from-[#0F172A]/80 to-[#020617]/80 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
-      {/* Glow Effect Behind Chart */}
       <div className="absolute top-0 left-1/4 w-1/2 h-full bg-primary/5 blur-3xl rounded-full pointer-events-none" />
 
       <div className="flex items-center justify-between mb-md md:mb-xl relative z-10">
@@ -106,62 +190,10 @@ export const FinancialChart = ({ transactions }: Props) => {
       </div>
 
       <div className="w-full h-[120px] md:h-[200px] relative z-10">
-        {!isMounted ? (
+        {!isMounted || !chartDataState ? (
           <div className="w-full h-full bg-white/[0.02] rounded-lg animate-pulse" />
         ) : (
-        <ResponsiveContainer width="100%" height="100%" minHeight={120} minWidth={0}>
-          <AreaChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-            <defs>
-              {/* Income Gradient */}
-              <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
-              </linearGradient>
-              {/* Expense Gradient */}
-              <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#EF4444" stopOpacity={0}/>
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff" strokeOpacity={0.05} vertical={false} />
-            <XAxis 
-              dataKey="dateStr" 
-              stroke="#ffffff" 
-              strokeOpacity={0.3} 
-              fontSize={10} 
-              tickMargin={10} 
-              tickLine={false}
-              axisLine={false}
-              minTickGap={20}
-            />
-            <YAxis 
-              hide={true} 
-              domain={['auto', 'auto']} 
-            />
-            <Tooltip content={<CustomTooltip currency={currency} locale={locale} />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '3 3' }} />
-            
-            <Area 
-              type="monotone" 
-              dataKey="income" 
-              name={t('dashboard.income')} 
-              stroke="#10B981" 
-              strokeWidth={3}
-              fillOpacity={1} 
-              fill="url(#colorIncome)" 
-              activeDot={{ r: 6, strokeWidth: 0, fill: '#10B981' }}
-            />
-            <Area 
-              type="monotone" 
-              dataKey="expense" 
-              name={t('dashboard.expenses')} 
-              stroke="#EF4444" 
-              strokeWidth={3}
-              fillOpacity={1} 
-              fill="url(#colorExpense)" 
-              activeDot={{ r: 6, strokeWidth: 0, fill: '#EF4444' }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+          <Line data={chartDataState} options={options} />
         )}
       </div>
     </Card>

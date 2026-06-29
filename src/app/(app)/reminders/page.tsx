@@ -466,6 +466,7 @@ export default function RemindersPage() {
       </div>
 
       {/* Add/Edit Modal */}
+      {isModalOpen && (
       <Modal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
@@ -551,6 +552,7 @@ export default function RemindersPage() {
           </div>
         </div>
       </Modal>
+    )}
 
       {/* Mobile-only FAB for New Reminder */}
       <div className="md:hidden fixed bottom-24 right-4 z-40">

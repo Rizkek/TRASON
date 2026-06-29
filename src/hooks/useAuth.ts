@@ -34,6 +34,23 @@ function authLog(
   }
 }
 
+/**
+ * isNetworkError — returns true for errors that are caused by the device being
+ * offline or the Supabase auth endpoint being temporarily unreachable.
+ * Used to suppress noisy "Failed to fetch" console errors that are not bugs.
+ */
+function isNetworkError(err: unknown): boolean {
+  if (!err) return false;
+  const msg = (err as Error)?.message?.toLowerCase() ?? '';
+  return (
+    msg.includes('failed to fetch') ||
+    msg.includes('networkerror') ||
+    msg.includes('network request failed') ||
+    msg.includes('load failed') ||
+    msg.includes('the internet connection appears to be offline')
+  );
+}
+
 export const useAuth = () => {
   const {
     user,
@@ -198,6 +215,13 @@ export const useAuth = () => {
 
         // Handle sign in and updates - batch state updates
         if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user) {
+          // Guard: skip if offline — Supabase will throw "Failed to fetch" trying
+          // to refresh the token, which is not a real error.
+          if (navigator.onLine === false) {
+            authLog('onAuthStateChange', '⚠ Device offline — skipping DB fetch for ' + event, undefined, 'warn');
+            return;
+          }
+
           // Guard: skip expensive DB fetch if the same user is already loaded.
           // This prevents redundant round-trips during token auto-refresh (_recoverAndRefresh)
           // which fires SIGNED_IN repeatedly and was causing the 3-second timeout warn in production.
@@ -238,6 +262,11 @@ export const useAuth = () => {
             }
           } catch (err) {
             const errMsg = (err as Error)?.message;
+            // Suppress noisy "Failed to fetch" when device is offline — not a real error
+            if (isNetworkError(err) || !navigator.onLine) {
+              authLog('onAuthStateChange', '⚠ Network unavailable during token refresh — no action', { event }, 'warn');
+              return;
+            }
             if (errMsg === 'Profile load timeout') {
               authLog('onAuthStateChange',
                 `⚠ Profile fetch TIMED OUT after ${REFRESH_TIMEOUT_MS}ms → falling back to basicUser`,

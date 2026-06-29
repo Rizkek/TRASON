@@ -405,6 +405,23 @@ export interface CareerApplication {
   deleted_at?: string;
 }
 
+export interface InterviewJournal {
+  id: string;
+  user_id: string;
+  application_id?: string | null;
+  company_name: string;
+  role_title: string;
+  interview_date: string;
+  questions?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  outcome?: 'pass' | 'fail' | 'pending' | 'unknown';
+  lessons_learned?: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+}
+
 // ============================================================
 // SPORT — WORKOUT PLAN SYSTEM
 // ============================================================

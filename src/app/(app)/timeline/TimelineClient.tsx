@@ -728,6 +728,7 @@ export default function TimelinePage() {
         </div>
 
         {/* Modal */}
+        {isModalOpen && (
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -880,6 +881,7 @@ export default function TimelinePage() {
             />
           </div>
         </Modal>
+        )}
 
         <ConfirmModal
           isOpen={!!deleteConfirmId}

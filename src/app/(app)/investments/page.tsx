@@ -500,8 +500,9 @@ export default function InvestmentsPage() {
         </Button>
       </div>
 
-      <Modal
-        isOpen={isModalOpen}
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingPosition ? t('investment_page.edit_position') : t('investment_page.add_position_title')}
         footer={
@@ -606,7 +607,8 @@ export default function InvestmentsPage() {
             />
           </div>
         </div>
-      </Modal>
+        </Modal>
+      )}
 
       <ConfirmModal
         isOpen={!!deleteConfirmId}

@@ -8,6 +8,8 @@ const withSerwist = require('@serwist/next').default({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Enable gzip/brotli compression for all responses
+  compress: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -43,6 +45,16 @@ const nextConfig = {
           {
             key: 'Service-Worker-Allowed',
             value: '/',
+          },
+        ],
+      },
+      {
+        // Immutable cache for versioned JS/CSS chunks (Turbopack content-hashed)
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },

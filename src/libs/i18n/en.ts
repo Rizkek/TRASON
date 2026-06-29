@@ -19,7 +19,7 @@ export const en = {
   sport_page: {
     sport_fitness_title: 'Sport & Fitness',
     sport_fitness_desc: 'Track your workouts, smash personal records, and stay consistent.',
-    quick_log_workout: 'Quick Log Workout',
+    quick_log_workout: 'Quick Add Workout',
     this_week: 'This Week',
     avg_session: 'Avg Session',
     total_time: 'Total Time',
@@ -163,7 +163,38 @@ export const en = {
     },
     remove_app: 'Remove',
     remove_desc: 'Are you sure you want to remove this job application? This action cannot be undone.',
-    remove_btn: 'Remove'
+    remove_btn: 'Remove',
+    interview_journal: {
+      tab: 'Journal',
+      new_entry: 'New Entry',
+      empty: 'No interview notes yet. Every interview is a learning opportunity.',
+      edit_entry: 'Edit Entry',
+      new_entry_modal: 'Interview Journal',
+      save: 'Save',
+      company: 'Company',
+      role: 'Role',
+      date: 'Interview Date',
+      questions: 'Questions Asked',
+      questions_placeholder: 'What did they ask? (e.g., React lifecycle, REST API, system design...)',
+      difficulty: 'Difficulty',
+      outcome: 'Outcome',
+      lessons: 'Lessons Learned',
+      lessons_placeholder: 'What would you do differently? What to study next?',
+      notes: 'Notes',
+      notes_placeholder: 'Additional context, interviewer name, office vibe...',
+      remove_entry: 'Remove Entry',
+      remove_desc: 'Are you sure you want to remove this journal entry?',
+      remove_btn: 'Remove',
+      options: {
+        difficulty_easy: 'Easy',
+        difficulty_medium: 'Medium',
+        difficulty_hard: 'Hard',
+        outcome_pass: 'Passed',
+        outcome_fail: 'Failed',
+        outcome_pending: 'Pending',
+        outcome_unknown: 'Unknown',
+      }
+    }
   },
   insights_page: {
     title: 'Strategic Insights',
@@ -224,9 +255,9 @@ export const en = {
     desc: 'Weekly activity log',
     logs_upper: 'Logs',
     logged_upper: 'Logged',
-    log_activity_btn: 'Log',
-    edit_log: 'Edit log',
-    log_activity_modal: 'Log',
+    log_activity_btn: 'Add Activity',
+    edit_log: 'Edit Activity',
+    log_activity_modal: 'Add Activity',
     form: {
       title: 'Activity title',
       title_placeholder: 'What are you doing...',
@@ -333,7 +364,7 @@ export const en = {
   finance: {
     title: 'Financial Flow',
     subtitle: 'Audit your resources and track capital architecture',
-    newEntry: 'Log Flow',
+    newEntry: 'Add Transaction',
     totalIncome: 'Inflow',
     totalExpense: 'Outflow',
     netBalance: 'Residual balance',
@@ -367,8 +398,8 @@ export const en = {
       actions: 'Refinement'
     },
     modal: {
-      addTitle: 'Log Financial Flow',
-      editTitle: 'Refine Entry',
+      addTitle: 'Add Transaction',
+      editTitle: 'Edit Transaction',
       saveBtn: 'Save',
       savingBtn: 'Saving...',
       deleteConfirmTitle: 'Remove Entry',

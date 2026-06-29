@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLifeScore } from '@/hooks/useLifeScore';
 import { Card, Loading } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
 
 const DIMENSION_KEYS = ['finance', 'productivity', 'health', 'career'] as const;
@@ -73,6 +74,18 @@ export function LifeScoreCard() {
   const { lifeScore, isLoading } = useLifeScore();
   const [showInsights, setShowInsights] = useState(false);
   const { t } = useTranslation();
+  const { module_features } = useUserPreferences();
+
+  // Filter dimensions dynamically based on active modules
+  const activeDimensions = useMemo(() => {
+    return DIMENSION_KEYS.filter((key) => {
+      if (key === 'finance') return module_features?.['finance'] !== false;
+      if (key === 'productivity') return module_features?.['timeline'] !== false;
+      if (key === 'health') return module_features?.['sport'] !== false;
+      if (key === 'career') return module_features?.['career'] !== false;
+      return true;
+    });
+  }, [module_features]);
 
   if (isLoading) {
     return (
@@ -129,7 +142,7 @@ export function LifeScoreCard() {
 
         {/* Dimension Bars */}
         <div className="flex-1 space-y-sm md:space-y-md w-full">
-          {DIMENSION_KEYS.map((key) => (
+          {activeDimensions.map((key) => (
             <DimensionBar
               key={key}
               label={t(`life_score.dimensions.${key}`)}

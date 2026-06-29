@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 import { DashboardClient } from './DashboardClient';
 import { DashboardProvider } from './DashboardProvider';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   // 1. Fetch user session natively on the server (No Client Waterfall)
   const user = await getAuthenticatedUser();

@@ -7,6 +7,7 @@ import { getAuthenticatedUser } from '@/utils/supabase/server';
 // Tambah maxDuration agar Vercel memberi waktu lebih untuk AI generation
 // Free: max 10s, Pro: max 60s — set 25s sebagai kompromi
 export const maxDuration = 25;
+export const dynamic = 'force-dynamic';
 
 const insightsSchema = z.object({
   insights: z.array(

@@ -49,6 +49,43 @@ import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useCareer } from '@/hooks/useCareer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 
+function QuickCaptureInput() {
+  const { t } = useTranslation();
+  const [value, setValue] = React.useState('');
+
+  const handleSubmit = () => {
+    if (!value.trim()) return;
+    // Handle the quick capture submission here
+    console.log('Captured:', value);
+    setValue('');
+  };
+
+  return (
+    <Card className="p-sm md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+      <div className="flex flex-row gap-sm md:gap-md">
+        <div className="flex-1 relative group">
+          <div className="absolute left-md top-1/2 -translate-y-1/2 text-primary">
+            <Lightbulb size={16} className="md:w-[18px] md:h-[18px]" />
+          </div>
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+            placeholder={t('dashboard.capture_placeholder')}
+            className="w-full pl-xl md:pl-2xl pr-md md:pr-lg py-sm md:py-lg bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
+          />
+        </div>
+        <Button variant="primary" size="md" className="hidden md:flex" onClick={handleSubmit}>
+          {t('dashboard.capture_btn')}
+        </Button>
+        <Button variant="primary" size="sm" className="md:hidden px-3" onClick={handleSubmit}>
+          <RiAddLine size={20} />
+        </Button>
+      </div>
+    </Card>
+  );
+}
 
 export function DashboardClient() {
   const router = useRouter();
@@ -139,23 +176,8 @@ export function DashboardClient() {
         {/* Narrative Summary Card */}
         <DashboardHeader user={user} activities={activities} transactions={transactions} />
 
-        {/* Quick Action Input - Moved to top for thumb reachability & immediate capture */}
-        <Card className="p-sm md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
-          <div className="flex flex-row gap-sm md:gap-md">
-            <div className="flex-1 relative group">
-              <div className="absolute left-md top-1/2 -translate-y-1/2 text-primary">
-                <Lightbulb size={16} className="md:w-[18px] md:h-[18px]" />
-              </div>
-              <input
-                type="text"
-                placeholder={t('dashboard.capture_placeholder')}
-                className="w-full pl-xl md:pl-2xl pr-md md:pr-lg py-sm md:py-lg bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
-              />
-            </div>
-            <Button variant="primary" size="md" className="hidden md:flex">{t('dashboard.capture_btn')}</Button>
-            <Button variant="primary" size="sm" className="md:hidden px-3"><RiAddLine size={20} /></Button>
-          </div>
-        </Card>
+        {/* Quick Action Input - Isolated to prevent dashboard re-renders on keystroke */}
+        <QuickCaptureInput />
 
         {/* Due Subscriptions Alert */}
         {isFinanceEnabled && dueSubscriptions.length > 0 && (

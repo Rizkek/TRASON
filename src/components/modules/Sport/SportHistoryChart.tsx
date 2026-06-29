@@ -1,43 +1,25 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Card } from '@/components';
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
   Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from 'recharts';
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
 import type { WorkoutSession } from '@/types/database';
 
-// Custom tooltip for Recharts
-const CustomTooltip = ({ active, payload }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-warm-black/90 border border-black/10 dark:border-white/10 p-md rounded-md backdrop-blur-md shadow-2xl">
-        <p className="font-bold text-white mb-1">{data.displayDate}</p>
-        {data.hasWorkout ? (
-          <>
-            <p className="text-sm text-primary">
-              {data.minutes} minutes
-            </p>
-            <p className="text-xs text-gray-light">
-              {data.sessionsCount} session{data.sessionsCount > 1 ? 's' : ''}
-            </p>
-          </>
-        ) : (
-          <p className="text-sm text-gray-light">Rest Day</p>
-        )}
-      </div>
-    );
-  }
-  return null;
-};
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip
+);
 
 interface Props {
   sessions: WorkoutSession[];
@@ -45,9 +27,9 @@ interface Props {
 }
 
 export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
-  const [isMounted, setIsMounted] = React.useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsMounted(true);
   }, []);
 
@@ -55,7 +37,6 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
     const data = [];
     const today = new Date();
 
-    // Create an array of the last `days` days
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
@@ -67,7 +48,6 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
       
       const displayDate = date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
 
-      // Find sessions for this date
       const daySessions = sessions.filter(
         (s) => s.session_date === dateStr
       );
@@ -88,6 +68,86 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
     return data;
   }, [sessions, days]);
 
+  const barChartData = {
+    labels: chartData.map(d => d.displayDate),
+    datasets: [
+      {
+        data: chartData.map(d => d.minutes),
+        backgroundColor: chartData.map(d => d.hasWorkout ? '#4e4feb' : 'rgba(255,255,255,0.05)'),
+        borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
+        borderSkipped: false,
+        maxBarThickness: 40
+      }
+    ]
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        backgroundColor: 'rgba(11, 15, 20, 0.9)',
+        titleColor: '#FFFFFF',
+        titleFont: { size: 14, weight: 'bold' as const },
+        bodyColor: '#4e4feb',
+        bodyFont: { size: 14 },
+        padding: 12,
+        cornerRadius: 6,
+        boxPadding: 4,
+        displayColors: false,
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        callbacks: {
+          title: (context: any) => {
+            return context[0].label;
+          },
+          label: (context: any) => {
+            const index = context.dataIndex;
+            const dataItem = chartData[index];
+            if (dataItem.hasWorkout) {
+              const sessionsStr = `${dataItem.sessionsCount} session${dataItem.sessionsCount > 1 ? 's' : ''}`;
+              return [`${dataItem.minutes} minutes`, sessionsStr];
+            }
+            return 'Rest Day';
+          },
+          labelTextColor: (context: any) => {
+            const index = context.dataIndex;
+            const dataItem = chartData[index];
+            if (!dataItem.hasWorkout) return '#94A3B8'; // gray-light for rest day
+            return '#4e4feb'; // primary
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+        border: {
+          display: false,
+        },
+        ticks: {
+          color: 'rgba(255,255,255,0.4)',
+          font: { size: 11 },
+          callback: function(this: any, val: any, index: number) {
+            // Only show every 3rd label
+            return index % 3 === 0 ? this.getLabelForValue(val) : '';
+          }
+        }
+      },
+      y: {
+        display: false,
+        grid: {
+          display: false
+        }
+      }
+    }
+  };
+
   if (!isMounted) {
     return (
       <Card className="p-xl bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
@@ -107,33 +167,7 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
         <p className="text-sm text-gray-light">Last {days} days of training</p>
       </div>
       <div className="h-[250px] w-full" style={{ minWidth: 0 }}>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-            <XAxis 
-              dataKey="displayDate" 
-              tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} 
-              axisLine={false} 
-              tickLine={false}
-              tickFormatter={(value, index) => (index % 3 === 0 ? value : '')} // Show every 3rd label
-            />
-            <YAxis 
-              tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} 
-              axisLine={false} 
-              tickLine={false}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
-            <Bar dataKey="minutes" radius={[4, 4, 0, 0]} maxBarSize={40}>
-              {chartData.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={entry.hasWorkout ? '#4e4feb' : 'rgba(255,255,255,0.05)'} 
-                  className="transition-all duration-300 hover:opacity-80"
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <Bar data={barChartData} options={options} />
       </div>
     </Card>
   );

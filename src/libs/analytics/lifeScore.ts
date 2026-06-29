@@ -203,49 +203,76 @@ export function calculateCareerScore(params: {
 // ============================================================
 // COMPOSITE LIFE SCORE
 // ============================================================
-export function calculateLifeScore(params: {
-  finance: LifeScoreDetail;
-  productivity: LifeScoreDetail;
-  health: LifeScoreDetail;
-  career: LifeScoreDetail;
-}, t: (key: string) => string): LifeScoreResult {
+export function calculateLifeScore(
+  params: {
+    finance: LifeScoreDetail;
+    productivity: LifeScoreDetail;
+    health: LifeScoreDetail;
+    career: LifeScoreDetail;
+  },
+  t: (key: string) => string,
+  moduleFeatures?: Record<string, boolean>
+): LifeScoreResult {
   const { finance, productivity, health, career } = params;
 
-  // Weighted average
-  const overall = Math.round(
-    finance.score * 0.30 +
-    productivity.score * 0.25 +
-    health.score * 0.25 +
-    career.score * 0.20
-  );
+  const isFinanceEnabled = moduleFeatures?.['finance'] !== false;
+  const isProductivityEnabled = moduleFeatures?.['timeline'] !== false;
+  const isHealthEnabled = moduleFeatures?.['sport'] !== false;
+  const isCareerEnabled = moduleFeatures?.['career'] !== false;
+
+  let weightedSum = 0;
+  let weightTotal = 0;
+
+  if (isFinanceEnabled) {
+    weightedSum += finance.score * 0.30;
+    weightTotal += 0.30;
+  }
+  if (isProductivityEnabled) {
+    weightedSum += productivity.score * 0.25;
+    weightTotal += 0.25;
+  }
+  if (isHealthEnabled) {
+    weightedSum += health.score * 0.25;
+    weightTotal += 0.25;
+  }
+  if (isCareerEnabled) {
+    weightedSum += career.score * 0.20;
+    weightTotal += 0.20;
+  }
+
+  const overall = weightTotal > 0 ? Math.round(weightedSum / weightTotal) : 0;
 
   // Generate rule-based insights (no AI needed)
   const insights: string[] = [];
 
-  if (finance.score < 40) {
+  if (isFinanceEnabled && finance.score < 40) {
     insights.push(t('life_score.insights.finance_attention'));
   }
-  if (productivity.score < 40) {
+  if (isProductivityEnabled && productivity.score < 40) {
     insights.push(t('life_score.insights.productivity_momentum'));
   }
-  if (health.score < 40) {
+  if (isHealthEnabled && health.score < 40) {
     insights.push(t('life_score.insights.health_start'));
   }
-  if (career.score < 40) {
+  if (isCareerEnabled && career.score < 40) {
     insights.push(t('life_score.insights.career_activity'));
   }
 
-  const lowestDimension = [
-    { name: 'Finance', score: finance.score },
-    { name: 'Productivity', score: productivity.score },
-    { name: 'Health', score: health.score },
-    { name: 'Career', score: career.score },
-  ].sort((a, b) => a.score - b.score)[0];
+  const activeDimensions = [
+    { name: 'Finance', score: finance.score, enabled: isFinanceEnabled },
+    { name: 'Productivity', score: productivity.score, enabled: isProductivityEnabled },
+    { name: 'Health', score: health.score, enabled: isHealthEnabled },
+    { name: 'Career', score: career.score, enabled: isCareerEnabled },
+  ].filter(d => d.enabled);
 
-  if (overall >= 70 && lowestDimension.score < 50) {
-    const areaTrans = t(`life_score.dimensions.${lowestDimension.name.toLowerCase()}`);
-    insights.push(t('life_score.insights.area_to_improve').replace('{area}', areaTrans));
+  if (activeDimensions.length > 0) {
+    const lowestDimension = activeDimensions.sort((a, b) => a.score - b.score)[0];
+    if (overall >= 70 && lowestDimension.score < 50) {
+      const areaTrans = t(`life_score.dimensions.${lowestDimension.name.toLowerCase()}`);
+      insights.push(t('life_score.insights.area_to_improve').replace('{area}', areaTrans));
+    }
   }
+
   if (overall >= 80) {
     insights.push(t('life_score.insights.excellent_score'));
   }

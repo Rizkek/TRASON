@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { parseNaturalLanguageInput } from '@/services/ai/parser';
 import { getAuthenticatedUser } from '@/utils/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
   const user = await getAuthenticatedUser();
   if (!user) {

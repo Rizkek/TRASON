@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/utils/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 const safePercent = (numerator: number, denominator: number) => {
   if (!denominator) return 0;
   return (numerator / denominator) * 100;
