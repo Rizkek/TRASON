@@ -58,7 +58,7 @@ export interface Transaction {
   category_id: string | null;
   goal_id?: string | null;
   title: string;
-  description?: string;
+  description?: string | null;
   amount: number;
   type: 'income' | 'expense';
   date: string;
@@ -73,8 +73,8 @@ export interface Transaction {
   created_at: string;
   updated_at: string;
   deleted_at?: string;
-  /** Populated by Supabase join when selecting categories:category_id(...) — Supabase returns an array even for single-row joins */
-  categories?: CategoryJoin[] | null;
+  /** Populated by Supabase join when selecting categories:category_id(...) */
+  categories?: CategoryJoin | CategoryJoin[] | null;
 }
 
 export interface Subscription {

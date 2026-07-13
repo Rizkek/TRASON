@@ -46,7 +46,7 @@ function computeStats(applications: CareerApplication[]): CareerStats {
   };
 }
 
-export const useCareer = () => {
+export const useCareer = (fallbackData?: CareerApplication[]) => {
   const userId = useAuthStore((s) => s.user?.id);
 
   const {
@@ -60,6 +60,7 @@ export const useCareer = () => {
     {
       revalidateOnFocus: true,
       dedupingInterval: 10000,
+      fallbackData,
     }
   );
 

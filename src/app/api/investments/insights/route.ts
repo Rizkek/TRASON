@@ -13,11 +13,6 @@ const formatPercent = (value: number) => `${value >= 0 ? '+' : ''}${value.toFixe
 const capitalized = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
 export async function POST(request: NextRequest) {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
     const summary = body.summary || {};

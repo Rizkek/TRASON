@@ -85,9 +85,13 @@ export function handleQueryError(error: any): ApiError {
     return new ApiError(403, 'RLS_VIOLATION', 'You do not have permission to perform this action', error);
   }
 
-  // Network error
-  if (error instanceof TypeError && error.message === 'Failed to fetch') {
-    return new ApiError(0, 'NETWORK_ERROR', 'Network connection failed. Check your internet and try again.', error);
+  // Network error (sometimes wrapped as a plain object by postgrest-js)
+  if (
+    (error instanceof TypeError && error.message === 'Failed to fetch') ||
+    error?.message === 'TypeError: Failed to fetch' ||
+    error?.message === 'Failed to fetch'
+  ) {
+    return new ApiError(0, 'NETWORK_ERROR', 'Network connection failed. Check your internet connection or ad-blocker.', error);
   }
 
   // Fetch error (offline)

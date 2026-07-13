@@ -31,6 +31,16 @@ const nextConfig = {
         protocol: 'https',
         hostname: '*.supabase.in',
       },
+      {
+        // Google avatars
+        protocol: 'https',
+        hostname: '*.googleusercontent.com',
+      },
+      {
+        // GitHub avatars
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
     ],
   },
   async headers() {

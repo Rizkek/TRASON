@@ -14,17 +14,18 @@ import { getDateRange } from '@/libs/date';
 
 // Setup SWR Dates
 const CURRENT_DATE = new Date();
-const { start: CURRENT_START, end: CURRENT_END } = getDateRange(CURRENT_DATE.getMonth(), CURRENT_DATE.getFullYear());
 
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { 
-  RiCalendarLine as CalendarIcon, 
-  RiNotification3Line as Bell, 
-  RiLightbulbLine as Lightbulb, 
-  RiTimeLine as Clock,
-  RiAddLine,
-  RiErrorWarningLine
-} from 'react-icons/ri';
+  Calendar as CalendarIcon, 
+  Bell, 
+  Lightbulb, 
+  Clock,
+  Plus as RiAddLine,
+  AlertTriangle as RiErrorWarningLine,
+  ChevronLeft as RiArrowLeftSLine,
+  ChevronRight as RiArrowRightSLine
+} from 'lucide-react';
 
 // Extracted Components
 import { DashboardHeader } from './components/DashboardHeader';
@@ -95,9 +96,12 @@ export function DashboardClient() {
   const { t } = useTranslation();
   const preferences = useUserPreferences();
   const { locale, timezone, module_features, isOnboarded } = preferences;
-  
+  const [financeMonth, setFinanceMonth] = React.useState(CURRENT_DATE.getMonth());
+  const [financeYear, setFinanceYear] = React.useState(CURRENT_DATE.getFullYear());
+  const { start: financeStart, end: financeEnd } = useMemo(() => getDateRange(financeMonth, financeYear), [financeMonth, financeYear]);
+
   // SWR automatically handles all data fetching in background
-  const { transactions } = useTransaction(CURRENT_START, CURRENT_END);
+  const { transactions } = useTransaction(financeStart, financeEnd);
   const { activities } = useActivity(CURRENT_DATE);
   const { reminders } = useReminder();
   const { summary: investmentSummary, insights: investmentInsights } = useInvestment();
@@ -212,8 +216,25 @@ export function DashboardClient() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-md md:gap-xl">
             {isFinanceEnabled && (
               <>
+                <div className="lg:col-span-3 flex items-center justify-between bg-black/[0.02] dark:bg-white/[0.02] p-2 rounded-xl border border-black/5 dark:border-white/5 w-fit">
+                  <button onClick={() => {
+                    if (financeMonth === 0) { setFinanceMonth(11); setFinanceYear(y => y - 1); }
+                    else { setFinanceMonth(m => m - 1); }
+                  }} className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-md text-gray-light">
+                    <RiArrowLeftSLine size={20} />
+                  </button>
+                  <span className="text-xs font-bold text-soft-cream w-[140px] text-center tracking-wide">
+                    {new Date(financeYear, financeMonth).toLocaleString(locale || 'en-US', { month: 'long', year: 'numeric' })}
+                  </span>
+                  <button onClick={() => {
+                    if (financeMonth === 11) { setFinanceMonth(0); setFinanceYear(y => y + 1); }
+                    else { setFinanceMonth(m => m + 1); }
+                  }} className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-md text-gray-light">
+                    <RiArrowRightSLine size={20} />
+                  </button>
+                </div>
                 <div className="lg:col-span-2">
-                  <FinancialChart transactions={transactions} />
+                  <FinancialChart transactions={transactions} month={financeMonth} year={financeYear} />
                 </div>
                 <div>
                   <SpendingBreakdown transactions={transactions} />

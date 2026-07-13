@@ -22,7 +22,7 @@ export interface UseTransactionReturn {
   refresh: () => Promise<Transaction[] | undefined>;
 }
 
-export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income' | 'expense'): UseTransactionReturn => {
+export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income' | 'expense', fallbackData?: Transaction[]): UseTransactionReturn => {
   // Generate stable cache key using CACHE_KEYS helper
   const key = startDate && endDate
     ? CACHE_KEYS.transactions.list(startDate.toISOString(), endDate.toISOString())
@@ -46,7 +46,7 @@ export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income'
           'useTransaction.fetch'
         );
     },
-    SWR_CONFIG_DASHBOARD
+    { ...SWR_CONFIG_DASHBOARD, fallbackData }
   );
 
   const createTransaction = useCallback(
@@ -88,24 +88,23 @@ export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income'
     ) => {
       return await executeMutation(
             (async () => {
+          // Optimistic update: preserve existing categories join, but mark category_id change
+          // If category_id changed, we clear the categories join so it shows blank until re-fetch
           await mutate(
                     (currentData: Transaction[] | undefined) => 
-                      currentData ? currentData.map((t) => (t.id === id ? { ...t, ...updates } as Transaction : t)) : [],
+                      currentData ? currentData.map((t) => {
+                        if (t.id !== id) return t;
+                        const updated = { ...t, ...updates } as Transaction;
+                        // If category_id changed, clear stale categories join
+                        if (updates.category_id !== undefined && updates.category_id !== t.category_id) {
+                          (updated as any).categories = null;
+                        }
+                        return updated;
+                      }) : [],
                     { revalidate: false }
                   );
           const result = await transactionQueries.updateTransaction(id, updates);
-          const keysToInvalidate = INVALIDATION_PATTERNS.onTransactionChange();
-          await Promise.all(keysToInvalidate.map(k => {
-                    if (typeof k === 'string') {
-                      return globalMutate(k);
-                    }
-                    return globalMutate(
-                      (key) => Array.isArray(key) && key[0] === 'transactions',
-                      undefined,
-                      { revalidate: true }
-                    );
-                  }));
-          // Force local re-fetch to get real DB data with joins
+          // Force re-fetch with joined category data from DB
           await mutate();
           return result;
             })(),

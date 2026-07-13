@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { FiArrowLeft } from 'react-icons/fi';
-import { RiCompass3Line } from 'react-icons/ri';
+import { ArrowLeft, Compass } from 'lucide-react';
 
 export default function TermsPage() {
   return (
@@ -14,12 +13,12 @@ export default function TermsPage() {
       <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-black/[0.03] dark:border-white/[0.03]">
         <div className="max-w-7xl mx-auto px-lg md:px-2xl h-20 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-sm group cursor-pointer">
-            <FiArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-warm-gold" />
+            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-warm-gold" />
             <span className="text-sm font-bold uppercase tracking-widest text-warm-gold">Back</span>
           </Link>
           <div className="flex items-center gap-sm">
             <div className="w-8 h-8 bg-warm-gold rounded-full flex items-center justify-center text-warm-black">
-              <RiCompass3Line size={18} />
+              <Compass size={18} />
             </div>
             <span className="text-xl font-serif font-bold tracking-tight">TRASON</span>
           </div>

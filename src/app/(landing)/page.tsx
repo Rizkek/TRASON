@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import { FiArrowUpRight, FiCommand } from 'react-icons/fi';
+
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { PieChart, Activity, CheckSquare, Table, TrendingUp, Target, CreditCard, ChevronRight } from 'lucide-react';
+import { PieChart, Activity, CheckSquare, Table, TrendingUp, Target, CreditCard, ChevronRight, ArrowUpRight, Command } from 'lucide-react';
 
 const SPLASH_STORAGE_KEY = 'trason_home_splash_seen';
 
@@ -82,8 +82,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-warm-black text-soft-cream font-sans selection:bg-warm-gold/30 selection:text-soft-cream relative overflow-x-hidden">
       {/* Dynamic Background Elements */}
-      <div className="fixed top-[-20%] right-[-10%] w-[800px] h-[800px] bg-warm-gold/5 md:blur-[160px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
-      <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-deep-sage/5 md:blur-[140px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
+      <div className="fixed top-[-20%] right-[-10%] w-[800px] h-[800px] bg-warm-gold/5 blur-3xl md:blur-[160px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
+      <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-deep-sage/5 blur-3xl md:blur-[140px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
 
       <LandingNavbar />
 
@@ -91,7 +91,7 @@ export default function Home() {
       <header className="relative pt-40 pb-20 md:pt-56 md:pb-32 px-lg">
         <div className="max-w-4xl mx-auto text-center space-y-xl relative z-10">
           <div className="inline-flex items-center gap-2 px-md py-xs rounded-full border border-warm-gold/20 bg-warm-gold/5 text-warm-gold text-xs font-bold uppercase tracking-widest mb-md animate-fade-in">
-            <FiCommand size={14} /> The Personal Operating System
+            <Command size={14} /> The Personal Operating System
           </div>
 
           <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-serif leading-[1.1] md:leading-[1] tracking-tighter">
@@ -107,7 +107,7 @@ export default function Home() {
             <Link href="/signup">
               <button className="w-full sm:w-auto bg-soft-cream text-warm-black px-3xl py-4 rounded-xl font-bold flex items-center justify-center gap-sm group hover:bg-warm-gold transition-all shadow-[0_0_30px_rgba(244,201,93,0.15)] text-lg">
                 Initialize Sanctuary
-                <FiArrowUpRight size={22} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                <ArrowUpRight size={22} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </button>
             </Link>
             <Link href="/preview">
@@ -160,13 +160,13 @@ export default function Home() {
 
         {/* REALISTIC PREVIEW HERO IMAGE/MOCKUP */}
         <div className="mt-2xl max-w-6xl mx-auto relative group perspective-1000">
-           <div className="absolute inset-0 bg-warm-gold/10 blur-[100px] rounded-[3rem] group-hover:bg-warm-gold/20 transition-all duration-700" />
-           <div className="relative w-full bg-gray-strong/90 backdrop-blur-3xl rounded-[2rem] border border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] overflow-hidden transform rotate-x-12 group-hover:rotate-x-0 transition-transform duration-1000">
+           <div className="absolute inset-0 bg-warm-gold/10 blur-2xl md:blur-[100px] rounded-[3rem] group-hover:bg-warm-gold/20 transition-all duration-700" />
+           <div className="relative w-full bg-gray-strong/90 backdrop-blur-xl md:backdrop-blur-3xl rounded-[2rem] border border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] overflow-hidden transform rotate-x-12 group-hover:rotate-x-0 transition-transform duration-1000">
               {/* Fake Dashboard Top Bar */}
               <div className="h-12 border-b border-white/5 flex items-center px-lg gap-sm bg-black/40">
                 <div className="flex gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500/50" /><div className="w-3 h-3 rounded-full bg-yellow-500/50" /><div className="w-3 h-3 rounded-full bg-green-500/50" /></div>
                 <div className="mx-auto text-[10px] uppercase tracking-widest text-gray-light/40 font-bold flex items-center gap-2">
-                  <FiCommand size={12} /> TRASON COMMAND CENTER
+                  <Command size={12} /> TRASON COMMAND CENTER
                 </div>
               </div>
               {/* Fake Dashboard Content */}
@@ -215,7 +215,7 @@ export default function Home() {
                     
                     {/* Daily Insight */}
                     <div className="rounded-2xl bg-gradient-to-br from-gray-strong to-black border border-white/5 p-lg space-y-md relative overflow-hidden">
-                       <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-amber-500/10 blur-3xl rounded-full" />
+                       <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-amber-500/10 blur-xl md:blur-3xl rounded-full" />
                        <div className="flex items-center gap-3 relative z-10">
                          <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
                            <Activity size={16} />
@@ -244,7 +244,7 @@ export default function Home() {
             <Link href="/signup">
                <button className="w-full bg-soft-cream text-warm-black px-3xl py-5 rounded-2xl font-bold text-xl shadow-[0_0_40px_rgba(244,201,93,0.15)] hover:shadow-[0_0_60px_rgba(244,201,93,0.25)] hover:scale-105 active:scale-95 transition-all group overflow-hidden relative">
                   <span className="relative z-10 flex items-center justify-center gap-2">
-                    Initialize Free <FiArrowUpRight size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                    Initialize Free <ArrowUpRight size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </span>
                </button>
             </Link>

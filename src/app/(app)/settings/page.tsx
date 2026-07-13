@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Layout, Card, Button, Input, Loading, Alert, ErrorAlert, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { User, supabase } from '@/services/supabaseClient';
@@ -47,6 +48,7 @@ interface PreferenceData {
   push_notifications_enabled: boolean;
   email_digest_enabled: boolean;
   digest_frequency: string;
+  module_features?: Record<string, boolean>;
 }
 
 interface UserData {
@@ -130,14 +132,10 @@ const ModuleItem = React.memo(function ModuleItem({
 
   const Icon = MODULE_ICONS[metadata.icon] || Grid3X3;
 
-  // For Timeline and Reminders: detect if all sub-features are turned off
   const allSubFeaturesOff = isEnabled && (() => {
     const f = moduleFeatures || {};
     if (id === 'timeline') {
       return f['timeline_weekly_log'] === false && f['timeline_daily_checklist'] === false;
-    }
-    if (id === 'reminders') {
-      return f['reminders_active'] === false && f['reminders_history'] === false;
     }
     return false;
   })();
@@ -233,23 +231,6 @@ const ModuleItem = React.memo(function ModuleItem({
           )}
           {id === 'reminders' && (
             <>
-              <div className="flex items-center justify-between gap-md py-sm">
-                <span className="text-xs text-gray-light flex-1 min-w-0">{t('modules.reminders_active')}</span>
-                <button
-                  type="button"
-                  onClick={() => handleSubToggle('reminders_active')}
-                  disabled={isLocalLoading}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 will-change-transform ${
-                    moduleFeatures?.['reminders_active'] !== false
-                      ? 'bg-primary'
-                      : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
-                  }`}
-                >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    moduleFeatures?.['reminders_active'] !== false ? 'translate-x-6' : 'translate-x-1'
-                  }`} />
-                </button>
-              </div>
               <div className="flex items-center justify-between gap-md py-sm">
                 <span className="text-xs text-gray-light flex-1 min-w-0">{t('modules.reminders_history')}</span>
                 <button
@@ -488,6 +469,7 @@ export default function SettingsPage() {
                 push_notifications_enabled: freshPrefs.push_notifications_enabled ?? true,
                 email_digest_enabled: freshPrefs.email_digest_enabled ?? true,
                 digest_frequency: freshPrefs.digest_frequency || 'weekly',
+                module_features: freshPrefs.module_features,
               };
               setPrefs(loaded);
               setOriginalPrefs(loaded);
@@ -637,6 +619,7 @@ export default function SettingsPage() {
           push_notifications_enabled: updatedPrefs.push_notifications_enabled,
           email_digest_enabled: updatedPrefs.email_digest_enabled,
           digest_frequency: updatedPrefs.digest_frequency,
+          module_features: updatedPrefs.module_features,
         };
 
         setUser({ ...freshUser, user_preferences: [normalizedPrefs] } as any);
@@ -788,7 +771,7 @@ export default function SettingsPage() {
                         {isUploadingAvatar ? (
                           <Loading />
                         ) : profile.avatar_url ? (
-                          <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                          <Image src={profile.avatar_url} alt="Avatar" fill className="object-cover" />
                         ) : (
                           profile.first_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'
                         )}

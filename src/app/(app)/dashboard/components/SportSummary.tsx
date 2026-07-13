@@ -1,8 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card } from '@/components';
-import { FaDumbbell as Dumbbell } from 'react-icons/fa6';
-import { RiFireLine as Flame } from 'react-icons/ri';
+import { Dumbbell, Flame } from 'lucide-react';
 import { WeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 

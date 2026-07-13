@@ -2,17 +2,18 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { FiArrowLeft, FiMail } from 'react-icons/fi';
 import { 
-  RiCompass3Line, 
-  RiShieldKeyholeLine, 
-  RiWallet3Line, 
-  RiBriefcaseLine, 
-  RiQuestionLine, 
-  RiSendPlaneFill,
-  RiCheckDoubleLine
-} from 'react-icons/ri';
-import { FaDumbbell } from 'react-icons/fa6';
+  ArrowLeft,
+  Mail,
+  Compass,
+  Shield,
+  Wallet,
+  Briefcase,
+  HelpCircle,
+  Send,
+  CheckCheck,
+  Dumbbell
+} from 'lucide-react';
 
 interface FAQItem {
   q: string;
@@ -33,11 +34,11 @@ export default function SupportPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const categories = [
-    { id: 'all', name: 'All Topics', icon: RiQuestionLine },
-    { id: 'privacy', name: 'Privacy & Security', icon: RiShieldKeyholeLine },
-    { id: 'finance', name: 'Finance Module', icon: RiWallet3Line },
-    { id: 'sport', name: 'Sport & Timeline', icon: FaDumbbell },
-    { id: 'career', name: 'Career Tracker', icon: RiBriefcaseLine },
+    { id: 'all', name: 'All Topics', icon: HelpCircle },
+    { id: 'privacy', name: 'Privacy & Security', icon: Shield },
+    { id: 'finance', name: 'Finance Module', icon: Wallet },
+    { id: 'sport', name: 'Sport & Timeline', icon: Dumbbell },
+    { id: 'career', name: 'Career Tracker', icon: Briefcase },
   ];
 
   const faqs: FAQItem[] = [
@@ -105,12 +106,12 @@ export default function SupportPage() {
       <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-black/[0.03] dark:border-white/[0.03]">
         <div className="max-w-7xl mx-auto px-lg md:px-2xl h-20 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-sm group cursor-pointer">
-            <FiArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-warm-gold" />
+            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-warm-gold" />
             <span className="text-sm font-bold uppercase tracking-widest text-warm-gold">Back</span>
           </Link>
           <div className="flex items-center gap-sm">
             <div className="w-8 h-8 bg-warm-gold rounded-full flex items-center justify-center text-warm-black">
-              <RiCompass3Line size={18} />
+              <Compass size={18} />
             </div>
             <span className="text-xl font-serif font-bold tracking-tight">TRASON</span>
           </div>
@@ -215,7 +216,7 @@ export default function SupportPage() {
             <div className="max-w-xl mx-auto space-y-lg">
               <div className="text-center space-y-sm">
                 <div className="w-12 h-12 bg-warm-gold/10 rounded-2xl flex items-center justify-center text-warm-gold mx-auto mb-sm">
-                  <FiMail size={20} />
+                  <Mail size={20} />
                 </div>
                 <h2 className="text-3xl font-serif">Still have questions?</h2>
                 <p className="text-sm text-gray-light font-light leading-relaxed">
@@ -226,7 +227,7 @@ export default function SupportPage() {
               {isSubmitted ? (
                 <div className="p-xl rounded-2xl bg-deep-sage/10 border border-deep-sage/30 text-center space-y-md animate-fade-in">
                   <div className="w-10 h-10 bg-deep-sage/20 text-deep-sage rounded-full flex items-center justify-center mx-auto text-xl">
-                    <RiCheckDoubleLine />
+                    <CheckCheck />
                   </div>
                   <h4 className="font-serif text-lg text-soft-cream">Message Sent Successfully</h4>
                   <p className="text-xs text-gray-light font-light">
@@ -284,7 +285,7 @@ export default function SupportPage() {
                     className="w-full bg-warm-gold hover:bg-soft-cream text-warm-black py-md px-xl rounded-full text-sm font-bold flex items-center justify-center gap-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-lg shadow-warm-gold/15"
                   >
                     {isSubmitting ? 'Sending inquiry...' : 'Send Private Inquiry'}
-                    <RiSendPlaneFill size={14} />
+                    <Send size={14} />
                   </button>
                 </form>
               )}

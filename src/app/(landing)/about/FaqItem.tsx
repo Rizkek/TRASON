@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export function FaqItem({ q, a }: { q: string, a: string }) {
   const [open, setOpen] = useState(false);
@@ -13,7 +13,7 @@ export function FaqItem({ q, a }: { q: string, a: string }) {
         onClick={() => setOpen(!open)}
       >
         {q}
-        {open ? <FiChevronUp /> : <FiChevronDown />}
+        {open ? <ChevronUp size={20} className="text-warm-gold" /> : <ChevronDown size={20} className="text-gray-light group-hover:text-soft-cream transition-colors" />}
       </button>
       {open && (
         <div className="px-lg pb-md text-gray-light/80 leading-relaxed text-sm">

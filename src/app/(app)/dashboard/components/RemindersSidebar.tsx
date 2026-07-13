@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from '@/components';
-import { RiNotification3Line as Bell } from 'react-icons/ri';
+import { Bell } from 'lucide-react';
 import { Reminder } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 

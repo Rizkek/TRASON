@@ -24,6 +24,9 @@ export const SportPageClient: React.FC = () => {
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
   const [isCreatePlanModalOpen, setIsCreatePlanModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
   const {
     sessions,
@@ -176,12 +179,12 @@ export const SportPageClient: React.FC = () => {
                 <PRBoard records={prBoard} />
               </div>
 
-              {/* Recent Sessions List */}
-              {recentSessions.length > 0 && (
+              {/* Sessions History List */}
+              {sessions.length > 0 && (
                 <div className="space-y-md">
                   <h2 className="text-xl font-serif font-bold text-white">{t('sport_page.recent_workouts')}</h2>
                   <div className="grid grid-cols-1 gap-md">
-                    {recentSessions.map((session) => (
+                    {sessions.slice((page - 1) * limit, page * limit).map((session) => (
                       <div key={session.id} className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-lg p-md flex justify-between items-center hover:bg-black/[0.05] dark:bg-white/[0.05] transition-colors">
                         <div>
                           <p className="text-white font-bold">{new Date(session.session_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
@@ -196,6 +199,34 @@ export const SportPageClient: React.FC = () => {
                       </div>
                     ))}
                   </div>
+                  {Math.ceil(sessions.length / limit) > 1 && (
+                    <div className="flex items-center justify-between mt-4">
+                      <p className="text-xs text-gray-light">
+                        Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, sessions.length)} of {sessions.length}
+                      </p>
+                      <div className="flex items-center gap-xs">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setPage(p => Math.max(1, p - 1))} 
+                          disabled={page === 1}
+                        >
+                          Prev
+                        </Button>
+                        <div className="px-sm text-xs font-bold text-soft-cream min-w-[60px] text-center">
+                          {page} / {Math.ceil(sessions.length / limit)}
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setPage(p => Math.min(Math.ceil(sessions.length / limit), p + 1))} 
+                          disabled={page === Math.ceil(sessions.length / limit)}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </>

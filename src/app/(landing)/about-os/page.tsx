@@ -2,16 +2,18 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { FiArrowLeft, FiZap, FiActivity } from 'react-icons/fi';
 import { 
-  RiCompass3Line, 
-  RiCpuLine, 
-  RiStackLine, 
-  RiShieldCheckLine, 
-  RiWallet3Line, 
-  RiHistoryLine, 
-  RiBriefcaseLine
-} from 'react-icons/ri';
+  ArrowLeft, 
+  Zap, 
+  Activity, 
+  Compass, 
+  Cpu, 
+  Layers, 
+  ShieldCheck, 
+  Wallet, 
+  History, 
+  Briefcase 
+} from 'lucide-react';
 
 export default function AboutOS() {
   return (
@@ -24,12 +26,12 @@ export default function AboutOS() {
       <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-black/[0.03] dark:border-white/[0.03]">
         <div className="max-w-7xl mx-auto px-lg md:px-2xl h-20 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-sm group cursor-pointer">
-            <FiArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-warm-gold" />
+            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-warm-gold" />
             <span className="text-sm font-bold uppercase tracking-widest text-warm-gold">Back</span>
           </Link>
           <div className="flex items-center gap-sm">
             <div className="w-8 h-8 bg-warm-gold rounded-full flex items-center justify-center text-warm-black">
-              <RiCompass3Line size={18} />
+              <Compass size={18} />
             </div>
             <span className="text-xl font-serif font-bold tracking-tight">TRASON</span>
           </div>
@@ -43,7 +45,7 @@ export default function AboutOS() {
           {/* Header */}
           <section className="space-y-xl text-center">
             <div className="inline-flex items-center gap-sm px-md py-xs rounded-full bg-warm-gold/10 border border-warm-gold/20 text-[10px] uppercase tracking-[0.3em] text-warm-gold">
-              <RiCpuLine size={12} />
+              <Cpu size={12} />
               <span>Personal OS Concept</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-serif leading-tight">
@@ -64,14 +66,14 @@ export default function AboutOS() {
               </p>
               <div className="space-y-md pt-md">
                 <div className="flex gap-md">
-                  <div className="mt-1 text-warm-gold"><RiStackLine size={20} /></div>
+                  <div className="mt-1 text-warm-gold"><Layers size={20} /></div>
                   <div>
                     <h4 className="font-bold">The Core Spine</h4>
                     <p className="text-sm text-gray-light/60">A unified Life Log that captures every signal from your integrated modules.</p>
                   </div>
                 </div>
                 <div className="flex gap-md">
-                  <div className="mt-1 text-warm-gold"><FiZap size={20} /></div>
+                  <div className="mt-1 text-warm-gold"><Zap size={20} /></div>
                   <div>
                     <h4 className="font-bold">The Modular Edge</h4>
                     <p className="text-sm text-gray-light/60">Deep-dive tools for Finance, Vitality, and Career that share a single design language.</p>
@@ -82,14 +84,14 @@ export default function AboutOS() {
             <div className="relative aspect-square bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-[3rem] p-xl flex items-center justify-center">
                {/* Visual representation of sanctuary architecture */}
                <div className="relative w-full h-full border border-warm-gold/20 rounded-full animate-[spin_20s_linear_infinite]">
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><RiWallet3Line size={20} /></div>
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><FiActivity size={20} /></div>
-                  <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><RiHistoryLine size={20} /></div>
-                  <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><RiBriefcaseLine size={20} /></div>
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><Wallet size={20} /></div>
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><Activity size={20} /></div>
+                  <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><History size={20} /></div>
+                  <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><Briefcase size={20} /></div>
                </div>
                <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-24 h-24 bg-warm-gold rounded-full flex items-center justify-center text-warm-black shadow-[0_0_50px_rgba(244,201,93,0.3)]">
-                    <RiCompass3Line size={40} />
+                    <Compass size={40} />
                   </div>
                </div>
             </div>
@@ -123,9 +125,9 @@ export default function AboutOS() {
             <h2 className="text-3xl md:text-5xl font-serif text-center">Modular Pillars</h2>
             <div className="space-y-lg">
                {[
-                 { t: "Life Log (Core)", d: "The chronological spine of your existence. Every log, from a financial inflow to a session of vitality, is recorded here.", i: RiHistoryLine },
+                 { t: "Life Log (Core)", d: "The chronological spine of your existence. Every log, from a financial inflow to a session of vitality, is recorded here.", i: History },
                  
-                 { t: "Integrated Mesh", d: "Specific environments for Financial Flow, Vitality, and Career Architect that share the same design DNA.", i: RiStackLine }
+                 { t: "Integrated Mesh", d: "Specific environments for Financial Flow, Vitality, and Career Architect that share the same design DNA.", i: Layers }
                ].map((item, i) => (
                  <div key={i} className="flex flex-col md:flex-row gap-xl p-xl border-b border-black/5 dark:border-white/5 items-center">
                     <div className="w-12 h-12 text-warm-gold shrink-0"><item.i size={48} /></div>

@@ -32,7 +32,25 @@ const coingeckoHeaders = () => {
 const fetchCryptoQuotes = async (positions: PriceRequestPosition[]) => {
   if (positions.length === 0) return {};
 
-  const ids = positions.map((position) => {
+  const manualPositions = positions.filter(p => p.manual_current_price != null);
+  const apiPositions = positions.filter(p => p.manual_current_price == null);
+
+  const results: Record<string, any> = {};
+
+  for (const pos of manualPositions) {
+    results[pos.id] = {
+      symbol: pos.symbol.toUpperCase(),
+      assetType: 'crypto',
+      currentPrice: pos.manual_current_price,
+      changePercent24h: 0,
+      source: 'manual',
+      asOf: new Date().toISOString(),
+    };
+  }
+
+  if (apiPositions.length === 0) return results;
+
+  const ids = apiPositions.map((position) => {
     const normalized =
       position.external_id ||
       COIN_MAP[position.symbol.toLowerCase()] ||
@@ -57,7 +75,7 @@ const fetchCryptoQuotes = async (positions: PriceRequestPosition[]) => {
 
   const data = await response.json();
 
-  return positions.reduce<Record<string, any>>((acc, position) => {
+  const apiResults = apiPositions.reduce<Record<string, any>>((acc, position) => {
     const id =
       position.external_id ||
       COIN_MAP[position.symbol.toLowerCase()] ||
@@ -77,9 +95,61 @@ const fetchCryptoQuotes = async (positions: PriceRequestPosition[]) => {
 
     return acc;
   }, {});
+
+  return { ...results, ...apiResults };
+};
+
+const fetchYahooFinanceQuote = async (symbol: string) => {
+  try {
+    const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d`, {
+      cache: 'no-store',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+    if (!res.ok) {
+      console.error(`Yahoo Finance API failed for ${symbol}: ${res.status} ${res.statusText}`);
+      return null;
+    }
+    const data = await res.json();
+    const result = data.chart?.result?.[0];
+    if (!result) return null;
+    
+    const price = result.meta.regularMarketPrice;
+    const prevClose = result.meta.chartPreviousClose || result.meta.previousClose;
+    const changePct = prevClose ? ((price - prevClose) / prevClose) * 100 : 0;
+    
+    return {
+      symbol: symbol.toUpperCase(),
+      assetType: 'stock',
+      currentPrice: price,
+      changePercent24h: changePct,
+      source: 'yahoofinance',
+      asOf: new Date(result.meta.regularMarketTime * 1000).toISOString(),
+    };
+  } catch (err) {
+    return null;
+  }
 };
 
 const fetchStockQuote = async (position: PriceRequestPosition) => {
+  if (position.manual_current_price != null) {
+    return {
+      symbol: position.symbol.toUpperCase(),
+      assetType: 'stock',
+      currentPrice: position.manual_current_price,
+      changePercent24h: 0,
+      source: 'manual',
+      asOf: new Date().toISOString(),
+    };
+  }
+
+  // Khusus saham Indonesia (.JK), prioritas pakai Yahoo Finance karena lebih lengkap
+  if (position.symbol.toUpperCase().endsWith('.JK')) {
+    const yfQuote = await fetchYahooFinanceQuote(position.symbol);
+    if (yfQuote) return yfQuote;
+  }
+
   const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
   if (!apiKey) {
     return {
@@ -106,6 +176,10 @@ const fetchStockQuote = async (position: PriceRequestPosition) => {
   const quote = data['Global Quote'];
 
   if (!quote || !quote['05. price']) {
+    // Fallback ke Yahoo Finance jika AlphaVantage gagal/limit
+    const yfQuote = await fetchYahooFinanceQuote(position.symbol);
+    if (yfQuote) return yfQuote;
+
     return {
       symbol: position.symbol.toUpperCase(),
       assetType: 'stock',
@@ -126,9 +200,37 @@ const fetchStockQuote = async (position: PriceRequestPosition) => {
   };
 };
 
+const fetchIdrGoldPrice = async (): Promise<number | null> => {
+  try {
+    const fetchYF = async (sym: string) => {
+      const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d`, {
+        cache: 'no-store',
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.chart?.result?.[0]?.meta?.regularMarketPrice || null;
+    };
+    const [goldUSD, usdIdr] = await Promise.all([fetchYF('GC=F'), fetchYF('IDR=X')]);
+    if (goldUSD && usdIdr) {
+      return (goldUSD / 31.1034768) * usdIdr; // Convert Oz to Gram, then USD to IDR
+    }
+  } catch (err) {
+    console.error('Failed to fetch IDR gold price:', err);
+  }
+  return null;
+};
+
 const fetchGoldQuote = async (positions: PriceRequestPosition[]) => {
   const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
   let marketPrice: number | null = null;
+  let idrMarketPrice: number | null = null;
+
+  // Jika ada aset XAU.IDR, fetch harga spot gram dalam IDR otomatis
+  const needsIdr = positions.some(p => p.symbol.toUpperCase() === 'XAU.IDR' && p.manual_current_price == null);
+  if (needsIdr) {
+    idrMarketPrice = await fetchIdrGoldPrice();
+  }
 
   if (apiKey) {
     const url = new URL('https://www.alphavantage.co/query');
@@ -147,15 +249,18 @@ const fetchGoldQuote = async (positions: PriceRequestPosition[]) => {
   }
 
   return positions.reduce<Record<string, any>>((acc, position) => {
-    const currentPrice = position.manual_current_price ?? marketPrice ?? 0;
+    const isIdr = position.symbol.toUpperCase() === 'XAU.IDR';
+    const autoPrice = isIdr ? idrMarketPrice : marketPrice;
+    const currentPrice = position.manual_current_price ?? autoPrice ?? 0;
+    
     acc[position.id] = {
       symbol: position.symbol.toUpperCase(),
       assetType: 'gold',
       currentPrice: Number(currentPrice),
       changePercent24h: 0,
-      source: position.manual_current_price ? 'manual' : 'alphavantage',
+      source: position.manual_current_price ? 'manual' : (isIdr ? 'yahoofinance' : 'alphavantage'),
       asOf: new Date().toISOString(),
-      error: !currentPrice ? 'Provide a manual gold price or configure Alpha Vantage.' : undefined,
+      error: (!position.manual_current_price && !autoPrice) ? 'Provide a manual gold price or configure an API key' : undefined,
     };
     return acc;
   }, {});

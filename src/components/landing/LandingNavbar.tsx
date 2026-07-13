@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { RiCompass3Line } from 'react-icons/ri';
-import { FiArrowUpRight, FiMenu, FiX } from 'react-icons/fi';
+import { Compass, ArrowUpRight, Menu, X } from 'lucide-react';
 import { PieChart, Briefcase, Activity, LayoutDashboard, Monitor, Target } from 'lucide-react';
 import { Logo } from '@/components';
 
@@ -58,7 +57,7 @@ export function LandingNavbar() {
       <div className="max-w-7xl mx-auto px-lg md:px-2xl flex justify-between items-center">
         <Link href="/" className="flex items-center gap-sm group cursor-pointer">
           <div className="w-10 h-10 flex items-center justify-center transform transition-transform duration-500 hover:scale-105">
-            <Logo size={28} variant="gold" />
+            <Compass size={24} className="text-warm-gold" />
           </div>
           <span className="text-2xl font-serif font-bold tracking-tight">TRASON</span>
         </Link>
@@ -109,7 +108,7 @@ export function LandingNavbar() {
           <Link href="/signup">
             <button className="relative overflow-hidden bg-warm-gold text-warm-black px-xl py-2.5 rounded-xl text-sm font-bold shadow-[0_0_20px_rgba(244,201,93,0.2)] hover:shadow-[0_0_30px_rgba(244,201,93,0.4)] hover:scale-105 transition-all duration-300 group">
               <span className="relative z-10 flex items-center gap-2">
-                Get Started <FiArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                Get Started <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </span>
               <div className="absolute inset-0 bg-black/20 dark:bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
             </button>
@@ -121,7 +120,7 @@ export function LandingNavbar() {
           className="md:hidden text-soft-cream p-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          {mobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 

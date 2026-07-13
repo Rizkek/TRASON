@@ -1,8 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card, Button, Badge } from '@/components';
-import { FiArrowRight as ArrowRight } from 'react-icons/fi';
-import { RiBankLine as Landmark, RiCoinsLine as Coins, RiShieldLine as Shield } from 'react-icons/ri';
+import { ArrowRight, Landmark, Coins, Shield } from 'lucide-react';
 import {
   InvestmentPortfolioSummary,
   getAllocationLabel,

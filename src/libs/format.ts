@@ -64,7 +64,10 @@ export const formatDatetime = (
 };
 
 export const formatNumber = (num: number, decimals = 2): string => {
-  return num.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: decimals,
+  }).format(num);
 };
 
 /**

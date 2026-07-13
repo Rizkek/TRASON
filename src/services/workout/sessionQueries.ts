@@ -12,7 +12,8 @@ export const workoutSessionQueries = {
         .is('deleted_at', null)
         .gte('session_date', startDate.toISOString().split('T')[0])
         .lte('session_date', endDate.toISOString().split('T')[0])
-        .order('session_date', { ascending: false });
+        .order('session_date', { ascending: false })
+        .limit(1000);
       if (error) throw error;
       return (data as WorkoutSession[]) || [];
     });

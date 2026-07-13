@@ -585,7 +585,7 @@ export default function TimelinePage() {
             </div>
           ) : activeTab === 'weekly-log' && module_features?.['timeline_weekly_log'] !== false && (
             <div className="glass rounded-xl border border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
-              <div className="overflow-x-auto custom-scrollbar">
+              <div className="hidden md:block overflow-x-auto custom-scrollbar">
                 <div className="min-w-[700px] md:min-w-0">
                   <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/60 sticky top-0 z-20">
                 <div className="border-r border-black/[0.03] dark:border-white/[0.03]" />
@@ -722,6 +722,52 @@ export default function TimelinePage() {
                 </div>
               </div>
                 </div>
+              </div>
+
+              {/* Mobile Day View */}
+              <div className="md:hidden p-md space-y-md min-h-[50vh]">
+                <div className="flex items-center justify-between border-b border-black/[0.05] dark:border-white/[0.05] pb-2 mb-md">
+                  <h3 className="font-bold text-soft-cream uppercase tracking-widest text-sm">
+                    Today's Timeline
+                  </h3>
+                  <button onClick={() => openAddModal()} className="text-primary hover:text-primary-light p-1">
+                    <Plus size={16} />
+                  </button>
+                </div>
+                {(() => {
+                  const todayDay = new Date().getDay();
+                  const todayIdx = todayDay === 0 ? 6 : todayDay - 1;
+                  const todaysActivities = grid[todayIdx] ? HOURS.flatMap(h => grid[todayIdx][h] || []) : [];
+                  
+                  if (todaysActivities.length === 0) {
+                    return (
+                      <div className="text-center py-xl space-y-sm">
+                        <p className="text-gray-light italic text-xs">No activities logged for today.</p>
+                      </div>
+                    );
+                  }
+
+                  return todaysActivities.map(act => (
+                    <div key={act.id} onClick={() => openEditModal(act)} className="glass-card p-sm flex items-start gap-md active:bg-black/10 transition-colors">
+                      <div className="text-[10px] font-bold text-gray-light w-10 text-right pt-0.5">
+                        {formatHour(new Date(act.start_time).getHours())}
+                      </div>
+                      <div className="flex-1 border-l-2 border-primary pl-md relative group">
+                        <p className="font-bold text-sm text-soft-cream">{act.title}</p>
+                        <div className="flex flex-wrap gap-2 text-[8px] text-gray-light uppercase tracking-widest mt-1">
+                          {act.category && <span className="text-primary">{act.category}</span>}
+                          {getDurationLabel(act) && <span>• {getDurationLabel(act)}</span>}
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(act.id); }}
+                          className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 text-gray-light hover:text-expense transition-opacity"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  ));
+                })()}
               </div>
             </div>
           )}

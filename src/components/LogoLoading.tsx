@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Logo } from '@/components';
+import { Logo } from './Logo';
 
 export const LogoLoading: React.FC = () => {
   return (

@@ -14,3 +14,4 @@ export * from './layout/Layout';
 export * from './LogoLoading';
 export * from './Logo';
 export * from './ui/CategoryIcon';
+export * from './BottomSheet';

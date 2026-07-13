@@ -32,9 +32,11 @@ ChartJS.register(
 
 interface Props {
   transactions: Transaction[];
+  month?: number; // 0-11
+  year?: number;
 }
 
-export const FinancialChart = ({ transactions }: Props) => {
+export const FinancialChart = ({ transactions, month, year }: Props) => {
   const { t } = useTranslation();
   const { currency, locale } = useUserPreferences();
   const [isMounted, setIsMounted] = useState(false);
@@ -47,12 +49,12 @@ export const FinancialChart = ({ transactions }: Props) => {
     const dailyData: Record<string, { income: number; expense: number; dateStr: string }> = {};
 
     const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const targetYear = year !== undefined ? year : now.getFullYear();
+    const targetMonth = month !== undefined ? month : now.getMonth();
+    const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
 
     for (let i = 1; i <= daysInMonth; i++) {
-      const d = new Date(year, month, i);
+      const d = new Date(targetYear, targetMonth, i);
       const dayStr = d.toLocaleDateString('en-CA');
       const displayDate = d.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
       dailyData[dayStr] = { income: 0, expense: 0, dateStr: displayDate };
@@ -73,7 +75,7 @@ export const FinancialChart = ({ transactions }: Props) => {
     return Object.keys(dailyData)
       .sort((a, b) => a.localeCompare(b))
       .map(key => dailyData[key]);
-  }, [transactions, locale]);
+  }, [transactions, locale, month, year]);
 
   const chartDataState = useMemo(() => {
     return {

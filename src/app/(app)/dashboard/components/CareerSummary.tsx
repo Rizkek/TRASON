@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card, Badge } from '@/components';
-import { RiBriefcaseLine as Briefcase, RiTimeLine as Clock } from 'react-icons/ri';
+import { Briefcase, Clock } from 'lucide-react';
 import { CareerStats } from '@/hooks/useCareer';
 import { CareerApplication } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';

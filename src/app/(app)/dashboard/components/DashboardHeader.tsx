@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from '@/components';
-import { FiTrendingUp as TrendingUp } from 'react-icons/fi';
+import { TrendingUp } from 'lucide-react';
 import { formatCurrency } from '@/libs/format';
 import { User, Transaction, Activity } from '@/types/database';
 import { useUserPreferences } from '@/hooks/useUserPreferences';

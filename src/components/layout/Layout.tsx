@@ -2,30 +2,32 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { ConfirmModal, Logo } from '@/components';
+import { ConfirmModal } from '../ConfirmModal';
+import { Logo } from '../Logo';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useReminder } from '@/hooks/useReminder';
 import { useScheduleNotifications } from '@/hooks/useScheduleNotifications';
 import { ModuleId } from '@/modules/types';
 import { DEFAULT_MODULE_STATUS } from '@/modules/registry';
-import { FaDumbbell } from 'react-icons/fa6';
-import { WifiOff } from 'lucide-react';
-import {
-  RiDashboardLine,
-  RiWallet3Line,
-  RiCalendarLine,
-  RiNotification3Line,
-  RiLightbulbLine,
-  RiBriefcase4Line,
-  RiBriefcaseLine,
-  RiSettings4Line,
-  RiLogoutBoxRLine,
-  RiCloseLine,
-  RiAppsLine,
-} from 'react-icons/ri';
+import { 
+  WifiOff, 
+  Dumbbell,
+  LayoutDashboard,
+  Wallet,
+  Calendar,
+  Bell,
+  BellOff,
+  Lightbulb,
+  Briefcase,
+  Settings,
+  LogOut,
+  X,
+  LayoutGrid
+} from 'lucide-react';
 
 /**
  * ReminderScheduler lives here (not in AuthProvider root) so it only
@@ -140,6 +142,24 @@ function OfflineBanner() {
   );
 }
 
+const NotificationToggle = () => {
+  const { notifications_enabled, updatePreferences, isUpdating } = useUserPreferences();
+
+  return (
+    <button
+      disabled={isUpdating}
+      onClick={() => updatePreferences({ notifications_enabled: !notifications_enabled })}
+      className={`p-1.5 rounded-full transition-colors flex items-center justify-center shrink-0 ${
+        notifications_enabled 
+          ? 'text-primary bg-primary/10 hover:bg-primary/20' 
+          : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/10'
+      }`}
+      title={notifications_enabled ? 'Notifications ON' : 'Notifications OFF'}
+    >
+      {notifications_enabled ? <Bell size={18} /> : <BellOff size={18} />}
+    </button>
+  );
+};
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -167,15 +187,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   // Memoized menu items — only recompute when enabled modules change
   const menuItems: { label: string; href: string; icon: any; moduleId?: ModuleId }[] = useMemo(() => [
-    { label: 'Dashboard', href: '/dashboard', icon: RiDashboardLine }, // Core, always visible
-    { label: 'Finance', href: '/finance', icon: RiWallet3Line, moduleId: 'finance' as ModuleId },
-    { label: 'Investments', href: '/investments', icon: RiBriefcase4Line, moduleId: 'investments' as ModuleId },
-    { label: 'Timeline', href: '/timeline', icon: RiCalendarLine, moduleId: 'timeline' as ModuleId },
-    { label: 'Sport', href: '/sport', icon: FaDumbbell, moduleId: 'sport' as ModuleId },
-    { label: 'Career', href: '/career', icon: RiBriefcaseLine, moduleId: 'career' as ModuleId },
-    { label: 'Reminders', href: '/reminders', icon: RiNotification3Line, moduleId: 'reminders' as ModuleId },
-    { label: 'Insights', href: '/insights', icon: RiLightbulbLine, moduleId: 'insights' as ModuleId },
-    { label: 'Settings', href: '/settings', icon: RiSettings4Line }, // Core, always visible
+    { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard }, // Core, always visible
+    { label: 'Finance', href: '/finance', icon: Wallet, moduleId: 'finance' as ModuleId },
+    { label: 'Investments', href: '/investments', icon: Briefcase, moduleId: 'investments' as ModuleId },
+    { label: 'Timeline', href: '/timeline', icon: Calendar, moduleId: 'timeline' as ModuleId },
+    { label: 'Sport', href: '/sport', icon: Dumbbell, moduleId: 'sport' as ModuleId },
+    { label: 'Career', href: '/career', icon: Briefcase, moduleId: 'career' as ModuleId },
+    { label: 'Reminders', href: '/reminders', icon: Bell, moduleId: 'reminders' as ModuleId },
+    { label: 'Insights', href: '/insights', icon: Lightbulb, moduleId: 'insights' as ModuleId },
+    { label: 'Settings', href: '/settings', icon: Settings }, // Core, always visible
   ], []);
 
   // Filter items based on enabled modules
@@ -198,13 +218,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     return visibleMenuItems.filter((i) => !primaryHrefs.has(i.href));
   }, [visibleMenuItems, primaryNavItems]);
 
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
+
+  const currentMenuItem = menuItems.find((item) => isActive(item.href));
+
   const { t } = useTranslation();
 
   if (!isAuthenticated) {
     return <>{children}</>;
   }
-
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -263,7 +285,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center gap-md px-lg py-md rounded-md bg-soft-cream/5 border border-soft-cream/10">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-bold text-white shadow-lg overflow-hidden shrink-0">
               {(user as any)?.avatar_url ? (
-                <img src={(user as any).avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                <Image src={(user as any).avatar_url} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
               ) : (
                 user?.first_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'
               )}
@@ -272,13 +294,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <p className="font-bold text-sm text-soft-cream truncate">{user?.first_name || user?.name || 'User'}</p>
               <p className="text-[10px] text-gray-light truncate opacity-80">{user?.email}</p>
             </div>
+            <NotificationToggle />
           </div>
           {/* Logout */}
           <button
             onClick={() => setIsLogoutModalOpen(true)}
             className="w-full flex items-center gap-md px-lg py-md rounded-md text-gray-light hover:text-danger hover:bg-danger/10 transition-all duration-300 group"
           >
-            <RiLogoutBoxRLine size={20} className="group-hover:-translate-x-1 transition-transform" />
+            <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-semibold tracking-wide">{t('nav.logout')}</span>
           </button>
         </div>
@@ -286,21 +309,31 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* ── Main content area ─────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative md:ml-72">
-        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary opacity-[0.03] blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-[-5%] left-[-5%] w-[400px] h-[400px] bg-secondary opacity-[0.02] blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary opacity-[0.03] blur-2xl md:blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-[-5%] left-[-5%] w-[400px] h-[400px] bg-secondary opacity-[0.02] blur-2xl md:blur-[100px] rounded-full pointer-events-none" />
 
         {/* Mobile top header */}
-        <header className="bg-warm-black border-b border-soft-cream/5 px-lg py-md flex items-center justify-center md:hidden relative z-10 transition-colors">
+        <header className="bg-warm-black/95 backdrop-blur-md border-b border-soft-cream/5 px-md py-sm pt-[max(env(safe-area-inset-top),16px)] flex items-center justify-between md:hidden relative z-40 transition-colors">
           <div className="flex items-center gap-sm">
-            <Logo size={24} variant="gold" />
-            <h2 className="text-xl font-serif font-bold text-gradient">
-              TRASON
+            <Logo size={20} variant="gold" />
+            <h2 className="text-sm font-bold text-soft-cream tracking-wider uppercase">
+              {currentMenuItem ? t(`nav.${currentMenuItem.href.replace('/', '')}`) : 'TRASON'}
             </h2>
+          </div>
+          <div className="flex items-center gap-sm">
+            <NotificationToggle />
+            <button onClick={() => setIsBottomSheetOpen(true)} className="relative w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-[10px] font-bold text-white shadow-lg overflow-hidden shrink-0">
+              {(user as any)?.avatar_url ? (
+                <Image src={(user as any).avatar_url} alt="Avatar" fill className="object-cover" />
+              ) : (
+                user?.first_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'
+              )}
+            </button>
           </div>
         </header>
 
         <main className="flex-1 overflow-y-auto relative z-10 pb-24 md:pb-0">
-          <div className="container mx-auto px-md py-lg md:px-2xl md:py-xl max-w-6xl">
+          <div className="container mx-auto px-sm py-sm md:px-2xl md:py-xl max-w-6xl">
             {children}
           </div>
         </main>
@@ -342,7 +375,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             }`}
           >
             <div className={`p-1.5 rounded-lg transition-all duration-200 ${isBottomSheetOpen ? 'bg-primary/15' : ''}`}>
-              <RiAppsLine size={22} />
+              <LayoutGrid size={22} />
             </div>
             <span className="text-[10px] mt-0.5 font-medium tracking-wide">More</span>
           </button>
@@ -372,7 +405,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={() => setIsBottomSheetOpen(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-soft-cream/5 hover:bg-soft-cream/10 transition-colors text-gray-light hover:text-soft-cream"
               >
-                <RiCloseLine size={18} />
+                <X size={20} />
               </button>
             </div>
 
@@ -419,7 +452,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/5'
                   }`}
                 >
-                  <RiSettings4Line size={20} />
+                  <Settings size={20} />
                   <span className="text-sm font-semibold">{t('nav.settings')}</span>
                 </Link>
 
@@ -427,7 +460,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <div className="flex items-center gap-md px-md py-sm rounded-xl bg-soft-cream/5 border border-soft-cream/5">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-bold text-white shadow-lg flex-shrink-0 overflow-hidden">
                     {(user as any)?.avatar_url ? (
-                      <img src={(user as any).avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                      <Image src={(user as any).avatar_url} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
                     ) : (
                       user?.first_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'
                     )}
@@ -436,11 +469,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <p className="font-bold text-sm text-soft-cream truncate">{user?.first_name || user?.name || 'User'}</p>
                     <p className="text-[10px] text-gray-light truncate opacity-80">{user?.email}</p>
                   </div>
+                  <NotificationToggle />
                   <button
                     onClick={() => { setIsBottomSheetOpen(false); setIsLogoutModalOpen(true); }}
                     className="flex items-center gap-xs text-gray-light hover:text-danger transition-colors text-xs font-medium px-sm py-xs rounded-lg hover:bg-danger/10"
                   >
-                    <RiLogoutBoxRLine size={16} />
+                    <LogOut size={16} />
                     <span>Logout</span>
                   </button>
                 </div>

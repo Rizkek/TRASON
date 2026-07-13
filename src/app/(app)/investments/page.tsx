@@ -150,14 +150,11 @@ export default function InvestmentsPage() {
         buy_price: Number(form.buy_price.replace(/,/g, '')),
         buy_date: form.buy_date,
         quote_currency: 'USD',
-        price_source:
-          form.asset_type === 'crypto'
+        price_source: form.manual_current_price
+          ? 'manual'
+          : form.asset_type === 'crypto'
             ? 'coingecko'
-            : form.asset_type === 'stock'
-              ? 'alphavantage'
-              : form.manual_current_price
-                ? 'manual'
-                : 'alphavantage',
+            : 'alphavantage',
         external_id: form.asset_type === 'crypto' ? form.external_id.trim().toLowerCase() || null : null,
         manual_current_price: form.manual_current_price ? Number(form.manual_current_price.replace(/,/g, '')) : null,
         notes: form.notes.trim() || null,
@@ -243,36 +240,6 @@ export default function InvestmentsPage() {
           </Alert>
         )}
 
-        <Card className="p-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-44 h-44 bg-primary/10 blur-3xl rounded-full" />
-          <div className="relative z-10 space-y-sm">
-            <p className="text-sm text-soft-cream italic">"{headerInsight}"</p>
-            <div className="flex flex-wrap gap-sm pt-sm">
-              {insights?.scenario ? (
-                <Badge variant="info" size="sm">{t(`investment_page.scenario_${insights.scenario}`)}</Badge>
-              ) : null}
-              {insights?.confidence ? (
-                <Badge variant={insights.confidence === 'low' ? 'danger' : insights.confidence === 'moderate' ? 'warning' : 'success'} size="sm">
-                  {t(`investment_page.confidence_${insights.confidence}`)}
-                </Badge>
-              ) : null}
-            </div>
-            {insights?.riskWarning ? (
-              <p className="text-xs text-warning mt-2">{insights.riskWarning}</p>
-            ) : null}
-            {insights?.recommendation ? (
-              <p className="text-sm text-gray-light mt-2">{insights.recommendation}</p>
-            ) : null}
-            {insights?.observations?.length ? (
-              <div className="flex flex-wrap gap-sm pt-sm">
-                {insights.observations.map((item: string) => (
-                  <Badge key={item} variant="insight" size="sm">{item}</Badge>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        </Card>
-
         <div className="grid grid-cols-2 md:grid-cols-4 gap-md md:gap-lg">
           <Card className="p-xl">
             <p className="text-micro text-gray-light mb-sm">{t('investment_page.portfolio_value')}</p>
@@ -306,7 +273,7 @@ export default function InvestmentsPage() {
                     <div className="h-2 w-full rounded-full bg-black/5 dark:bg-white/5 overflow-hidden">
                       <div
                         style={{ width: `${Math.min(percent, 100)}%` }}
-                        className={`h-full rounded-full ${type === 'stock' ? 'bg-info' : type === 'crypto' ? 'bg-activity' : 'bg-warning'}`}
+                        className="h-full rounded-full bg-primary"
                       />
                     </div>
                   </div>
@@ -337,15 +304,15 @@ export default function InvestmentsPage() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-black/5 dark:border-white/5 text-[10px] uppercase tracking-widest text-gray-light">
-                    <th className="px-lg py-md">{t('investment_page.asset')}</th>
-                    <th className="px-lg py-md">{t('investment_page.amount')}</th>
-                    <th className="px-lg py-md">{t('investment_page.avg_cost')}</th>
-                    <th className="px-lg py-md">{t('investment_page.current_price')}</th>
-                    <th className="px-lg py-md">{t('investment_page.day_chg')}</th>
-                    <th className="px-lg py-md">{t('investment_page.value')}</th>
-                    <th className="px-lg py-md">{t('investment_page.pl')}</th>
-                    <th className="px-lg py-md">{t('investment_page.risk')}</th>
-                    <th className="px-lg py-md text-right">{t('investment_page.actions')}</th>
+                    <th className="px-sm py-sm">{t('investment_page.asset')}</th>
+                    <th className="px-sm py-sm">{t('investment_page.amount')}</th>
+                    <th className="px-sm py-sm">{t('investment_page.avg_cost')}</th>
+                    <th className="px-sm py-sm">{t('investment_page.current_price')}</th>
+                    <th className="px-sm py-sm">{t('investment_page.day_chg')}</th>
+                    <th className="px-sm py-sm">{t('investment_page.value')}</th>
+                    <th className="px-sm py-sm">{t('investment_page.pl')}</th>
+                    <th className="px-sm py-sm">{t('investment_page.risk')}</th>
+                    <th className="px-sm py-sm text-right">{t('investment_page.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -356,11 +323,11 @@ export default function InvestmentsPage() {
                       : null;
                     return (
                     <tr key={position.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:bg-white/5 transition-colors">
-                      <td className="px-lg py-lg">
+                      <td className="px-sm py-md">
                         <div className="space-y-1">
-                          <div className="flex items-center gap-sm">
-                            <p className="font-bold text-white">{position.symbol}</p>
-                            <Badge variant={getAssetBadgeVariant(position.asset_type)} size="sm">
+                          <div className="flex items-center gap-xs">
+                            <p className="font-bold text-white text-xs">{position.symbol}</p>
+                            <Badge variant={getAssetBadgeVariant(position.asset_type)} size="sm" className="text-[9px] px-1 py-0">
                               {position.asset_type}
                             </Badge>
                             {isLive ? (
@@ -373,62 +340,62 @@ export default function InvestmentsPage() {
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-gray-light">{position.display_name || t('investment_page.tracked_position')}</p>
+                          <p className="text-[10px] text-gray-light truncate max-w-[120px]">{position.display_name || t('investment_page.tracked_position')}</p>
                         </div>
                       </td>
-                      <td className="px-lg py-lg text-sm text-soft-cream">{formatNumber(position.amount, 4)}</td>
-                      <td className="px-lg py-lg text-sm text-soft-cream">{formatCurrency(position.buy_price, currency, locale)}</td>
-                      <td className="px-lg py-lg">
-                        <p className="text-sm text-soft-cream">{formatCurrency(position.current_price, currency, locale)}</p>
+                      <td className="px-sm py-md text-xs text-soft-cream">{formatNumber(position.amount, 4)}</td>
+                      <td className="px-sm py-md text-xs text-soft-cream">{formatCurrency(position.buy_price, currency, locale)}</td>
+                      <td className="px-sm py-md">
+                        <p className="text-xs text-soft-cream">{formatCurrency(position.current_price, currency, locale)}</p>
                         {lastUpdated && (
-                          <p className="text-[10px] text-gray-light mt-1">{t('investment_page.update_label')} {lastUpdated}</p>
+                          <p className="text-[9px] text-gray-light mt-1">{t('investment_page.update_label')} {lastUpdated}</p>
                         )}
                       </td>
-                      <td className="px-lg py-lg">
-                        <div className={`flex items-center gap-1 text-sm font-semibold ${
+                      <td className="px-sm py-md">
+                        <div className={`flex items-center gap-1 text-xs font-semibold ${
                           position.day_change_percent >= 0 ? 'text-success' : 'text-danger'
                         }`}>
                           {position.day_change_percent >= 0
-                            ? <TrendingUp size={12} />
-                            : <TrendingDown size={12} />
+                            ? <TrendingUp size={10} />
+                            : <TrendingDown size={10} />
                           }
                           {formatSignedPercent(position.day_change_percent)}
                         </div>
-                        <div className="text-xs text-gray-light">{formatSignedCurrency(position.day_change_value, currency, locale)}</div>
+                        <div className="text-[10px] text-gray-light">{formatSignedCurrency(position.day_change_value, currency, locale)}</div>
                       </td>
-                      <td className="px-lg py-lg text-sm font-semibold text-white">{formatCurrency(position.current_value, currency, locale)}</td>
-                      <td className="px-lg py-lg">
-                        <div className={`${position.profit_loss >= 0 ? 'text-success' : 'text-danger'} text-sm font-semibold`}>
+                      <td className="px-sm py-md text-xs font-semibold text-white">{formatCurrency(position.current_value, currency, locale)}</td>
+                      <td className="px-sm py-md">
+                        <div className={`${position.profit_loss >= 0 ? 'text-success' : 'text-danger'} text-xs font-semibold`}>
                           {formatSignedCurrency(position.profit_loss, currency, locale)}
                         </div>
-                        <div className="text-xs text-gray-light">{formatSignedPercent(position.percentage_change)}</div>
+                        <div className="text-[10px] text-gray-light">{formatSignedPercent(position.percentage_change)}</div>
                       </td>
-                      <td className="px-lg py-lg align-top">
+                      <td className="px-sm py-md align-top">
                         <div className="space-y-1">
                           <Badge
                             variant={position.risk_category === 'high' ? 'danger' : position.risk_category === 'moderate' ? 'warning' : 'success'}
                             size="sm"
+                            className="text-[9px] px-1 py-0"
                           >
                             {position.risk_category.toUpperCase()}
                           </Badge>
-                          <p className="text-[11px] text-gray-light">
+                          <p className="text-[10px] text-gray-light">
                             {position.risk_status === 'overweight'
                               ? t('investment_page.overweight')
                               : position.risk_status === 'underweight'
                               ? t('investment_page.underweight')
                               : t('investment_page.balanced')}
                           </p>
-                          <p className="text-[10px] text-gray-light">{position.portfolio_weight_pct.toFixed(1)}% of portfolio</p>
                         </div>
                       </td>
-                      <td className="px-lg py-lg">
-                        <div className="flex items-center justify-end gap-sm">
-                          <Button variant="ghost" size="sm" onClick={() => openEditModal(position)}>{t('investment_page.edit')}</Button>
+                      <td className="px-sm py-md">
+                        <div className="flex items-center justify-end gap-xs">
+                          <Button variant="ghost" size="sm" onClick={() => openEditModal(position)} className="h-6 text-xs px-2">{t('investment_page.edit')}</Button>
                           <button
                             onClick={() => setDeleteConfirmId(position.id)}
-                            className="p-sm text-danger hover:bg-danger/10 rounded-md transition-colors"
+                            className="p-1 text-danger hover:bg-danger/10 rounded-md transition-colors"
                           >
-                            <Trash2 size={16} />
+                            <Trash2 size={14} />
                           </button>
                         </div>
                       </td>
@@ -584,17 +551,15 @@ export default function InvestmentsPage() {
             />
           )}
 
-          {form.asset_type === 'gold' && (
-            <Input
-              label={t('investment_page.manual_price')}
-              type="number"
-              step="0.01"
-              placeholder="Useful if API pricing is unavailable"
-              value={form.manual_current_price}
-              onChange={(e) => setForm((prev) => ({ ...prev, manual_current_price: e.target.value }))}
-              helpText={t('investment_page.manual_price_help')}
-            />
-          )}
+          <Input
+            label={t('investment_page.manual_price')}
+            type="number"
+            step="0.01"
+            placeholder="Useful if API pricing is unavailable (e.g., IPOs)"
+            value={form.manual_current_price}
+            onChange={(e) => setForm((prev) => ({ ...prev, manual_current_price: e.target.value }))}
+            helpText={t('investment_page.manual_price_help')}
+          />
 
           <div className="space-y-sm">
             <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('investment_page.notes_upper')}</label>

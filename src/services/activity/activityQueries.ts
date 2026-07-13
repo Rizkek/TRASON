@@ -37,7 +37,7 @@ export const activityQueries = {
   },
 
   // Fetch activities by date range
-  async getActivities(startDate: Date, endDate: Date, limit: number = 50, offset: number = 0) {
+  async getActivities(startDate: Date, endDate: Date, limit: number = 1000, offset: number = 0) {
     try {
   return await withAuthQuery(async (userId) => {
   const { data, error, count } = await supabase

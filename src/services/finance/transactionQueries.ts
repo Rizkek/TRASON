@@ -19,7 +19,7 @@ export const transactionQueries = {
     startDate?: Date,
     endDate?: Date,
     type?: 'income' | 'expense',
-    limit: number = 50,
+    limit: number = 1000,
     offset: number = 0
   ) {
     try {
@@ -63,12 +63,18 @@ export const transactionQueries = {
   ) {
     try {
   return await withAuthQuery(async (userId) => {
+    console.log('[transactionQueries] createTransaction input:', { amount: transaction.amount, category_id: transaction.category_id, currency: transaction.original_currency });
   const { data, error } = await supabase
           .from('transactions')
           .insert([{ ...transaction, user_id: userId }])
-          .select()
+          .select(
+            `id, user_id, category_id, title, description, amount, type, date, time,
+            payment_method, tags, created_at, updated_at,
+            categories:category_id(id, name, color, icon)`
+          )
           .single();
   if (error) throw error;
+  console.log('[transactionQueries] createTransaction result:', { amount: data?.amount, category_id: data?.category_id, categories: data?.categories });
   return data;
   });
   } catch (err) {
@@ -83,18 +89,24 @@ export const transactionQueries = {
     updates: Partial<Omit<Transaction, 'id' | 'user_id' | 'created_at'>>
   ) {
     try {
-  return await withAuthQuery(async (userId) => {
-  const { data, error } = await supabase
+      return await withAuthQuery(async (userId) => {
+        console.log('[transactionQueries] updateTransaction input:', { id, amount: updates.amount, category_id: updates.category_id });
+        const { data, error } = await supabase
           .from('transactions')
           .update({ ...updates, updated_at: new Date().toISOString() })
           .eq('id', id)
           .eq('user_id', userId)
-          .select()
+          .select(
+            `id, user_id, category_id, title, description, amount, type, date, time,
+            payment_method, tags, created_at, updated_at,
+            categories:category_id(id, name, color, icon)`
+          )
           .single();
-  if (error) throw error;
-  return data;
-  });
-  } catch (err) {
+        if (error) throw error;
+        console.log('[transactionQueries] updateTransaction result:', { amount: data?.amount, category_id: data?.category_id, categories: data?.categories });
+        return data;
+      });
+    } catch (err) {
       logError(err, 'transactionQueries.updateTransaction');
       throw handleQueryError(err);
     }
