@@ -10,6 +10,7 @@ import {
   UserPreferences
 } from '../supabase/supabaseClient';
 import { handleQueryError, logError } from '@/libs/apiErrors';
+import { formatDateOnly } from '@/libs/date';
 import type { DailyTask } from '@/types/database';
 import { withAuthQuery } from "@/services/supabase/queryBuilder";
 
@@ -36,10 +37,10 @@ export const transactionQueries = {
             .eq('user_id', userId)
             .is('deleted_at', null);
     if (startDate) {
-            query = query.gte('date', startDate.toISOString().split('T')[0]);
+            query = query.gte('date', formatDateOnly(startDate));
           }
     if (endDate) {
-            query = query.lte('date', endDate.toISOString().split('T')[0]);
+            query = query.lte('date', formatDateOnly(endDate));
           }
     if (type) {
             query = query.eq('type', type);
@@ -135,8 +136,8 @@ export const transactionQueries = {
       const { data, error } = await supabase
             .rpc('get_transaction_analytics', {
               p_user_id: userId,
-              p_start_date: startDate.toISOString().split('T')[0],
-              p_end_date: endDate.toISOString().split('T')[0],
+              p_start_date: formatDateOnly(startDate),
+              p_end_date: formatDateOnly(endDate),
             });
       if (error) throw error;
       return data;
@@ -158,8 +159,8 @@ export const transactionQueries = {
             )
             .eq('user_id', userId)
             .is('deleted_at', null)
-            .gte('date', startDate.toISOString().split('T')[0])
-            .lte('date', endDate.toISOString().split('T')[0]);
+            .gte('date', formatDateOnly(startDate))
+            .lte('date', formatDateOnly(endDate));
       if (error) throw error;
       interface TransactionSummaryRow {
             type: string;

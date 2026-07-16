@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import FinanceClient from './FinanceClient';
 
-import { getDateRange } from '@/libs/date';
+import { formatDateOnly, getDateRange } from '@/libs/date';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,8 +41,8 @@ export default async function FinancePage() {
         )
       `)
       .eq('user_id', user.id)
-      .gte('date', start.toISOString())
-      .lte('date', end.toISOString())
+      .gte('date', formatDateOnly(start))
+      .lte('date', formatDateOnly(end))
       .order('date', { ascending: false });
 
     if (data) {

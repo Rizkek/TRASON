@@ -38,3 +38,73 @@ const serwist = new Serwist({
 });
 
 serwist.addEventListeners();
+
+// Handle Push Notifications
+self.addEventListener('push', (event) => {
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      const title = data.title || 'TRASON';
+      const options: NotificationOptions = {
+        body: data.body || 'You have a new update.',
+        icon: '/icon-192x192.png',
+        badge: '/icon-192x192.png',
+        data: {
+          url: data.url || '/',
+        },
+      };
+
+      event.waitUntil(self.registration.showNotification(title, options));
+    } catch (err) {
+      console.error('[SW] Failed to parse push event data:', err);
+      // Fallback notification if parsing fails
+      event.waitUntil(
+        self.registration.showNotification('TRASON', {
+          body: event.data.text(),
+          icon: '/icon-192x192.png',
+          badge: '/icon-192x192.png',
+          data: { url: '/' },
+        })
+      );
+    }
+  } else {
+    // Fallback if no data is provided
+    event.waitUntil(
+      self.registration.showNotification('TRASON', {
+        body: 'You have a new notification.',
+        icon: '/icon-192x192.png',
+        badge: '/icon-192x192.png',
+        data: { url: '/' },
+      })
+    );
+  }
+});
+
+// Handle Notification Clicks
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  const targetUrl = event.notification.data?.url || '/';
+
+  // Open the target URL
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // If a window is already open, focus it and navigate
+        for (const client of clientList) {
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            return client.focus().then((focusedClient) => {
+              if ('navigate' in focusedClient) {
+                return focusedClient.navigate(targetUrl);
+              }
+            });
+          }
+        }
+        // Otherwise, open a new window
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(targetUrl);
+        }
+      })
+  );
+});

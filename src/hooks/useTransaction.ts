@@ -8,6 +8,7 @@ import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { executeMutation } from "@/libs/api/mutationBuilder";
 import { getUserErrorMessage } from "@/libs/apiErrors";
+import { formatDateOnly } from '@/libs/date';
 
 export interface UseTransactionReturn {
   transactions: Transaction[];
@@ -25,7 +26,7 @@ export interface UseTransactionReturn {
 export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income' | 'expense', fallbackData?: Transaction[]): UseTransactionReturn => {
   // Generate stable cache key using CACHE_KEYS helper
   const key = startDate && endDate
-    ? CACHE_KEYS.transactions.list(startDate.toISOString(), endDate.toISOString())
+    ? CACHE_KEYS.transactions.list(formatDateOnly(startDate), formatDateOnly(endDate))
     : CACHE_KEYS.transactions.all();
 
   // Append type filter to key if specified

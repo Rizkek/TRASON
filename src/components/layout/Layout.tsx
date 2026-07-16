@@ -11,6 +11,7 @@ import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useReminder } from '@/hooks/useReminder';
 import { useScheduleNotifications } from '@/hooks/useScheduleNotifications';
+import { usePushNotification } from '@/hooks/usePushNotification';
 import { ModuleId } from '@/modules/types';
 import { DEFAULT_MODULE_STATUS } from '@/modules/registry';
 import { 
@@ -144,11 +145,35 @@ function OfflineBanner() {
 
 const NotificationToggle = () => {
   const { notifications_enabled, updatePreferences, isUpdating } = useUserPreferences();
+  const push = usePushNotification();
+
+  const handleToggle = async () => {
+    const newState = !notifications_enabled;
+    
+    await updatePreferences({ 
+      notifications_enabled: newState,
+      push_notifications_enabled: newState 
+    });
+
+    if (newState) {
+      try {
+        await push.subscribe();
+      } catch (err) {
+        console.error('Failed to subscribe to push on toggle:', err);
+      }
+    } else {
+      try {
+        await push.unsubscribe();
+      } catch (err) {
+        console.error('Failed to unsubscribe from push on toggle:', err);
+      }
+    }
+  };
 
   return (
     <button
-      disabled={isUpdating}
-      onClick={() => updatePreferences({ notifications_enabled: !notifications_enabled })}
+      disabled={isUpdating || push.isLoading}
+      onClick={handleToggle}
       className={`p-1.5 rounded-full transition-colors flex items-center justify-center shrink-0 ${
         notifications_enabled 
           ? 'text-primary bg-primary/10 hover:bg-primary/20' 

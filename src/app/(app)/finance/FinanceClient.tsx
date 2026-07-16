@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
 import { fetchExchangeRates } from '@/libs/exchange';
-import { getDateRange } from '@/libs/date';
+import { formatDateOnly, getDateRange } from '@/libs/date';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import type { CategoryJoin } from '@/types/database';
@@ -215,7 +215,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
       amount: t.amount.toString(),
       type: t.type,
       category_id: t.category_id || '',
-      date: new Date(t.date).toISOString().split('T')[0],
+      date: formatDateOnly(t.date),
       description: t.description || '',
       original_currency: t.original_currency || currency || 'USD',
       decision_notes: (t.metadata?.decision_notes as string) || '',

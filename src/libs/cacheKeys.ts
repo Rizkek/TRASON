@@ -96,6 +96,8 @@ export const INVALIDATION_PATTERNS = {
     CACHE_KEYS.transactions.all(),
     CACHE_KEYS.dashboard.overview,
     'financial-summary',
+    'financial-overview',
+    'dashboard-finance',
   ],
 
   // When activity changes, invalidate these
