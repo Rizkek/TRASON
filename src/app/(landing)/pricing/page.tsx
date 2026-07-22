@@ -1,10 +1,25 @@
 
 
 import React from 'react';
+import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { Check, X } from 'lucide-react';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Pricing – Free Forever, Pro When You Need It',
+  description:
+    'TRASON is free to start. Get full access to Financial Tracking, Habit Heatmaps, and Career Pipeline at no cost. Upgrade to Pro for AI Insights and Investment Sync.',
+  alternates: { canonical: '/pricing' },
+  openGraph: {
+    title: 'TRASON Pricing – Free Forever, Pro When You Need It',
+    description:
+      'Start for free with full core access. Upgrade to Pro for advanced AI Insights, Investment Sync, and unlimited Career Pipeline.',
+    url: 'https://www.trason.web.id/pricing',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TRASON Pricing' }],
+  },
+};
 
 export default function PricingPage() {
   return (

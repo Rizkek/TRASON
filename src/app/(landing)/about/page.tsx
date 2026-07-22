@@ -1,7 +1,22 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { FaqItem } from './FaqItem';
+
+export const metadata: Metadata = {
+  title: 'About TRASON – Philosophy & FAQ',
+  description:
+    'Learn why TRASON was built, the philosophy behind the Personal OS concept, and get answers to the most common questions about privacy, pricing, and compatibility.',
+  alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'About TRASON – Philosophy & FAQ',
+    description:
+      'Learn why TRASON was built and the philosophy behind a unified Personal Operating System for finances, habits, and career.',
+    url: 'https://www.trason.web.id/about',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TRASON About' }],
+  },
+};
 
 const FAQS = [
   {

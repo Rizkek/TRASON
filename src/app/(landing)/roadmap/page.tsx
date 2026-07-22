@@ -1,9 +1,24 @@
 
 
 import React from 'react';
+import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { Map, Flag, Rocket, CheckCircle2, CircleDashed, Clock } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Roadmap – What We Are Building Next',
+  description:
+    'See what the TRASON team has recently shipped, what is actively in development, and what features are planned for Q3 2026. We build in public.',
+  alternates: { canonical: '/roadmap' },
+  openGraph: {
+    title: 'TRASON Roadmap – What We Are Building Next',
+    description:
+      'Crypto Wallet Integration, Career CRM Upgrades, Mobile App, and more. See the full TRASON product evolution.',
+    url: 'https://www.trason.web.id/roadmap',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TRASON Roadmap' }],
+  },
+};
 
 export default function RoadmapPage() {
   return (

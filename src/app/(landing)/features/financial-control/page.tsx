@@ -1,10 +1,25 @@
 
 
 import React from 'react';
+import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { CircleDollarSign, TrendingUp, TrendingDown, Wallet, ArrowUpRight, BarChart3, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Financial Control – Track Your Money, Burn Rate & Net Worth',
+  description:
+    'Stop guessing where your money goes. TRASON provides absolute clarity on your burn rate, runway, and net worth trajectory across all accounts — with multi-currency support and investment tracking.',
+  alternates: { canonical: '/features/financial-control' },
+  openGraph: {
+    title: 'Financial Control – TRASON',
+    description:
+      'Master your capital. Track expenses, net worth, burn rate, and investment portfolios in one unified dashboard. Free to start.',
+    url: 'https://www.trason.web.id/features/financial-control',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TRASON Financial Control' }],
+  },
+};
 
 export default function FinancialControlPage() {
   return (
@@ -199,7 +214,7 @@ export default function FinancialControlPage() {
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">Take back control of your capital.</h2>
             <p className="text-gray-light max-w-xl mx-auto mb-10">
-              Join thousands of professionals who have stopped guessing and started building wealth with intentionality.
+              Stop guessing. Start building real financial clarity — track every transaction, understand your burn rate, and grow your net worth with intentionality.
             </p>
             <Link href="/signup">
               <button className="bg-white text-black px-8 py-4 rounded-xl font-bold flex items-center gap-2 mx-auto hover:bg-gray-200 transition-colors">

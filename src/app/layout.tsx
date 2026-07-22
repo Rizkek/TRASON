@@ -8,53 +8,71 @@ import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import NextTopLoader from 'nextjs-toploader';
 
 const sans = Instrument_Sans({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
-const serif = Cormorant_Garamond({ 
+const serif = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-serif',
-  display: 'swap'
+  display: 'swap',
 });
 
+const BASE_URL = 'https://www.trason.web.id';
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.trason.web.id'),
+  metadataBase: new URL(BASE_URL),
   title: {
-    default: 'TRASON - Personal OS',
+    default: 'TRASON – Personal OS for Finances, Habits & Career',
     template: '%s | TRASON',
   },
-  description: 'A calm Personal OS for finance, routines, sport, reminders, career signals, and plain-language insights.',
+  description:
+    'Stop switching between 5 apps. TRASON unifies your money, routines, reminders, and career growth into one calm dashboard — free, private, and built for ambitious individuals.',
   keywords: [
-    'Personal OS', 'habit tracker', 'financial planner', 
-    'career growth', 'reminders', 'productivity', 'TRASON'
+    'Personal OS',
+    'habit tracker',
+    'financial planner',
+    'career growth',
+    'personal dashboard',
+    'life management app',
+    'productivity',
+    'TRASON',
+    'personal operating system',
   ],
-  authors: [{ name: 'TRASON' }],
+  authors: [{ name: 'TRASON', url: BASE_URL }],
   creator: 'TRASON',
   publisher: 'TRASON',
+  alternates: {
+    canonical: '/',
+  },
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
   openGraph: {
-    title: 'TRASON - Your Personal OS',
-    description: 'A calm Personal OS for finance, routines, sport, reminders, and career signals.',
-    url: 'https://www.trason.web.id',
+    title: 'TRASON – Your Finances, Habits & Career. One Place.',
+    description:
+      'Stop switching between 5 apps. TRASON unifies your money, routines, reminders, and career growth into one calm dashboard — free to start.',
+    url: BASE_URL,
     siteName: 'TRASON',
     images: [
       {
-        url: '/icon-192x192.png',
-        width: 192,
-        height: 192,
-        alt: 'TRASON Logo',
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'TRASON – Personal Operating System dashboard preview',
+        type: 'image/png',
       },
     ],
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
-    card: 'summary',
-    title: 'TRASON - Your Personal OS',
-    description: 'A calm Personal OS for finance, routines, sport, reminders, and career signals.',
-    images: ['/icon-192x192.png'],
+    card: 'summary_large_image',
+    title: 'TRASON – Your Finances, Habits & Career. One Place.',
+    description:
+      'Stop switching between 5 apps. TRASON unifies your money, routines, reminders, and career growth into one calm dashboard — free to start.',
+    images: ['/og-image.png'],
+    site: '@trasonapp',
+    creator: '@trasonapp',
   },
   manifest: '/manifest.json',
   appleWebApp: {
@@ -63,8 +81,25 @@ export const metadata: Metadata = {
     title: 'TRASON',
   },
   icons: {
-    icon: '/favicon.png',
+    icon: [
+      { url: '/favicon.png', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
     apple: '/icon-192x192.png',
+    other: [
+      { rel: 'mask-icon', url: '/favicon.svg', color: '#F4C95D' },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
@@ -73,6 +108,77 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+};
+
+// ── Structured Data (JSON-LD) ────────────────────────────────────────────────
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${BASE_URL}/#website`,
+      url: BASE_URL,
+      name: 'TRASON',
+      description:
+        'Personal Operating System for finances, habits, reminders, and career growth.',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${BASE_URL}/search?q={search_term_string}`,
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${BASE_URL}/#organization`,
+      name: 'TRASON',
+      url: BASE_URL,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${BASE_URL}/icon-512x512.png`,
+        width: 512,
+        height: 512,
+      },
+      sameAs: ['https://github.com/Rizkek/TRASON'],
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        email: 'hello@trason.app',
+        areaServed: 'ID',
+        availableLanguage: ['Indonesian', 'English'],
+      },
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': `${BASE_URL}/#app`,
+      name: 'TRASON',
+      url: BASE_URL,
+      description:
+        'TRASON is a free Personal Operating System that unifies your finances, daily habits, career pipeline, and smart reminders into one calm dashboard.',
+      applicationCategory: 'ProductivityApplication',
+      operatingSystem: 'Web, iOS (PWA), Android (PWA)',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        description: 'Free core features, forever.',
+      },
+      featureList: [
+        'Financial tracking and net worth dashboard',
+        'Habit heatmaps and streak tracking',
+        'Career pipeline and job application tracking',
+        'Smart context-aware reminders',
+        'AI-powered life insights',
+        'Offline support via PWA',
+      ],
+      screenshot: `${BASE_URL}/og-image.png`,
+      author: {
+        '@id': `${BASE_URL}/#organization`,
+      },
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -86,10 +192,17 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <link rel="icon" href="/favicon.png" type="image/png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
-      <body className={`${sans.variable} ${serif.variable} ${sans.className}`} suppressHydrationWarning>
+      <body
+        className={`${sans.variable} ${serif.variable} ${sans.className}`}
+        suppressHydrationWarning
+      >
         <ErrorBoundary>
-          <NextTopLoader 
+          <NextTopLoader
             color="#F4C95D"
             initialPosition={0.08}
             crawlSpeed={200}

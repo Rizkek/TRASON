@@ -1,10 +1,25 @@
 
 
 import React from 'react';
+import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { Briefcase, KanbanSquare, CheckCircle, FileText, ArrowUpRight, ArrowRight, MoreHorizontal, Calendar, Plus } from 'lucide-react';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Career Architect – Manage Job Applications & Professional Growth',
+  description:
+    'Track job applications, interviews, and offers in a unified career pipeline. Never miss a follow-up, negotiate better offers, and grow your professional skills with clarity.',
+  alternates: { canonical: '/features/career-architect' },
+  openGraph: {
+    title: 'Career Architect – TRASON',
+    description:
+      'Manage your entire job search and career growth in one place. Pipeline tracking, interview logging, and skill development — all connected.',
+    url: 'https://www.trason.web.id/features/career-architect',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TRASON Career Architect' }],
+  },
+};
 
 export default function CareerArchitectPage() {
   return (

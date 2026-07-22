@@ -1,8 +1,23 @@
 
 
 import React from 'react';
+import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+
+export const metadata: Metadata = {
+  title: 'Our Vision – Why We Built TRASON',
+  description:
+    'App fatigue is killing our focus. TRASON was built to give ambitious individuals a single, private environment where financial capital, professional growth, and physical vitality converge.',
+  alternates: { canonical: '/vision' },
+  openGraph: {
+    title: 'TRASON Vision – Why We Built a Personal Operating System',
+    description:
+      'We built TRASON because your life is an interconnected system, but your tools are fragmented. One place for capital, vitality, and ambition.',
+    url: 'https://www.trason.web.id/vision',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TRASON Vision' }],
+  },
+};
 
 export default function VisionPage() {
   return (

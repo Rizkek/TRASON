@@ -1,10 +1,25 @@
 
 
 import React from 'react';
+import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { Activity, Calendar as CalendarIcon, Target, HeartPulse, Flame, ArrowRight, Check } from 'lucide-react';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Vitality & Habits – Build Routines That Actually Stick',
+  description:
+    'Track your daily habits with GitHub-style heatmaps, build flexible routines, and recover without guilt when life gets in the way. Free habit tracker built for real humans.',
+  alternates: { canonical: '/features/vitality-habits' },
+  openGraph: {
+    title: 'Vitality & Habits – TRASON',
+    description:
+      'Build unbreakable consistency. Heatmap visualizations, flexible routines, and health correlations — all in one free habit tracking dashboard.',
+    url: 'https://www.trason.web.id/features/vitality-habits',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TRASON Vitality & Habits' }],
+  },
+};
 
 export default function VitalityHabitsPage() {
   return (

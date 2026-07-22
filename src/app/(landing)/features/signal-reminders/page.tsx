@@ -1,10 +1,25 @@
 
 
 import React from 'react';
+import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { Target, BellRing, BrainCircuit, BellOff, VolumeX, Shield, ArrowRight, Zap } from 'lucide-react';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Signal Reminders – Smart Notifications That Respect Your Focus',
+  description:
+    'Context-aware reminders that separate signals from noise. TRASON only notifies you when it matters — respecting your focus hours and deep work blocks.',
+  alternates: { canonical: '/features/signal-reminders' },
+  openGraph: {
+    title: 'Signal Reminders – TRASON',
+    description:
+      'Smart, context-aware reminders that filter out the noise. Only the signals that actually matter, delivered at the right time.',
+    url: 'https://www.trason.web.id/features/signal-reminders',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TRASON Signal Reminders' }],
+  },
+};
 
 export default function SignalRemindersPage() {
   return (
