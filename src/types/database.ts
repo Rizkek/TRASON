@@ -92,6 +92,17 @@ export interface Subscription {
   updated_at: string;
 }
 
+export interface Budget {
+  id: string;
+  user_id: string;
+  category_id?: string | null;
+  period_type: string; // e.g., 'monthly'
+  amount: number;
+  currency: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Goal {
   id: string;
   user_id: string;

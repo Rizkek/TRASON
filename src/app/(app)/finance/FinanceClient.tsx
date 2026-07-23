@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon, BottomSheet } from '@/components';
 import { CategoryManagerModal } from './components/CategoryManagerModal';
+import { BudgetManagerModal } from './components/BudgetManagerModal';
 import { TransactionFeed } from './components/TransactionFeed';
 import { useAuthStore } from '@/store/authStore';
 import { useTransaction } from '@/hooks/useTransaction';
 import { useCategory } from '@/hooks/useCategory';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useBudget } from '@/hooks/useBudget';
 import { validateTransaction, sanitizeError } from '@/libs/validation';
 import { Transaction } from '@/types/database';
 import { 
@@ -61,7 +64,14 @@ export default function FinanceClient({ initialTransactions }: Props) {
   const carryStart = new Date(2000, 0, 1);
   const carryEnd = new Date(start.getTime() - 1); // 1ms before start of selected month
   
-  const { transactions, isLoading: isTransactionsLoading, createTransaction, updateTransaction, deleteTransaction } = useTransaction(start, end, undefined, initialTransactions);
+  const isCurrentMonth = selectedMonth === now.getMonth() && selectedYear === now.getFullYear();
+  
+  const { transactions, isLoading: isTransactionsLoading, createTransaction, updateTransaction, deleteTransaction } = useTransaction(
+    start, 
+    end, 
+    undefined, 
+    isCurrentMonth ? initialTransactions : undefined
+  );
   // Fetch all transactions BEFORE selected month to compute opening balance (carry-forward)
   const { transactions: prevTransactions, isLoading: isPrevLoading } = useTransaction(carryStart, carryEnd);
   
@@ -70,12 +80,15 @@ export default function FinanceClient({ initialTransactions }: Props) {
     return t.type === 'income' ? sum + t.amount : sum - t.amount;
   }, 0);
   const { categories } = useCategory();
+  const { createSubscription } = useSubscription();
+  const { globalBudget } = useBudget();
   
   const [page, setPage] = useState(1);
   const limit = 20;
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
+  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -94,6 +107,8 @@ export default function FinanceClient({ initialTransactions }: Props) {
     original_currency: currency || 'USD',
     decision_notes: '',
     expected_impact: '',
+    is_recurring: false,
+    billing_cycle: 'monthly' as 'monthly' | 'yearly' | 'weekly',
   });
 
   useEffect(() => {
@@ -161,6 +176,25 @@ export default function FinanceClient({ initialTransactions }: Props) {
         await updateTransaction(editingTransaction.id, payload);
       } else {
         await createTransaction(payload);
+        
+        // Handle subscription creation
+        if (form.is_recurring) {
+          const nextDate = new Date(form.date);
+          if (form.billing_cycle === 'monthly') nextDate.setMonth(nextDate.getMonth() + 1);
+          else if (form.billing_cycle === 'yearly') nextDate.setFullYear(nextDate.getFullYear() + 1);
+          else if (form.billing_cycle === 'weekly') nextDate.setDate(nextDate.getDate() + 7);
+          
+          await createSubscription({
+            name: form.title,
+            amount: safeAmount,
+            currency: form.original_currency,
+            billing_cycle: form.billing_cycle,
+            next_billing_date: nextDate.toISOString().split('T')[0],
+            category_id: form.category_id || null,
+            is_active: true,
+            notes: form.description || undefined,
+          });
+        }
       }
       setIsModalOpen(false);
     } catch (err) {
@@ -204,6 +238,8 @@ export default function FinanceClient({ initialTransactions }: Props) {
       original_currency: currency || 'USD',
       decision_notes: '',
       expected_impact: '',
+      is_recurring: false,
+      billing_cycle: 'monthly',
     });
     setIsModalOpen(true);
   };
@@ -220,6 +256,8 @@ export default function FinanceClient({ initialTransactions }: Props) {
       original_currency: t.original_currency || currency || 'USD',
       decision_notes: (t.metadata?.decision_notes as string) || '',
       expected_impact: (t.metadata?.expected_impact as string) || '',
+      is_recurring: false, // Editing doesn't re-create subscription
+      billing_cycle: 'monthly',
     });
     setIsModalOpen(true);
   };
@@ -326,6 +364,51 @@ export default function FinanceClient({ initialTransactions }: Props) {
           </div>
         </div>
 
+        {/* Budget Progress Bar */}
+        {globalBudget && (
+          <div className="bg-[#141414] border border-white/5 rounded-2xl p-lg relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-md mb-sm">
+              <div>
+                <div className="flex items-center gap-sm">
+                  <Wallet size={16} className="text-primary" />
+                  <h3 className="text-sm font-bold text-soft-cream">Global Monthly Budget</h3>
+                </div>
+                <p className="text-xs text-gray-light mt-1">
+                  {formatCurrency(totalExpense, currency || 'USD', locale)} / {formatCurrency(globalBudget.amount, currency || 'USD', locale)}
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setIsBudgetModalOpen(true)}>
+                Ubah Target
+              </Button>
+            </div>
+            
+            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+              <div 
+                className={`h-full rounded-full transition-all duration-1000 ${
+                  (totalExpense / globalBudget.amount) > 0.9 ? 'bg-danger' : 
+                  (totalExpense / globalBudget.amount) > 0.75 ? 'bg-warning' : 'bg-primary'
+                }`}
+                style={{ width: `${Math.min((totalExpense / globalBudget.amount) * 100, 100)}%` }}
+              ></div>
+            </div>
+            <p className="text-[10px] text-right mt-2 font-mono text-gray-light">
+              {Math.round((totalExpense / globalBudget.amount) * 100)}% digunakan
+            </p>
+          </div>
+        )}
+
+        {!globalBudget && (
+          <div className="bg-[#141414] border border-white/5 border-dashed rounded-2xl p-md flex items-center justify-between">
+            <p className="text-sm text-gray-light flex items-center gap-2">
+              <Wallet size={14} /> Belum ada target pengeluaran bulan ini.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => setIsBudgetModalOpen(true)}>
+              Atur Target
+            </Button>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-sm md:gap-lg">
           {/* Income */}
           <Card className="p-sm md:p-xl relative overflow-hidden group">
@@ -337,7 +420,13 @@ export default function FinanceClient({ initialTransactions }: Props) {
               <p className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.totalIncome')}</p>
             </div>
             <div className="flex items-end justify-between mt-sm">
-              <p className="text-sm md:text-2xl font-bold text-success truncate">{formatCurrency(totalIncome, currency, locale)}</p>
+              <p className="text-sm md:text-2xl font-bold text-success truncate">
+                {isTransactionsLoading ? (
+                  <span className="animate-pulse text-gray-light">...</span>
+                ) : (
+                  formatCurrency(totalIncome, currency, locale)
+                )}
+              </p>
             </div>
           </Card>
           
@@ -351,7 +440,13 @@ export default function FinanceClient({ initialTransactions }: Props) {
               <p className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.totalExpense')}</p>
             </div>
             <div className="flex items-end justify-between mt-sm">
-              <p className="text-sm md:text-2xl font-bold text-danger truncate">{formatCurrency(totalExpense, currency, locale)}</p>
+              <p className="text-sm md:text-2xl font-bold text-danger truncate">
+                {isTransactionsLoading ? (
+                  <span className="animate-pulse text-gray-light">...</span>
+                ) : (
+                  formatCurrency(totalExpense, currency, locale)
+                )}
+              </p>
             </div>
           </Card>
 
@@ -365,7 +460,13 @@ export default function FinanceClient({ initialTransactions }: Props) {
               <p className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.netBalance')}</p>
             </div>
             <div className="flex items-end justify-between mt-sm">
-              <p className="text-sm md:text-2xl font-bold text-white truncate">{formatCurrency(totalIncome - totalExpense, currency, locale)}</p>
+              <p className="text-sm md:text-2xl font-bold text-white truncate">
+                {isTransactionsLoading ? (
+                  <span className="animate-pulse text-gray-light">...</span>
+                ) : (
+                  formatCurrency(totalIncome - totalExpense, currency, locale)
+                )}
+              </p>
             </div>
           </Card>
 
@@ -380,8 +481,12 @@ export default function FinanceClient({ initialTransactions }: Props) {
             </div>
             <div className="flex items-end justify-between mt-sm">
               <div className="min-w-0">
-                <p className={`text-sm md:text-2xl font-bold truncate ${closingBalance >= 0 ? 'text-accent-gold' : 'text-danger'}`}>
-                  {formatCurrency(closingBalance, currency, locale)}
+                <p className={`text-sm md:text-2xl font-bold truncate ${(isTransactionsLoading || isPrevLoading) ? 'text-gray-light' : (closingBalance >= 0 ? 'text-accent-gold' : 'text-danger')}`}>
+                  {(isTransactionsLoading || isPrevLoading) ? (
+                    <span className="animate-pulse">...</span>
+                  ) : (
+                    formatCurrency(closingBalance, currency, locale)
+                  )}
                 </p>
               </div>
             </div>
@@ -709,32 +814,91 @@ export default function FinanceClient({ initialTransactions }: Props) {
             />
           </div>
 
-          <div className="bg-primary/5 border border-primary/10 rounded-lg p-md space-y-md">
-            <h4 className="text-sm font-bold text-primary">Transaction Reflection</h4>
-            <p className="text-xs text-gray-light">Optional: Document your reasoning for this transaction to evaluate your financial habits later.</p>
-            
-            <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">REASONING & CONTEXT</label>
-              <textarea
-                placeholder="e.g. Buying a new laptop for frontend development..."
-                rows={2}
-                value={form.decision_notes}
-                onChange={(e) => setForm(f => ({ ...f, decision_notes: e.target.value }))}
-                className="w-full bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md p-md text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
-              />
+          {!editingTransaction && (
+            <div className="flex flex-col gap-sm p-md bg-gray-strong/40 rounded-lg border border-white/[0.05]">
+              <div className="flex items-center gap-sm">
+                <input
+                  type="checkbox"
+                  id="is_recurring"
+                  checked={form.is_recurring}
+                  onChange={(e) => setForm(f => ({ ...f, is_recurring: e.target.checked }))}
+                  className="w-4 h-4 rounded border-white/10 bg-gray-strong text-primary focus:ring-primary accent-primary"
+                />
+                <label htmlFor="is_recurring" className="text-sm font-semibold text-soft-cream cursor-pointer">
+                  Jadikan pengeluaran rutin (Langganan)
+                </label>
+              </div>
+              {form.is_recurring && (
+                <div className="flex items-center gap-md pl-6">
+                  <span className="text-xs text-gray-light">Siklus:</span>
+                  <div className="flex bg-gray-strong p-1 rounded-md border border-white/[0.05]">
+                    {(['monthly', 'yearly', 'weekly'] as const).map((cycle) => (
+                      <button
+                        key={cycle}
+                        type="button"
+                        onClick={() => setForm(f => ({ ...f, billing_cycle: cycle }))}
+                        className={`px-3 py-1 text-[10px] font-bold rounded-sm transition-all uppercase tracking-widest ${
+                          form.billing_cycle === cycle 
+                            ? 'bg-primary/20 text-primary'
+                            : 'text-gray-light hover:text-soft-cream'
+                        }`}
+                      >
+                        {cycle === 'monthly' ? 'Bulan' : cycle === 'yearly' ? 'Tahun' : 'Minggu'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
+          )}
 
-            <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">EXPECTED VALUE / ROI</label>
-              <textarea
-                placeholder="e.g. Expected to increase my productivity by 20%..."
-                rows={2}
-                value={form.expected_impact}
-                onChange={(e) => setForm(f => ({ ...f, expected_impact: e.target.value }))}
-                className="w-full bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md p-md text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
-              />
+          <details className="bg-primary/5 border border-primary/10 rounded-lg group">
+            <summary className="p-md text-sm font-bold text-primary cursor-pointer flex items-center justify-between list-none">
+              ✨ Catatan Evaluasi (Mindful Spending)
+              <ChevronRight size={16} className="group-open:rotate-90 transition-transform" />
+            </summary>
+            
+            <div className="px-md pb-md space-y-md border-t border-primary/10 pt-md">
+              <div className="space-y-sm">
+                <label className="text-[10px] font-bold text-gray-light tracking-widest block">SIFAT PENGELUARAN</label>
+                <div className="flex bg-gray-strong p-1 rounded-md border border-black/[0.05] dark:border-white/[0.05]">
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, expected_impact: 'Kebutuhan (Need)' }))}
+                    className={`flex-1 py-sm text-xs font-bold rounded-sm transition-all ${
+                      form.expected_impact === 'Kebutuhan (Need)' 
+                        ? 'bg-primary text-white shadow-md'
+                        : 'text-gray-light hover:text-soft-cream'
+                    }`}
+                  >
+                    Kebutuhan
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, expected_impact: 'Keinginan (Want)' }))}
+                    className={`flex-1 py-sm text-xs font-bold rounded-sm transition-all ${
+                      form.expected_impact === 'Keinginan (Want)' 
+                        ? 'bg-primary text-white shadow-md'
+                        : 'text-gray-light hover:text-soft-cream'
+                    }`}
+                  >
+                    Keinginan
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-sm">
+                <label className="text-[10px] font-bold text-gray-light tracking-widest block">MANFAAT / ALASAN BELI INI</label>
+                <textarea
+                  placeholder="Misal: Self-reward setelah gajian, alat kerja, dll..."
+                  rows={2}
+                  value={form.decision_notes}
+                  onChange={(e) => setForm(f => ({ ...f, decision_notes: e.target.value }))}
+                  className="w-full bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md p-md text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+                />
+              </div>
             </div>
-          </div>
+          </details>
 
           {editingTransaction && (
             <button 
@@ -766,6 +930,10 @@ export default function FinanceClient({ initialTransactions }: Props) {
           typeFilter={form.type}
         />
       )}
+      <BudgetManagerModal
+        isOpen={isBudgetModalOpen}
+        onClose={() => setIsBudgetModalOpen(false)}
+      />
       </Layout>
     </>
   );

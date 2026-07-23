@@ -9,8 +9,10 @@ import { useActivity } from '@/hooks/useActivity';
 import { useReminder } from '@/hooks/useReminder';
 import { useInvestment } from '@/hooks/useInvestment';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useBudget } from '@/hooks/useBudget';
 import { InvestmentInsightResponse } from '@/services/finance/investmentService';
 import { getDateRange } from '@/libs/date';
+import { formatCurrency } from '@/libs/format';
 
 // Setup SWR Dates
 const CURRENT_DATE = new Date();
@@ -24,7 +26,8 @@ import {
   Plus as RiAddLine,
   AlertTriangle as RiErrorWarningLine,
   ChevronLeft as RiArrowLeftSLine,
-  ChevronRight as RiArrowRightSLine
+  ChevronRight as RiArrowRightSLine,
+  Wallet
 } from 'lucide-react';
 
 // Extracted Components
@@ -117,6 +120,13 @@ export function DashboardClient() {
   const isRemindersEnabled = module_features?.['reminders'] !== false;
 
   const { subscriptions } = useSubscription();
+  const { globalBudget } = useBudget();
+  
+  const totalExpense = useMemo(() => {
+    return transactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+  }, [transactions]);
 
   const dueSubscriptions = useMemo(() => {
     if (!subscriptions || subscriptions.length === 0) return [];
@@ -233,6 +243,34 @@ export function DashboardClient() {
                     <RiArrowRightSLine size={20} />
                   </button>
                 </div>
+                
+                {/* Global Budget Mini Widget */}
+                {globalBudget && (
+                  <div className="lg:col-span-3 bg-[#141414] border border-white/5 rounded-2xl p-md relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-sm mb-sm">
+                      <div className="flex items-center gap-sm">
+                        <div className="p-1.5 bg-primary/10 rounded-lg text-primary">
+                          <Wallet size={16} />
+                        </div>
+                        <h3 className="text-sm font-bold text-soft-cream">Monthly Budget</h3>
+                      </div>
+                      <p className="text-xs font-mono text-gray-light">
+                        {formatCurrency(totalExpense, preferences?.currency || 'USD', locale)} / {formatCurrency(globalBudget.amount, preferences?.currency || 'USD', locale)}
+                      </p>
+                    </div>
+                    <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden mt-xs">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-1000 ${
+                          (totalExpense / globalBudget.amount) > 0.9 ? 'bg-danger' : 
+                          (totalExpense / globalBudget.amount) > 0.75 ? 'bg-warning' : 'bg-primary'
+                        }`}
+                        style={{ width: `${Math.min((totalExpense / globalBudget.amount) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="lg:col-span-2">
                   <FinancialChart transactions={transactions} month={financeMonth} year={financeYear} />
                 </div>
