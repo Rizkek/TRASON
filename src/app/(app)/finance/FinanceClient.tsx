@@ -28,7 +28,10 @@ import {
   RefreshCcw,
   Sparkles,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Coins,
+  Receipt,
+  Landmark
 } from 'lucide-react';
 import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
 import { fetchExchangeRates } from '@/libs/exchange';
@@ -81,7 +84,19 @@ export default function FinanceClient({ initialTransactions }: Props) {
   }, 0);
   const { categories } = useCategory();
   const { createSubscription } = useSubscription();
-  const { globalBudget } = useBudget();
+  const { globalBudget, budgets } = useBudget();
+  
+  const categorySpending = React.useMemo(() => {
+    const spending: Record<string, number> = {};
+    transactions.forEach(t => {
+      if (t.type === 'expense' && t.category_id) {
+        spending[t.category_id] = (spending[t.category_id] || 0) + t.amount;
+      }
+    });
+    return spending;
+  }, [transactions]);
+  
+  const categoryBudgets = budgets.filter(b => b.category_id !== null);
   
   const [page, setPage] = useState(1);
   const limit = 20;
@@ -328,7 +343,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
             <h1 className="text-display font-serif text-gradient">{t('finance.title')}</h1>
             <div className="flex items-center gap-md">
               <p className="text-subtext flex items-center gap-sm">
-                <Wallet size={14} className="text-primary" />
                 {t('finance.subtitle')}
               </p>
               <div className="w-px h-4 bg-white/10 hidden md:block"></div>
@@ -399,13 +413,58 @@ export default function FinanceClient({ initialTransactions }: Props) {
         )}
 
         {!globalBudget && (
-          <div className="bg-[#141414] border border-white/5 border-dashed rounded-2xl p-md flex items-center justify-between">
-            <p className="text-sm text-gray-light flex items-center gap-2">
-              <Wallet size={14} /> Belum ada target pengeluaran bulan ini.
+          <div className="bg-[#141414] border border-white/5 border-dashed rounded-2xl p-sm md:p-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-sm">
+            <p className="text-xs md:text-sm text-gray-light flex items-center gap-2">
+              <Wallet size={14} className="shrink-0" /> Belum ada target pengeluaran bulan ini.
             </p>
-            <Button variant="outline" size="sm" onClick={() => setIsBudgetModalOpen(true)}>
+            <Button variant="outline" size="sm" onClick={() => setIsBudgetModalOpen(true)} className="w-full sm:w-auto">
               Atur Target
             </Button>
+          </div>
+        )}
+
+        {/* Category Budget Progress Bars (Predictive Budgeting) */}
+        {categoryBudgets.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+            {categoryBudgets.map(budget => {
+              const spent = categorySpending[budget.category_id!] || 0;
+              const cat = categories.find(c => c.id === budget.category_id);
+              const percentage = Math.min((spent / budget.amount) * 100, 100);
+              
+              return (
+                <div key={budget.id} className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5 rounded-2xl p-md relative overflow-hidden group">
+                  <div className="flex items-center justify-between gap-sm mb-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-md bg-gray-strong/40 flex items-center justify-center text-[10px] text-soft-cream">
+                        <CategoryIcon name={cat?.icon || 'Box'} />
+                      </div>
+                      <h3 className="text-xs font-bold text-soft-cream">{cat?.name || 'Kategori'}</h3>
+                    </div>
+                    <p className="text-[10px] font-mono text-gray-light">
+                      {Math.round(percentage)}%
+                    </p>
+                  </div>
+                  
+                  <div className="h-1.5 w-full bg-black/10 dark:bg-white/5 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-1000 ${
+                        percentage > 90 ? 'bg-danger' : 
+                        percentage > 75 ? 'bg-warning' : 'bg-primary'
+                      }`}
+                      style={{ width: `${percentage}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-[10px] text-gray-light">
+                      {formatCurrency(spent, currency || 'USD', locale)}
+                    </p>
+                    <p className="text-[10px] text-gray-light">
+                      {formatCurrency(budget.amount, currency || 'USD', locale)}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -415,7 +474,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
             <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-all" />
             <div className="flex items-center gap-xs mb-1 md:mb-md text-gray-light">
               <div className="p-1 bg-success/10 rounded-md shrink-0 text-success">
-                <ArrowUpRight size={12} />
+                <Coins size={12} />
               </div>
               <p className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.totalIncome')}</p>
             </div>
@@ -435,7 +494,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
             <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-danger/5 rounded-full blur-2xl group-hover:bg-danger/10 transition-all" />
             <div className="flex items-center gap-xs mb-1 md:mb-md text-gray-light">
               <div className="p-1 bg-danger/10 rounded-md shrink-0 text-danger">
-                <ArrowDownLeft size={12} />
+                <Receipt size={12} />
               </div>
               <p className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.totalExpense')}</p>
             </div>
@@ -455,7 +514,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
             <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
             <div className="flex items-center gap-xs mb-1 md:mb-md text-gray-light">
               <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary">
-                <TrendingUp size={12} />
+                <Landmark size={12} />
               </div>
               <p className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.netBalance')}</p>
             </div>
@@ -553,7 +612,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                             t.type === 'income' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
                           }`}>
-                            {t.type === 'income' ? <ArrowUpRight size={18} /> : <ArrowDownLeft size={18} />}
+                            {t.type === 'income' ? <Coins size={18} /> : <Receipt size={18} />}
                           </div>
                           <div>
                             <p className="text-sm font-bold text-soft-cream group-hover:text-primary transition-colors underline-offset-4 decoration-primary">{t.title}</p>

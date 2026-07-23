@@ -19,7 +19,6 @@ export const RemindersSidebar = ({ reminders }: Props) => {
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="px-lg py-md border-b border-black/[0.05] dark:border-white/[0.05] flex justify-between items-center bg-black/[0.01] dark:bg-white/[0.01]">
         <div className="flex items-center gap-sm">
-          <Bell size={16} className="text-secondary" />
           <h3 className="text-sm font-bold tracking-tight">{t('dashboard.next_signals')}</h3>
         </div>
         <div className="w-5 h-5 bg-danger text-[10px] font-bold text-white rounded-full flex items-center justify-center">

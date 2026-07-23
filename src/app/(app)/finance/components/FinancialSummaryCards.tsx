@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card } from '@/components';
-import { ArrowUpRight, ArrowDownLeft, TrendingUp, Wallet } from 'lucide-react';
+import { Coins, Receipt, Landmark, Wallet } from 'lucide-react';
 import { formatCurrency } from '@/libs/format';
 
 interface Props {
@@ -30,7 +30,7 @@ export function FinancialSummaryCards({
     {
       label: 'Pemasukan',
       value: totalIncome,
-      Icon: ArrowUpRight,
+      Icon: Coins,
       valueColor: 'text-success',
       iconClass: 'bg-success/10 text-success',
       border: '',
@@ -38,7 +38,7 @@ export function FinancialSummaryCards({
     {
       label: 'Pengeluaran',
       value: totalExpense,
-      Icon: ArrowDownLeft,
+      Icon: Receipt,
       valueColor: 'text-danger',
       iconClass: 'bg-danger/10 text-danger',
       border: '',
@@ -46,7 +46,7 @@ export function FinancialSummaryCards({
     {
       label: 'Tabungan',
       value: netSavings,
-      Icon: TrendingUp,
+      Icon: Landmark,
       valueColor: netSavings >= 0 ? 'text-primary' : 'text-danger',
       iconClass: netSavings >= 0 ? 'bg-primary/10 text-primary' : 'bg-danger/10 text-danger',
       border: 'border-b-2 border-primary/20',

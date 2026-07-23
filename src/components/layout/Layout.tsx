@@ -12,6 +12,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useReminder } from '@/hooks/useReminder';
 import { useScheduleNotifications } from '@/hooks/useScheduleNotifications';
 import { usePushNotification } from '@/hooks/usePushNotification';
+import { NavIcon } from '@/components/ui/NavIcon';
 import { ModuleId } from '@/modules/types';
 import { DEFAULT_MODULE_STATUS } from '@/modules/registry';
 import { 
@@ -285,17 +286,21 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 key={item.href}
                 href={item.href}
                 prefetch={false}
-                className={`flex items-center gap-md px-lg py-md rounded-md transition-all duration-300 relative group overflow-hidden ${isActive(item.href)
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/5'
+                className={`flex items-center gap-md px-lg py-md rounded-xl transition-all duration-300 relative group overflow-hidden ${
+                  isActive(item.href)
+                    ? 'bg-white/5 border border-white/10 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)] text-soft-cream'
+                    : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/5 border border-transparent'
                   }`}
               >
                 {isActive(item.href) && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r shadow-[0_0_10px_rgba(78,79,235,0.8)]" />
+                  <div className="absolute left-0 top-[15%] bottom-[15%] w-1 bg-primary rounded-r-full shadow-[0_0_12px_rgba(244,201,93,0.8)]" />
                 )}
 
-                <Icon size={20} className={`${isActive(item.href) ? 'text-primary' : 'group-hover:text-secondary'} transition-colors`} />
-                <span className="text-sm font-semibold tracking-wide">{t(`nav.${item.href.replace('/', '')}`)}</span>
+                <NavIcon icon={Icon} isActive={isActive(item.href)} size={20} />
+                
+                <span className={`text-sm font-semibold tracking-wide transition-colors duration-300 ${isActive(item.href) ? 'text-soft-cream drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]' : ''}`}>
+                  {t(`nav.${item.href.replace('/', '')}`)}
+                </span>
 
                 {isActive(item.href) && (
                   <div className="absolute right-[-20%] top-[-50%] w-24 h-24 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
@@ -373,19 +378,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 key={item.href}
                 href={item.href}
                 prefetch={false}
-                className={`flex flex-col items-center p-2 rounded-xl min-w-[60px] transition-all duration-200 ${
+                className={`flex flex-col items-center p-2 rounded-xl min-w-[60px] transition-all duration-300 group ${
                   active
                     ? 'text-primary'
                     : 'text-gray-light hover:text-soft-cream'
                 }`}
               >
-                <div className={`relative p-1.5 rounded-lg transition-all duration-200 ${active ? 'bg-primary/15' : ''}`}>
-                  <Icon size={22} className={active ? 'text-primary' : ''} />
+                <div className="relative p-1.5 transition-all duration-300">
+                  <NavIcon icon={Icon} isActive={active} size={22} />
                   {active && (
-                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_6px_rgba(78,79,235,0.9)]" />
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-1 rounded-full bg-primary shadow-[0_0_8px_rgba(244,201,93,0.9)] opacity-80" />
                   )}
                 </div>
-                <span className="text-[10px] mt-0.5 font-medium tracking-wide">
+                <span className={`text-[10px] mt-1 font-medium tracking-wide transition-colors ${active ? 'text-soft-cream drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]' : ''}`}>
                   {t(`nav.${item.href.replace('/', '')}`)}
                 </span>
               </Link>
@@ -447,14 +452,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         href={item.href}
                         prefetch={false}
                         onClick={() => setIsBottomSheetOpen(false)}
-                        className={`flex flex-col items-center gap-sm p-md rounded-2xl border transition-all duration-200 ${
+                        className={`flex flex-col items-center gap-sm p-md rounded-2xl border transition-all duration-300 group ${
                           active
-                            ? 'bg-primary/15 border-primary/30 text-primary'
-                            : 'bg-soft-cream/5 border-soft-cream/5 text-gray-light hover:bg-soft-cream/10 hover:text-soft-cream'
+                            ? 'bg-white/5 border-white/10 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)] text-soft-cream'
+                            : 'bg-soft-cream/5 border-soft-cream/5 text-gray-light hover:bg-soft-cream/10 hover:text-soft-cream hover:border-soft-cream/10'
                         }`}
                       >
-                        <Icon size={24} />
-                        <span className="text-[11px] font-medium text-center leading-tight">
+                        <NavIcon icon={Icon} isActive={active} size={24} />
+                        <span className={`text-[11px] font-medium text-center leading-tight transition-colors ${active ? 'text-soft-cream drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]' : ''}`}>
                           {t(`nav.${item.href.replace('/', '')}`)}
                         </span>
                       </Link>
