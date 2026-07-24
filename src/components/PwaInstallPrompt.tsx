@@ -26,7 +26,7 @@ export function PwaInstallPrompt() {
     // Already running as installed PWA
     if (window.matchMedia('(display-mode: standalone)').matches) return;
 
-    // Server says already installed on any device — never show again
+    // HardDrives says already installed on any device — never show again
     if (moduleFeatures?.['pwa_installed'] === true) {
       setIsVisible(false);
       return;

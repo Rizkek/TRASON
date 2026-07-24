@@ -8,12 +8,7 @@ import { useTranslation } from '@/libs/i18n/useTranslation';
 
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import {
-  PieChart, Activity, CheckSquare, Table, TrendingUp, Target,
-  ArrowUpRight, Command, ShieldCheck, Github, Zap,
-  CircleDollarSign, Briefcase, HeartPulse, Bell,
-  ChevronDown, ChevronUp, Lock
-} from 'lucide-react';
+import { ChartPieSlice as PieChart, Heartbeat, CheckSquare, Table, TrendUp as TrendingUp, Target, ArrowUpRight, Command, ShieldCheck, GithubLogo, Lightning as Zap, CurrencyCircleDollar, Briefcase, Bell, CaretDown as ChevronDown, CaretUp as ChevronUp, Lock } from '@phosphor-icons/react';
 
 const SPLASH_STORAGE_KEY = 'trason_home_splash_seen';
 
@@ -69,7 +64,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 // ─── Feature cards data ───────────────────────────────────────────────────────
 const FEATURES = [
   {
-    icon: CircleDollarSign,
+    icon: CurrencyCircleDollar,
     label: 'Financial Control',
     headline: 'Know exactly where every rupiah goes.',
     body: 'Track income, expenses, and net worth across all accounts. See your burn rate, runway, and saving rate in one dashboard.',
@@ -79,7 +74,7 @@ const FEATURES = [
     bg: 'group-hover:bg-yellow-400/5',
   },
   {
-    icon: HeartPulse,
+    icon: Heartbeat,
     label: 'Vitality & Habits',
     headline: 'Build routines that actually stick.',
     body: 'GitHub-style heatmaps for your habits. Flexible schedules, streak tracking, and guilt-free recovery when life happens.',
@@ -276,7 +271,7 @@ export default function Home() {
             className="flex items-center gap-2 hover:text-warm-gold transition-colors"
             aria-label="View TRASON on GitHub"
           >
-            <Github size={14} />
+            <GithubLogo size={14} />
             Open Source
           </a>
           <span className="flex items-center gap-2">
@@ -302,7 +297,7 @@ export default function Home() {
           <div className="flex flex-wrap justify-center gap-lg md:gap-2xl opacity-80 transition-all duration-700">
             {[
               { name: 'Finance Tracker', icon: PieChart, colorClass: 'group-hover:text-amber-400 group-hover:border-amber-400/50 group-hover:bg-amber-400/10' },
-              { name: 'Habit App', icon: Activity, colorClass: 'group-hover:text-rose-400 group-hover:border-rose-400/50 group-hover:bg-rose-400/10' },
+              { name: 'Habit App', icon: Heartbeat, colorClass: 'group-hover:text-rose-400 group-hover:border-rose-400/50 group-hover:bg-rose-400/10' },
               { name: 'To-Do List', icon: CheckSquare, colorClass: 'group-hover:text-blue-400 group-hover:border-blue-400/50 group-hover:bg-blue-400/10' },
               { name: 'Spreadsheets', icon: Table, colorClass: 'group-hover:text-emerald-400 group-hover:border-emerald-400/50 group-hover:bg-emerald-400/10' },
             ].map((app, i) => {
@@ -397,7 +392,7 @@ export default function Home() {
                   <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-amber-500/10 blur-xl md:blur-3xl rounded-full" />
                   <div className="flex items-center gap-3 relative z-10">
                     <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
-                      <Activity size={16} />
+                      <Heartbeat size={16} />
                     </div>
                     <h4 className="font-serif italic text-md text-white">Daily Insight</h4>
                   </div>

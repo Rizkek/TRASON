@@ -19,16 +19,14 @@ const CURRENT_DATE = new Date();
 
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { 
-  Calendar as CalendarIcon, 
-  Bell, 
-  Lightbulb, 
+  Calendar, 
   Clock,
-  Plus as RiAddLine,
-  AlertTriangle as RiErrorWarningLine,
-  ChevronLeft as RiArrowLeftSLine,
-  ChevronRight as RiArrowRightSLine,
-  Wallet
-} from 'lucide-react';
+  Warning,
+  CaretLeft,
+  CaretRight
+} from '@phosphor-icons/react';
+import { SYS_ICONS } from '@/config/icons';
+import { TrasonIcon } from '@/components/ui/TrasonIcon';
 
 // Extracted Components
 import { DashboardHeader } from './components/DashboardHeader';
@@ -69,7 +67,7 @@ function QuickCaptureInput() {
       <div className="flex flex-row gap-sm md:gap-md">
         <div className="flex-1 relative group">
           <div className="absolute left-md top-1/2 -translate-y-1/2 text-primary">
-            <Lightbulb size={16} className="md:w-[18px] md:h-[18px]" />
+            <TrasonIcon icon={SYS_ICONS.insights} size={16} className="md:w-[18px] md:h-[18px]" />
           </div>
           <input
             type="text"
@@ -84,7 +82,7 @@ function QuickCaptureInput() {
           {t('dashboard.capture_btn')}
         </Button>
         <Button variant="primary" size="sm" className="md:hidden px-3" onClick={handleSubmit}>
-          <RiAddLine size={20} />
+          <TrasonIcon icon={SYS_ICONS.add} size={20} />
         </Button>
       </div>
     </Card>
@@ -178,10 +176,10 @@ export function DashboardClient() {
               <span>{user?.first_name || user?.name?.split(' ')[0] || 'User'}</span>
             </h1>
             <div className="flex items-center gap-md text-gray-very-light opacity-60">
-              <CalendarIcon size={14} className="text-secondary" />
+              <TrasonIcon icon={Calendar} size={14} className="text-secondary" />
               <p className="text-micro">{todayDate}</p>
               <div className="w-1 h-1 rounded-full bg-gray-light" />
-              <Clock size={14} className="text-secondary" />
+              <TrasonIcon icon={SYS_ICONS.timeline} size={14} className="text-secondary" />
               <p className="text-micro">{todayTime}</p>
             </div>
           </div>
@@ -197,7 +195,7 @@ export function DashboardClient() {
         {isFinanceEnabled && dueSubscriptions.length > 0 && (
           <div className="bg-warning/10 border border-warning/30 rounded-xl p-md flex items-start sm:items-center gap-md">
             <div className="bg-warning/20 p-sm rounded-full text-warning shrink-0">
-              <RiErrorWarningLine size={20} />
+              <TrasonIcon icon={Warning} size={20} />
             </div>
             <div className="flex-1">
               <p className="text-warning text-sm font-bold">
@@ -231,7 +229,7 @@ export function DashboardClient() {
                     if (financeMonth === 0) { setFinanceMonth(11); setFinanceYear(y => y - 1); }
                     else { setFinanceMonth(m => m - 1); }
                   }} className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-md text-gray-light">
-                    <RiArrowLeftSLine size={20} />
+                    <TrasonIcon icon={CaretLeft} size={20} />
                   </button>
                   <span className="text-xs font-bold text-soft-cream w-[140px] text-center tracking-wide">
                     {new Date(financeYear, financeMonth).toLocaleString(locale || 'en-US', { month: 'long', year: 'numeric' })}
@@ -240,7 +238,7 @@ export function DashboardClient() {
                     if (financeMonth === 11) { setFinanceMonth(0); setFinanceYear(y => y + 1); }
                     else { setFinanceMonth(m => m + 1); }
                   }} className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-md text-gray-light">
-                    <RiArrowRightSLine size={20} />
+                    <TrasonIcon icon={CaretRight} size={20} />
                   </button>
                 </div>
                 
@@ -251,7 +249,7 @@ export function DashboardClient() {
                     <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-sm mb-sm">
                       <div className="flex items-center gap-sm">
                         <div className="p-1.5 bg-primary/10 rounded-lg text-primary">
-                          <Wallet size={16} />
+                          <TrasonIcon icon={SYS_ICONS.finance.main} size={16} />
                         </div>
                         <h3 className="text-sm font-bold text-soft-cream">Monthly Budget</h3>
                       </div>

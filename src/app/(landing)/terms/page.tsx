@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Compass } from 'lucide-react';
+import { ArrowLeft, Compass } from '@phosphor-icons/react/dist/ssr';
 
 export default function TermsPage() {
   return (

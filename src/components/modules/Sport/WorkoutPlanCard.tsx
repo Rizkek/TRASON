@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Badge, Button } from '@/components';
 import type { WorkoutPlan } from '@/types/database';
-import { Calendar, Play, CheckCircle2, ChevronRight, Activity } from 'lucide-react';
+import { Calendar, Play, CheckCircle, CaretRight as ChevronRight, Heartbeat as Activity } from '@phosphor-icons/react/dist/ssr';
 
 interface Props {
   plan: WorkoutPlan;
@@ -61,7 +61,7 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
           </div>
           <div className="bg-black/5 dark:bg-white/5 rounded-md p-md">
             <div className="flex items-center gap-2 text-gray-light mb-1">
-              <CheckCircle2 size={14} />
+              <CheckCircle size={14} />
               <span className="text-[10px] uppercase tracking-widest font-bold">Training Days</span>
             </div>
             <p className="text-lg font-bold text-white">{daysCount} Days/Week</p>

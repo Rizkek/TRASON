@@ -1,3 +1,5 @@
+'use client';
+
 export * from './ui/Button';
 export * from './Input';
 export * from './ui/Badge';

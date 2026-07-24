@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card } from '@/components';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendUp as TrendingUp, TrendDown as TrendingDown } from '@phosphor-icons/react';
 import { formatCurrency } from '@/libs/format';
 import type { SpendingLeak } from '@/libs/analytics/financialHealth';
 

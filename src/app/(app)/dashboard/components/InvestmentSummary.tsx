@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card, Button, Badge } from '@/components';
-import { ArrowRight, Landmark, Coins, Shield } from 'lucide-react';
+import { ArrowRight, Bank as Landmark, Coins, Shield } from '@phosphor-icons/react/dist/ssr';
 import {
   InvestmentPortfolioSummary,
   getAllocationLabel,

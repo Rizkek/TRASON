@@ -1,17 +1,8 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useMemo } from 'react';
 import { Card, Badge, Loading } from '@/components';
-import {
-  Search,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Calendar,
-  X,
-  Edit2,
-  Trash2,
-  Sparkles,
-} from 'lucide-react';
+import { MagnifyingGlass as Search, ArrowUpRight, ArrowDownLeft, Calendar, X, PencilSimple as Edit2, Trash as Trash2, Sparkle } from '@phosphor-icons/react';
 import { formatCurrency, formatDate } from '@/libs/format';
 import type { Transaction, CategoryJoin } from '@/types/database';
 
@@ -137,7 +128,7 @@ export function TransactionFeed({
           </div>
         ) : groups.length === 0 ? (
           <div className="py-2xl flex flex-col items-center justify-center gap-md opacity-50">
-            <Sparkles size={32} className="text-gray-light" />
+            <Sparkle size={32} className="text-gray-light" />
             <div className="text-center">
               <p className="text-sm font-semibold text-soft-cream">Belum ada transaksi</p>
               <p className="text-xs text-gray-light mt-xs">

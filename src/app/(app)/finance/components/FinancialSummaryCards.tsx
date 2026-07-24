@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { Card } from '@/components';
-import { Coins, Receipt, Landmark, Wallet } from 'lucide-react';
+import { Coins } from '@phosphor-icons/react';
+import { SYS_ICONS } from '@/config/icons';
+import { TrasonIcon } from '@/components/ui/TrasonIcon';
 import { formatCurrency } from '@/libs/format';
 
 interface Props {
@@ -38,7 +40,7 @@ export function FinancialSummaryCards({
     {
       label: 'Pengeluaran',
       value: totalExpense,
-      Icon: Receipt,
+      Icon: SYS_ICONS.finance.transaction,
       valueColor: 'text-danger',
       iconClass: 'bg-danger/10 text-danger',
       border: '',
@@ -46,7 +48,7 @@ export function FinancialSummaryCards({
     {
       label: 'Tabungan',
       value: netSavings,
-      Icon: Landmark,
+      Icon: SYS_ICONS.finance.bank,
       valueColor: netSavings >= 0 ? 'text-primary' : 'text-danger',
       iconClass: netSavings >= 0 ? 'bg-primary/10 text-primary' : 'bg-danger/10 text-danger',
       border: 'border-b-2 border-primary/20',
@@ -54,7 +56,7 @@ export function FinancialSummaryCards({
     {
       label: 'Dompet',
       value: closingBalance,
-      Icon: Wallet,
+      Icon: SYS_ICONS.finance.main,
       valueColor: closingBalance >= 0 ? 'text-accent-gold' : 'text-danger',
       iconClass: closingBalance >= 0 ? 'bg-accent-gold/10 text-accent-gold' : 'bg-danger/10 text-danger',
       border: 'border-b-2 border-accent-gold/30',
@@ -80,7 +82,7 @@ export function FinancialSummaryCards({
         <Card key={label} className={`p-sm md:p-lg ${border}`}>
           <div className="flex items-center gap-xs mb-1">
             <span className={`p-1 rounded-md shrink-0 ${iconClass}`}>
-              <Icon size={12} />
+              <TrasonIcon icon={Icon} size={12} variant="default" />
             </span>
             <p className="text-[9px] md:text-[11px] tracking-widest uppercase font-semibold text-gray-light truncate">
               {label}

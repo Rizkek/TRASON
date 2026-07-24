@@ -4,7 +4,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { Check, X } from 'lucide-react';
+import { Check, X } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 
 export const metadata: Metadata = {

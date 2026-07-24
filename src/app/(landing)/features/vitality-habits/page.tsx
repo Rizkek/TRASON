@@ -4,7 +4,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { Activity, Calendar as CalendarIcon, Target, HeartPulse, Flame, ArrowRight, Check } from 'lucide-react';
+import { Heartbeat as Activity, Calendar as CalendarIcon, Target, Heartbeat, Flame, ArrowRight, Check } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -143,7 +143,7 @@ export default function VitalityHabitsPage() {
                  {/* Health Metrics */}
                  <div className="grid grid-cols-2 gap-6">
                    <div className="bg-gradient-to-br from-warm-gold/10 to-transparent border border-warm-gold/20 rounded-3xl p-6 relative overflow-hidden">
-                     <HeartPulse size={120} className="absolute -bottom-10 -right-10 text-warm-gold/10" />
+                     <Heartbeat size={120} className="absolute -bottom-10 -right-10 text-warm-gold/10" />
                      <h4 className="text-sm font-bold text-violet-300 mb-1">Average Sleep</h4>
                      <p className="text-3xl font-serif text-white">7h 24m</p>
                      <p className="text-xs text-yellow-500 mt-2 flex items-center gap-1">+12m vs last week</p>
@@ -183,7 +183,7 @@ export default function VitalityHabitsPage() {
           </div>
           <div className="space-y-6">
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
-              <HeartPulse size={24} />
+              <Heartbeat size={24} />
             </div>
             <h3 className="text-3xl font-serif text-white">Health Correlations</h3>
             <p className="text-gray-light leading-relaxed">

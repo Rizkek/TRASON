@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card } from '@/components';
-import { CreditCard, ChevronRight } from 'lucide-react';
+import { CreditCard, CaretRight as ChevronRight } from '@phosphor-icons/react';
 import { formatCurrency } from '@/libs/format';
 import type { Subscription } from '@/types/database';
 

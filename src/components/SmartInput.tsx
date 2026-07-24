@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Loader2, Send } from 'lucide-react';
+import { MagnifyingGlass as Search, Spinner as Loader2, PaperPlaneRight } from '@phosphor-icons/react';
 import { getLocalISODate } from '@/libs/format';
 import { 
   createTransactionWithInvalidation,
@@ -138,7 +138,7 @@ export function SmartInput() {
             disabled={isLoading || !input.trim()}
             className="absolute right-lg text-primary hover:text-white disabled:opacity-50"
           >
-            {isLoading ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
+            {isLoading ? <Loader2 className="animate-spin" size={20} /> : <PaperPlaneRight size={20} />}
           </button>
         </form>
 

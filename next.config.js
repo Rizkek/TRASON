@@ -17,7 +17,7 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   experimental: {
-    optimizePackageImports: ['lucide-react', 'react-icons'],
+    optimizePackageImports: ['@phosphor-icons/react'],
   },
   images: {
     remotePatterns: [

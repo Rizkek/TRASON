@@ -9,15 +9,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useCategory } from '@/hooks/useCategory';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import { 
-  Plus, 
-  ArrowLeft,
-  CreditCard,
-  MoreVertical,
-  Calendar,
-  Sparkles,
-  Repeat
-} from 'lucide-react';
+import { Plus, ArrowLeft, CreditCard, DotsThreeVertical as MoreVertical, Calendar, Sparkle, Repeat } from '@phosphor-icons/react';
 import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
 import { Subscription } from '@/types/database';
 
@@ -251,7 +243,7 @@ export default function SubscriptionsPage() {
                   <tr>
                     <td colSpan={4} className="py-2xl text-center">
                       <div className="flex flex-col items-center justify-center opacity-50">
-                        <Sparkles size={32} className="text-gray-light mb-md" />
+                        <Sparkle size={32} className="text-gray-light mb-md" />
                         <p className="text-sm text-soft-cream">{t('finance.noSubscriptions') || 'No subscriptions yet'}</p>
                         <p className="text-xs text-gray-light">{t('finance.trackSubscriptions') || 'Track your recurring payments here.'}</p>
                       </div>

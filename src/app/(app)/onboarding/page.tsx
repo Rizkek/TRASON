@@ -7,9 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { ModuleSelectionCard } from './components/ModuleSelectionCard';
-import { 
-  Globe, Clock, Wallet, TrendingUp, BellRing, Briefcase, Activity, Sparkles, ChevronRight, Check, Paintbrush
-} from 'lucide-react';
+import { Globe, Clock, Wallet, TrendUp as TrendingUp, BellRinging, Briefcase, Heartbeat, Sparkle, CaretRight as ChevronRight, Check, PaintBrush } from '@phosphor-icons/react';
 
 const LANGUAGE_OPTIONS = [
   { value: 'en', label: 'English' },
@@ -28,11 +26,11 @@ const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'IDR', 'JPY', 'SGD', 'AUD', 'CAD'
 const MODULE_OPTIONS = [
   { id: 'finance', title: 'Finance', description: 'Track your income, expenses, and manage your budget effectively.', icon: Wallet, color: '#22c55e' },
   { id: 'investments', title: 'Investments', description: 'Monitor your portfolio, stocks, crypto, and asset allocation.', icon: TrendingUp, color: '#8b5cf6' },
-  { id: 'sport', title: 'Sport & Workout', description: 'Plan workout routines, track progress, and log exercise sessions.', icon: Activity, color: '#ef4444' },
+  { id: 'sport', title: 'Sport & Workout', description: 'Plan workout routines, track progress, and log exercise sessions.', icon: Heartbeat, color: '#ef4444' },
   { id: 'career', title: 'Career Tracker', description: 'Manage job applications, interview schedules, and career growth.', icon: Briefcase, color: '#f97316' },
   { id: 'timeline', title: 'Timeline & Tasks', description: 'Daily checklists, weekly logs, and habit tracking.', icon: Clock, color: '#3b82f6' },
-  { id: 'reminders', title: 'Smart Reminders', description: 'Never miss an event with priority-based alerts and notifications.', icon: BellRing, color: '#f59e0b' },
-  { id: 'insights', title: 'AI Insights', description: 'Get intelligent analytics and suggestions across all your data.', icon: Sparkles, color: '#eab308' },
+  { id: 'reminders', title: 'Smart Reminders', description: 'Never miss an event with priority-based alerts and notifications.', icon: BellRinging, color: '#f59e0b' },
+  { id: 'insights', title: 'AI Insights', description: 'Get intelligent analytics and suggestions across all your data.', icon: Sparkle, color: '#eab308' },
 ];
 
 export default function OnboardingPage() {
@@ -233,7 +231,7 @@ export default function OnboardingPage() {
 
                 <div className="space-y-md">
                   <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
-                    <Paintbrush size={14} className="text-primary" /> THEME
+                    <PaintBrush size={14} className="text-primary" /> THEME
                   </label>
                   <div className="flex gap-sm">
                     {['dark', 'light'].map((th) => (

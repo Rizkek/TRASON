@@ -9,7 +9,7 @@ import { WorkoutPlanCard } from '@/components/modules/Sport/WorkoutPlanCard';
 import { PRBoard } from '@/components/modules/Sport/PRBoard';
 import { QuickLogModal } from '@/components/modules/Sport/QuickLogModal';
 import { CreatePlanModal } from '@/components/modules/Sport/CreatePlanModal';
-import { Dumbbell, Plus, Flame, Timer, Activity } from 'lucide-react';
+import { Barbell as Dumbbell, Plus, Flame, Timer, Heartbeat as Activity } from '@phosphor-icons/react';
 import dynamic from 'next/dynamic';
 
 const SportHistoryChart = dynamic(() => import('@/components/modules/Sport/SportHistoryChart').then(mod => mod.SportHistoryChart), {
@@ -179,7 +179,7 @@ export const SportPageClient: React.FC = () => {
                 <PRBoard records={prBoard} />
               </div>
 
-              {/* Sessions History List */}
+              {/* Sessions ClockCounterClockwise List */}
               {sessions.length > 0 && (
                 <div className="space-y-md">
                   <h2 className="text-xl font-serif font-bold text-white">{t('sport_page.recent_workouts')}</h2>

@@ -50,7 +50,29 @@ if (supabaseUrl && !isValidHttpUrl(supabaseUrl)) {
  * dan mengirim autoRefresh lock secara aman. Ini memperbaiki bug "stolen lock" 
  * tanpa perlu modifikasi globalThis manual yang rentan terhadap edge cases.
  */
-export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createBrowserClient(
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseAnonKey || 'placeholder', 
+  {
+    global: {
+      fetch: async (...args: Parameters<typeof fetch>) => {
+        try {
+          return await fetch(...args);
+        } catch (error) {
+          // Prevent unhandled promise rejections for "Failed to fetch" (e.g. offline, visibility changes)
+          if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+            console.warn('[Supabase] Network error caught to prevent unhandled rejection.');
+            return new Response(JSON.stringify({ error: 'Network error', message: error.message }), {
+              status: 502,
+              headers: { 'Content-Type': 'application/json' },
+            });
+          }
+          throw error;
+        }
+      }
+    }
+  }
+);
 
 // Types only used internally — not duplicated from database.ts
 export interface Habit {

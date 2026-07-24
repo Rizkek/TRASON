@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Compass, ArrowUpRight, Menu, X } from 'lucide-react';
-import { PieChart, Briefcase, Activity, LayoutDashboard, Monitor, Target } from 'lucide-react';
+import { Compass, ArrowUpRight, List as Menu, X } from '@phosphor-icons/react';
+import { ChartPieSlice as PieChart, Briefcase, Heartbeat, SquaresFour as LayoutDashboard, Monitor, Target } from '@phosphor-icons/react';
 import { Logo } from '@/components';
 
 export function LandingNavbar() {
@@ -37,7 +37,7 @@ export function LandingNavbar() {
       items: [
         { name: 'Financial Control', href: '/features/financial-control', desc: 'Track every transaction and burn rate.', icon: PieChart },
         { name: 'Career Architect', href: '/features/career-architect', desc: 'Manage your professional growth.', icon: Briefcase },
-        { name: 'Vitality & Habits', href: '/features/vitality-habits', desc: 'Build consistency with flexible routines.', icon: Activity },
+        { name: 'Vitality & Habits', href: '/features/vitality-habits', desc: 'Build consistency with flexible routines.', icon: Heartbeat },
         { name: 'Signal Reminders', href: '/features/signal-reminders', desc: 'Separate the noise from the signal.', icon: Target },
       ]
     },

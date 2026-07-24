@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Modal, Input, Button } from '@/components';
 import { useAuthStore } from '@/store/authStore';
-import { Dumbbell, Plus, Trash2 } from 'lucide-react';
+import { Barbell as Dumbbell, Plus, Trash as Trash2 } from '@phosphor-icons/react';
 import type { SportType } from '@/types/database';
 
 interface Props {

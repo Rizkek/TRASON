@@ -5,7 +5,7 @@ import { useLifeScore } from '@/hooks/useLifeScore';
 import { Card, Loading } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
+import { TrendUp as TrendingUp, CaretDown as ChevronDown, CaretUp as ChevronUp } from '@phosphor-icons/react';
 
 const DIMENSION_KEYS = ['finance', 'productivity', 'health', 'career'] as const;
 

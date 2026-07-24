@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button, Input, ErrorAlert } from '@/components';
 import { useCategory } from '@/hooks/useCategory';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import { Plus, Trash2, Edit2, X, Smile } from 'lucide-react';
+import { Plus, Trash as Trash2, PencilSimple as Edit2, X, Smiley } from '@phosphor-icons/react/dist/ssr';
 import { Category } from '@/types/database';
 import { CategoryIcon, CATEGORY_ICONS } from '@/components';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { AlertCircle, Home, ArrowLeft } from 'lucide-react';
+import { WarningCircle as AlertCircle, House as Home, ArrowLeft } from '@phosphor-icons/react';
 import { Button, Card } from '@/components';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';

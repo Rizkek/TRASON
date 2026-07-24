@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card } from '@/components';
-import { Dumbbell, Flame } from 'lucide-react';
+import { Barbell as Dumbbell, Flame } from '@phosphor-icons/react/dist/ssr';
 import { WeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 

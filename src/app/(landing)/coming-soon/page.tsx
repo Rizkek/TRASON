@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { Construction, ArrowLeft } from 'lucide-react';
+import { TrafficCone, ArrowLeft } from '@phosphor-icons/react/dist/ssr';
 
 export default function ComingSoonPage() {
   return (
@@ -13,7 +13,7 @@ export default function ComingSoonPage() {
       
       <main className="flex-1 flex flex-col items-center justify-center pt-32 pb-24 px-lg text-center relative z-10">
         <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(255,255,255,0.05)] border border-white/10">
-          <Construction className="text-warm-gold w-12 h-12" />
+          <TrafficCone className="text-warm-gold w-12 h-12" />
         </div>
         
         <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 tracking-tight">

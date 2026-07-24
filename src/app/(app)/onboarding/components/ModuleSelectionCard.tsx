@@ -1,11 +1,10 @@
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
 
 interface ModuleSelectionCardProps {
   id: string;
   title: string;
   description: string;
-  icon: LucideIcon;
+  icon: React.ElementType;
   color: string;
   isSelected: boolean;
   onToggle: (id: string) => void;

@@ -7,19 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useInvestment } from '@/hooks/useInvestment';
 import { validateTransaction, sanitizeError } from '@/libs/validation';
 import { InvestmentPosition } from '@/types/database';
-import {
-  BriefcaseBusiness,
-  Coins,
-  Landmark,
-  Plus,
-  RefreshCcw,
-  Shield,
-  Trash2,
-  TrendingUp,
-  TrendingDown,
-  Wifi,
-  WifiOff,
-} from 'lucide-react';
+import { Briefcase, Coins, Bank as Landmark, Plus, ArrowsClockwise, Shield, Trash as Trash2, TrendUp as TrendingUp, TrendDown as TrendingDown, WifiHigh as Wifi, WifiX as WifiOff } from '@phosphor-icons/react';
 import { formatCurrency, formatNumber, getLocalISODate } from '@/libs/format';
 import { formatSignedCurrency, formatSignedPercent } from '@/services/finance/investmentService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -218,13 +206,13 @@ export default function InvestmentsPage() {
           <div className="space-y-sm max-w-2xl">
             <h1 className="text-display font-serif text-gradient">{t('investment_page.investment_analyst_title')}</h1>
             <p className="text-subtext flex items-center gap-sm">
-              <BriefcaseBusiness size={14} className="text-primary" />
+              <Briefcase size={14} className="text-primary" />
               {t('investment_page.investment_analyst_desc')}
             </p>
           </div>
           <div className="hidden md:flex gap-md">
             <Button variant="ghost" size="md" onClick={() => refreshPortfolio()} disabled={isRefreshing}>
-              <RefreshCcw size={16} className={`mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <ArrowsClockwise size={16} className={`mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
               {t('investment_page.refresh_prices')}
             </Button>
             <Button variant="primary" size="md" onClick={openNewModal}>
@@ -455,7 +443,7 @@ export default function InvestmentsPage() {
           className="rounded-full w-12 h-12 flex items-center justify-center shadow-lg bg-black/80 dark:bg-white/10 text-white"
           aria-label={t('investment_page.refresh_prices')}
         >
-          <RefreshCcw size={20} className={isRefreshing ? 'animate-spin' : ''} />
+          <ArrowsClockwise size={20} className={isRefreshing ? 'animate-spin' : ''} />
         </Button>
         <Button 
           variant="primary" 

@@ -15,21 +15,8 @@ import { usePushNotification } from '@/hooks/usePushNotification';
 import { NavIcon } from '@/components/ui/NavIcon';
 import { ModuleId } from '@/modules/types';
 import { DEFAULT_MODULE_STATUS } from '@/modules/registry';
-import { 
-  WifiOff, 
-  Dumbbell,
-  LayoutDashboard,
-  Wallet,
-  Calendar,
-  Bell,
-  BellOff,
-  Lightbulb,
-  Briefcase,
-  Settings,
-  LogOut,
-  X,
-  LayoutGrid
-} from 'lucide-react';
+import { SYS_ICONS } from '@/config/icons';
+import { TrasonIcon } from '@/components/ui/TrasonIcon';
 
 /**
  * ReminderScheduler lives here (not in AuthProvider root) so it only
@@ -136,7 +123,7 @@ function OfflineBanner() {
         </>
       ) : (
         <>
-          <WifiOff size={11} className="text-warning opacity-80" />
+          <TrasonIcon icon={SYS_ICONS.offline} size={11} className="text-warning opacity-80" />
           <span className="text-warning/90">Offline — changes will sync when connected</span>
         </>
       )}
@@ -182,7 +169,7 @@ const NotificationToggle = () => {
       }`}
       title={notifications_enabled ? 'Notifications ON' : 'Notifications OFF'}
     >
-      {notifications_enabled ? <Bell size={18} /> : <BellOff size={18} />}
+      {notifications_enabled ? <TrasonIcon icon={SYS_ICONS.notifications} size={18} /> : <TrasonIcon icon={SYS_ICONS.notificationsOff} size={18} />}
     </button>
   );
 };
@@ -213,15 +200,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   // Memoized menu items — only recompute when enabled modules change
   const menuItems: { label: string; href: string; icon: any; moduleId?: ModuleId }[] = useMemo(() => [
-    { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard }, // Core, always visible
-    { label: 'Finance', href: '/finance', icon: Wallet, moduleId: 'finance' as ModuleId },
-    { label: 'Investments', href: '/investments', icon: Briefcase, moduleId: 'investments' as ModuleId },
-    { label: 'Timeline', href: '/timeline', icon: Calendar, moduleId: 'timeline' as ModuleId },
-    { label: 'Sport', href: '/sport', icon: Dumbbell, moduleId: 'sport' as ModuleId },
-    { label: 'Career', href: '/career', icon: Briefcase, moduleId: 'career' as ModuleId },
-    { label: 'Reminders', href: '/reminders', icon: Bell, moduleId: 'reminders' as ModuleId },
-    { label: 'Insights', href: '/insights', icon: Lightbulb, moduleId: 'insights' as ModuleId },
-    { label: 'Settings', href: '/settings', icon: Settings }, // Core, always visible
+    { label: 'Dashboard', href: '/dashboard', icon: SYS_ICONS.dashboard }, // Core, always visible
+    { label: 'Finance', href: '/finance', icon: SYS_ICONS.finance.main, moduleId: 'finance' as ModuleId },
+    { label: 'Investments', href: '/investments', icon: SYS_ICONS.career, moduleId: 'investments' as ModuleId },
+    { label: 'Timeline', href: '/timeline', icon: SYS_ICONS.timeline, moduleId: 'timeline' as ModuleId },
+    { label: 'Sport', href: '/sport', icon: SYS_ICONS.sport, moduleId: 'sport' as ModuleId },
+    { label: 'Career', href: '/career', icon: SYS_ICONS.career, moduleId: 'career' as ModuleId },
+    { label: 'Reminders', href: '/reminders', icon: SYS_ICONS.notifications, moduleId: 'reminders' as ModuleId },
+    { label: 'Insights', href: '/insights', icon: SYS_ICONS.insights, moduleId: 'insights' as ModuleId },
+    { label: 'Settings', href: '/settings', icon: SYS_ICONS.settings }, // Core, always visible
   ], []);
 
   // Filter items based on enabled modules
@@ -331,7 +318,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             onClick={() => setIsLogoutModalOpen(true)}
             className="w-full flex items-center gap-md px-lg py-md rounded-md text-gray-light hover:text-danger hover:bg-danger/10 transition-all duration-300 group"
           >
-            <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
+            <TrasonIcon icon={SYS_ICONS.logout} size={20} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-semibold tracking-wide">{t('nav.logout')}</span>
           </button>
         </div>
@@ -405,7 +392,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             }`}
           >
             <div className={`p-1.5 rounded-lg transition-all duration-200 ${isBottomSheetOpen ? 'bg-primary/15' : ''}`}>
-              <LayoutGrid size={22} />
+              <TrasonIcon icon={SYS_ICONS.menu} size={22} />
             </div>
             <span className="text-[10px] mt-0.5 font-medium tracking-wide">More</span>
           </button>
@@ -435,7 +422,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={() => setIsBottomSheetOpen(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-soft-cream/5 hover:bg-soft-cream/10 transition-colors text-gray-light hover:text-soft-cream"
               >
-                <X size={20} />
+                <TrasonIcon icon={SYS_ICONS.close} size={20} />
               </button>
             </div>
 
@@ -482,7 +469,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/5'
                   }`}
                 >
-                  <Settings size={20} />
+                  <TrasonIcon icon={SYS_ICONS.settings} size={20} />
                   <span className="text-sm font-semibold">{t('nav.settings')}</span>
                 </Link>
 
@@ -504,7 +491,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     onClick={() => { setIsBottomSheetOpen(false); setIsLogoutModalOpen(true); }}
                     className="flex items-center gap-xs text-gray-light hover:text-danger transition-colors text-xs font-medium px-sm py-xs rounded-lg hover:bg-danger/10"
                   >
-                    <LogOut size={16} />
+                    <TrasonIcon icon={SYS_ICONS.logout} size={16} />
                     <span>Logout</span>
                   </button>
                 </div>

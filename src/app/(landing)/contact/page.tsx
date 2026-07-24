@@ -1,7 +1,7 @@
 import React from 'react';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Envelope as Mail, MapPin, Phone } from '@phosphor-icons/react/dist/ssr';
 import { ContactForm } from './ContactForm';
 
 export default function ContactPage() {
@@ -18,7 +18,7 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           <ContactForm />
 
-          {/* Contact Info & Map */}
+          {/* Contact Info & MapTrifold */}
           <div className="space-y-12">
             <div className="space-y-8">
               <h2 className="text-2xl font-bold font-serif">Contact Information</h2>
@@ -55,7 +55,7 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Simulated Map */}
+            {/* Simulated MapTrifold */}
             <div className="w-full h-64 bg-white/5 border border-white/10 rounded-3xl overflow-hidden relative group">
                {/* Embed Google Maps */}
                <iframe 

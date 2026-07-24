@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from '@/components';
-import { Bell } from 'lucide-react';
+import { Bell } from '@phosphor-icons/react/dist/ssr';
 import { Reminder } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 

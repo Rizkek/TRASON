@@ -1,7 +1,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Github, Linkedin, Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
+import { GithubLogo, LinkedinLogo, Envelope as Mail, MapPin, ChatCircle as MessageCircle, Phone } from '@phosphor-icons/react/dist/ssr';
 import { Logo } from '@/components';
 
 export function LandingFooter() {
@@ -23,10 +23,10 @@ export function LandingFooter() {
               <MessageCircle size={18} />
             </a>
             <a href="https://github.com/Rizkek/TRASON" target="_blank" rel="noopener noreferrer" className="text-gray-light hover:text-warm-gold transition-colors">
-              <Github size={18} />
+              <GithubLogo size={18} />
             </a>
             <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-light hover:text-warm-gold transition-colors">
-              <Linkedin size={18} />
+              <LinkedinLogo size={18} />
             </a>
           </div>
         </div>

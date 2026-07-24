@@ -4,7 +4,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { CircleDollarSign, TrendingUp, TrendingDown, Wallet, ArrowUpRight, BarChart3, ArrowRight } from 'lucide-react';
+import { CurrencyCircleDollar, TrendUp as TrendingUp, TrendDown as TrendingDown, Wallet, ArrowUpRight, ChartBar, ArrowRight } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -34,7 +34,7 @@ export default function FinancialControlPage() {
         {/* Hero Section */}
         <div className="text-center space-y-md max-w-4xl mx-auto relative z-10">
            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warm-gold/10 text-yellow-500 border border-warm-gold/20 text-sm font-bold mb-6">
-             <CircleDollarSign size={16} /> Financial Control
+             <CurrencyCircleDollar size={16} /> Financial Control
            </div>
            <h1 className="text-5xl md:text-7xl font-serif leading-tight">
              Master Your <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-200">Capital.</span>
@@ -121,7 +121,7 @@ export default function FinancialControlPage() {
                      </div>
                      <div>
                        <div className="flex justify-between text-sm mb-2">
-                         <span className="text-gray-light flex items-center gap-2"><BarChart3 size={14} className="text-yellow-500" /> Investments</span>
+                         <span className="text-gray-light flex items-center gap-2"><ChartBar size={14} className="text-yellow-500" /> Investments</span>
                          <span className="font-bold text-white">40%</span>
                        </div>
                        <div className="h-2 w-full bg-black/50 rounded-full overflow-hidden">
@@ -130,7 +130,7 @@ export default function FinancialControlPage() {
                      </div>
                      <div>
                        <div className="flex justify-between text-sm mb-2">
-                         <span className="text-gray-light flex items-center gap-2"><CircleDollarSign size={14} className="text-yellow-500" /> Crypto</span>
+                         <span className="text-gray-light flex items-center gap-2"><CurrencyCircleDollar size={14} className="text-yellow-500" /> Crypto</span>
                          <span className="font-bold text-white">15%</span>
                        </div>
                        <div className="h-2 w-full bg-black/50 rounded-full overflow-hidden">
@@ -181,7 +181,7 @@ export default function FinancialControlPage() {
           </div>
           <div className="space-y-6">
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
-              <BarChart3 size={24} />
+              <ChartBar size={24} />
             </div>
             <h3 className="text-3xl font-serif text-white">Runway Forecasting</h3>
             <p className="text-gray-light leading-relaxed">

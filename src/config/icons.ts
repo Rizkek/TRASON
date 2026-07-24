@@ -1,0 +1,65 @@
+import {
+  House,
+  Wallet,
+  Briefcase,
+  Target,
+  Flame,
+  Clock,
+  Receipt,
+  Gear,
+  User,
+  ChartPieSlice,
+  Bell,
+  MagnifyingGlass,
+  Plus,
+  SignOut,
+  ArrowRight,
+  ArrowLeft,
+  X,
+  Check,
+  CreditCard,
+  Bank,
+  CurrencyCircleDollar,
+  Barbell,
+  Lightbulb,
+  SquaresFour,
+  WifiX,
+  BellSlash,
+} from '@phosphor-icons/react';
+
+// Central dictionary for all TRASON icons to ensure consistency
+export const SYS_ICONS = {
+  // Navigation & Core Modules
+  dashboard: House,
+  finance: {
+    main: Wallet,
+    transaction: Receipt,
+    card: CreditCard,
+    bank: Bank,
+    currency: CurrencyCircleDollar,
+  },
+  career: Briefcase,
+  goals: Target,
+  habit: Flame,
+  timeline: Clock,
+  sport: Barbell,
+  insights: Lightbulb,
+  
+  // App & System
+  settings: Gear,
+  profile: User,
+  analytics: ChartPieSlice,
+  notifications: Bell,
+  notificationsOff: BellSlash,
+  search: MagnifyingGlass,
+  menu: SquaresFour,
+  offline: WifiX,
+  
+  // Actions & UI
+  add: Plus,
+  logout: SignOut,
+  arrowRight: ArrowRight,
+  arrowLeft: ArrowLeft,
+  close: X,
+  success: Check,
+} as const;

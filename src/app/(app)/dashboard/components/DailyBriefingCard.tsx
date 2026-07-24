@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card, Loading } from '@/components';
 import { useDailyBriefing } from '@/hooks/useDailyBriefing';
-import { BellRing, CheckSquare, Zap, TrendingUp, TrendingDown } from 'lucide-react';
+import { BellRinging, CheckSquare, Lightning as Zap, TrendUp as TrendingUp, TrendDown as TrendingDown } from '@phosphor-icons/react';
 import { useAuthStore } from '@/store/authStore';
 
 export function DailyBriefingCard() {
@@ -48,7 +48,7 @@ export function DailyBriefingCard() {
 
           {briefing.urgentReminders > 0 && (
             <div className="flex items-center gap-sm bg-red-400/10 rounded-full px-lg py-xs border border-red-400/20">
-              <BellRing size={14} className="text-red-400" />
+              <BellRinging size={14} className="text-red-400" />
               <span className="text-xs text-red-400 font-bold">
                 {briefing.urgentReminders} pengingat mendesak
               </span>

@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card, Badge } from '@/components';
-import { Briefcase, Clock } from 'lucide-react';
+import { Briefcase, Clock } from '@phosphor-icons/react/dist/ssr';
 import { CareerStats } from '@/hooks/useCareer';
 import { CareerApplication } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';

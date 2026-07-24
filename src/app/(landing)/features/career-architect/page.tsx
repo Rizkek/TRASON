@@ -4,7 +4,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { Briefcase, KanbanSquare, CheckCircle, FileText, ArrowUpRight, ArrowRight, MoreHorizontal, Calendar, Plus } from 'lucide-react';
+import { Briefcase, Kanban, CheckCircle, FileText, ArrowUpRight, ArrowRight, DotsThree as MoreHorizontal, Calendar, Plus } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -204,7 +204,7 @@ export default function CareerArchitectPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 py-16">
           <div className="space-y-6">
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
-              <KanbanSquare size={24} />
+              <Kanban size={24} />
             </div>
             <h3 className="text-3xl font-serif text-white">Application Board</h3>
             <p className="text-gray-light leading-relaxed">
@@ -233,7 +233,7 @@ export default function CareerArchitectPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <ArrowUpRight size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Compensation History</h3>
+            <h3 className="text-3xl font-serif text-white">Compensation ClockCounterClockwise</h3>
             <p className="text-gray-light leading-relaxed">
               Log historical offers and your current compensation packages to visualize your career growth trajectory and negotiate from a position of strength.
             </p>

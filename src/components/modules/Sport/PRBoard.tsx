@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from '@/components';
 import type { PersonalRecord } from '@/types/database';
-import { Trophy, Dumbbell, Timer, Footprints } from 'lucide-react';
+import { Trophy, Barbell as Dumbbell, Timer, Footprints } from '@phosphor-icons/react/dist/ssr';
 
 interface Props {
   records: PersonalRecord[];

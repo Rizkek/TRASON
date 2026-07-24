@@ -2,18 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { 
-  ArrowLeft, 
-  Zap, 
-  Activity, 
-  Compass, 
-  Cpu, 
-  Layers, 
-  ShieldCheck, 
-  Wallet, 
-  History, 
-  Briefcase 
-} from 'lucide-react';
+import { ArrowLeft, Lightning as Zap, Heartbeat as Activity, Compass, Cpu, Stack, ShieldCheck, Wallet, ClockCounterClockwise, Briefcase } from '@phosphor-icons/react';
 
 export default function AboutOS() {
   return (
@@ -66,7 +55,7 @@ export default function AboutOS() {
               </p>
               <div className="space-y-md pt-md">
                 <div className="flex gap-md">
-                  <div className="mt-1 text-warm-gold"><Layers size={20} /></div>
+                  <div className="mt-1 text-warm-gold"><Stack size={20} /></div>
                   <div>
                     <h4 className="font-bold">The Core Spine</h4>
                     <p className="text-sm text-gray-light/60">A unified Life Log that captures every signal from your integrated modules.</p>
@@ -86,7 +75,7 @@ export default function AboutOS() {
                <div className="relative w-full h-full border border-warm-gold/20 rounded-full animate-[spin_20s_linear_infinite]">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><Wallet size={20} /></div>
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><Activity size={20} /></div>
-                  <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><History size={20} /></div>
+                  <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><ClockCounterClockwise size={20} /></div>
                   <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-strong border border-warm-gold/50 rounded-xl flex items-center justify-center text-warm-gold"><Briefcase size={20} /></div>
                </div>
                <div className="absolute inset-0 flex items-center justify-center">
@@ -125,9 +114,9 @@ export default function AboutOS() {
             <h2 className="text-3xl md:text-5xl font-serif text-center">Modular Pillars</h2>
             <div className="space-y-lg">
                {[
-                 { t: "Life Log (Core)", d: "The chronological spine of your existence. Every log, from a financial inflow to a session of vitality, is recorded here.", i: History },
+                 { t: "Life Log (Core)", d: "The chronological spine of your existence. Every log, from a financial inflow to a session of vitality, is recorded here.", i: ClockCounterClockwise },
                  
-                 { t: "Integrated Mesh", d: "Specific environments for Financial Flow, Vitality, and Career Architect that share the same design DNA.", i: Layers }
+                 { t: "Integrated Mesh", d: "Specific environments for Financial Flow, Vitality, and Career Architect that share the same design DNA.", i: Stack }
                ].map((item, i) => (
                  <div key={i} className="flex flex-col md:flex-row gap-xl p-xl border-b border-black/5 dark:border-white/5 items-center">
                     <div className="w-12 h-12 text-warm-gold shrink-0"><item.i size={48} /></div>

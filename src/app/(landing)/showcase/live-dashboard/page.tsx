@@ -3,22 +3,7 @@
 import React, { useState } from 'react';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { 
-  LayoutDashboard, 
-  PieChart, 
-  Briefcase, 
-  Activity, 
-  Settings, 
-  Bell, 
-  Search, 
-  ChevronDown,
-  ArrowUpRight,
-  TrendingUp,
-  User,
-  Zap,
-  CheckCircle2,
-  Calendar
-} from 'lucide-react';
+import { SquaresFour as LayoutDashboard, ChartPieSlice as PieChart, Briefcase, Heartbeat, Gear as Settings, Bell, MagnifyingGlass as Search, CaretDown as ChevronDown, ArrowUpRight, TrendUp as TrendingUp, User, Lightning as Zap, CheckCircle, Calendar } from '@phosphor-icons/react';
 import Link from 'next/link';
 
 export default function LiveDashboardPage() {
@@ -81,7 +66,7 @@ export default function LiveDashboardPage() {
                       { icon: LayoutDashboard, label: 'Overview', active: true },
                       { icon: PieChart, label: 'Finance', active: false },
                       { icon: Briefcase, label: 'Career', active: false },
-                      { icon: Activity, label: 'Vitality', active: false },
+                      { icon: Heartbeat, label: 'Vitality', active: false },
                     ].map((item, i) => (
                       <button key={i} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${item.active ? 'bg-warm-gold/10 text-warm-gold border border-warm-gold/20' : 'text-gray-light hover:text-white hover:bg-white/5'}`}>
                         <item.icon size={18} />
@@ -179,7 +164,7 @@ export default function LiveDashboardPage() {
                       <div className="absolute -right-6 -top-6 w-24 h-24 bg-warm-gold/10 rounded-full blur-xl group-hover:bg-warm-gold/20 transition-all" />
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-2 text-gray-light">
-                          <Activity size={16} className="text-yellow-500" />
+                          <Heartbeat size={16} className="text-yellow-500" />
                           <span className="text-sm font-bold">Consistency Score</span>
                         </div>
                         <span className="text-xs text-yellow-500 bg-warm-gold/10 px-2 py-1 rounded font-bold">14 Day Streak</span>
@@ -231,7 +216,7 @@ export default function LiveDashboardPage() {
                           </div>
                         </div>
                         <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex items-start gap-3">
-                          <div className="mt-0.5 text-yellow-500"><CheckCircle2 size={16} /></div>
+                          <div className="mt-0.5 text-yellow-500"><CheckCircle size={16} /></div>
                           <div>
                             <p className="text-sm font-bold text-white">Evening Workout</p>
                             <p className="text-xs text-gray-500">Scheduled for 6:00 PM</p>

@@ -152,7 +152,7 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
     return (
       <Card className="p-xl bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
         <div className="mb-lg">
-          <h3 className="text-lg font-serif font-bold text-white">Activity History</h3>
+          <h3 className="text-lg font-serif font-bold text-white">Activity ClockCounterClockwise</h3>
           <p className="text-sm text-gray-light">Last {days} days of training</p>
         </div>
         <div className="h-[250px] w-full bg-black/[0.01] dark:bg-white/[0.01] rounded-lg animate-pulse" />
@@ -163,7 +163,7 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
   return (
     <Card className="p-xl bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
       <div className="mb-lg">
-        <h3 className="text-lg font-serif font-bold text-white">Activity History</h3>
+        <h3 className="text-lg font-serif font-bold text-white">Activity ClockCounterClockwise</h3>
         <p className="text-sm text-gray-light">Last {days} days of training</p>
       </div>
       <div className="h-[250px] w-full" style={{ minWidth: 0 }}>

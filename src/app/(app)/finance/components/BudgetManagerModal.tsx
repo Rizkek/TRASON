@@ -5,7 +5,7 @@ import { useBudget } from '@/hooks/useBudget';
 import { useCategory } from '@/hooks/useCategory';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { sanitizeError } from '@/libs/validation';
-import { Wallet, Target } from 'lucide-react';
+import { Wallet, Target } from '@phosphor-icons/react/dist/ssr';
 
 interface Props {
   isOpen: boolean;

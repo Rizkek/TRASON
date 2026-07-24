@@ -8,7 +8,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { sanitizeError, validateEmail } from '@/libs/validation';
 import { supabase } from '@/services/supabaseClient';
-import { Compass, ArrowLeft, Quote, Eye, EyeOff } from 'lucide-react';
+import { Compass, ArrowLeft, Quotes, Eye, EyeSlash as EyeOff } from '@phosphor-icons/react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -92,14 +92,14 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
-      {/* Left Side: Aesthetic/Quote (Hidden on mobile) */}
+      {/* Left Side: Aesthetic/Quotes (Hidden on mobile) */}
       <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-4xl overflow-hidden border-r border-black/[0.05] dark:border-white/[0.05]">
          {/* Decorative elements */}
          <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-deep-sage/10 blur-[100px] rounded-full" />
          <div className="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-warm-gold/5 blur-[80px] rounded-full" />
          
          <div className="relative z-10 max-w-md space-y-xl animate-fade-in">
-            <Quote size={48} className="text-warm-gold opacity-40 mb-lg" />
+            <Quotes size={48} className="text-warm-gold opacity-40 mb-lg" />
             <h2 className="text-4xl lg:text-5xl font-serif italic leading-tight text-soft-cream/90">
               "Return to the signal. Leave the noise outside."
             </h2>

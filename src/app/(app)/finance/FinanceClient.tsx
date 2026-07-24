@@ -14,25 +14,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useBudget } from '@/hooks/useBudget';
 import { validateTransaction, sanitizeError } from '@/libs/validation';
 import { Transaction } from '@/types/database';
-import { 
-  Plus, 
-  TrendingUp, 
-  TrendingDown, 
-  Wallet, 
-  Search, 
-  Filter, 
-  MoreVertical,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Calendar,
-  RefreshCcw,
-  Sparkles,
-  ChevronLeft,
-  ChevronRight,
-  Coins,
-  Receipt,
-  Landmark
-} from 'lucide-react';
+import { Plus, Wallet, Funnel, MagnifyingGlass as Search, Sparkle, Target, Swap, X, Bell, TrendUp as TrendingUp, TrendDown as TrendingDown, DotsThreeVertical as MoreVertical, ArrowUpRight, ArrowDownLeft, Calendar, ArrowsClockwise, CaretLeft as ChevronLeft, CaretRight as ChevronRight, Coins, Receipt, Bank as Landmark } from '@phosphor-icons/react';
 import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
 import { fetchExchangeRates } from '@/libs/exchange';
 import { formatDateOnly, getDateRange } from '@/libs/date';
@@ -647,7 +629,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                   <tr>
                     <td colSpan={5} className="py-2xl text-center">
                       <div className="flex flex-col items-center justify-center opacity-50">
-                        <Sparkles size={32} className="text-gray-light mb-md" />
+                        <Sparkle size={32} className="text-gray-light mb-md" />
                         <p className="text-sm text-soft-cream">{t('moduleCommon.emptyTitle')}</p>
                         <p className="text-xs text-gray-light">{t('moduleCommon.emptyDesc')}</p>
                       </div>

@@ -2,18 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { 
-  ArrowLeft,
-  Mail,
-  Compass,
-  Shield,
-  Wallet,
-  Briefcase,
-  HelpCircle,
-  Send,
-  CheckCheck,
-  Dumbbell
-} from 'lucide-react';
+import { ArrowLeft, Envelope as Mail, Compass, Shield, Wallet, Briefcase, Question as HelpCircle, PaperPlaneRight, Checks, Barbell as Dumbbell } from '@phosphor-icons/react';
 
 interface FAQItem {
   q: string;
@@ -220,14 +209,14 @@ export default function SupportPage() {
                 </div>
                 <h2 className="text-3xl font-serif">Still have questions?</h2>
                 <p className="text-sm text-gray-light font-light leading-relaxed">
-                  Send a private message to the TRASON developers. We read all constructive feedback and support inquiries.
+                  PaperPlaneRight a private message to the TRASON developers. We read all constructive feedback and support inquiries.
                 </p>
               </div>
 
               {isSubmitted ? (
                 <div className="p-xl rounded-2xl bg-deep-sage/10 border border-deep-sage/30 text-center space-y-md animate-fade-in">
                   <div className="w-10 h-10 bg-deep-sage/20 text-deep-sage rounded-full flex items-center justify-center mx-auto text-xl">
-                    <CheckCheck />
+                    <Checks />
                   </div>
                   <h4 className="font-serif text-lg text-soft-cream">Message Sent Successfully</h4>
                   <p className="text-xs text-gray-light font-light">
@@ -237,7 +226,7 @@ export default function SupportPage() {
                     onClick={() => setIsSubmitted(false)}
                     className="text-xs font-bold text-warm-gold uppercase tracking-widest hover:underline pt-sm"
                   >
-                    Send another inquiry
+                    PaperPlaneRight another inquiry
                   </button>
                 </div>
               ) : (
@@ -284,8 +273,8 @@ export default function SupportPage() {
                     disabled={isSubmitting}
                     className="w-full bg-warm-gold hover:bg-soft-cream text-warm-black py-md px-xl rounded-full text-sm font-bold flex items-center justify-center gap-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-lg shadow-warm-gold/15"
                   >
-                    {isSubmitting ? 'Sending inquiry...' : 'Send Private Inquiry'}
-                    <Send size={14} />
+                    {isSubmitting ? 'Sending inquiry...' : 'PaperPlaneRight Private Inquiry'}
+                    <PaperPlaneRight size={14} />
                   </button>
                 </form>
               )}

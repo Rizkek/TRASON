@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Modal, Input, Button } from '@/components';
-import { Dumbbell } from 'lucide-react';
+import { Barbell as Dumbbell } from '@phosphor-icons/react';
 
 interface Props {
   isOpen: boolean;

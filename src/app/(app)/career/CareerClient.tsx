@@ -10,21 +10,7 @@ import { CareerApplication } from '@/types/database';
 import { getLocalISODate } from '@/libs/format';
 import { sanitizeError } from '@/libs/validation';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import {
-  Briefcase,
-  Plus,
-  Trash2,
-  ExternalLink,
-  Calendar,
-  MapPin,
-  Clock,
-  GraduationCap,
-  Rocket,
-  BookOpen,
-  Star,
-  Target,
-  MessageSquare
-} from 'lucide-react';
+import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare } from '@phosphor-icons/react';
 import { useInterviewJournal } from '@/hooks/useInterviewJournal';
 
 const FILTER_TABS = [

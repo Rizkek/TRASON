@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { z } from 'zod';
-import { Send } from 'lucide-react';
+import { PaperPlaneRight } from '@phosphor-icons/react';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -45,7 +45,7 @@ export function ContactForm() {
 
   return (
     <div className="bg-black/20 border border-white/5 p-8 rounded-3xl space-y-6">
-      <h2 className="text-2xl font-bold font-serif mb-6">Send us a message</h2>
+      <h2 className="text-2xl font-bold font-serif mb-6">PaperPlaneRight us a message</h2>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="name" className="block text-sm font-bold text-gray-light mb-2">Name</label>
@@ -90,8 +90,8 @@ export function ContactForm() {
           type="submit"
           className="w-full bg-warm-gold text-warm-black font-bold py-3 px-6 rounded-xl hover:bg-white transition-colors flex items-center justify-center gap-2 mt-4"
         >
-          <Send size={18} />
-          Send Message
+          <PaperPlaneRight size={18} />
+          PaperPlaneRight Message
         </button>
       </form>
     </div>

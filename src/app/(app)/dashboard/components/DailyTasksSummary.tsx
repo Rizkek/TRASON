@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Badge, Loading } from '@/components';
 import { useDailyTasks } from '@/hooks/useDailyTasks';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import { ListChecks } from 'lucide-react';
+import { ListChecks } from '@phosphor-icons/react/dist/ssr';
 
 export const DailyTasksSummary = () => {
   const { t } = useTranslation();

@@ -3,7 +3,7 @@
 import React from 'react';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { Network, Server, Share2, Layers, Cpu, Zap, ArrowRight, Activity, Briefcase, PieChart, Shield } from 'lucide-react';
+import { Network, HardDrives, ShareNetwork as Share2, Stack, Cpu, Lightning as Zap, ArrowRight, Heartbeat as Activity, Briefcase, ChartPieSlice as PieChart, Shield } from '@phosphor-icons/react';
 import Link from 'next/link';
 
 export default function LifeCommandCenterPage() {

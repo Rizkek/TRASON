@@ -11,18 +11,8 @@ import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useCareer } from '@/hooks/useCareer';
 import { useReminder } from '@/hooks/useReminder';
 import { useActivity } from '@/hooks/useActivity';
-import { 
-  Lightbulb, 
-  TrendingUp, 
-  TrendingDown, 
-  Zap, 
-  Target, 
-  BarChart3,
-  Calendar,
-  Layers,
-  Trash2
-} from 'lucide-react';
-import { Sparkles } from 'lucide-react';
+import { Lightbulb, TrendUp as TrendingUp, TrendDown as TrendingDown, Lightning as Zap, Target, ChartBar, Calendar, Stack, Trash as Trash2 } from '@phosphor-icons/react';
+import { Sparkle } from '@phosphor-icons/react';
 import { formatDate } from '@/libs/format';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -182,7 +172,7 @@ User Context Profile (TRASON Unified Life OS):
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `Server error ${res.status}`);
+        throw new Error(errData.error || `HardDrives error ${res.status}`);
       }
 
       const data = await res.json();
@@ -266,7 +256,7 @@ User Context Profile (TRASON Unified Life OS):
     ...dbInsights,
   ];
 
-  // Map Supabase canonical Insight type rows to UI expectations
+  // MapTrifold Supabase canonical Insight type rows to UI expectations
   const insights = rawInsights.map((i: any) => {
     if (i.description && i.title) {
       return i;
@@ -300,7 +290,7 @@ User Context Profile (TRASON Unified Life OS):
           <div className="space-y-sm">
             <h1 className="text-display font-serif text-gradient">{t('insights_page.title')}</h1>
             <p className="text-subtext flex items-center gap-sm">
-              <Sparkles size={14} className="text-primary" />
+              <Sparkle size={14} className="text-primary" />
               {t('insights_page.desc')}
             </p>
           </div>
@@ -310,7 +300,7 @@ User Context Profile (TRASON Unified Life OS):
               disabled={isGenerating}
               className="px-lg py-md bg-primary text-black font-bold rounded-lg flex items-center gap-sm hover:opacity-90 disabled:opacity-50 transition-all"
             >
-              {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkles size={16} /> {t('insights_page.ask_ai')}</>}
+              {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkle size={16} /> {t('insights_page.ask_ai')}</>}
             </button>
           </div>
         </div>
@@ -342,7 +332,7 @@ User Context Profile (TRASON Unified Life OS):
                       insight.type === 'productivity' || insight.type === 'career' ? 'bg-secondary/10 text-secondary' : 
                       'bg-primary/10 text-primary'
                     }`}>
-                      {insight.type === 'finance' || insight.type === 'investment' ? <BarChart3 size={24} /> : 
+                      {insight.type === 'finance' || insight.type === 'investment' ? <ChartBar size={24} /> : 
                        insight.type === 'productivity' || insight.type === 'career' ? <Target size={24} /> : 
                        <Lightbulb size={24} />}
                     </div>
@@ -392,7 +382,7 @@ User Context Profile (TRASON Unified Life OS):
               <>
                 <Card className="p-xl flex flex-col justify-center items-center text-center space-y-md opacity-60">
                   <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center text-gray-light">
-                    <Layers size={32} />
+                    <Stack size={32} />
                   </div>
                   <h3 className="text-lg font-bold">{t('insights_page.no_insights_title')}</h3>
                   <p className="text-xs text-gray-light max-w-xs">
@@ -436,7 +426,7 @@ User Context Profile (TRASON Unified Life OS):
           disabled={isGenerating}
           className="w-full py-sm  bg-primary text-black font-bold rounded-xl flex items-center justify-center gap-sm shadow-[0_4px_20px_rgba(78,79,235,0.4)] disabled:opacity-50 transition-all"
         >
-          {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkles size={18} /> <span className="text-sm">{t('insights_page.ask_ai')}</span></>}
+          {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkle size={18} /> <span className="text-sm">{t('insights_page.ask_ai')}</span></>}
         </button>
       </div>
     </Layout>

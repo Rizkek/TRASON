@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { AlertCircle, X } from 'lucide-react';
+import { WarningCircle as AlertCircle, X } from '@phosphor-icons/react';
 
 interface ErrorAlertProps {
   error: string | null;

@@ -14,21 +14,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 import { ModuleId } from '@/modules/types';
 import { DEFAULT_MODULE_STATUS, MODULE_METADATA } from '@/modules/registry';
-import {
-  User as UserIcon,
-  Paintbrush,
-  ShieldCheck,
-  BellRing,
-  Camera,
-  Globe,
-  Save,
-  Grid3X3,
-  Wallet,
-  TrendingUp,
-  Clock,
-  AlertTriangle,
-  type LucideIcon
-} from 'lucide-react';
+import { User as UserIcon, PaintBrush, ShieldCheck, BellRinging, Camera, Globe, FloppyDisk as Save, GridNine, Wallet, TrendUp as TrendingUp, Clock, Warning as AlertTriangle, type Icon } from '@phosphor-icons/react';
 
 // --- Interfaces ---
 interface ProfileData {
@@ -62,11 +48,11 @@ interface UserData {
   user_preferences?: PreferenceData[];
 }
 
-const MODULE_ICONS: Record<string, LucideIcon> = {
+const MODULE_ICONS: Record<string, Icon> = {
   Wallet,
   TrendingUp,
   Clock,
-  Bell: BellRing,
+  Bell: BellRinging,
   Lightbulb: Camera,
 };
 
@@ -130,7 +116,7 @@ const ModuleItem = React.memo(function ModuleItem({
     }
   }, [onSubToggle]);
 
-  const Icon = MODULE_ICONS[metadata.icon] || Grid3X3;
+  const Icon = MODULE_ICONS[metadata.icon] || GridNine;
 
   const allSubFeaturesOff = isEnabled && (() => {
     const f = moduleFeatures || {};
@@ -699,11 +685,11 @@ export default function SettingsPage() {
 
   if (!isAuthenticated) return null;
 
-  const tabs: { id: Tab; label: string; icon: LucideIcon }[] = [
+  const tabs: { id: Tab; label: string; icon: Icon }[] = [
     { id: 'profile', label: t('settings.tabs.profile'), icon: UserIcon },
-    { id: 'preferences', label: t('settings.tabs.interface'), icon: Paintbrush },
-    { id: 'notifications', label: t('settings.tabs.alerts'), icon: BellRing },
-    { id: 'modules', label: t('settings.tabs.modules'), icon: Grid3X3 },
+    { id: 'preferences', label: t('settings.tabs.interface'), icon: PaintBrush },
+    { id: 'notifications', label: t('settings.tabs.alerts'), icon: BellRinging },
+    { id: 'modules', label: t('settings.tabs.modules'), icon: GridNine },
     { id: 'security', label: t('settings.tabs.security'), icon: ShieldCheck },
   ];
 
@@ -934,7 +920,7 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between p-lg rounded-md border bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
                     <div className="flex items-center gap-md">
                       <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
-                        <BellRing size={20} className="text-secondary" />
+                        <BellRinging size={20} className="text-secondary" />
                       </div>
                       <div>
                         <h4 className="text-sm font-medium text-soft-cream">{t('settings.alerts.push')}</h4>

@@ -4,7 +4,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { Target, BellRing, BrainCircuit, BellOff, VolumeX, Shield, ArrowRight, Zap } from 'lucide-react';
+import { Target, BellRinging, Brain, BellSlash as BellOff, SpeakerSlash, Shield, ArrowRight, Lightning as Zap } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -112,7 +112,7 @@ export default function SignalRemindersPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 py-16">
           <div className="space-y-6">
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
-              <BrainCircuit size={24} />
+              <Brain size={24} />
             </div>
             <h3 className="text-3xl font-serif text-white">Context-Aware Nudges</h3>
             <p className="text-gray-light leading-relaxed">
@@ -121,7 +121,7 @@ export default function SignalRemindersPage() {
           </div>
           <div className="space-y-6">
             <div className="w-12 h-12 bg-yellow-500/10 text-yellow-400 flex items-center justify-center rounded-2xl">
-              <BellRing size={24} />
+              <BellRinging size={24} />
             </div>
             <h3 className="text-3xl font-serif text-white">Recurring Obligations</h3>
             <p className="text-gray-light leading-relaxed">
@@ -130,7 +130,7 @@ export default function SignalRemindersPage() {
           </div>
           <div className="space-y-6">
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
-              <VolumeX size={24} />
+              <SpeakerSlash size={24} />
             </div>
             <h3 className="text-3xl font-serif text-white">Intelligent Snooze</h3>
             <p className="text-gray-light leading-relaxed">

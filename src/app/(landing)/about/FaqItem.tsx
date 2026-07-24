@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { CaretDown as ChevronDown, CaretUp as ChevronUp } from '@phosphor-icons/react';
 
 export function FaqItem({ q, a }: { q: string, a: string }) {
   const [open, setOpen] = useState(false);

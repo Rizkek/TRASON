@@ -7,7 +7,7 @@ import { Button, Input, Alert, Logo } from '@/components';
 import { supabase } from '@/services/supabaseClient';
 import { userQueries } from '@/services/core/userQueries';
 import { validateEmail, validatePassword, sanitizeError } from '@/libs/validation';
-import { Compass, ArrowLeft, Layers, CheckCircle, AlertTriangle, Loader2, XCircle, Eye, EyeOff } from 'lucide-react';
+import { Compass, ArrowLeft, Stack, CheckCircle, Warning as AlertTriangle, Spinner as Loader2, XCircle, Eye, EyeSlash as EyeOff } from '@phosphor-icons/react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -103,7 +103,7 @@ export default function SignupPage() {
   const getSignUpErrorMessage = (signUpError: any): string => {
     const message = signUpError?.message ?? 'Unable to register';
     if (signUpError?.status === 500) {
-      return 'Server error while registering. Check Supabase logs or try again later.';
+      return 'HardDrives error while registering. Check Supabase logs or try again later.';
     }
     if (
       signUpError?.status === 409 ||
@@ -161,7 +161,7 @@ export default function SignupPage() {
          <div className="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-warm-gold/5 blur-[80px] rounded-full" />
          
          <div className="relative z-10 max-w-md space-y-xl animate-fade-in">
-            <Layers size={48} className="text-warm-gold opacity-40 mb-lg" />
+            <Stack size={48} className="text-warm-gold opacity-40 mb-lg" />
             <h2 className="text-4xl lg:text-5xl font-serif italic leading-tight text-soft-cream/90">
               "Build the system, then let the system carry you."
             </h2>

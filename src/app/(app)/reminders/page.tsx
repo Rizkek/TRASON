@@ -10,17 +10,7 @@ import { validateReminder, sanitizeError } from '@/libs/validation';
 import { Reminder } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { 
-  Bell,
-  BellOff,
-  CheckCircle2,
-  Clock,
-  Plus,
-  Trash2,
-  Edit2,
-  List,
-  Calendar as CalendarIcon
-} from 'lucide-react';
+import { Bell, BellSlash as BellOff, CheckCircle, Clock, Plus, Trash as Trash2, PencilSimple as Edit2, List, Calendar as CalendarIcon } from '@phosphor-icons/react';
 import { getLocalISODate } from '@/libs/format';
 
 
@@ -317,7 +307,7 @@ export default function RemindersPage() {
                               reminder.status === 'completed' ? 'bg-income border-income text-warm-black' : 'border-gray-medium hover:border-warm-gold'
                             }`}
                           >
-                            {reminder.status === 'completed' && <CheckCircle2 size={14} />}
+                            {reminder.status === 'completed' && <CheckCircle size={14} />}
                           </button>
                           <div>
                             <h4 className={`text-lg font-medium ${reminder.status === 'completed' ? 'line-through opacity-40' : ''}`}>{reminder.title}</h4>

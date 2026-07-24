@@ -4,7 +4,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { Map, Flag, Rocket, CheckCircle2, CircleDashed, Clock } from 'lucide-react';
+import { MapTrifold, Flag, Rocket, CheckCircle, CircleDashed, Clock } from '@phosphor-icons/react/dist/ssr';
 
 export const metadata: Metadata = {
   title: 'Roadmap – What We Are Building Next',
@@ -32,7 +32,7 @@ export default function RoadmapPage() {
         {/* Presentation Header */}
         <div className="text-center space-y-6 max-w-3xl mx-auto relative z-10">
            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warm-gold/10 text-yellow-500 border border-warm-gold/20 text-sm font-bold mb-4">
-             <Map size={16} /> Product Evolution
+             <MapTrifold size={16} /> Product Evolution
            </div>
            <h1 className="text-4xl md:text-6xl font-serif leading-tight">
              The <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-200">Roadmap.</span>
@@ -49,7 +49,7 @@ export default function RoadmapPage() {
             {/* Column 1: Recently Shipped */}
             <div className="space-y-6">
               <div className="flex items-center gap-2 border-b border-white/10 pb-4">
-                <CheckCircle2 size={20} className="text-warm-gold" />
+                <CheckCircle size={20} className="text-warm-gold" />
                 <h2 className="text-xl font-bold text-white">Recently Shipped</h2>
                 <span className="ml-auto text-xs font-bold bg-white/10 px-2 py-1 rounded">Q2 2026</span>
               </div>

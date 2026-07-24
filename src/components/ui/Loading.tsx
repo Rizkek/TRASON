@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Spinner as Loader2, Sparkle } from '@phosphor-icons/react';
 
 interface LoadingProps {
   size?: 'sm' | 'md' | 'lg';
@@ -32,7 +32,7 @@ export const Loading: React.FC<LoadingProps> = ({
       </div>
       {text && <p className="text-gray-very-light text-sm font-medium">{text}</p>}
       {showTip && <p className="text-gray-light text-xs">This usually takes a few seconds.</p>}
-      <Sparkles size={14} className="text-secondary/80 animate-pulse" aria-hidden="true" />
+      <Sparkle size={14} className="text-secondary/80 animate-pulse" aria-hidden="true" />
     </div>
   );
 

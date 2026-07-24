@@ -10,21 +10,7 @@ import { validateActivity, sanitizeError } from '@/libs/validation';
 import { Activity } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import {
-  Plus,
-  Trash2,
-  Clock,
-  Tag,
-  Smile,
-  MapPin,
-  Star,
-  Activity as ActivityIcon,
-  CheckSquare2,
-  Square,
-  ListChecks,
-  CalendarDays,
-  RotateCcw,
-} from 'lucide-react';
+import { Plus, Trash as Trash2, Clock, Tag, Smiley, MapPin, Star, Heartbeat as ActivityIcon, CheckSquare, Square, ListChecks, Calendar, ArrowCounterClockwise } from '@phosphor-icons/react';
 
 
 const MOOD_OPTIONS = [
@@ -418,7 +404,7 @@ export default function TimelinePage() {
                     : 'text-gray-light hover:text-soft-cream'
                 }`}
               >
-                <CalendarDays size={14} />
+                <Calendar size={14} />
                 Weekly Log
               </button>
             )}
@@ -469,7 +455,7 @@ export default function TimelinePage() {
                   )}
                 </div>
                 <div className="flex items-center gap-sm text-[9px] text-gray-light opacity-50">
-                  <RotateCcw size={11} />
+                  <ArrowCounterClockwise size={11} />
                   Resets midnight
                 </div>
               </div>
@@ -546,7 +532,7 @@ export default function TimelinePage() {
                         aria-label={task.completed_today ? 'Mark as not done' : 'Mark as done'}
                       >
                         {task.completed_today ? (
-                          <CheckSquare2 size={20} className="drop-shadow-[0_0_6px_rgba(0,200,100,0.4)]" />
+                          <CheckSquare size={20} className="drop-shadow-[0_0_6px_rgba(0,200,100,0.4)]" />
                         ) : (
                           <Square size={20} />
                         )}
