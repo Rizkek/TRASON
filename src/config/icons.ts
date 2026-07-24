@@ -1,12 +1,11 @@
 import {
-  House,
   Wallet,
   Briefcase,
   Target,
-  Flame,
-  Clock,
+  ArrowsClockwise,
+  GitCommit,
   Receipt,
-  Gear,
+  Faders,
   User,
   ChartPieSlice,
   Bell,
@@ -21,16 +20,17 @@ import {
   Bank,
   CurrencyCircleDollar,
   Barbell,
-  Lightbulb,
+  ChartPolar,
   SquaresFour,
   WifiX,
   BellSlash,
+  List,
 } from '@phosphor-icons/react';
 
 // Central dictionary for all TRASON icons to ensure consistency
 export const SYS_ICONS = {
   // Navigation & Core Modules
-  dashboard: House,
+  dashboard: SquaresFour, // Replaced House (too generic)
   finance: {
     main: Wallet,
     transaction: Receipt,
@@ -40,19 +40,19 @@ export const SYS_ICONS = {
   },
   career: Briefcase,
   goals: Target,
-  habit: Flame,
-  timeline: Clock,
+  habit: ArrowsClockwise, // Replaced Flame
+  timeline: GitCommit, // Replaced Clock
   sport: Barbell,
-  insights: Lightbulb,
+  insights: ChartPolar, // Replaced Lightbulb
   
   // App & System
-  settings: Gear,
+  settings: Faders, // Replaced Gear
   profile: User,
   analytics: ChartPieSlice,
   notifications: Bell,
   notificationsOff: BellSlash,
   search: MagnifyingGlass,
-  menu: SquaresFour,
+  menu: List, // Replaced SquaresFour (now used for Dashboard)
   offline: WifiX,
   
   // Actions & UI

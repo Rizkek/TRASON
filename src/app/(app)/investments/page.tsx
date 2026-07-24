@@ -206,7 +206,6 @@ export default function InvestmentsPage() {
           <div className="space-y-sm max-w-2xl">
             <h1 className="text-display font-serif text-gradient">{t('investment_page.investment_analyst_title')}</h1>
             <p className="text-subtext flex items-center gap-sm">
-              <Briefcase size={14} className="text-primary" />
               {t('investment_page.investment_analyst_desc')}
             </p>
           </div>

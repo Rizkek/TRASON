@@ -358,7 +358,6 @@ export default function TimelinePage() {
             <div className="space-y-xs">
               <h1 className="text-display font-serif text-gradient">{t('timeline_page.title')}</h1>
               <p className="text-subtext flex items-center gap-sm">
-                <Clock size={14} className="text-primary" />
                 {t('timeline_page.desc')}
               </p>
             </div>

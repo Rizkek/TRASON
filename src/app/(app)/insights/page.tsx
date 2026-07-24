@@ -290,7 +290,6 @@ User Context Profile (TRASON Unified Life OS):
           <div className="space-y-sm">
             <h1 className="text-display font-serif text-gradient">{t('insights_page.title')}</h1>
             <p className="text-subtext flex items-center gap-sm">
-              <Sparkle size={14} className="text-primary" />
               {t('insights_page.desc')}
             </p>
           </div>

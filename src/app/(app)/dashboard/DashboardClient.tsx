@@ -176,10 +176,8 @@ export function DashboardClient() {
               <span>{user?.first_name || user?.name?.split(' ')[0] || 'User'}</span>
             </h1>
             <div className="flex items-center gap-md text-gray-very-light opacity-60">
-              <TrasonIcon icon={Calendar} size={14} className="text-secondary" />
               <p className="text-micro">{todayDate}</p>
               <div className="w-1 h-1 rounded-full bg-gray-light" />
-              <TrasonIcon icon={SYS_ICONS.timeline} size={14} className="text-secondary" />
               <p className="text-micro">{todayTime}</p>
             </div>
           </div>

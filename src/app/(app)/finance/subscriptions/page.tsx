@@ -153,7 +153,6 @@ export default function SubscriptionsPage() {
           <div className="space-y-sm">
             <h1 className="text-display font-serif text-gradient">{t('finance.subscriptions') || 'Subscriptions'}</h1>
             <p className="text-subtext flex items-center gap-sm">
-              <CreditCard size={14} className="text-primary" />
               {t('finance.manageSubscriptions') || 'Manage your recurring payments.'}
             </p>
           </div>
