@@ -159,7 +159,7 @@ export async function GET(request: Request) {
     // Send Email via Resend
     try {
       const result = await resend.emails.send({
-        from: 'TRASON <onboarding@resend.dev>', // Change to your custom domain later
+        from: 'TRASON <hello@trason.web.id>', // Custom domain for production
         to: email,
         subject: `Your ${freq.charAt(0).toUpperCase() + freq.slice(1)} TRASON Digest`,
         html: htmlContent,

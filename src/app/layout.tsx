@@ -20,11 +20,11 @@ const BASE_URL = 'https://www.trason.web.id';
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'TRASON – Personal OS for Finances, Habits & Career',
+    default: 'TRASON',
     template: '%s | TRASON',
   },
   description:
-    'Stop switching between 5 apps. TRASON unifies your money, routines, reminders, and career growth into one calm dashboard — free, private, and built for ambitious individuals.',
+    'Stop switching apps. TRASON unifies your finance, daily habits, and career tracking into one calm dashboard. Start for free.',
   keywords: [
     'Personal OS',
     'habit tracker',
@@ -48,9 +48,9 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
-    title: 'TRASON – Your Finances, Habits & Career. One Place.',
+    title: 'TRASON | Personal OS',
     description:
-      'Stop switching between 5 apps. TRASON unifies your money, routines, reminders, and career growth into one calm dashboard — free to start.',
+      'Stop switching apps. TRASON unifies your finance, daily habits, and career tracking into one calm dashboard.',
     url: BASE_URL,
     siteName: 'TRASON',
     images: [
@@ -67,9 +67,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TRASON – Your Finances, Habits & Career. One Place.',
+    title: 'TRASON | Personal OS',
     description:
-      'Stop switching between 5 apps. TRASON unifies your money, routines, reminders, and career growth into one calm dashboard — free to start.',
+      'Stop switching apps. TRASON unifies your finance, daily habits, and career tracking into one calm dashboard.',
     images: ['/og-image.png'],
     site: '@trasonapp',
     creator: '@trasonapp',

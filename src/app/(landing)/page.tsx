@@ -65,9 +65,9 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 const FEATURES = [
   {
     icon: CurrencyCircleDollar,
-    label: 'Financial Control',
+    label: 'Finance',
     headline: 'Know exactly where every rupiah goes.',
-    body: 'Track income, expenses, and net worth across all accounts. See your burn rate, runway, and saving rate in one dashboard.',
+    body: 'Track income, expenses, and net worth across all accounts. See your cash flow and saving rate in one dashboard.',
     href: '/features/financial-control',
     color: 'text-yellow-400',
     border: 'group-hover:border-yellow-400/40',
@@ -75,7 +75,7 @@ const FEATURES = [
   },
   {
     icon: Heartbeat,
-    label: 'Vitality & Habits',
+    label: 'Habits',
     headline: 'Build routines that actually stick.',
     body: 'GitHub-style heatmaps for your habits. Flexible schedules, streak tracking, and guilt-free recovery when life happens.',
     href: '/features/vitality-habits',
@@ -85,8 +85,8 @@ const FEATURES = [
   },
   {
     icon: Briefcase,
-    label: 'Career Architect',
-    headline: 'Manage your professional growth like a CEO.',
+    label: 'Career Pipeline',
+    headline: 'Manage your professional growth.',
     body: 'Track job applications, interviews, offers, and skills in a unified career pipeline. Never miss a follow-up again.',
     href: '/features/career-architect',
     color: 'text-blue-400',
@@ -95,7 +95,7 @@ const FEATURES = [
   },
   {
     icon: Bell,
-    label: 'Signal Reminders',
+    label: 'Smart Reminders',
     headline: 'Only the reminders that actually matter.',
     body: 'Context-aware notifications that respect your focus hours. Separate signals from noise so you stay in flow.',
     href: '/features/signal-reminders',
@@ -205,17 +205,17 @@ export default function Home() {
 
           {/* H1 — clearer value proposition */}
           <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-serif leading-[1.1] md:leading-[1] tracking-tighter">
-            Your Finances, Habits{' '}
+            Finances, Habits{' '}
             <br className="hidden md:block" />
             <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-warm-gold via-soft-cream to-warm-gold bg-[length:200%_auto] animate-shimmer">
-              & Career. One Place.
+              and Career. All in one place.
             </span>
           </h1>
 
           {/* Sub-headline — concrete, not poetic */}
           <p className="text-lg md:text-2xl text-gray-light/80 max-w-2xl mx-auto leading-relaxed font-light animate-slide-up [animation-delay:0.2s]">
-            Stop switching between 5 apps. TRASON unifies your money, routines,
-            reminders, and career growth into one calm dashboard — for free.
+            Stop switching apps. TRASON unifies your money, routines,
+            and career pipeline into one calm dashboard.
           </p>
 
           {/* CTA group */}
@@ -286,7 +286,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto text-center space-y-2xl">
           <div className="space-y-sm">
             <h2 className="text-3xl md:text-5xl font-serif text-gray-light">
-              Right now, your life is scattered.
+              Too many apps, too much friction.
             </h2>
             <p className="text-gray-light/60 text-lg max-w-2xl mx-auto">
               You budget in a spreadsheet, track habits in a separate app, log workouts elsewhere, 
@@ -319,9 +319,9 @@ export default function Home() {
       <section className="py-16 md:py-32 px-md md:px-lg relative z-10 bg-gradient-to-b from-transparent via-warm-gold/[0.02] to-transparent border-y border-white/[0.02]">
         <div className="max-w-5xl mx-auto text-center space-y-xl">
           <h2 className="text-4xl md:text-6xl font-serif text-warm-gold">
-            TRASON brings everything{' '}
+            One dashboard for{' '}
             <br />
-            into focus.
+            everything that matters.
           </h2>
           <p className="text-xl text-gray-light/80 font-light max-w-2xl mx-auto">
             One login. One dashboard. All the clarity you need to make better decisions about
@@ -492,7 +492,7 @@ export default function Home() {
       {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
       <section className="py-24 md:py-40 px-md md:px-lg text-center space-y-lg md:space-y-xl relative z-10">
         <h2 className="text-4xl md:text-7xl font-serif italic tracking-tight leading-[1.2] md:leading-[1]">
-          Take back control <br className="hidden md:block" /> of your life.
+          Ready to get <br className="hidden md:block" /> organized?
         </h2>
         <div className="max-w-sm mx-auto space-y-lg pt-lg">
           <Link href="/signup">
@@ -501,7 +501,7 @@ export default function Home() {
               className="w-full bg-soft-cream text-warm-black px-3xl py-5 rounded-2xl font-bold text-xl shadow-[0_0_40px_rgba(244,201,93,0.15)] hover:shadow-[0_0_60px_rgba(244,201,93,0.25)] hover:scale-105 active:scale-95 transition-all group overflow-hidden relative"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
-                Build My Dashboard Free{' '}
+                Get Started{' '}
                 <ArrowUpRight size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </span>
             </button>

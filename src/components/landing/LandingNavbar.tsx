@@ -35,17 +35,17 @@ export function LandingNavbar() {
     {
       name: 'Features',
       items: [
-        { name: 'Financial Control', href: '/features/financial-control', desc: 'Track every transaction and burn rate.', icon: PieChart },
-        { name: 'Career Architect', href: '/features/career-architect', desc: 'Manage your professional growth.', icon: Briefcase },
-        { name: 'Vitality & Habits', href: '/features/vitality-habits', desc: 'Build consistency with flexible routines.', icon: Heartbeat },
-        { name: 'Signal Reminders', href: '/features/signal-reminders', desc: 'Separate the noise from the signal.', icon: Target },
+        { name: 'Finance', href: '/features/financial-control', desc: 'Track every transaction and cash flow.', icon: PieChart },
+        { name: 'Career Pipeline', href: '/features/career-architect', desc: 'Manage your professional growth.', icon: Briefcase },
+        { name: 'Habits', href: '/features/vitality-habits', desc: 'Build consistency with flexible routines.', icon: Heartbeat },
+        { name: 'Smart Reminders', href: '/features/signal-reminders', desc: 'Separate the noise from the signal.', icon: Target },
       ]
     },
     {
       name: 'Showcase',
       items: [
         { name: 'Live Dashboard', href: '/showcase/live-dashboard', desc: 'Experience the interactive preview environment.', icon: Monitor },
-        { name: 'Life Command Center', href: '/showcase/life-command-center', desc: 'See how all TRASON modules connect.', icon: LayoutDashboard },
+        { name: 'Interactive Demo', href: '/showcase/life-command-center', desc: 'See how all TRASON modules connect.', icon: LayoutDashboard },
       ]
     },
     { name: 'Roadmap', href: '/roadmap' },

@@ -1,2 +1,16 @@
 {
+  "crons": [
+    {
+      "path": "/api/cron/digest",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/reminders",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/timeline",
+      "schedule": "0 20 * * *"
+    }
+  ]
 }
