@@ -180,8 +180,25 @@ export default function Home() {
 
   if (isAuthenticated) return null;
 
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQS.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.a,
+      },
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-warm-black text-soft-cream font-sans selection:bg-warm-gold/30 selection:text-soft-cream relative overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       {/* Ambient background */}
       <div
         className="fixed top-[-20%] right-[-10%] w-[800px] h-[800px] bg-warm-gold/5 blur-3xl md:blur-[160px] rounded-full pointer-events-none"
@@ -363,7 +380,7 @@ export default function Home() {
                   <div className="flex justify-between items-start z-10 relative">
                     <div>
                       <p className="text-xs text-gray-light/60 font-bold uppercase tracking-widest">Financial Flow</p>
-                      <h4 className="text-2xl font-serif text-white mt-1">$4,250.00</h4>
+                      <div className="text-2xl font-serif text-white mt-1">$4,250.00</div>
                     </div>
                     <div className="flex gap-2">
                       <span className="px-2 py-1 rounded bg-green-500/10 text-green-400 text-xs flex items-center gap-1">
@@ -394,7 +411,7 @@ export default function Home() {
                     <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
                       <Heartbeat size={16} />
                     </div>
-                    <h4 className="font-serif italic text-md text-white">Daily Insight</h4>
+                    <div className="font-serif italic text-md text-white">Daily Insight</div>
                   </div>
                   <p className="text-sm text-gray-light/80 italic leading-relaxed relative z-10">
                     &ldquo;Your financial outflow is stable, but vitality logs are missing. Log a quick session to balance your day.&rdquo;

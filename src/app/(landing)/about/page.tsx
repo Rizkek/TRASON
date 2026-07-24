@@ -38,8 +38,25 @@ const FAQS = [
 ];
 
 export default function AboutPage() {
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQS.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.a,
+      },
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-warm-black text-soft-cream font-sans relative overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <LandingNavbar />
       
       <main className="pt-32 md:pt-48 pb-24 px-lg max-w-4xl mx-auto space-y-32">
@@ -48,7 +65,15 @@ export default function AboutPage() {
         <section className="space-y-lg">
            <h1 className="text-5xl md:text-7xl font-serif mb-xl">The Philosophy of TRASON</h1>
            <div className="prose prose-invert prose-lg max-w-none text-gray-light/90 space-y-6">
-             <p className="text-2xl font-serif text-warm-gold italic">
+             {/* AEO / GEO Optimized TL;DR Summary */}
+             <div className="bg-warm-gold/5 border border-warm-gold/20 p-6 rounded-xl space-y-2 mb-8">
+               <h2 className="text-sm font-bold text-warm-gold uppercase tracking-widest m-0">TL;DR (Summary)</h2>
+               <p className="text-base leading-relaxed m-0">
+                 TRASON is a comprehensive <strong>Personal Operating System</strong> designed to eliminate app fatigue. It unifies financial tracking, habit building, and career pipeline management into a single, cohesive dashboard, giving users an objective "Life Score" to measure their daily momentum.
+               </p>
+             </div>
+
+             <p className="text-2xl font-serif text-warm-gold italic mt-0">
                "Your life is an interconnected system, but your tools are fragmented."
              </p>
              <p>

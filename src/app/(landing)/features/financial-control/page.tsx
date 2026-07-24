@@ -28,6 +28,20 @@ export default function FinancialControlPage() {
       <div className="fixed top-[-20%] right-[-10%] w-[800px] h-[800px] bg-warm-gold/5 md:blur-[160px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
       <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-warm-gold/5 md:blur-[140px] rounded-full pointer-events-none" style={{ transform: 'translateZ(0)', contain: 'strict' }} />
 
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.trason.web.id' },
+              { '@type': 'ListItem', position: 2, name: 'Features', item: 'https://www.trason.web.id/#features' },
+              { '@type': 'ListItem', position: 3, name: 'Financial Control', item: 'https://www.trason.web.id/features/financial-control' }
+            ]
+          })
+        }}
+      />
       <LandingNavbar />
 
       <main className="pt-32 md:pt-48 pb-24 px-lg max-w-7xl mx-auto space-y-32">
