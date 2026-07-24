@@ -423,7 +423,7 @@ User Context Profile (TRASON Unified Life OS):
         <button 
           onClick={handleGenerateAI}
           disabled={isGenerating}
-          className="w-full py-sm  bg-primary text-black font-bold rounded-xl flex items-center justify-center gap-sm shadow-[0_4px_20px_rgba(78,79,235,0.4)] disabled:opacity-50 transition-all"
+          className="w-full py-sm  bg-primary text-black font-bold rounded-xl flex items-center justify-center gap-sm shadow-[0_4px_20px_rgba(244,201,93,0.4)] disabled:opacity-50 transition-all"
         >
           {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkle size={18} /> <span className="text-sm">{t('insights_page.ask_ai')}</span></>}
         </button>

@@ -91,7 +91,7 @@ export const SportPageClient: React.FC = () => {
               <Button
                 variant="primary"
                 onClick={() => setIsLogModalOpen(true)}
-                className="w-full sm:w-auto shadow-[0_0_20px_rgba(78,79,235,0.3)] hover:shadow-[0_0_30px_rgba(78,79,235,0.5)]"
+                className="w-full sm:w-auto shadow-[0_0_20px_rgba(244,201,93,0.3)] hover:shadow-[0_0_30px_rgba(244,201,93,0.5)]"
               >
                 <Dumbbell size={18} className="mr-2" /> {t('sport_page.quick_log_workout')}
               </Button>
@@ -239,7 +239,7 @@ export const SportPageClient: React.FC = () => {
         <Button 
           variant="primary" 
           onClick={() => setIsLogModalOpen(true)} 
-          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(78,79,235,0.4)]"
+          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(244,201,93,0.4)]"
           aria-label={t('sport_page.quick_log_workout')}
         >
           <Dumbbell size={24} />

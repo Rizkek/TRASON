@@ -637,7 +637,7 @@ export default function CareerClient({ initialApplications }: Props) {
           <Button 
             variant="primary" 
             onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal} 
-            className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(78,79,235,0.4)]"
+            className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(244,201,93,0.4)]"
             aria-label={mainTab === 'applications' ? "Add new application" : "Add new journal entry"}
           >
             <Plus size={24} />
@@ -926,7 +926,7 @@ export default function CareerClient({ initialApplications }: Props) {
           <Button 
             variant="primary" 
             onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal} 
-            className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(78,79,235,0.4)]"
+            className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(244,201,93,0.4)]"
             aria-label={mainTab === 'applications' ? t('career_page.new_application') : 'New Journal Entry'}
           >
             <Plus size={24} />

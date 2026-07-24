@@ -64,7 +64,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
                 onClick={() => setSportType(type as SportType)}
                 className={`px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all ${
                   sportType === type 
-                    ? 'bg-primary text-warm-black shadow-[0_0_10px_rgba(78,79,235,0.3)]' 
+                    ? 'bg-primary text-warm-black shadow-[0_0_10px_rgba(244,201,93,0.3)]' 
                     : 'bg-black/5 dark:bg-white/5 text-gray-light hover:bg-black/10 dark:bg-white/10'
                 }`}
               >

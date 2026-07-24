@@ -477,7 +477,7 @@ export default function RemindersPage() {
         <Button 
           variant="primary" 
           onClick={openAddModal} 
-          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(78,79,235,0.4)]"
+          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(244,201,93,0.4)]"
           aria-label={t('reminders_page.new_reminder')}
         >
           <Plus size={24} />
