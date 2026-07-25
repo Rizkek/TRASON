@@ -32,7 +32,7 @@ import { TrasonIcon } from '@/components/ui/TrasonIcon';
 import { DashboardHeader } from './components/DashboardHeader';
 import { DailyTasksSummary } from './components/DailyTasksSummary';
 import { RemindersSidebar } from './components/RemindersSidebar';
-import { InvestmentSummary } from './components/InvestmentSummary';
+import { NetWorthSummary } from './components/NetWorthSummary';
 import { SportSummary } from './components/SportSummary';
 import { CareerSummary } from './components/CareerSummary';
 import { DailyBriefingCard } from './components/DailyBriefingCard';
@@ -280,10 +280,13 @@ export function DashboardClient() {
                 <DailyTasksSummary />
               </div>
             )}
+            {investmentSummary && (
+              <div className="lg:col-span-3 mb-md">
+                <NetWorthSummary summary={investmentSummary} />
+              </div>
+            )}
           </div>
         )}
-
-        {isFinanceEnabled && <InvestmentSummary summary={investmentSummary} />}
 
         {/* Modules Summary Grid */}
         {(isRemindersEnabled || isSportEnabled || isCareerEnabled) && (

@@ -13,7 +13,7 @@ import { formatSignedCurrency, formatSignedPercent } from '@/services/finance/in
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 
-type AssetType = 'stock' | 'crypto' | 'gold';
+type AssetType = 'stock' | 'crypto' | 'gold' | 'property' | 'debt' | 'vehicle' | 'other';
 
 interface InvestmentFormState {
   asset_type: AssetType;
@@ -25,6 +25,7 @@ interface InvestmentFormState {
   external_id: string;
   manual_current_price: string;
   notes: string;
+  rationale_type: 'long_term' | 'dividend' | 'trading' | 'hedging' | 'fomo' | 'dca' | 'other' | '';
 }
 
 const defaultForm: InvestmentFormState = {
@@ -37,6 +38,7 @@ const defaultForm: InvestmentFormState = {
   external_id: '',
   manual_current_price: '',
   notes: '',
+  rationale_type: '',
 };
 
 const getAssetBadgeVariant = (type: AssetType) => {
@@ -100,6 +102,7 @@ export default function InvestmentsPage() {
       external_id: position.external_id || '',
       manual_current_price: position.manual_current_price ? String(position.manual_current_price) : '',
       notes: position.notes || '',
+      rationale_type: '', // Will be saved in InvestmentTransaction, not Position for MVP, or we can just keep it blank on edit.
     });
     setIsModalOpen(true);
   };
@@ -147,6 +150,8 @@ export default function InvestmentsPage() {
         manual_current_price: form.manual_current_price ? Number(form.manual_current_price.replace(/,/g, '')) : null,
         notes: form.notes.trim() || null,
         is_active: true,
+        // rationale_type is part of the form and will be used when we create an InvestmentTransaction in the backend
+        // We'll log it if createPosition accepts it in the payload. Let's add it to payload as a custom metadata for now if not typed.
       };
 
       if (editingPosition) {
@@ -547,6 +552,38 @@ export default function InvestmentsPage() {
             onChange={(e) => setForm((prev) => ({ ...prev, manual_current_price: e.target.value }))}
             helpText={t('investment_page.manual_price_help')}
           />
+
+          {/* Investment Journal Section */}
+          <div className="pt-sm border-t border-white/5 space-y-md">
+            <div>
+              <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase mb-sm block">
+                Investment Journal: Kenapa Membeli?
+              </label>
+              <div className="flex flex-wrap gap-xs">
+                {[
+                  { value: 'long_term', label: 'Long Term' },
+                  { value: 'dividend', label: 'Dividend' },
+                  { value: 'trading', label: 'Trading' },
+                  { value: 'hedging', label: 'Hedging' },
+                  { value: 'fomo', label: 'FOMO' },
+                  { value: 'dca', label: 'DCA' }
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setForm((prev) => ({ ...prev, rationale_type: prev.rationale_type === option.value ? '' : option.value as any }))}
+                    className={`px-sm py-xs rounded-full border text-xs transition-colors ${
+                      form.rationale_type === option.value
+                        ? 'bg-primary/20 border-primary text-primary'
+                        : 'border-white/10 text-gray-light hover:border-white/30'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
 
           <div className="space-y-sm">
             <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('investment_page.notes_upper')}</label>

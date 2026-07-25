@@ -10,7 +10,8 @@ import { validateActivity, sanitizeError } from '@/libs/validation';
 import { Activity } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Plus, Trash as Trash2, Clock, Tag, Smiley, MapPin, Star, Heartbeat as ActivityIcon, CheckSquare, Square, ListChecks, Calendar, ArrowCounterClockwise } from '@phosphor-icons/react';
+import { Plus, Trash as Trash2, Clock, Tag, Smiley, MapPin, Star, Heartbeat as ActivityIcon, CheckSquare, Square, ListChecks, Calendar, ArrowCounterClockwise, ProjectorScreenChart } from '@phosphor-icons/react';
+import { LifeEventsFeed } from './components/LifeEventsFeed';
 
 
 const MOOD_OPTIONS = [
@@ -122,7 +123,7 @@ export default function TimelinePage() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // Daily checklist tab
-  const [activeTab, setActiveTab] = useState<'weekly-log' | 'daily-checklist'>('weekly-log');
+  const [activeTab, setActiveTab] = useState<'weekly-log' | 'daily-checklist' | 'life-events'>('weekly-log');
   const { tasks, isLoading: isTasksLoading, completedCount, totalCount, createTask, toggleTask, deleteTask } = useDailyTasks();
   const [newTaskInput, setNewTaskInput] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
@@ -427,7 +428,23 @@ export default function TimelinePage() {
                 )}
               </button>
             )}
+            <button
+              onClick={() => setActiveTab('life-events')}
+              className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === 'life-events'
+                  ? 'bg-primary text-white shadow-lg'
+                  : 'text-gray-light hover:text-soft-cream'
+              }`}
+            >
+              <ProjectorScreenChart size={14} />
+              Life Timeline
+            </button>
           </div>
+
+          {/* Daily Checklist Panel */}
+          {activeTab === 'life-events' && (
+            <LifeEventsFeed />
+          )}
 
           {/* Daily Checklist Panel */}
           {activeTab === 'daily-checklist' && module_features?.['timeline_daily_checklist'] !== false && (

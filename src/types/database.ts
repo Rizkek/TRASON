@@ -328,7 +328,7 @@ export interface WeeklyScheduleSnapshot {
 export interface InvestmentPosition {
   id: string;
   user_id: string;
-  asset_type: 'stock' | 'crypto' | 'gold';
+  asset_type: 'stock' | 'crypto' | 'gold' | 'property' | 'debt' | 'vehicle' | 'other';
   symbol: string;
   display_name?: string | null;
   amount: number;
@@ -356,8 +356,40 @@ export interface InvestmentPriceSnapshot {
   price: number;
   change_percent?: number | null;
   source: string;
-  metadata?: Record<string, unknown>;
   created_at: string;
+}
+
+export interface InvestmentGoalAllocation {
+  id: string;
+  user_id: string;
+  position_id: string;
+  goal_id: string;
+  allocated_percentage?: number; // 0 to 100
+  allocated_amount?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InvestmentTransaction {
+  id: string;
+  user_id: string;
+  position_id: string;
+  type: 'buy' | 'sell' | 'deposit' | 'withdrawal' | 'dividend' | 'interest' | 'fee';
+  amount: number; // e.g. 0.5 BTC, or Rp 5,000,000 for deposit
+  price_per_unit?: number;
+  total_value: number; // e.g. amount * price_per_unit
+  currency: string;
+  transaction_date: string;
+  
+  // Journal & Reflection
+  rationale_type?: 'long_term' | 'dividend' | 'trading' | 'hedging' | 'fomo' | 'dca' | 'other';
+  notes?: string;
+  review_date?: string; // Set to 6 months after transaction_date for reflection
+  is_reviewed?: boolean;
+  review_notes?: string;
+  
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Insight {

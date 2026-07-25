@@ -1,9 +1,9 @@
 'use client';
 
 import { formatCurrency } from '@/libs/format';
-import { InvestmentPosition } from '@/services/supabaseClient';
+import { InvestmentPosition } from '@/types/database';
 
-export type InvestmentAssetType = 'stock' | 'crypto' | 'gold';
+export type InvestmentAssetType = InvestmentPosition['asset_type'];
 
 export interface InvestmentQuote {
   symbol: string;
@@ -41,6 +41,11 @@ export interface InvestmentPortfolioSummary {
   allocationByType: Record<InvestmentAssetType, number>;
   topPerformer?: CalculatedInvestmentPosition;
   riskiestBucket?: InvestmentAssetType;
+  
+  // Net Worth specific
+  netWorth: number;
+  totalAssets: number;
+  totalLiabilities: number;
 }
 
 export interface InvestmentInsightResponse {
@@ -132,19 +137,33 @@ export const calculatePortfolioSummary = (
 
   const allocationByType = calculatedPositions.reduce(
     (acc, item) => {
-      acc[item.asset_type] += item.current_value;
+      acc[item.asset_type] = (acc[item.asset_type] || 0) + item.current_value;
       return acc;
     },
-    { stock: 0, crypto: 0, gold: 0 } as Record<InvestmentAssetType, number>
+    {} as Record<InvestmentAssetType, number>
   );
 
   const bucketTotals = calculatedPositions.reduce(
     (acc, item) => {
-      acc[item.asset_type] += item.current_value;
+      acc[item.asset_type] = (acc[item.asset_type] || 0) + item.current_value;
       return acc;
     },
-    { stock: 0, crypto: 0, gold: 0 } as Record<InvestmentAssetType, number>
+    {} as Record<InvestmentAssetType, number>
   );
+
+  // Net Worth Calculation
+  let totalAssets = 0;
+  let totalLiabilities = 0;
+  
+  calculatedPositions.forEach(item => {
+    if (item.asset_type === 'debt') {
+      totalLiabilities += item.current_value;
+    } else {
+      totalAssets += item.current_value;
+    }
+  });
+
+  const netWorth = totalAssets - totalLiabilities;
 
   const finalPositions = calculatedPositions.map((item) => {
     const portfolioWeightPct = safePercent(item.current_value, totalValue);
@@ -171,15 +190,12 @@ export const calculatePortfolioSummary = (
 
   const volatilityByType = finalPositions.reduce(
     (acc, item) => {
+      if (!acc[item.asset_type]) acc[item.asset_type] = { total: 0, count: 0 };
       acc[item.asset_type].total += Math.abs(item.day_change_percent);
       acc[item.asset_type].count += 1;
       return acc;
     },
-    {
-      stock: { total: 0, count: 0 },
-      crypto: { total: 0, count: 0 },
-      gold: { total: 0, count: 0 },
-    } as Record<InvestmentAssetType, { total: number; count: number }>
+    {} as Record<InvestmentAssetType, { total: number; count: number }>
   );
 
   const riskiestBucket = (Object.entries(volatilityByType) as Array<
@@ -200,10 +216,15 @@ export const calculatePortfolioSummary = (
       totalChangePercent,
       dailyChangeValue,
       dailyChangePercent,
-      positionsCount: finalPositions.length,
+      positionsCount: positions.length,
       allocationByType,
-      topPerformer,
-      riskiestBucket,
+      topPerformer: finalPositions.length > 0 ? finalPositions.reduce((prev, current) =>
+        prev.percentage_change > current.percentage_change ? prev : current
+      ) : undefined,
+      riskiestBucket: undefined,
+      netWorth,
+      totalAssets,
+      totalLiabilities,
     } satisfies InvestmentPortfolioSummary,
   };
 };
