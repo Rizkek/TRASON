@@ -99,7 +99,7 @@ const defaultForm: ActivityFormData = {
 
 const CELL_HEIGHT = 64; // px per hour row
 
-export default function TimelinePage() {
+export function TimelineClient() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);

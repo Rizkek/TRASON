@@ -1,7 +1,7 @@
 import React from 'react';
 import { getAuthenticatedUser } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { DashboardClient } from './DashboardClient';
+import { DashboardClient } from './_client';
 import { DashboardProvider } from './DashboardProvider';
 
 export const dynamic = 'force-dynamic';

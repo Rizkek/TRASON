@@ -105,7 +105,6 @@ export const useInvestment = (): UseInvestmentReturn => {
               price: quote.currentPrice,
               change_percent: quote.changePercent24h ?? 0,
               source: quote.source,
-              metadata: { symbol: quote.symbol, asset_type: quote.assetType, as_of: quote.asOf }
             });
           } catch {
             // Tabel investment_price_snapshots belum dibuat, skip saja
