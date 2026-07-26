@@ -30,17 +30,17 @@ export function LifeEventsFeed() {
   const events: LifeEvent[] = useMemo(() => {
     const list: LifeEvent[] = [];
     
-    // Add Investments
+    // Add Investment Journals (Focus on Rationale & Notes)
     investments.forEach(inv => {
       list.push({
         id: `inv-${inv.id}`,
         date: new Date(inv.transaction_date),
         type: 'investment',
-        title: `Investasi ${inv.asset_symbol}`,
-        description: `Membeli ${inv.amount} ${inv.asset_symbol} senilai ${formatCurrency(inv.total_value, inv.currency, locale)}`,
+        title: `Keputusan Finansial: ${inv.asset_name || inv.asset_symbol}`,
+        description: inv.notes || `Alasan: ${inv.rationale_type?.replace('_', ' ').toUpperCase() || 'Tanpa Alasan'}`,
         icon: TrendUp,
         colorClass: 'text-primary bg-primary/10 border-primary/20',
-        metadata: { rationale: inv.rationale_type }
+        metadata: { rationale: inv.rationale_type, amount: formatCurrency(inv.total_value, inv.currency, locale) }
       });
     });
 

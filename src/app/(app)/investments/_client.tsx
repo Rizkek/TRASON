@@ -232,46 +232,20 @@ export function InvestmentsClient() {
           </Alert>
         )}
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-md md:gap-lg">
-          <Card className="p-xl">
-            <p className="text-micro text-gray-light mb-sm">{t('investment_page.portfolio_value')}</p>
-            <p className="text-2xl font-bold text-white">{formatCurrency(summary?.totalValue || 0, currency, locale)}</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-md md:gap-lg">
+          <Card className="p-xl bg-gradient-to-br from-black/20 to-black/5 border-primary/20 backdrop-blur-md">
+            <p className="text-micro text-primary/80 uppercase tracking-widest font-semibold mb-sm">{t('dashboard.net_worth')}</p>
+            <p className="text-3xl font-serif text-white">{formatCurrency(summary?.netWorth || 0, currency, locale)}</p>
           </Card>
-          <Card className="p-xl">
-            <p className="text-micro text-gray-light mb-sm">{t('investment_page.unrealized_pl')}</p>
-            <p className={`text-2xl font-bold ${(summary?.totalProfitLoss || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
-              {formatSignedCurrency(summary?.totalProfitLoss || 0, currency, locale)}
-            </p>
+          <Card className="p-xl bg-black/20 border-white/5">
+            <p className="text-micro text-gray-light mb-sm uppercase tracking-widest">{t('dashboard.total_assets')}</p>
+            <p className="text-2xl font-bold text-white">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</p>
+            <p className="text-xs text-gray-light mt-1">Liquid, Property, Vehicle</p>
           </Card>
-          <Card className="p-xl">
-            <p className="text-micro text-gray-light mb-sm">{t('dashboard.today')}</p>
-            <p className={`text-2xl font-bold ${(summary?.dailyChangeValue || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
-              {formatSignedCurrency(summary?.dailyChangeValue || 0, currency, locale)}
-            </p>
-            <p className="text-xs text-gray-light mt-1">{formatSignedPercent(summary?.dailyChangePercent || 0)}</p>
-          </Card>
-          <Card className="p-xl">
-            <p className="text-micro text-gray-light mb-sm">{t('investment_page.allocation_mix')}</p>
-            <div className="space-y-3 text-xs text-gray-light">
-              {['stock', 'crypto', 'gold'].map((type) => {
-                const value = summary?.allocationByType[type as keyof typeof summary['allocationByType']] || 0;
-                const percent = summary?.totalValue ? (value / summary.totalValue) * 100 : 0;
-                return (
-                  <div key={type} className="space-y-2">
-                    <div className="flex justify-between text-[11px]">
-                      <span>{t(`dashboard.${type === 'stock' ? 'stocks' : type === 'crypto' ? 'crypto' : 'gold'}`)}</span>
-                      <span>{percent.toFixed(0)}%</span>
-                    </div>
-                    <div className="h-2 w-full rounded-full bg-black/5 dark:bg-white/5 overflow-hidden">
-                      <div
-                        style={{ width: `${Math.min(percent, 100)}%` }}
-                        className="h-full rounded-full bg-primary"
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          <Card className="p-xl bg-black/20 border-white/5">
+            <p className="text-micro text-gray-light mb-sm uppercase tracking-widest">{t('dashboard.total_liabilities')}</p>
+            <p className="text-2xl font-bold text-white">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</p>
+            <p className="text-xs text-gray-light mt-1">Debt & Mortgages</p>
           </Card>
         </div>
 
@@ -299,11 +273,8 @@ export function InvestmentsClient() {
                     <th className="px-sm py-sm">{t('investment_page.asset')}</th>
                     <th className="px-sm py-sm">{t('investment_page.amount')}</th>
                     <th className="px-sm py-sm">{t('investment_page.avg_cost')}</th>
-                    <th className="px-sm py-sm">{t('investment_page.current_price')}</th>
-                    <th className="px-sm py-sm">{t('investment_page.day_chg')}</th>
                     <th className="px-sm py-sm">{t('investment_page.value')}</th>
-                    <th className="px-sm py-sm">{t('investment_page.pl')}</th>
-                    <th className="px-sm py-sm">{t('investment_page.risk')}</th>
+                    <th className="px-sm py-sm text-center">Life Goal</th>
                     <th className="px-sm py-sm text-right">{t('investment_page.actions')}</th>
                   </tr>
                 </thead>
@@ -337,57 +308,25 @@ export function InvestmentsClient() {
                       </td>
                       <td className="px-sm py-md text-xs text-soft-cream">{formatNumber(position.amount, 4)}</td>
                       <td className="px-sm py-md text-xs text-soft-cream">{formatCurrency(position.buy_price, currency, locale)}</td>
-                      <td className="px-sm py-md">
-                        <p className="text-xs text-soft-cream">{formatCurrency(position.current_price, currency, locale)}</p>
-                        {lastUpdated && (
-                          <p className="text-[9px] text-gray-light mt-1">{t('investment_page.update_label')} {lastUpdated}</p>
-                        )}
+                      <td className="px-sm py-md text-xs font-bold text-white">
+                        {formatCurrency(position.current_value, currency, locale)}
                       </td>
-                      <td className="px-sm py-md">
-                        <div className={`flex items-center gap-1 text-xs font-semibold ${
-                          position.day_change_percent >= 0 ? 'text-success' : 'text-danger'
-                        }`}>
-                          {position.day_change_percent >= 0
-                            ? <TrendingUp size={10} />
-                            : <TrendingDown size={10} />
-                          }
-                          {formatSignedPercent(position.day_change_percent)}
-                        </div>
-                        <div className="text-[10px] text-gray-light">{formatSignedCurrency(position.day_change_value, currency, locale)}</div>
+                      <td className="px-sm py-md text-center">
+                        <Badge variant="default" size="sm" className="text-[9px]">
+                          Unassigned
+                        </Badge>
                       </td>
-                      <td className="px-sm py-md text-xs font-semibold text-white">{formatCurrency(position.current_value, currency, locale)}</td>
-                      <td className="px-sm py-md">
-                        <div className={`${position.profit_loss >= 0 ? 'text-success' : 'text-danger'} text-xs font-semibold`}>
-                          {formatSignedCurrency(position.profit_loss, currency, locale)}
-                        </div>
-                        <div className="text-[10px] text-gray-light">{formatSignedPercent(position.percentage_change)}</div>
-                      </td>
-                      <td className="px-sm py-md align-top">
-                        <div className="space-y-1">
-                          <Badge
-                            variant={position.risk_category === 'high' ? 'danger' : position.risk_category === 'moderate' ? 'warning' : 'success'}
-                            size="sm"
-                            className="text-[9px] px-1 py-0"
-                          >
-                            {position.risk_category.toUpperCase()}
-                          </Badge>
-                          <p className="text-[10px] text-gray-light">
-                            {position.risk_status === 'overweight'
-                              ? t('investment_page.overweight')
-                              : position.risk_status === 'underweight'
-                              ? t('investment_page.underweight')
-                              : t('investment_page.balanced')}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="px-sm py-md">
-                        <div className="flex items-center justify-end gap-xs">
-                          <Button variant="ghost" size="sm" onClick={() => openEditModal(position)} className="h-6 text-xs px-2">{t('investment_page.edit')}</Button>
+                      <td className="px-sm py-md text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => openEditModal(position)}>
+                            {t('investment_page.edit')}
+                          </Button>
                           <button
                             onClick={() => setDeleteConfirmId(position.id)}
-                            className="p-1 text-danger hover:bg-danger/10 rounded-md transition-colors"
+                            className="p-xs text-gray-light hover:text-danger hover:bg-danger/10 rounded transition-colors"
+                            aria-label={t('investment_page.delete')}
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
