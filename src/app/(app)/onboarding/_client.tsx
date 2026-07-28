@@ -154,7 +154,7 @@ export function OnboardingClient() {
         <ErrorAlert error={error} onDismiss={() => setError(null)} />
 
         <div className="text-center space-y-sm mb-xl">
-          <h1 className="text-3xl md:text-display font-serif text-white tracking-tight">
+          <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-white">
             Welcome to <span className="text-gradient">TRASON</span>
           </h1>
           <p className="text-gray-light text-sm md:text-base max-w-md mx-auto">

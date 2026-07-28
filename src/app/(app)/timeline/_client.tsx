@@ -357,7 +357,7 @@ export function TimelineClient() {
           {/* Header */}
           <div className="flex items-start justify-between flex-wrap gap-md">
             <div className="space-y-xs">
-              <h1 className="text-display font-serif text-gradient">{t('timeline_page.title')}</h1>
+              <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-gradient">{t('timeline_page.title')}</h1>
               <p className="text-subtext flex items-center gap-sm">
                 {t('timeline_page.desc')}
               </p>

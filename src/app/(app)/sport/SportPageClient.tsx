@@ -82,7 +82,7 @@ export const SportPageClient: React.FC = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-md">
             <div>
-              <h1 className="text-4xl font-serif font-bold text-gradient mb-2">{t('sport_page.sport_fitness_title')}</h1>
+              <h1 className="text-4xl font-sans font-bold tracking-tight font-bold text-gradient mb-2">{t('sport_page.sport_fitness_title')}</h1>
               <p className="text-gray-light text-sm tracking-wide">
                 {t('sport_page.sport_fitness_desc')}
               </p>
@@ -107,7 +107,7 @@ export const SportPageClient: React.FC = () => {
               {/* Workout Plans */}
               <div className="space-y-md">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-serif font-bold text-white">{t('sport_page.workout_plans')}</h2>
+                  <h2 className="text-xl font-sans font-bold tracking-tight font-bold text-white">{t('sport_page.workout_plans')}</h2>
                   <Button variant="ghost" size="sm" className="text-xs" onClick={() => setIsCreatePlanModalOpen(true)}>
                     <Plus size={14} className="mr-1" /> {t('sport_page.new_plan')}
                   </Button>
@@ -173,7 +173,7 @@ export const SportPageClient: React.FC = () => {
 
               {/* PR Board */}
               <div className="space-y-md">
-                <h2 className="text-xl font-serif font-bold text-white flex items-center gap-2">
+                <h2 className="text-xl font-sans font-bold tracking-tight font-bold text-white flex items-center gap-2">
                   <Flame className="text-accent-gold" size={20} /> {t('sport_page.personal_records')}
                 </h2>
                 <PRBoard records={prBoard} />
@@ -182,7 +182,7 @@ export const SportPageClient: React.FC = () => {
               {/* Sessions ClockCounterClockwise List */}
               {sessions.length > 0 && (
                 <div className="space-y-md">
-                  <h2 className="text-xl font-serif font-bold text-white">{t('sport_page.recent_workouts')}</h2>
+                  <h2 className="text-xl font-sans font-bold tracking-tight font-bold text-white">{t('sport_page.recent_workouts')}</h2>
                   <div className="grid grid-cols-1 gap-md">
                     {sessions.slice((page - 1) * limit, page * limit).map((session) => (
                       <div key={session.id} className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-lg p-md flex justify-between items-center hover:bg-black/[0.05] dark:bg-white/[0.05] transition-colors">

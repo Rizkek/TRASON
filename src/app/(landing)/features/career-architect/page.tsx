@@ -50,7 +50,7 @@ export default function CareerArchitectPage() {
            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warm-gold/10 text-yellow-500 border border-warm-gold/20 text-sm font-bold mb-6">
              <Briefcase size={16} /> Career Architect
            </div>
-           <h1 className="text-5xl md:text-7xl font-serif leading-tight">
+           <h1 className="text-5xl md:text-7xl font-display tracking-tight leading-tight">
              Design Your <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-200">Career.</span>
            </h1>
            <p className="text-xl text-gray-light/80 max-w-2xl mx-auto font-light leading-relaxed">
@@ -73,7 +73,7 @@ export default function CareerArchitectPage() {
              {/* Mock Header */}
              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 border-b border-white/5 pb-8">
                <div>
-                 <h2 className="text-3xl font-serif text-white tracking-tight mb-2">Job Pipeline</h2>
+                 <h2 className="text-3xl font-display tracking-tight text-white tracking-tight mb-2">Job Pipeline</h2>
                  <p className="text-sm text-gray-light">Currently tracking 14 active applications.</p>
                </div>
                <div className="flex gap-4">
@@ -220,7 +220,7 @@ export default function CareerArchitectPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <Kanban size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Application Board</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Application Board</h3>
             <p className="text-gray-light leading-relaxed">
               Visualize your entire job hunt. Move applications seamlessly from 'Applied' to 'Offer' and never let an opportunity slip through the cracks.
             </p>
@@ -229,7 +229,7 @@ export default function CareerArchitectPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <FileText size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Interview Preparation Notes</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Interview Preparation Notes</h3>
             <p className="text-gray-light leading-relaxed">
               Store company research, behavioral questions, and technical prep notes directly attached to each specific job application card.
             </p>
@@ -238,7 +238,7 @@ export default function CareerArchitectPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <CheckCircle size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Skill Progression Tracking</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Skill Progression Tracking</h3>
             <p className="text-gray-light leading-relaxed">
               Identify skill gaps required for your dream roles. Track your learning progress over time and match it against market demands.
             </p>
@@ -247,7 +247,7 @@ export default function CareerArchitectPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <ArrowUpRight size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Compensation ClockCounterClockwise</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Compensation ClockCounterClockwise</h3>
             <p className="text-gray-light leading-relaxed">
               Log historical offers and your current compensation packages to visualize your career growth trajectory and negotiate from a position of strength.
             </p>
@@ -258,7 +258,7 @@ export default function CareerArchitectPage() {
         <div className="py-24 text-center space-y-8 bg-white/5 border border-white/5 rounded-[3rem] relative overflow-hidden">
           <div className="absolute inset-0 bg-warm-gold/10 md:blur-[100px]" style={{ transform: 'translateZ(0)' }} />
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">Build the career you deserve.</h2>
+            <h2 className="text-4xl md:text-5xl font-display tracking-tight text-white mb-6">Build the career you deserve.</h2>
             <p className="text-gray-light max-w-xl mx-auto mb-10">
               Treat your professional growth with the same rigor a company treats its sales pipeline.
             </p>

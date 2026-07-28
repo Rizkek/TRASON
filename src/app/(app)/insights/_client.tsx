@@ -288,7 +288,7 @@ User Context Profile (TRASON Unified Life OS):
       <div className="space-y-xl animate-fade-in">
         <div className="flex items-start justify-between">
           <div className="space-y-sm">
-            <h1 className="text-display font-serif text-gradient">{t('insights_page.title')}</h1>
+            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-gradient">{t('insights_page.title')}</h1>
             <p className="text-subtext flex items-center gap-sm">
               {t('insights_page.desc')}
             </p>

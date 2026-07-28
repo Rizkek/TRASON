@@ -22,7 +22,7 @@ export default function AboutOS() {
             <div className="w-8 h-8 bg-warm-gold rounded-full flex items-center justify-center text-warm-black">
               <Compass size={18} />
             </div>
-            <span className="text-xl font-serif font-bold tracking-tight">TRASON</span>
+            <span className="text-xl font-display tracking-tight font-bold tracking-tight">TRASON</span>
           </div>
           <div className="w-20" /> {/* Spacer */}
         </div>
@@ -37,7 +37,7 @@ export default function AboutOS() {
               <Cpu size={12} />
               <span>Personal OS Concept</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-serif leading-tight">
+            <h1 className="text-5xl md:text-7xl font-display tracking-tight leading-tight">
               What is a <br />
               <span className="italic text-warm-gold">Personal Sanctuary?</span>
             </h1>
@@ -49,7 +49,7 @@ export default function AboutOS() {
           {/* The Concept: Modular but Unified */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-2xl items-center">
             <div className="space-y-lg">
-              <h2 className="text-3xl md:text-4xl font-serif">Architecture for Life</h2>
+              <h2 className="text-3xl md:text-4xl font-display tracking-tight">Architecture for Life</h2>
               <p className="text-gray-light leading-relaxed font-light">
                 TRASON employs a <strong>Modular Mesh Architecture</strong>. Instead of a rigid, bloated dashboard, you interact with specialized modules that plug into a central chronological spine: The Life Log.
               </p>
@@ -88,7 +88,7 @@ export default function AboutOS() {
 
           {/* Why "Personal Sanctuary"? */}
           <section className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-[2rem] p-xl md:p-3xl space-y-xl">
-             <h2 className="text-3xl md:text-4xl font-serif text-center">Principles of the Sanctuary</h2>
+             <h2 className="text-3xl md:text-4xl font-display tracking-tight text-center">Principles of the Sanctuary</h2>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
                 <div className="space-y-md">
                    <h4 className="text-warm-gold font-bold uppercase tracking-widest text-xs">01. Single Source of Truth</h4>
@@ -111,7 +111,7 @@ export default function AboutOS() {
 
           {/* The Pillars Detail */}
           <section className="space-y-2xl">
-            <h2 className="text-3xl md:text-5xl font-serif text-center">Modular Pillars</h2>
+            <h2 className="text-3xl md:text-5xl font-display tracking-tight text-center">Modular Pillars</h2>
             <div className="space-y-lg">
                {[
                  { t: "Life Log (Core)", d: "The chronological spine of your existence. Every log, from a financial inflow to a session of vitality, is recorded here.", i: ClockCounterClockwise },
@@ -121,7 +121,7 @@ export default function AboutOS() {
                  <div key={i} className="flex flex-col md:flex-row gap-xl p-xl border-b border-black/5 dark:border-white/5 items-center">
                     <div className="w-12 h-12 text-warm-gold shrink-0"><item.i size={48} /></div>
                     <div className="space-y-sm">
-                       <h3 className="text-2xl font-serif">{item.t}</h3>
+                       <h3 className="text-2xl font-display tracking-tight">{item.t}</h3>
                        <p className="text-gray-light font-light">{item.d}</p>
                     </div>
                  </div>
@@ -131,7 +131,7 @@ export default function AboutOS() {
 
           {/* CTA */}
           <section className="text-center space-y-xl pt-2xl">
-            <h2 className="text-4xl md:text-6xl font-serif italic">Begin your <br /> Architecture.</h2>
+            <h2 className="text-4xl md:text-6xl font-display tracking-tight italic">Begin your <br /> Architecture.</h2>
             <Link href="/signup">
                <button className="bg-warm-gold text-warm-black px-3xl py-xl rounded-full font-bold text-xl hover:bg-soft-cream transition-all shadow-2xl">
                   Commence Initialization

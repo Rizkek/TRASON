@@ -209,7 +209,7 @@ export function InvestmentsClient() {
         <div className="space-y-xl animate-fade-in">
           <div className="flex items-start justify-between gap-md flex-wrap">
           <div className="space-y-sm max-w-2xl">
-            <h1 className="text-display font-serif text-gradient">{t('investment_page.investment_analyst_title')}</h1>
+            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-gradient">{t('investment_page.investment_analyst_title')}</h1>
             <p className="text-subtext flex items-center gap-sm">
               {t('investment_page.investment_analyst_desc')}
             </p>
@@ -235,16 +235,16 @@ export function InvestmentsClient() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-md md:gap-lg">
           <Card className="p-xl bg-gradient-to-br from-black/20 to-black/5 border-primary/20 backdrop-blur-md">
             <p className="text-micro text-primary/80 uppercase tracking-widest font-semibold mb-sm">{t('dashboard.net_worth')}</p>
-            <p className="text-3xl font-serif text-white">{formatCurrency(summary?.netWorth || 0, currency, locale)}</p>
+            <p className="text-3xl font-sans font-bold tracking-tight tabular-nums text-white">{formatCurrency(summary?.netWorth || 0, currency, locale)}</p>
           </Card>
           <Card className="p-xl bg-black/20 border-white/5">
             <p className="text-micro text-gray-light mb-sm uppercase tracking-widest">{t('dashboard.total_assets')}</p>
-            <p className="text-2xl font-bold text-white">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</p>
+            <p className="text-2xl font-bold tabular-nums text-white">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</p>
             <p className="text-xs text-gray-light mt-1">Liquid, Property, Vehicle</p>
           </Card>
           <Card className="p-xl bg-black/20 border-white/5">
             <p className="text-micro text-gray-light mb-sm uppercase tracking-widest">{t('dashboard.total_liabilities')}</p>
-            <p className="text-2xl font-bold text-white">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</p>
+            <p className="text-2xl font-bold tabular-nums text-white">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</p>
             <p className="text-xs text-gray-light mt-1">Debt & Mortgages</p>
           </Card>
         </div>

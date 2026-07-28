@@ -43,7 +43,7 @@ export function InvestmentGoalsClient() {
         {/* Header Section */}
         <div className="flex items-start justify-between gap-md flex-wrap">
           <div className="space-y-sm max-w-2xl">
-            <h1 className="text-display font-serif text-gradient">Goal-based Investment</h1>
+            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-gradient">Goal-based Investment</h1>
             <p className="text-subtext flex items-center gap-sm">
               Berhenti berinvestasi tanpa arah. Setiap rupiah yang Anda alokasikan memiliki tujuan hidupnya sendiri.
             </p>

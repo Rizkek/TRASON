@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Instrument_Sans, Cormorant_Garamond } from 'next/font/google';
+import { Geist, Plus_Jakarta_Sans, Cormorant_Garamond } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -7,11 +7,16 @@ import { SmartInput } from '@/components/SmartInput';
 import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import NextTopLoader from 'nextjs-toploader';
 
-const sans = Instrument_Sans({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
-const serif = Cormorant_Garamond({
+const sans = Geist({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
+const display = Plus_Jakarta_Sans({ 
+  subsets: ['latin'], 
+  variable: '--font-display', 
+  display: 'swap',
+});
+const brand = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-serif',
+  variable: '--font-brand',
   display: 'swap',
 });
 
@@ -198,7 +203,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${sans.variable} ${serif.variable} ${sans.className}`}
+        className={`${sans.variable} ${display.variable} ${brand.variable} font-sans`}
         suppressHydrationWarning
       >
         <ErrorBoundary>

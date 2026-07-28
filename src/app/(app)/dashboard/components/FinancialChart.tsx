@@ -186,7 +186,7 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
 
       <div className="flex items-center justify-between mb-md md:mb-xl relative z-10">
         <div>
-          <h3 className="font-serif italic text-md md:text-lg text-white">{t('dashboard.financial_analytics')}</h3>
+          <h3 className="font-sans font-medium text-gray-light text-md md:text-lg text-white">{t('dashboard.financial_analytics')}</h3>
           <p className="text-[10px] md:text-micro text-gray-light mt-1">{t('dashboard.monthly_overview')}</p>
         </div>
       </div>

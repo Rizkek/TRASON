@@ -11,7 +11,7 @@ export default function ContactPage() {
       
       <main className="pt-32 md:pt-48 pb-24 px-lg max-w-7xl mx-auto space-y-12">
         <div className="text-center space-y-md max-w-3xl mx-auto mb-16">
-           <h1 className="text-5xl md:text-7xl font-serif">Contact Us</h1>
+           <h1 className="text-5xl md:text-7xl font-display tracking-tight">Contact Us</h1>
            <p className="text-xl text-gray-light/60">Have questions, feedback, or need support? We're here to help.</p>
         </div>
 
@@ -21,7 +21,7 @@ export default function ContactPage() {
           {/* Contact Info & MapTrifold */}
           <div className="space-y-12">
             <div className="space-y-8">
-              <h2 className="text-2xl font-bold font-serif">Contact Information</h2>
+              <h2 className="text-2xl font-bold font-display tracking-tight">Contact Information</h2>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center shrink-0">

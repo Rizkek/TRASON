@@ -109,7 +109,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
     <Card className="p-md md:p-xl bg-gradient-to-br from-[#0F172A]/80 to-[#020617]/80 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group h-full">
       <div className="flex justify-between items-start mb-md">
         <div>
-          <h3 className="font-serif italic text-md md:text-lg text-white">Spending Breakdown</h3>
+          <h3 className="font-sans font-medium text-gray-light text-md md:text-lg text-white">Spending Breakdown</h3>
           <p className="text-[10px] md:text-micro text-gray-light mt-1">Percentage based analysis</p>
         </div>
       </div>

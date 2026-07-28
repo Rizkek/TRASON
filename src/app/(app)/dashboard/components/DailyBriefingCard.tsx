@@ -29,10 +29,10 @@ export function DailyBriefingCard() {
       <div className="relative z-10 space-y-md">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-xl font-serif text-white mb-1">
+            <h2 className="text-heading-md font-sans font-bold tracking-tight text-white mb-xs">
               {briefing.greetingInsight}
             </h2>
-            <p className="text-sm text-gray-light italic">
+            <p className="text-body-sm text-gray-light opacity-90 leading-relaxed">
               {briefing.highlightInsight}
             </p>
           </div>

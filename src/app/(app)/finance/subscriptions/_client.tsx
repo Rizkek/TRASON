@@ -151,7 +151,7 @@ export function SubscriptionsClient() {
 
         <div className="flex items-start justify-between flex-wrap gap-md">
           <div className="space-y-sm">
-            <h1 className="text-display font-serif text-gradient">{t('finance.subscriptions') || 'Subscriptions'}</h1>
+            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-gradient">{t('finance.subscriptions') || 'Subscriptions'}</h1>
             <p className="text-subtext flex items-center gap-sm">
               {t('finance.manageSubscriptions') || 'Manage your recurring payments.'}
             </p>

@@ -63,7 +63,7 @@ export default function AboutPage() {
         
         {/* The Philosophy */}
         <section className="space-y-lg">
-           <h1 className="text-5xl md:text-7xl font-serif mb-xl">The Philosophy of TRASON</h1>
+           <h1 className="text-5xl md:text-7xl font-display tracking-tight mb-xl">The Philosophy of TRASON</h1>
            <div className="prose prose-invert prose-lg max-w-none text-gray-light/90 space-y-6">
              {/* AEO / GEO Optimized TL;DR Summary */}
              <div className="bg-warm-gold/5 border border-warm-gold/20 p-6 rounded-xl space-y-2 mb-8">
@@ -73,7 +73,7 @@ export default function AboutPage() {
                </p>
              </div>
 
-             <p className="text-2xl font-serif text-warm-gold italic mt-0">
+             <p className="text-2xl font-display tracking-tight text-warm-gold italic mt-0">
                "Your life is an interconnected system, but your tools are fragmented."
              </p>
              <p>
@@ -97,7 +97,7 @@ export default function AboutPage() {
 
         {/* Current Status / Roadmap */}
         <section className="space-y-xl">
-           <h2 className="text-3xl md:text-4xl font-serif">Current Status & Roadmap</h2>
+           <h2 className="text-3xl md:text-4xl font-display tracking-tight">Current Status & Roadmap</h2>
            
            <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
               <div className="bg-black/20 border border-white/5 p-lg rounded-2xl space-y-md">
@@ -133,7 +133,7 @@ export default function AboutPage() {
         {/* FAQ */}
         <section className="space-y-xl">
            <div className="space-y-sm">
-             <h2 className="text-3xl md:text-4xl font-serif">Frequently Asked Questions</h2>
+             <h2 className="text-3xl md:text-4xl font-display tracking-tight">Frequently Asked Questions</h2>
              <p className="text-gray-light">Everything you need to know about the platform.</p>
            </div>
            

@@ -50,7 +50,7 @@ export default function SignalRemindersPage() {
            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warm-gold/10 text-yellow-500 border border-warm-gold/20 text-sm font-bold mb-6">
              <Target size={16} /> Signal Reminders
            </div>
-           <h1 className="text-5xl md:text-7xl font-serif leading-tight">
+           <h1 className="text-5xl md:text-7xl font-display tracking-tight leading-tight">
              Separate the <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-200">Signal</span> from the Noise.
            </h1>
            <p className="text-xl text-gray-light/80 max-w-2xl mx-auto font-light leading-relaxed">
@@ -72,7 +72,7 @@ export default function SignalRemindersPage() {
              
              {/* Mock Header */}
              <div className="text-center mb-16">
-               <h2 className="text-3xl font-serif text-white tracking-tight mb-4">Intelligent Notification Engine</h2>
+               <h2 className="text-3xl font-display tracking-tight text-white tracking-tight mb-4">Intelligent Notification Engine</h2>
                <div className="inline-flex items-center gap-2 bg-warm-gold/10 border border-warm-gold/20 text-yellow-500 px-4 py-1.5 rounded-full text-xs font-bold">
                  <Shield size={14} /> 24 Notifications Blocked Today
                </div>
@@ -128,7 +128,7 @@ export default function SignalRemindersPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <Brain size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Context-Aware Nudges</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Context-Aware Nudges</h3>
             <p className="text-gray-light leading-relaxed">
               TRASON knows if you're in deep work. Low-priority habits and reminders are batched and delivered silently, while only critical signals bypass your focus barriers.
             </p>
@@ -137,7 +137,7 @@ export default function SignalRemindersPage() {
             <div className="w-12 h-12 bg-yellow-500/10 text-yellow-400 flex items-center justify-center rounded-2xl">
               <BellRinging size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Recurring Obligations</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Recurring Obligations</h3>
             <p className="text-gray-light leading-relaxed">
               Set up complex recurring rules for bill payments, subscription renewals, or monthly reviews. Never miss a deadline, but don't let it clutter your daily view.
             </p>
@@ -146,7 +146,7 @@ export default function SignalRemindersPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <SpeakerSlash size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Intelligent Snooze</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Intelligent Snooze</h3>
             <p className="text-gray-light leading-relaxed">
               Don't just snooze for "10 minutes". TRASON lets you defer tasks logically: "Remind me when I get home", "Next weekend", or "When I open my laptop".
             </p>
@@ -155,7 +155,7 @@ export default function SignalRemindersPage() {
             <div className="w-12 h-12 bg-red-500/10 text-red-400 flex items-center justify-center rounded-2xl">
               <Target size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Life Score Integration</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Life Score Integration</h3>
             <p className="text-gray-light leading-relaxed">
               Reminders adapt based on your Life Score. If your vitality is low, TRASON automatically reduces the volume of ambitious habit nudges to help you recover.
             </p>
@@ -166,7 +166,7 @@ export default function SignalRemindersPage() {
         <div className="py-24 text-center space-y-8 bg-white/5 border border-white/5 rounded-[3rem] relative overflow-hidden">
           <div className="absolute inset-0 bg-warm-gold/10 md:blur-[100px]" style={{ transform: 'translateZ(0)' }} />
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">Reclaim your focus.</h2>
+            <h2 className="text-4xl md:text-5xl font-display tracking-tight text-white mb-6">Reclaim your focus.</h2>
             <p className="text-gray-light max-w-xl mx-auto mb-10">
               Stop letting notifications dictate your life. Start telling them when to arrive.
             </p>

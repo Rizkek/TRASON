@@ -45,7 +45,7 @@ export function ContactForm() {
 
   return (
     <div className="bg-black/20 border border-white/5 p-8 rounded-3xl space-y-6">
-      <h2 className="text-2xl font-bold font-serif mb-6">PaperPlaneRight us a message</h2>
+      <h2 className="text-2xl font-bold font-display tracking-tight mb-6">PaperPlaneRight us a message</h2>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="name" className="block text-sm font-bold text-gray-light mb-2">Name</label>

@@ -16,7 +16,7 @@ export default function ComingSoonPage() {
           <TrafficCone className="text-warm-gold w-12 h-12" />
         </div>
         
-        <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 tracking-tight">
+        <h1 className="text-5xl md:text-7xl font-display tracking-tight font-bold mb-6 tracking-tight">
           Coming Soon
         </h1>
         

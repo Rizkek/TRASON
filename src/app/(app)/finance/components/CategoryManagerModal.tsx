@@ -4,7 +4,7 @@ import { useCategory } from '@/hooks/useCategory';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Plus, Trash as Trash2, PencilSimple as Edit2, X, Smiley } from '@phosphor-icons/react/dist/ssr';
 import { Category } from '@/types/database';
-import { CategoryIcon, CATEGORY_ICONS } from '@/components';
+import { CategoryIcon, CATEGORY_ICONS, ICON_CATEGORIES } from '@/components';
 
 interface CategoryManagerModalProps {
   isOpen: boolean;
@@ -155,19 +155,28 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
             </div>
 
             {showIconPicker && (
-              <div className="bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md p-sm max-h-[150px] overflow-y-auto grid grid-cols-5 sm:grid-cols-7 gap-xs">
-                {CATEGORY_ICONS.map(iconName => (
-                  <button
-                    key={iconName}
-                    type="button"
-                    onClick={() => {
-                      setForm({ ...form, icon: iconName });
-                      setShowIconPicker(false);
-                    }}
-                    className={`p-2 rounded-md flex items-center justify-center transition-colors ${form.icon === iconName ? 'bg-primary/20 text-primary' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-light hover:text-white'}`}
-                  >
-                    <CategoryIcon name={iconName} />
-                  </button>
+              <div className="bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md p-sm max-h-[250px] overflow-y-auto space-y-md relative">
+                {ICON_CATEGORIES.map(category => (
+                  <div key={category.name}>
+                    <div className="text-[10px] font-bold text-gray-light mb-2 uppercase tracking-widest sticky top-0 bg-[#252525]/90 dark:bg-gray-strong/90 backdrop-blur py-1 z-10">
+                      {category.name}
+                    </div>
+                    <div className="grid grid-cols-5 sm:grid-cols-7 gap-xs">
+                      {category.icons.map(iconName => (
+                        <button
+                          key={iconName}
+                          type="button"
+                          onClick={() => {
+                            setForm({ ...form, icon: iconName });
+                            setShowIconPicker(false);
+                          }}
+                          className={`p-2 rounded-md flex items-center justify-center transition-colors ${form.icon === iconName ? 'bg-primary/20 text-primary' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-light hover:text-white'}`}
+                        >
+                          <CategoryIcon name={iconName} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}

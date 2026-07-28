@@ -102,7 +102,7 @@ export default function SupportPage() {
             <div className="w-8 h-8 bg-warm-gold rounded-full flex items-center justify-center text-warm-black">
               <Compass size={18} />
             </div>
-            <span className="text-xl font-serif font-bold tracking-tight">TRASON</span>
+            <span className="text-xl font-display tracking-tight font-bold tracking-tight">TRASON</span>
           </div>
           <div className="w-20" /> {/* Spacer */}
         </div>
@@ -113,7 +113,7 @@ export default function SupportPage() {
           
           {/* Header & Hero */}
           <section className="space-y-xl text-center">
-            <h1 className="text-5xl md:text-7xl font-serif leading-tight">
+            <h1 className="text-5xl md:text-7xl font-display tracking-tight leading-tight">
               Sanctuary <br />
               <span className="italic text-warm-gold">Support Center</span>
             </h1>
@@ -160,7 +160,7 @@ export default function SupportPage() {
 
           {/* FAQ Display Accordion */}
           <section className="space-y-md">
-            <h3 className="text-lg font-serif italic text-warm-gold/80 mb-sm">Frequently Asked Questions</h3>
+            <h3 className="text-lg font-display tracking-tight italic text-warm-gold/80 mb-sm">Frequently Asked Questions</h3>
             <div className="space-y-sm">
               {filteredFaqs.map((faq, index) => {
                 const isExpanded = expandedFAQ === index;
@@ -207,7 +207,7 @@ export default function SupportPage() {
                 <div className="w-12 h-12 bg-warm-gold/10 rounded-2xl flex items-center justify-center text-warm-gold mx-auto mb-sm">
                   <Mail size={20} />
                 </div>
-                <h2 className="text-3xl font-serif">Still have questions?</h2>
+                <h2 className="text-3xl font-display tracking-tight">Still have questions?</h2>
                 <p className="text-sm text-gray-light font-light leading-relaxed">
                   PaperPlaneRight a private message to the TRASON developers. We read all constructive feedback and support inquiries.
                 </p>
@@ -218,7 +218,7 @@ export default function SupportPage() {
                   <div className="w-10 h-10 bg-deep-sage/20 text-deep-sage rounded-full flex items-center justify-center mx-auto text-xl">
                     <Checks />
                   </div>
-                  <h4 className="font-serif text-lg text-soft-cream">Message Sent Successfully</h4>
+                  <h4 className="font-display tracking-tight text-lg text-soft-cream">Message Sent Successfully</h4>
                   <p className="text-xs text-gray-light font-light">
                     Your inquiry has been stored securely in our registry. Thank you for helping us improve TRASON.
                   </p>

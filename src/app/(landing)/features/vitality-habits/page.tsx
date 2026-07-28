@@ -50,7 +50,7 @@ export default function VitalityHabitsPage() {
            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warm-gold/10 text-yellow-500 border border-warm-gold/20 text-sm font-bold mb-6">
              <Activity size={16} /> Vitality & Habits
            </div>
-           <h1 className="text-5xl md:text-7xl font-serif leading-tight">
+           <h1 className="text-5xl md:text-7xl font-display tracking-tight leading-tight">
              Forge Unbreakable <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-500">Consistency.</span>
            </h1>
            <p className="text-xl text-gray-light/80 max-w-2xl mx-auto font-light leading-relaxed">
@@ -73,7 +73,7 @@ export default function VitalityHabitsPage() {
              {/* Mock Header */}
              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 border-b border-white/5 pb-8">
                <div>
-                 <h2 className="text-3xl font-serif text-white tracking-tight mb-2">Vitality Scorecard</h2>
+                 <h2 className="text-3xl font-display tracking-tight text-white tracking-tight mb-2">Vitality Scorecard</h2>
                  <p className="text-sm text-gray-light">Your physical and mental momentum over the last 30 days.</p>
                </div>
                <div className="flex gap-4">
@@ -159,13 +159,13 @@ export default function VitalityHabitsPage() {
                    <div className="bg-gradient-to-br from-warm-gold/10 to-transparent border border-warm-gold/20 rounded-3xl p-6 relative overflow-hidden">
                      <Heartbeat size={120} className="absolute -bottom-10 -right-10 text-warm-gold/10" />
                      <h4 className="text-sm font-bold text-violet-300 mb-1">Average Sleep</h4>
-                     <p className="text-3xl font-serif text-white">7h 24m</p>
+                     <p className="text-3xl font-display tracking-tight text-white">7h 24m</p>
                      <p className="text-xs text-yellow-500 mt-2 flex items-center gap-1">+12m vs last week</p>
                    </div>
                    <div className="bg-gradient-to-br from-warm-gold/10 to-transparent border border-warm-gold/20 rounded-3xl p-6 relative overflow-hidden">
                      <Activity size={120} className="absolute -bottom-10 -right-10 text-warm-gold/10" />
                      <h4 className="text-sm font-bold text-yellow-400 mb-1">Workout Completion</h4>
-                     <p className="text-3xl font-serif text-white">85%</p>
+                     <p className="text-3xl font-display tracking-tight text-white">85%</p>
                      <p className="text-xs text-yellow-500 mt-2 flex items-center gap-1">Top 10% of users</p>
                    </div>
                  </div>
@@ -181,7 +181,7 @@ export default function VitalityHabitsPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <CalendarIcon size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Heatmap Visualizations</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Heatmap Visualizations</h3>
             <p className="text-gray-light leading-relaxed">
               Visualize your consistency instantly. Our rich heatmap interface provides a bird's-eye view of your adherence to multiple habits over months or years.
             </p>
@@ -190,7 +190,7 @@ export default function VitalityHabitsPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <Target size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Flexible Routines</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Flexible Routines</h3>
             <p className="text-gray-light leading-relaxed">
               Not all habits need to be done daily. Setup complex recurring schedules—like "Gym 3x a week" or "Read every weekend"—and let TRASON track your compliance intelligently.
             </p>
@@ -199,7 +199,7 @@ export default function VitalityHabitsPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <Heartbeat size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Health Correlations</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Health Correlations</h3>
             <p className="text-gray-light leading-relaxed">
               See how your sleep affects your productivity. TRASON correlates your physical vitality metrics with your daily output to help you optimize your lifestyle.
             </p>
@@ -208,7 +208,7 @@ export default function VitalityHabitsPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <Activity size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Guilt-Free Recovery</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Guilt-Free Recovery</h3>
             <p className="text-gray-light leading-relaxed">
               Broke a 30-day streak? It happens. Instead of guilt-tripping notifications, TRASON focuses on your recovery time and encourages you to start the next streak immediately.
             </p>
@@ -219,7 +219,7 @@ export default function VitalityHabitsPage() {
         <div className="py-24 text-center space-y-8 bg-white/5 border border-white/5 rounded-[3rem] relative overflow-hidden">
           <div className="absolute inset-0 bg-warm-gold/10 md:blur-[100px]" style={{ transform: 'translateZ(0)' }} />
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">Master your time and energy.</h2>
+            <h2 className="text-4xl md:text-5xl font-display tracking-tight text-white mb-6">Master your time and energy.</h2>
             <p className="text-gray-light max-w-xl mx-auto mb-10">
               Transform your goals into concrete, trackable actions that compound over time.
             </p>

@@ -34,7 +34,7 @@ export default function RoadmapPage() {
            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warm-gold/10 text-yellow-500 border border-warm-gold/20 text-sm font-bold mb-4">
              <MapTrifold size={16} /> Product Evolution
            </div>
-           <h1 className="text-4xl md:text-6xl font-serif leading-tight">
+           <h1 className="text-4xl md:text-6xl font-display tracking-tight leading-tight">
              The <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-200">Roadmap.</span>
            </h1>
            <p className="text-lg text-gray-light font-light leading-relaxed">

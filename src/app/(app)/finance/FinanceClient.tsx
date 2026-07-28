@@ -322,7 +322,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
       <div className="space-y-xl animate-fade-in">
         <div className="flex items-start justify-between flex-wrap gap-md">
           <div className="space-y-sm w-full md:w-auto flex-1">
-            <h1 className="text-display font-serif text-gradient">{t('finance.title')}</h1>
+            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-gradient">{t('finance.title')}</h1>
             <div className="flex items-center gap-md">
               <p className="text-subtext flex items-center gap-sm">
                 {t('finance.subtitle')}

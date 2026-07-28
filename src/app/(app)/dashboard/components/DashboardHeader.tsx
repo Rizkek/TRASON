@@ -32,9 +32,9 @@ export const DashboardHeader = ({ user, activities, transactions }: Props) => {
       return (
         <>
           "{t('dashboard.narrative_today')}{' '}
-          <span className="text-primary font-bold">{activities.length} {t('dashboard.narrative_logged_moments')}</span>{' '}
+          <span className="text-primary font-semibold">{activities.length} {t('dashboard.narrative_logged_moments')}</span>{' '}
           {t('dashboard.narrative_and')}{' '}
-          <span className="text-secondary font-bold">{formatCurrency(totalExpenses, currency, locale)}</span>{' '}
+          <span className="text-secondary font-semibold tabular-nums">{formatCurrency(totalExpenses, currency, locale)}</span>{' '}
           {t('dashboard.narrative_in_outflow')}
           {totalIncome > 0 ? (
             ` ${t('dashboard.narrative_income_msg').replace('{income}', formatCurrency(totalIncome, currency, locale))}`
@@ -49,7 +49,7 @@ export const DashboardHeader = ({ user, activities, transactions }: Props) => {
       return (
         <>
           "{t('dashboard.narrative_today')}{' '}
-          <span className="text-primary font-bold">{activities.length} {t('dashboard.narrative_logged_moments')}</span>.{' '}
+          <span className="text-primary font-semibold">{activities.length} {t('dashboard.narrative_logged_moments')}</span>.{' '}
           {t('dashboard.narrative_default_msg')}"
         </>
       );
@@ -59,7 +59,7 @@ export const DashboardHeader = ({ user, activities, transactions }: Props) => {
       return (
         <>
           "{t('dashboard.narrative_today')}{' '}
-          <span className="text-secondary font-bold">{formatCurrency(totalExpenses, currency, locale)}</span>{' '}
+          <span className="text-secondary font-semibold tabular-nums">{formatCurrency(totalExpenses, currency, locale)}</span>{' '}
           {t('dashboard.narrative_in_outflow')}
           {totalIncome > 0 ? (
             ` ${t('dashboard.narrative_income_msg').replace('{income}', formatCurrency(totalIncome, currency, locale))}`
@@ -92,7 +92,7 @@ export const DashboardHeader = ({ user, activities, transactions }: Props) => {
               </span>
             )}
           </div>
-          <p className="text-lg leading-relaxed text-soft-cream font-serif italic opacity-90">
+          <p className="text-body-md md:text-body-lg text-gray-light font-sans font-normal opacity-90 max-w-2xl leading-relaxed">
             {renderNarrative()}
           </p>
           {user?.bio && (

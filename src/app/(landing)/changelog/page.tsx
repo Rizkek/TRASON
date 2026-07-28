@@ -45,7 +45,7 @@ export default function ChangelogPage() {
       
       <main className="pt-32 md:pt-48 pb-24 px-lg max-w-3xl mx-auto space-y-16">
         <div className="space-y-md mb-16">
-           <h1 className="text-5xl md:text-7xl font-serif">Changelog</h1>
+           <h1 className="text-5xl md:text-7xl font-display tracking-tight">Changelog</h1>
            <p className="text-xl text-gray-light/60">New updates and improvements to TRASON.</p>
         </div>
 

@@ -218,7 +218,7 @@ export function RemindersClient() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-lg">
           <div className="space-y-xs">
-            <h1 className="text-5xl font-serif">{t('reminders_page.title')} <span className="text-warm-gold italic">{t('reminders_page.title_highlight')}</span></h1>
+            <h1 className="text-5xl font-sans font-bold tracking-tight">{t('reminders_page.title')} <span className="text-warm-gold italic">{t('reminders_page.title_highlight')}</span></h1>
             <p className="text-gray-light font-light">{t('reminders_page.desc')}</p>
           </div>
           <div className="flex items-center gap-md">
@@ -338,7 +338,7 @@ export function RemindersClient() {
           {/* Side Panel: Selected Date Details */}
           <div className="lg:col-span-4 space-y-xl">
              <div className="glass-card p-xl border-warm-gold/10">
-                <h3 className="font-serif text-xl mb-xl">
+                <h3 className="font-sans font-bold tracking-tight text-xl mb-xl">
                   {selectedDate.toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' })}
                 </h3>
                 

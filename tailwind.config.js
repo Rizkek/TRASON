@@ -32,10 +32,12 @@ module.exports = {
         'accent-purple': '#8B5CF6',  // Static — for avatar gradient
       },
       fontFamily: {
-        serif: ['var(--font-cormorant)', 'serif'],
-        sans: ['var(--font-inter)', 'sans-serif'],
+        brand: ['var(--font-brand)', 'serif'],
+        display: ['var(--font-display)', 'sans-serif'],
+        sans: ['var(--font-sans)', 'sans-serif'],
       },
       fontSize: {
+        // Legacy (to be deprecated)
         'display': '40px',
         'h1': '32px',
         'h2': '24px',
@@ -43,6 +45,21 @@ module.exports = {
         'body': '16px',
         'caption': '14px',
         'micro': '12px',
+        
+        // Semantic Design Tokens
+        'display-xl': ['48px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '800' }],
+        'display-lg': ['40px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '800' }],
+        'heading-xl': ['32px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }],
+        'heading-lg': ['24px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }],
+        'heading-md': ['20px', { lineHeight: '1.3', fontWeight: '600' }],
+        'title-lg': ['18px', { lineHeight: '1.4', fontWeight: '600' }],
+        'title-md': ['16px', { lineHeight: '1.4', fontWeight: '600' }],
+        'body-lg': ['16px', { lineHeight: '1.6', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '1.6', fontWeight: '400' }],
+        'body-sm': ['13px', { lineHeight: '1.5', fontWeight: '400' }],
+        'label-md': ['13px', { lineHeight: '1.5', fontWeight: '500' }],
+        'label-sm': ['12px', { lineHeight: '1.5', fontWeight: '600', letterSpacing: '0.02em' }],
+        'token-micro': ['10px', { lineHeight: '1.4', fontWeight: '600', letterSpacing: '0.05em' }],
       },
       spacing: {
         'xs': '4px',

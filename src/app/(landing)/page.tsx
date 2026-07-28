@@ -169,7 +169,7 @@ export default function Home() {
         <div className="text-center space-y-md z-10 px-lg max-w-2xl">
           <h2
             key={motionStep}
-            className="text-2xl md:text-4xl font-serif text-warm-gold animate-fade-in italic"
+            className="text-2xl md:text-4xl font-display tracking-tight text-warm-gold animate-fade-in italic"
           >
             {mounted ? motionTexts[motionStep] : motionTexts[0]}
           </h2>
@@ -217,22 +217,21 @@ export default function Home() {
 
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-md py-xs rounded-full border border-warm-gold/20 bg-warm-gold/5 text-warm-gold text-xs font-bold uppercase tracking-widest mb-md animate-fade-in">
-            <Command size={14} /> The Personal Operating System
+            <Command size={14} /> Design Your Life
           </div>
 
-          {/* H1 — clearer value proposition */}
-          <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-serif leading-[1.1] md:leading-[1] tracking-tighter">
-            Finances, Habits{' '}
+          {/* H1 — emotional value proposition */}
+          <h1 className="text-5xl md:text-7xl lg:text-[6.5rem] font-display font-extrabold leading-[1.1] md:leading-[1.05] tracking-tight">
+            Your Personal{' '}
             <br className="hidden md:block" />
-            <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-warm-gold via-soft-cream to-warm-gold bg-[length:200%_auto] animate-shimmer">
-              and Career. All in one place.
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-warm-gold via-soft-cream to-warm-gold bg-[length:200%_auto] animate-shimmer">
+              Operating System.
             </span>
           </h1>
 
-          {/* Sub-headline — concrete, not poetic */}
-          <p className="text-lg md:text-2xl text-gray-light/80 max-w-2xl mx-auto leading-relaxed font-light animate-slide-up [animation-delay:0.2s]">
-            Stop switching apps. TRASON unifies your money, routines,
-            and career pipeline into one calm dashboard.
+          {/* Sub-headline — features */}
+          <p className="text-lg md:text-2xl text-gray-light/80 max-w-2xl mx-auto leading-relaxed font-sans font-normal animate-slide-up [animation-delay:0.2s]">
+            Manage your finances, career, habits, and daily life from one calm workspace.
           </p>
 
           {/* CTA group */}
@@ -302,7 +301,7 @@ export default function Home() {
       <section className="py-16 md:py-32 px-md md:px-lg relative z-10">
         <div className="max-w-5xl mx-auto text-center space-y-2xl">
           <div className="space-y-sm">
-            <h2 className="text-3xl md:text-5xl font-serif text-gray-light">
+            <h2 className="text-3xl md:text-5xl font-display tracking-tight text-gray-light">
               Too many apps, too much friction.
             </h2>
             <p className="text-gray-light/60 text-lg max-w-2xl mx-auto">
@@ -335,7 +334,7 @@ export default function Home() {
       {/* ── SOLUTION + DASHBOARD PREVIEW ─────────────────────────────────── */}
       <section className="py-16 md:py-32 px-md md:px-lg relative z-10 bg-gradient-to-b from-transparent via-warm-gold/[0.02] to-transparent border-y border-white/[0.02]">
         <div className="max-w-5xl mx-auto text-center space-y-xl">
-          <h2 className="text-4xl md:text-6xl font-serif text-warm-gold">
+          <h2 className="text-4xl md:text-6xl font-display tracking-tight text-warm-gold">
             One dashboard for{' '}
             <br />
             everything that matters.
@@ -365,7 +364,7 @@ export default function Home() {
             <div className="p-xl grid grid-cols-1 md:grid-cols-3 gap-xl">
               <div className="col-span-2 space-y-xl">
                 <div className="space-y-sm">
-                  <h3 className="text-3xl font-serif text-white flex gap-2 items-baseline">
+                  <h3 className="text-3xl font-display tracking-tight text-white flex gap-2 items-baseline">
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-warm-gold to-soft-cream">Good Evening</span>, User
                   </h3>
                   <div className="flex items-center gap-3 text-xs text-gray-light/60">
@@ -380,7 +379,7 @@ export default function Home() {
                   <div className="flex justify-between items-start z-10 relative">
                     <div>
                       <p className="text-xs text-gray-light/60 font-bold uppercase tracking-widest">Financial Flow</p>
-                      <div className="text-2xl font-serif text-white mt-1">$4,250.00</div>
+                      <div className="text-2xl font-display tracking-tight text-white mt-1">$4,250.00</div>
                     </div>
                     <div className="flex gap-2">
                       <span className="px-2 py-1 rounded bg-green-500/10 text-green-400 text-xs flex items-center gap-1">
@@ -402,7 +401,7 @@ export default function Home() {
                   <div className="absolute inset-0 bg-warm-gold/5" />
                   <Target className="text-warm-gold/30 absolute top-4 right-4" size={24} />
                   <div className="text-xs text-gray-light/60 font-bold uppercase tracking-widest relative z-10">Life Score</div>
-                  <div className="text-7xl font-serif text-warm-gold drop-shadow-[0_0_15px_rgba(244,201,93,0.3)] relative z-10">86</div>
+                  <div className="text-7xl font-display tracking-tight text-warm-gold drop-shadow-[0_0_15px_rgba(244,201,93,0.3)] relative z-10">86</div>
                 </div>
 
                 <div className="rounded-2xl bg-gradient-to-br from-gray-strong to-black border border-white/5 p-lg space-y-md relative overflow-hidden">
@@ -411,7 +410,7 @@ export default function Home() {
                     <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
                       <Heartbeat size={16} />
                     </div>
-                    <div className="font-serif italic text-md text-white">Daily Insight</div>
+                    <div className="font-display tracking-tight italic text-md text-white">Daily Insight</div>
                   </div>
                   <p className="text-sm text-gray-light/80 italic leading-relaxed relative z-10">
                     &ldquo;Your financial outflow is stable, but vitality logs are missing. Log a quick session to balance your day.&rdquo;
@@ -430,7 +429,7 @@ export default function Home() {
       <section className="py-16 md:py-32 px-md md:px-lg relative z-10">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 space-y-sm">
-            <h2 className="text-3xl md:text-5xl font-serif">
+            <h2 className="text-3xl md:text-5xl font-display tracking-tight">
               Everything you need. Nothing you don&apos;t.
             </h2>
             <p className="text-gray-light/60 text-lg max-w-xl mx-auto">
@@ -448,7 +447,7 @@ export default function Home() {
                       <Icon size={22} />
                     </div>
                     <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${f.color}`}>{f.label}</p>
-                    <h3 className="text-xl font-serif text-white mb-3 group-hover:text-soft-cream transition-colors">
+                    <h3 className="text-xl font-display tracking-tight text-white mb-3 group-hover:text-soft-cream transition-colors">
                       {f.headline}
                     </h3>
                     <p className="text-sm text-gray-light/70 leading-relaxed">{f.body}</p>
@@ -466,13 +465,13 @@ export default function Home() {
       {/* ── SOCIAL PROOF / FOUNDER NOTE ───────────────────────────────────── */}
       <section className="py-16 md:py-24 px-md md:px-lg relative z-10 bg-gradient-to-b from-transparent via-black/20 to-transparent">
         <div className="max-w-3xl mx-auto text-center space-y-8">
-          <blockquote className="text-2xl md:text-3xl font-serif italic text-gray-light/90 leading-relaxed">
+          <blockquote className="text-2xl md:text-3xl font-display tracking-tight italic text-gray-light/90 leading-relaxed">
             &ldquo;I built TRASON because I was tired of maintaining 6 different apps just to understand my own life.
             I wanted one calm place where everything made sense.&rdquo;
           </blockquote>
           <div className="flex items-center justify-center gap-4">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-warm-gold to-yellow-600 flex items-center justify-center shrink-0">
-              <span className="text-black font-serif font-bold text-xl">T</span>
+              <span className="text-black font-display tracking-tight font-bold text-xl">T</span>
             </div>
             <div className="text-left">
               <p className="font-bold text-soft-cream">The TRASON Team</p>
@@ -495,7 +494,7 @@ export default function Home() {
       <section className="py-16 md:py-32 px-md md:px-lg relative z-10">
         <div className="max-w-3xl mx-auto space-y-xl">
           <div className="text-center space-y-sm">
-            <h2 className="text-3xl md:text-5xl font-serif">Common Questions</h2>
+            <h2 className="text-3xl md:text-5xl font-display tracking-tight">Common Questions</h2>
             <p className="text-gray-light/60">Everything you need to know before you start.</p>
           </div>
           <div className="space-y-3">
@@ -508,7 +507,7 @@ export default function Home() {
 
       {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
       <section className="py-24 md:py-40 px-md md:px-lg text-center space-y-lg md:space-y-xl relative z-10">
-        <h2 className="text-4xl md:text-7xl font-serif italic tracking-tight leading-[1.2] md:leading-[1]">
+        <h2 className="text-4xl md:text-7xl font-display tracking-tight italic tracking-tight leading-[1.2] md:leading-[1]">
           Ready to get <br className="hidden md:block" /> organized?
         </h2>
         <div className="max-w-sm mx-auto space-y-lg pt-lg">

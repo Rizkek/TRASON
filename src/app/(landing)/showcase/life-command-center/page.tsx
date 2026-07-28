@@ -20,7 +20,7 @@ export default function LifeCommandCenterPage() {
            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warm-gold/10 text-yellow-500 border border-warm-gold/20 text-sm font-bold mb-4">
              <Network size={16} /> Data Architecture
            </div>
-           <h1 className="text-4xl md:text-6xl font-serif leading-tight">
+           <h1 className="text-4xl md:text-6xl font-display tracking-tight leading-tight">
              The <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-200">Command Center.</span>
            </h1>
            <p className="text-lg text-gray-light font-light leading-relaxed">
@@ -39,7 +39,7 @@ export default function LifeCommandCenterPage() {
               
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div>
-                  <h2 className="text-3xl font-serif text-white tracking-tight mb-2">The Nexus Engine</h2>
+                  <h2 className="text-3xl font-display tracking-tight text-white tracking-tight mb-2">The Nexus Engine</h2>
                   <p className="text-gray-400 max-w-md">Our proprietary system ingests streams from all sub-modules, correlating your habits with your financial success and career velocity.</p>
                 </div>
 

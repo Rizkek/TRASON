@@ -116,7 +116,7 @@ export function LifeScoreCard() {
 
       <div className="flex items-center justify-between mb-md md:mb-xl">
         <div>
-          <h3 className="font-serif italic text-lg text-white flex items-center gap-sm">
+          <h3 className="font-sans font-medium text-gray-light text-lg text-white flex items-center gap-sm">
             <TrendingUp size={18} className="text-primary" />
             {t('life_score.ui.title')}
           </h3>

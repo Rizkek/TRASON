@@ -19,7 +19,7 @@ export const DailyTasksSummary = () => {
             <ListChecks size={18} className="md:w-5 md:h-5" />
           </div>
           <div>
-            <h3 className="font-serif italic text-md md:text-lg text-white">Daily Tasks</h3>
+            <h3 className="font-sans font-medium text-gray-light text-md md:text-lg text-white">Daily Tasks</h3>
             <p className="hidden md:block text-micro text-gray-light mt-1">Today's checklist</p>
           </div>
         </div>

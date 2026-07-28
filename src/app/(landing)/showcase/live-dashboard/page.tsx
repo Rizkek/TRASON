@@ -20,7 +20,7 @@ export default function LiveDashboardPage() {
       <main className="pt-32 md:pt-48 pb-24 px-lg max-w-7xl mx-auto space-y-24">
         {/* Presentation Header */}
         <div className="text-center space-y-6 max-w-3xl mx-auto relative z-10">
-           <h1 className="text-4xl md:text-6xl font-serif leading-tight">
+           <h1 className="text-4xl md:text-6xl font-display tracking-tight leading-tight">
              Live <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-warm-gold to-yellow-200">Dashboard.</span>
            </h1>
            <p className="text-lg text-gray-light font-light leading-relaxed">
@@ -54,9 +54,9 @@ export default function LiveDashboardPage() {
                   {/* Logo Area */}
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warm-gold to-yellow-600 flex items-center justify-center">
-                      <span className="text-black font-serif font-bold text-lg">T</span>
+                      <span className="text-black font-display tracking-tight font-bold text-lg">T</span>
                     </div>
-                    <span className="font-serif font-bold text-xl text-white">TRASON</span>
+                    <span className="font-display tracking-tight font-bold text-xl text-white">TRASON</span>
                   </div>
 
                   {/* Nav Menu */}
@@ -121,7 +121,7 @@ export default function LiveDashboardPage() {
                   {/* Greeting & Life Score */}
                   <div className="flex justify-between items-end">
                     <div>
-                      <h2 className="text-3xl font-serif text-white tracking-tight mb-1">Good Morning, John.</h2>
+                      <h2 className="text-3xl font-display tracking-tight text-white tracking-tight mb-1">Good Morning, John.</h2>
                       <p className="text-gray-light">Your life score is up 3 points since yesterday.</p>
                     </div>
                     <button className="bg-warm-gold text-black px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-yellow-500 transition-colors">
@@ -141,7 +141,7 @@ export default function LiveDashboardPage() {
                         </div>
                         <span className="text-xs text-yellow-500 bg-warm-gold/10 px-2 py-1 rounded font-bold">+2.4%</span>
                       </div>
-                      <h3 className="text-3xl font-serif text-white mb-1">$142,500</h3>
+                      <h3 className="text-3xl font-display tracking-tight text-white mb-1">$142,500</h3>
                       <p className="text-xs text-gray-500">Updated 2 hours ago</p>
                     </div>
 
@@ -155,7 +155,7 @@ export default function LiveDashboardPage() {
                         </div>
                         <span className="text-xs text-yellow-500 bg-warm-gold/10 px-2 py-1 rounded font-bold">2 Interviews</span>
                       </div>
-                      <h3 className="text-3xl font-serif text-white mb-1">14</h3>
+                      <h3 className="text-3xl font-display tracking-tight text-white mb-1">14</h3>
                       <p className="text-xs text-gray-500">Pipeline health: Good</p>
                     </div>
 
@@ -169,7 +169,7 @@ export default function LiveDashboardPage() {
                         </div>
                         <span className="text-xs text-yellow-500 bg-warm-gold/10 px-2 py-1 rounded font-bold">14 Day Streak</span>
                       </div>
-                      <h3 className="text-3xl font-serif text-white mb-1">85/100</h3>
+                      <h3 className="text-3xl font-display tracking-tight text-white mb-1">85/100</h3>
                       <p className="text-xs text-gray-500">Top 15% this month</p>
                     </div>
                   </div>

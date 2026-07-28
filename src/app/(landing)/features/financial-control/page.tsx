@@ -50,7 +50,7 @@ export default function FinancialControlPage() {
            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warm-gold/10 text-yellow-500 border border-warm-gold/20 text-sm font-bold mb-6">
              <CurrencyCircleDollar size={16} /> Financial Control
            </div>
-           <h1 className="text-5xl md:text-7xl font-serif leading-tight">
+           <h1 className="text-5xl md:text-7xl font-display tracking-tight leading-tight">
              Master Your <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-200">Capital.</span>
            </h1>
            <p className="text-xl text-gray-light/80 max-w-2xl mx-auto font-light leading-relaxed">
@@ -74,7 +74,7 @@ export default function FinancialControlPage() {
              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-white/5 pb-8">
                <div>
                  <p className="text-sm font-bold text-gray-light uppercase tracking-widest mb-2">Total Net Worth</p>
-                 <h2 className="text-5xl font-serif text-white tracking-tight">$142,500.00</h2>
+                 <h2 className="text-5xl font-display tracking-tight text-white tracking-tight">$142,500.00</h2>
                </div>
                <div className="flex gap-4">
                  <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl">
@@ -188,7 +188,7 @@ export default function FinancialControlPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <TrendingUp size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Multi-Currency Support</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Multi-Currency Support</h3>
             <p className="text-gray-light leading-relaxed">
               Whether you hold USD, EUR, or IDR, TRASON automatically converts and unifies your net worth into your primary base currency using real-time exchange rates.
             </p>
@@ -197,7 +197,7 @@ export default function FinancialControlPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <ChartBar size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Runway Forecasting</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Runway Forecasting</h3>
             <p className="text-gray-light leading-relaxed">
               Based on your moving average burn rate, TRASON predicts exactly how many months of runway you have left if your income suddenly dropped to zero.
             </p>
@@ -206,7 +206,7 @@ export default function FinancialControlPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <Wallet size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Automated Categorization</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Automated Categorization</h3>
             <p className="text-gray-light leading-relaxed">
               Stop tagging every coffee you buy. Our intelligent engine learns your spending habits and categorizes transactions automatically with 98% accuracy.
             </p>
@@ -215,7 +215,7 @@ export default function FinancialControlPage() {
             <div className="w-12 h-12 bg-warm-gold/10 text-yellow-500 flex items-center justify-center rounded-2xl">
               <ArrowUpRight size={24} />
             </div>
-            <h3 className="text-3xl font-serif text-white">Investment Tracking</h3>
+            <h3 className="text-3xl font-display tracking-tight text-white">Investment Tracking</h3>
             <p className="text-gray-light leading-relaxed">
               Connect your brokerage and crypto wallets. See your entire portfolio's performance alongside your liquid cash in one unified dashboard.
             </p>
@@ -226,7 +226,7 @@ export default function FinancialControlPage() {
         <div className="py-24 text-center space-y-8 bg-white/5 border border-white/5 rounded-[3rem] relative overflow-hidden">
           <div className="absolute inset-0 bg-warm-gold/10 md:blur-[100px]" style={{ transform: 'translateZ(0)' }} />
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">Take back control of your capital.</h2>
+            <h2 className="text-4xl md:text-5xl font-display tracking-tight text-white mb-6">Take back control of your capital.</h2>
             <p className="text-gray-light max-w-xl mx-auto mb-10">
               Stop guessing. Start building real financial clarity — track every transaction, understand your burn rate, and grow your net worth with intentionality.
             </p>

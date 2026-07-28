@@ -28,7 +28,7 @@ export const RemindersSidebar = ({ reminders }: Props) => {
       <div className="p-md space-y-md relative z-10">
         {upcomingReminders.map((r) => (
           <div key={r.id} className="flex gap-md p-sm rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]">
-            <div className="text-xs font-serif italic text-secondary min-w-[40px] pt-0.5">
+            <div className="text-xs font-sans font-medium text-gray-light text-secondary min-w-[40px] pt-0.5">
               {r.due_time || t('dashboard.today')}
             </div>
             <div className="min-w-0">

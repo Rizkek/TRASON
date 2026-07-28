@@ -34,7 +34,7 @@ export default function VisionPage() {
           
           {/* Manifesto Header */}
           <header className="space-y-12">
-            <h1 className="text-5xl md:text-8xl font-serif leading-[1.1] tracking-tight text-white">
+            <h1 className="text-5xl md:text-8xl font-display tracking-tight leading-[1.1] tracking-tight text-white">
               App fatigue <br />
               <span className="text-gray-500 italic">is killing our focus.</span>
             </h1>
@@ -64,7 +64,7 @@ export default function VisionPage() {
                 We believe your personal data should live in one place. It should compound. It should correlate. 
               </p>
               <p>
-                <strong className="text-white font-serif text-2xl">TRASON is not another app. It's a personal operating system.</strong>
+                <strong className="text-white font-display tracking-tight text-2xl">TRASON is not another app. It's a personal operating system.</strong>
               </p>
               <p>
                 Imagine a system that knows you spent $200 on an online course, automatically tags it to your Career Pipeline, and reminds you to study during your deep work block, all while ensuring it doesn't disrupt your sleep schedule. 
@@ -77,12 +77,12 @@ export default function VisionPage() {
 
           {/* Closing Statement */}
           <section className="pt-16 border-t border-white/10">
-            <blockquote className="text-3xl md:text-5xl font-serif text-white leading-tight">
+            <blockquote className="text-3xl md:text-5xl font-display tracking-tight text-white leading-tight">
               "We are building TRASON for the ambitious. For those who want to design their lives with the same rigor a CEO designs a company."
             </blockquote>
             <div className="mt-12 flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-warm-gold to-yellow-600 flex items-center justify-center">
-                <span className="text-black font-serif font-bold text-xl">T</span>
+                <span className="text-black font-display tracking-tight font-bold text-xl">T</span>
               </div>
               <div>
                 <p className="text-white font-bold">The TRASON Team</p>

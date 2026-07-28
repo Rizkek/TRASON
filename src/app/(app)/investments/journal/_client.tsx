@@ -56,7 +56,7 @@ export function InvestmentJournalClient() {
         {/* Header Section */}
         <div className="flex items-start justify-between gap-md flex-wrap">
           <div className="space-y-sm max-w-2xl">
-            <h1 className="text-display font-serif text-gradient flex items-center gap-2">
+            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-gradient flex items-center gap-2">
               <Notebook weight="duotone" className="text-primary" />
               Investment Journal
             </h1>

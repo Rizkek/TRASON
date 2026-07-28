@@ -20,7 +20,7 @@ export default function TermsPage() {
             <div className="w-8 h-8 bg-warm-gold rounded-full flex items-center justify-center text-warm-black">
               <Compass size={18} />
             </div>
-            <span className="text-xl font-serif font-bold tracking-tight">TRASON</span>
+            <span className="text-xl font-display tracking-tight font-bold tracking-tight">TRASON</span>
           </div>
           <div className="w-20" /> {/* Spacer */}
         </div>
@@ -29,11 +29,11 @@ export default function TermsPage() {
       {/* Content */}
       <main className="pt-32 pb-24 px-lg max-w-3xl mx-auto space-y-xl">
         <div className="space-y-sm text-center">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">Terms of Service</h1>
+          <h1 className="text-4xl md:text-5xl font-display tracking-tight font-bold tracking-tight">Terms of Service</h1>
           <p className="text-gray-light font-light">Last updated: May 2026</p>
         </div>
 
-        <div className="prose prose-invert prose-p:text-gray-light prose-headings:text-soft-cream prose-headings:font-serif prose-a:text-warm-gold hover:prose-a:text-[#E3B84D] max-w-none">
+        <div className="prose prose-invert prose-p:text-gray-light prose-headings:text-soft-cream prose-headings:font-display tracking-tight prose-a:text-warm-gold hover:prose-a:text-[#E3B84D] max-w-none">
           <p>
             Welcome to TRASON. By accessing or using our platform, you agree to be bound by these Terms of Service. 
             Please read them carefully before starting your journey.

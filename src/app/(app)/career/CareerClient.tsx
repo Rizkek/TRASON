@@ -294,7 +294,7 @@ export default function CareerClient({ initialApplications }: Props) {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-lg">
             <div className="space-y-xs">
-              <h1 className="text-5xl font-serif">
+              <h1 className="text-5xl font-sans font-bold tracking-tight">
                 {t('career_page.title')} <span className="text-warm-gold italic">{t('career_page.title_highlight')}</span>
               </h1>
               <p className="text-gray-light font-light">{t('career_page.desc')}</p>

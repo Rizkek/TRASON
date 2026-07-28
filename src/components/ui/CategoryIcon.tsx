@@ -1,20 +1,86 @@
 import React from 'react';
-import { ShoppingCart, Coffee, Car, House as Home, Heart, Lightning as Zap, Briefcase, GraduationCap, Gift, Airplane, MusicNotes, FilmStrip, Book, Monitor, DeviceMobile as Smartphone, ForkKnife, Bus, Train, Heartbeat as Activity, WifiHigh as Wifi, Drop, Flame, DotsThree as MoreHorizontal, Wallet, CreditCard, Money, Question as HelpCircle, Package } from '@phosphor-icons/react/dist/ssr';
+import { 
+  // Finance & Business
+  Wallet, CreditCard, Money, Bank, PiggyBank, Coins, TrendUp, TrendDown, ChartBar, ChartLineUp, Receipt, Vault, Briefcase, Calculator, CurrencyDollar, CurrencyEur, CurrencyGbp, CurrencyInr, CurrencyJpy,
+  // Shopping
+  ShoppingCart, Bag, Tote, Storefront, Basket, Gift, Tag, Barcode,
+  // Food & Drink
+  Coffee, ForkKnife, Hamburger, Pizza, Martini, BeerBottle, Wine, BowlFood, Cake, Carrot,
+  // Transport & Travel
+  Car, Bus, Train, Airplane, Bicycle, Boat, Taxi, Moped, Scooter, MapPin, MapTrifold, Compass, Globe, Suitcase,
+  // Home & Utilities
+  House, Drop, Flame, Lightning, Lightbulb, Plug, Key, Lock, Umbrella, Toilet, Shower, Bathtub, Bed,
+  // Health & Wellness
+  Heartbeat, Heart, FirstAidKit, Pill, Barbell, Brain, Person,
+  // Tech & Electronics
+  Monitor, DeviceMobile, Laptop, Desktop, Television, Headphones, SpeakerHigh, GameController, Mouse, Keyboard, Camera, VideoCamera,
+  // Lifestyle & Entertainment
+  MusicNotes, FilmStrip, Book, GraduationCap, Popcorn, Basketball, Football, TennisBall, Volleyball, PianoKeys, Guitar, Palette,
+  // Miscellaneous
+  Package, DotsThree, Question, Star, Gear, Bell, Calendar, Clock, CheckCircle, Warning, Info, Target, Trophy, Crown, Medal
+} from '@phosphor-icons/react/dist/ssr';
 
-export const CATEGORY_ICONS = [
-  'ShoppingCart', 'Coffee', 'Car', 'Home', 'Heart', 'Zap', 
-  'Briefcase', 'GraduationCap', 'Gift', 'Airplane', 'MusicNotes', 
-  'FilmStrip', 'Book', 'Monitor', 'Smartphone', 'ForkKnife',
-  'Bus', 'Train', 'Activity', 'Wifi', 'Drop', 'Flame',
-  'Wallet', 'CreditCard', 'Money', 'Package', 'MoreHorizontal'
+export const ICON_CATEGORIES = [
+  {
+    name: 'Finance & Business',
+    icons: ['Wallet', 'CreditCard', 'Money', 'Bank', 'PiggyBank', 'Coins', 'TrendUp', 'TrendDown', 'ChartBar', 'ChartLineUp', 'Receipt', 'Vault', 'Briefcase', 'Calculator', 'CurrencyDollar', 'CurrencyEur', 'CurrencyGbp', 'CurrencyInr', 'CurrencyJpy']
+  },
+  {
+    name: 'Shopping',
+    icons: ['ShoppingCart', 'Bag', 'Tote', 'Storefront', 'Basket', 'Gift', 'Tag', 'Barcode']
+  },
+  {
+    name: 'Food & Drink',
+    icons: ['Coffee', 'ForkKnife', 'Hamburger', 'Pizza', 'Martini', 'BeerBottle', 'Wine', 'BowlFood', 'Cake', 'Carrot']
+  },
+  {
+    name: 'Transport & Travel',
+    icons: ['Car', 'Bus', 'Train', 'Airplane', 'Bicycle', 'Boat', 'Taxi', 'Moped', 'Scooter', 'MapPin', 'MapTrifold', 'Compass', 'Globe', 'Suitcase']
+  },
+  {
+    name: 'Home & Utilities',
+    icons: ['Home', 'Drop', 'Flame', 'Zap', 'Lightbulb', 'Plug', 'Key', 'Lock', 'Umbrella', 'Toilet', 'Shower', 'Bathtub', 'Bed']
+  },
+  {
+    name: 'Health & Wellness',
+    icons: ['Activity', 'Heart', 'FirstAidKit', 'Pill', 'Barbell', 'Brain', 'Person']
+  },
+  {
+    name: 'Tech & Electronics',
+    icons: ['Monitor', 'Smartphone', 'Laptop', 'Desktop', 'Television', 'Headphones', 'SpeakerHigh', 'GameController', 'Mouse', 'Keyboard', 'Camera', 'VideoCamera']
+  },
+  {
+    name: 'Lifestyle & Entertainment',
+    icons: ['MusicNotes', 'FilmStrip', 'Book', 'GraduationCap', 'Popcorn', 'Basketball', 'Football', 'TennisBall', 'Volleyball', 'PianoKeys', 'Guitar', 'Palette']
+  },
+  {
+    name: 'Miscellaneous',
+    icons: ['Package', 'MoreHorizontal', 'HelpCircle', 'Star', 'Gear', 'Bell', 'Calendar', 'Clock', 'CheckCircle', 'Warning', 'Info', 'Target', 'Trophy', 'Crown', 'Medal']
+  }
 ];
 
+// For backward compatibility and easy flat mapping
+export const CATEGORY_ICONS = ICON_CATEGORIES.flatMap(cat => cat.icons);
+
 const iconMap: Record<string, React.ElementType> = {
-  ShoppingCart, Coffee, Car, Home, Heart, Zap, 
-  Briefcase, GraduationCap, Gift, Airplane, MusicNotes, 
-  FilmStrip, Book, Monitor, Smartphone, ForkKnife,
-  Bus, Train, Activity, Wifi, Drop, Flame,
-  Wallet, CreditCard, Money, Package, MoreHorizontal
+  // Finance & Business
+  Wallet, CreditCard, Money, Bank, PiggyBank, Coins, TrendUp, TrendDown, ChartBar, ChartLineUp, Receipt, Vault, Briefcase, Calculator, CurrencyDollar, CurrencyEur, CurrencyGbp, CurrencyInr, CurrencyJpy,
+  // Shopping
+  ShoppingCart, Bag, Tote, Storefront, Basket, Gift, Tag, Barcode,
+  // Food & Drink
+  Coffee, ForkKnife, Hamburger, Pizza, Martini, BeerBottle, Wine, BowlFood, Cake, Carrot,
+  // Transport & Travel
+  Car, Bus, Train, Airplane, Bicycle, Boat, Taxi, Moped, Scooter, MapPin, MapTrifold, Compass, Globe, Suitcase,
+  // Home & Utilities
+  Home: House, Drop, Flame, Zap: Lightning, Lightbulb, Plug, Key, Lock, Umbrella, Toilet, Shower, Bathtub, Bed,
+  // Health & Wellness
+  Activity: Heartbeat, Heart, FirstAidKit, Pill, Barbell, Brain, Person,
+  // Tech & Electronics
+  Monitor, Smartphone: DeviceMobile, Laptop, Desktop, Television, Headphones, SpeakerHigh, GameController, Mouse, Keyboard, Camera, VideoCamera,
+  // Lifestyle & Entertainment
+  MusicNotes, FilmStrip, Book, GraduationCap, Popcorn, Basketball, Football, TennisBall, Volleyball, PianoKeys, Guitar, Palette,
+  // Miscellaneous
+  Package, MoreHorizontal: DotsThree, HelpCircle: Question, Star, Gear, Bell, Calendar, Clock, CheckCircle, Warning, Info, Target, Trophy, Crown, Medal
 };
 
 interface CategoryIconProps {
