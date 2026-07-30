@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from '@phosphor-icons/react';
 
 interface BottomSheetProps {
@@ -23,6 +24,11 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   closeButton = true,
 }) => {
   const sheetRef = React.useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -48,9 +54,9 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop */}
       <div
@@ -120,6 +126,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 };

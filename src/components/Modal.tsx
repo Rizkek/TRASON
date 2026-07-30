@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from '@phosphor-icons/react';
 
 interface ModalProps {
@@ -25,6 +26,11 @@ export const Modal: React.FC<ModalProps> = ({
   baseZIndex = 60,
 }) => {
   const modalRef = React.useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -50,9 +56,9 @@ export const Modal: React.FC<ModalProps> = ({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop with lighter blur for mobile performance */}
       <div
@@ -115,6 +121,7 @@ export const Modal: React.FC<ModalProps> = ({
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 };
