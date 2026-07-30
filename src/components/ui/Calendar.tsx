@@ -7,19 +7,21 @@ interface CalendarProps {
   onDateSelect?: (date: Date) => void;
   selectedDate?: Date;
   events?: any[];
+  locale?: string;
 }
 
 export const Calendar: React.FC<CalendarProps> = ({
   onDateSelect,
   selectedDate = new Date(),
   events = [],
+  locale = 'en-US',
 }) => {
   const [viewDate, setViewDate] = useState(new Date(selectedDate));
 
   const daysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
 
-  const monthName = viewDate.toLocaleString('default', { month: 'long' });
+  const monthName = viewDate.toLocaleString(locale, { month: 'long' });
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
 
@@ -110,7 +112,11 @@ export const Calendar: React.FC<CalendarProps> = ({
 
       {/* Days of week */}
       <div className="grid grid-cols-7 border-b border-black/[0.03] dark:border-white/[0.03] bg-black/[0.01] dark:bg-white/[0.01]">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+        {Array.from({ length: 7 }, (_, i) => {
+          // 2024-01-07 was a Sunday (0)
+          const d = new Date(2024, 0, 7 + i);
+          return d.toLocaleDateString(locale, { weekday: 'short' });
+        }).map(day => (
           <div key={day} className="py-2 text-center text-[10px] uppercase tracking-[0.2em] text-gray-light/60 font-bold">
             {day}
           </div>

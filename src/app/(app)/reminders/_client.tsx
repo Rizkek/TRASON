@@ -257,8 +257,9 @@ export function RemindersClient() {
             {view === 'calendar' && remindersActiveEnabled ? (
               <CalendarUI 
                 selectedDate={selectedDate} 
-                onDateSelect={handleDateSelect}
+                onDateSelect={handleDateSelect} 
                 events={reminders}
+                locale={locale}
               />
             ) : (
               <div className="space-y-md">

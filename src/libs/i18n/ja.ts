@@ -3,7 +3,7 @@ export const ja = {
     dashboard: 'ダッシュボード',
     finance: 'ファイナンス',
     investments: '投資',
-    timeline: 'タイムライン',
+    timeline: 'スケジュール',
     schedule: 'スケジュール',
     sport: '活力',
     career: 'キャリア',
@@ -264,9 +264,9 @@ export const ja = {
     }
   },
   timeline_page: {
-    title: 'タイムライン',
-    desc: '週次活動ログ',
-    logs_upper: 'ログ',
+    title: 'スケジュール',
+    desc: 'あなたの毎週のリズム',
+    logs_upper: '記録',
     logged_upper: '記録済み',
     log_activity_btn: '活動を追加',
     edit_log: '活動を編集',
@@ -460,11 +460,22 @@ export const ja = {
       vsLastMonth: '先月比'
     },
     budget: {
-      globalMonthly: 'グローバル月次予算',
-      predictiveBlueprint: '予測カテゴリーブループリント',
-      noCategories: '支出カテゴリーはまだありません。',
+      globalMonthly: 'グローバル月間予算',
+      predictiveBlueprint: '予測カテゴリブループリント',
+      noCategories: '支出カテゴリがまだありません。',
       globalPlaceholder: '例: 5000000',
-      targetPlaceholder: 'ターゲット (任意)'
+      targetPlaceholder: 'ターゲット (オプション)'
+    },
+    categories: {
+      manageTitle: '{type}カテゴリを管理',
+      addNew: '新しいカテゴリを追加',
+      edit: 'カテゴリを編集',
+      new: '新しいカテゴリ',
+      iconLabel: 'アイコン',
+      nameLabel: '名前',
+      namePlaceholder: '例: 食料品',
+      save: 'カテゴリを保存',
+      saving: '保存中...'
     }
   },
   dashboard: {
@@ -516,8 +527,8 @@ export const ja = {
     balance: '残高',
     
     recent_moments: '最近の瞬間',
-    open_timeline: 'タイムライン',
-    timeline_quiet: 'タイムラインは静かです。記憶に残ることを一つ記録しましょう。',
+    open_timeline: 'スケジュール',
+    timeline_quiet: 'スケジュールは静かです。記録する価値のあることを一つ捉えてください。',
     done: '完了',
     
     cash_flow: 'キャッシュフロー',

@@ -2,6 +2,7 @@ import React from 'react';
 import { Card } from '@/components';
 import type { PersonalRecord } from '@/types/database';
 import { Trophy, Barbell as Dumbbell, Timer, Footprints } from '@phosphor-icons/react/dist/ssr';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface Props {
   records: PersonalRecord[];
@@ -17,6 +18,7 @@ const getSportIcon = (type: string) => {
 };
 
 export const PRBoard: React.FC<Props> = ({ records }) => {
+  const { locale } = useUserPreferences();
   if (records.length === 0) {
     return (
       <Card className="p-xl bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] text-center">
@@ -62,7 +64,7 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
           
           <div className="mt-sm text-[10px] text-gray-very-light flex items-center justify-between border-t border-black/[0.05] dark:border-white/[0.05] pt-sm">
             <span>{pr.metric_type}</span>
-            <span>{new Date(pr.record_date).toLocaleDateString()}</span>
+            <span>{new Date(pr.record_date).toLocaleDateString(locale)}</span>
           </div>
         </Card>
       ))}

@@ -3,7 +3,7 @@ export const en = {
     dashboard: 'Dashboard',
     finance: 'Finance',
     investments: 'Investments',
-    timeline: 'Timeline',
+    timeline: 'Schedule',
     schedule: 'Schedule',
     sport: 'Vitality',
     career: 'Career',
@@ -263,8 +263,8 @@ export const en = {
     }
   },
   timeline_page: {
-    title: 'Timeline',
-    desc: 'Weekly activity log',
+    title: 'Schedule',
+    desc: 'Your weekly rhythm',
     logs_upper: 'Logs',
     logged_upper: 'Logged',
     log_activity_btn: 'Add Activity',
@@ -464,6 +464,17 @@ export const en = {
       noCategories: 'No expense categories yet.',
       globalPlaceholder: 'e.g., 5000000',
       targetPlaceholder: 'Target (Optional)'
+    },
+    categories: {
+      manageTitle: 'Manage {type} Categories',
+      addNew: 'Add New Category',
+      edit: 'Edit Category',
+      new: 'New Category',
+      iconLabel: 'ICON',
+      nameLabel: 'NAME',
+      namePlaceholder: 'e.g. Groceries',
+      save: 'Save Category',
+      saving: 'Saving...'
     }
   },
   dashboard: {
@@ -515,8 +526,8 @@ export const en = {
     balance: 'Balance',
     
     recent_moments: 'Recent moments',
-    open_timeline: 'Timeline',
-    timeline_quiet: 'Your timeline is quiet. Capture one thing worth remembering.',
+    open_timeline: 'Schedule',
+    timeline_quiet: 'Your schedule is quiet. Capture one thing worth remembering.',
     done: 'Done',
     
     cash_flow: 'Cash flow',

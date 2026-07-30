@@ -3,7 +3,7 @@ export const es = {
     dashboard: 'Panel',
     finance: 'Finanzas',
     investments: 'Inversiones',
-    timeline: 'Línea de tiempo',
+    timeline: 'Horario',
     schedule: 'Horario',
     sport: 'Vitalidad',
     career: 'Carrera',
@@ -264,8 +264,8 @@ export const es = {
     }
   },
   timeline_page: {
-    title: 'Línea de Tiempo',
-    desc: 'Registro de actividad semanal',
+    title: 'Horario',
+    desc: 'Tu ritmo semanal',
     logs_upper: 'Registros',
     logged_upper: 'Registrado',
     log_activity_btn: 'Añadir Actividad',
@@ -461,10 +461,21 @@ export const es = {
     },
     budget: {
       globalMonthly: 'Presupuesto Mensual Global',
-      predictiveBlueprint: 'Plan de Categoría Predictivo',
-      noCategories: 'No hay categorías de gastos aún.',
-      globalPlaceholder: 'ej., 5000000',
+      predictiveBlueprint: 'Plano Predictivo de Categorías',
+      noCategories: 'Aún no hay categorías de gastos.',
+      globalPlaceholder: 'ej., 5000',
       targetPlaceholder: 'Objetivo (Opcional)'
+    },
+    categories: {
+      manageTitle: 'Gestionar Categorías de {type}',
+      addNew: 'Añadir Nueva Categoría',
+      edit: 'Editar Categoría',
+      new: 'Nueva Categoría',
+      iconLabel: 'ICONO',
+      nameLabel: 'NOMBRE',
+      namePlaceholder: 'ej. Comestibles',
+      save: 'Guardar Categoría',
+      saving: 'Guardando...'
     }
   },
   dashboard: {
@@ -516,8 +527,8 @@ export const es = {
     balance: 'Saldo',
     
     recent_moments: 'Momentos recientes',
-    open_timeline: 'LÍNEA DE TIEMPO',
-    timeline_quiet: 'Tu línea de tiempo está vacía. Registra algo que valga la pena recordar.',
+    open_timeline: 'Horario',
+    timeline_quiet: 'Tu horario está tranquilo. Captura algo digno de recordar.',
     done: 'Hecho',
     
     cash_flow: 'Flujo de caja',

@@ -103,7 +103,7 @@ export function TimelineClient() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
-  const { module_features } = useUserPreferences();
+  const { module_features, locale } = useUserPreferences();
   const { t } = useTranslation();
 
   const { start: weekStart, end: weekEnd } = getCurrentWeekBounds();
@@ -454,7 +454,7 @@ export function TimelineClient() {
                 <div className="space-y-xs">
                   <h2 className="text-sm font-bold text-soft-cream uppercase tracking-widest flex items-center gap-sm">
                     <ListChecks size={15} className="text-primary" />
-                    {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                    {new Date().toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' })}
                   </h2>
                   {totalCount > 0 && (
                     <div className="flex items-center gap-sm">
@@ -606,7 +606,7 @@ export function TimelineClient() {
                       <p className={`text-[11px] font-bold uppercase tracking-[0.15em] ${
                         isToday ? 'text-primary' : 'text-gray-light'
                       }`}>
-                        {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                        {day.toLocaleDateString(locale, { weekday: 'short' })}
                       </p>
                     </div>
                   );
@@ -666,7 +666,7 @@ export function TimelineClient() {
                               onClick={() => {
                                 if (cellActivities.length === 0) openAddModal(day, hour);
                               }}
-                              aria-label={`${day.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} at ${formatHour(hour)}`}
+                              aria-label={`${day.toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' })} at ${formatHour(hour)}`}
                             >
                               {/* Empty slot hint */}
                               {cellActivities.length === 0 && (
@@ -811,7 +811,7 @@ export function TimelineClient() {
                   className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none disabled:opacity-50"
                 >
                   {daysOfWeek.map((d, i) => (
-                    <option key={i} value={i}>{d.toLocaleDateString('en-US', { weekday: 'long' })}</option>
+                    <option key={i} value={i}>{d.toLocaleDateString(locale, { weekday: 'long' })}</option>
                   ))}
                 </select>
                 {!editingActivity && (

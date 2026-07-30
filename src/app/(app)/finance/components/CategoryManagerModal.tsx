@@ -5,6 +5,8 @@ import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Plus, Trash as Trash2, PencilSimple as Edit2, X, Smiley } from '@phosphor-icons/react/dist/ssr';
 import { Category } from '@/types/database';
 import { CategoryIcon, CATEGORY_ICONS, ICON_CATEGORIES } from '@/components';
+import { ICON_NAME_SUGGESTIONS } from '@/libs/defaultCategories';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface CategoryManagerModalProps {
   isOpen: boolean;
@@ -15,6 +17,7 @@ interface CategoryManagerModalProps {
 export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryManagerModalProps) {
   const { categories, createCategory, updateCategory, deleteCategory } = useCategory();
   const { t } = useTranslation();
+  const { language } = useUserPreferences();
   
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -88,7 +91,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
         resetForm();
         onClose();
       }}
-      title={`Manage ${typeFilter === 'income' ? 'Income' : 'Expense'} Categories`}
+      title={t('finance.categories.manageTitle').replace('{type}', typeFilter === 'income' ? t('finance.modal.type.income') : t('finance.modal.type.expense'))}
     >
       <div className="space-y-md">
         <ErrorAlert error={error} onDismiss={() => setError(null)} />
@@ -121,13 +124,13 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
               onClick={() => setIsAdding(true)}
               leftIcon={<Plus size={16} />}
             >
-              Add New Category
+              {t('finance.categories.addNew')}
             </Button>
           </>
         ) : (
           <div className="space-y-md bg-gray-strong/20 p-md rounded-lg border border-black/5 dark:border-white/5">
             <div className="flex items-center justify-between mb-sm">
-              <h3 className="text-sm font-bold">{editingId ? 'Edit Category' : 'New Category'}</h3>
+              <h3 className="text-sm font-bold">{editingId ? t('finance.categories.edit') : t('finance.categories.new')}</h3>
               <button onClick={resetForm} className="text-gray-light hover:text-soft-cream">
                 <X size={16} />
               </button>
@@ -135,7 +138,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
             
             <div className="flex gap-md relative">
               <div className="w-20 flex flex-col items-center gap-xs">
-                <label className="text-[10px] font-bold text-gray-light tracking-widest self-start">ICON</label>
+                <label className="text-[10px] font-bold text-gray-light tracking-widest self-start">{t('finance.categories.iconLabel')}</label>
                 <button
                   type="button"
                   onClick={() => setShowIconPicker(!showIconPicker)}
@@ -146,10 +149,10 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
               </div>
               <div className="flex-1">
                 <Input
-                  label="NAME"
+                  label={t('finance.categories.nameLabel')}
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="e.g. Groceries"
+                  placeholder={t('finance.categories.namePlaceholder')}
                 />
               </div>
             </div>
@@ -167,7 +170,12 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
                           key={iconName}
                           type="button"
                           onClick={() => {
-                            setForm({ ...form, icon: iconName });
+                            const suggestion = ICON_NAME_SUGGESTIONS[iconName];
+                            setForm({ 
+                              ...form, 
+                              icon: iconName,
+                              name: form.name === '' ? (suggestion?.[language as keyof typeof suggestion] || suggestion?.en || '') : form.name
+                            });
                             setShowIconPicker(false);
                           }}
                           className={`p-2 rounded-md flex items-center justify-center transition-colors ${form.icon === iconName ? 'bg-primary/20 text-primary' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-light hover:text-white'}`}
@@ -182,9 +190,9 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
             )}
             
             <div className="flex justify-end gap-sm mt-md">
-              <Button variant="ghost" size="sm" onClick={resetForm} disabled={isSaving}>Cancel</Button>
+              <Button variant="ghost" size="sm" onClick={resetForm} disabled={isSaving}>{t('common.cancel')}</Button>
               <Button variant="primary" size="sm" onClick={handleSave} disabled={isSaving}>
-                {isSaving ? 'Saving...' : 'Save Category'}
+                {isSaving ? t('finance.categories.saving') : t('finance.categories.save')}
               </Button>
             </div>
           </div>

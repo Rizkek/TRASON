@@ -10,6 +10,7 @@ import { CareerApplication } from '@/types/database';
 import { getLocalISODate } from '@/libs/format';
 import { sanitizeError } from '@/libs/validation';
 import { useTranslation } from '@/libs/i18n/useTranslation';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare } from '@phosphor-icons/react';
 import { useInterviewJournal } from '@/hooks/useInterviewJournal';
 
@@ -71,6 +72,7 @@ export default function CareerClient({ initialApplications }: Props) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
   const { t } = useTranslation();
+  const { locale } = useUserPreferences();
 
   const { applications, stats, isLoading, error, createApplication, updateApplication, deleteApplication } = useCareer(initialApplications);
   const { analytics } = useCareerAnalytics();
@@ -471,7 +473,7 @@ export default function CareerClient({ initialApplications }: Props) {
                       <div className="flex flex-wrap items-center gap-md text-[10px] text-gray-light opacity-80">
                         <span className="flex items-center gap-1">
                           <Calendar size={10} />
-                          {t('career_page.applied_on')} {new Date(app.applied_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {t('career_page.applied_on')} {new Date(app.applied_date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
                         </span>
                         {app.location && (
                           <span className="flex items-center gap-1">
@@ -482,7 +484,7 @@ export default function CareerClient({ initialApplications }: Props) {
                         {hasInterview && (
                           <span className="flex items-center gap-1 text-purple-400 opacity-100">
                             <Clock size={10} />
-                            {t('career_page.interview_on')} {new Date(app.interview_date!).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                            {t('career_page.interview_on')} {new Date(app.interview_date!).toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })}
                           </span>
                         )}
                         {app.salary_range && (
@@ -562,7 +564,7 @@ export default function CareerClient({ initialApplications }: Props) {
                           <div className="flex flex-wrap items-center gap-md text-[10px] text-gray-light opacity-80 mt-1">
                             <span className="flex items-center gap-1">
                               <Calendar size={10} />
-                              {new Date(journal.interview_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                              {new Date(journal.interview_date).toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })}
                             </span>
                             <span className={`flex items-center gap-1 ${difficultyColor} opacity-100 font-bold`}>
                               <Target size={10} />

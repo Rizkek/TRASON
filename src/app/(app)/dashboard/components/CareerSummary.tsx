@@ -5,6 +5,7 @@ import { Briefcase, Clock } from '@phosphor-icons/react/dist/ssr';
 import { CareerStats } from '@/hooks/useCareer';
 import { CareerApplication } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface Props {
   stats: CareerStats;
@@ -14,6 +15,7 @@ interface Props {
 
 export const CareerSummary = ({ stats, nextInterview, isLoading }: Props) => {
   const { t } = useTranslation();
+  const { locale } = useUserPreferences();
   if (isLoading) {
     return (
       <Card className="p-xl bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
@@ -62,14 +64,14 @@ export const CareerSummary = ({ stats, nextInterview, isLoading }: Props) => {
               <div
                 className="flex items-start gap-sm p-md rounded-md bg-purple-500/10 border border-purple-500/20"
                 role="status"
-                aria-label={`Next interview: ${nextInterview.company_name} on ${new Date(nextInterview.interview_date!).toLocaleDateString()}`}
+                aria-label={`Next interview: ${nextInterview.company_name} on ${new Date(nextInterview.interview_date!).toLocaleDateString(locale)}`}
               >
                 <Clock size={14} className="text-purple-400 flex-shrink-0 mt-0.5" />
                 <div className="min-w-0">
                   <p className="text-[10px] text-purple-400 font-bold uppercase tracking-widest">{t('dashboard.next_conversation')}</p>
                   <p className="text-sm font-semibold text-soft-cream truncate">{nextInterview.company_name}</p>
                   <p className="text-[10px] text-gray-light">
-                    {new Date(nextInterview.interview_date!).toLocaleDateString('en-US', {
+                    {new Date(nextInterview.interview_date!).toLocaleDateString(locale, {
                       weekday: 'short',
                       month: 'short',
                       day: 'numeric',

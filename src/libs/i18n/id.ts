@@ -3,7 +3,7 @@ export const id = {
     dashboard: 'Dasbor',
     finance: 'Keuangan',
     investments: 'Investasi',
-    timeline: 'Linimasa',
+    timeline: 'Jadwal',
     schedule: 'Jadwal',
     sport: 'Vitalitas',
     career: 'Karier',
@@ -263,8 +263,8 @@ export const id = {
     }
   },
   timeline_page: {
-    title: 'Garis Waktu',
-    desc: 'Log aktivitas mingguan',
+    title: 'Jadwal',
+    desc: 'Irama mingguan Anda',
     logs_upper: 'Log',
     logged_upper: 'Dicatat',
     log_activity_btn: 'Tambah Aktivitas',
@@ -459,11 +459,22 @@ export const id = {
       vsLastMonth: 'vs bulan lalu'
     },
     budget: {
-      globalMonthly: 'Global Monthly Budget',
-      predictiveBlueprint: 'Predictive Category Blueprint',
+      globalMonthly: 'Anggaran Bulanan Global',
+      predictiveBlueprint: 'Cetak Biru Kategori Prediktif',
       noCategories: 'Belum ada kategori pengeluaran.',
-      globalPlaceholder: 'Misal: 5000000',
+      globalPlaceholder: 'misal, 5000000',
       targetPlaceholder: 'Target (Opsional)'
+    },
+    categories: {
+      manageTitle: 'Kelola Kategori {type}',
+      addNew: 'Tambah Kategori Baru',
+      edit: 'Ubah Kategori',
+      new: 'Kategori Baru',
+      iconLabel: 'IKON',
+      nameLabel: 'NAMA',
+      namePlaceholder: 'mis. Groceries',
+      save: 'Simpan Kategori',
+      saving: 'Menyimpan...'
     }
   },
   dashboard: {
@@ -515,8 +526,8 @@ export const id = {
     balance: 'Saldo',
     
     recent_moments: 'Momen terbaru',
-    open_timeline: 'Linimasa',
-    timeline_quiet: 'Linimasa Anda sepi. Catat satu hal yang patut diingat.',
+    open_timeline: 'Jadwal',
+    timeline_quiet: 'Jadwal Anda masih kosong. Catat satu hal yang patut diingat.',
     done: 'Selesai',
     
     cash_flow: 'Arus kas',

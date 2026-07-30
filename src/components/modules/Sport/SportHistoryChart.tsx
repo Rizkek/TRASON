@@ -12,6 +12,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import type { WorkoutSession } from '@/types/database';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 ChartJS.register(
   CategoryScale,
@@ -28,6 +29,7 @@ interface Props {
 
 export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
   const [isMounted, setIsMounted] = useState(false);
+  const { locale } = useUserPreferences();
 
   useEffect(() => {
     setIsMounted(true);
@@ -46,7 +48,7 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
       const d = String(date.getDate()).padStart(2, '0');
       const dateStr = `${y}-${m}-${d}`;
       
-      const displayDate = date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+      const displayDate = date.toLocaleDateString(locale, { month: 'short', day: '2-digit' });
 
       const daySessions = sessions.filter(
         (s) => s.session_date === dateStr
