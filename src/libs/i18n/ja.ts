@@ -113,6 +113,16 @@ export const ja = {
       interview: '面接',
       offer: '内定'
     },
+    stats_labels: {
+      responseRate: '返答率',
+      resp: '返答',
+      interviewRate: '面接率',
+      intv: '面接',
+      offerRate: '内定率',
+      offer: '内定',
+      avgToInterview: '面接までの平均',
+      avg: '平均'
+    },
     tabs: {
       all: 'すべて',
       active: '進行中',

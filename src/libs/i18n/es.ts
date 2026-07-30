@@ -113,6 +113,16 @@ export const es = {
       interview: 'Entrevista',
       offer: 'Oferta'
     },
+    stats_labels: {
+      responseRate: 'Tasa de respuesta',
+      resp: 'Resp.',
+      interviewRate: 'Tasa de entrevista',
+      intv: 'Entr.',
+      offerRate: 'Tasa de oferta',
+      offer: 'Ofer.',
+      avgToInterview: 'Prom. a Entrevista',
+      avg: 'Prom.'
+    },
     tabs: {
       all: 'Todo',
       active: 'Activo',

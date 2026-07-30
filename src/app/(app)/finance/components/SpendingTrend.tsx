@@ -5,6 +5,7 @@ import { Card } from '@/components';
 import { TrendUp as TrendingUp, TrendDown as TrendingDown } from '@phosphor-icons/react';
 import { formatCurrency } from '@/libs/format';
 import type { SpendingLeak } from '@/libs/analytics/financialHealth';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 
 interface Props {
   spendingLeaks: SpendingLeak[];
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function SpendingTrend({ spendingLeaks, currency, locale }: Props) {
+  const { t } = useTranslation();
   // Top 2 increases + top 1 notable drop
   const leaks = spendingLeaks.filter(l => l.changePercent > 5).slice(0, 2);
   const drops = spendingLeaks.filter(l => l.changePercent < -10).slice(0, 1);
