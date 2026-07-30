@@ -10,9 +10,11 @@ export async function GET(request: Request) {
 
   // Validate Secret
   const authHeader = request.headers.get('Authorization');
+  const url = new URL(request.url);
+  const querySecret = url.searchParams.get('secret');
   const expectedSecret = process.env.CRON_SECRET;
   
-  if (expectedSecret && authHeader !== `Bearer ${expectedSecret}`) {
+  if (expectedSecret && authHeader !== `Bearer ${expectedSecret}` && querySecret !== expectedSecret) {
     console.warn('[CRON-REMINDERS] Unauthorized access attempt.');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
