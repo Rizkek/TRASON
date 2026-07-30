@@ -337,28 +337,28 @@ export default function CareerClient({ initialApplications }: Props) {
               <div className="flex items-center gap-md sm:gap-xl overflow-x-auto snap-x no-scrollbar flex-nowrap pb-1">
                 <div className="text-center shrink-0 snap-center">
                   <p className="text-md md:text-lg font-bold text-white">{analytics.responseRate.toFixed(0)}%</p>
-                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">Response Rate</p>
-                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">Resp.</p>
+                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.responseRate')}</p>
+                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.resp')}</p>
                 </div>
                 <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
                 <div className="text-center shrink-0 snap-center">
                   <p className="text-md md:text-lg font-bold text-white">{analytics.interviewRate.toFixed(0)}%</p>
-                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">Interview Rate</p>
-                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">Intv.</p>
+                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.interviewRate')}</p>
+                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.intv')}</p>
                 </div>
                 <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
                 <div className="text-center shrink-0 snap-center">
                   <p className="text-md md:text-lg font-bold text-white">{analytics.offerRate.toFixed(0)}%</p>
-                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">Offer Rate</p>
-                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">Offer</p>
+                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.offerRate')}</p>
+                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.offer')}</p>
                 </div>
                 {analytics.avgDaysToInterview !== null && (
                   <>
                     <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
                     <div className="text-center shrink-0 snap-center">
                       <p className="text-md md:text-lg font-bold text-white">{analytics.avgDaysToInterview}d</p>
-                      <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">Avg. to Interview</p>
-                      <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">Avg.</p>
+                      <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.avgToInterview')}</p>
+                      <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.avg')}</p>
                     </div>
                   </>
                 )}

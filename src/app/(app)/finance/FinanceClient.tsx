@@ -21,6 +21,8 @@ import { formatDateOnly, getDateRange } from '@/libs/date';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import type { CategoryJoin } from '@/types/database';
+import { DEFAULT_FINANCE_CATEGORIES } from '@/libs/defaultCategories';
+import { categoryQueries } from '@/services/activity/categoryQueries';
 
 /** Safely get the category object regardless of whether Supabase returns an array or single object */
 function resolveCategory(categories: CategoryJoin | CategoryJoin[] | null | undefined): CategoryJoin | null {
@@ -64,7 +66,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
   const carryForwardBalance = prevTransactions.reduce((sum, t) => {
     return t.type === 'income' ? sum + t.amount : sum - t.amount;
   }, 0);
-  const { categories } = useCategory();
+  const { categories, mutate: mutateCategories } = useCategory();
   const { createSubscription } = useSubscription();
   const { globalBudget, budgets } = useBudget();
   
@@ -113,6 +115,25 @@ export default function FinanceClient({ initialTransactions }: Props) {
       router.push('/login');
     }
   }, [authLoading, isAuthenticated, router]);
+
+  // Auto-seed default categories for users who have none (skip onboarding / old accounts)
+  useEffect(() => {
+    if (!isAuthenticated || categories.length > 0) return;
+    // Wait until SWR has finished the first fetch (categories is [] but not yet loading)
+    const timer = setTimeout(async () => {
+      try {
+        const existing = await categoryQueries.getCategories();
+        if (!existing || existing.length === 0) {
+          await categoryQueries.seedDefaultCategories(DEFAULT_FINANCE_CATEGORIES);
+          mutateCategories();
+        }
+      } catch (e) {
+        console.warn('[Finance] Auto-seed categories failed:', e);
+      }
+    }, 1500); // small delay to let SWR settle
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, categories.length]);
 
   const handleSave = async () => {
     const validation = validateTransaction(form);
@@ -732,8 +753,8 @@ export default function FinanceClient({ initialTransactions }: Props) {
           </div>
 
           <Input
-            label="TITLE"
-            placeholder="Coffee, Subscription, Freelance..."
+            label={t('finance.modal.title')}
+            placeholder={t('finance.modal.titlePlaceholder')}
             value={form.title}
             onChange={(e) => {
               setForm(f => ({ ...f, title: e.target.value }));
@@ -750,12 +771,14 @@ export default function FinanceClient({ initialTransactions }: Props) {
 
           <div className="grid grid-cols-2 gap-md">
             <Input
-              label="AMOUNT"
-              type="number"
-              placeholder="0.00"
+              label={t('finance.modal.amount')}
+              type="text"
+              inputMode="numeric"
+              placeholder="0"
               value={form.amount}
               onChange={(e) => {
-                setForm(f => ({ ...f, amount: e.target.value }));
+                const val = e.target.value.replace(/\D/g, '');
+                setForm(f => ({ ...f, amount: val }));
                 if (formErrors.amount) {
                   setFormErrors(prev => {
                     const copy = { ...prev };
@@ -767,7 +790,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
               error={formErrors.amount}
             />
             <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">DATE</label>
+              <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.modal.date')}</label>
               <input 
                 type="date" 
                 title="Select date"
@@ -791,7 +814,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
           <div className="space-y-sm">
             <div className="flex justify-between items-center">
               <label className="text-[10px] font-bold text-gray-light tracking-widest block">
-                CATEGORY
+                {t('finance.modal.category')}
                 {form.category_id && (
                   <span className="ml-2 text-primary normal-case font-normal">
                     — {categories.find(c => c.id === form.category_id)?.name || ''}
@@ -803,12 +826,12 @@ export default function FinanceClient({ initialTransactions }: Props) {
                 onClick={() => setIsCategoryManagerOpen(true)}
                 className="text-[10px] text-primary hover:underline font-bold uppercase tracking-widest"
               >
-                Manage
+                {t('finance.modal.manage')}
               </button>
             </div>
             {categories.filter(c => c.type === form.type).length === 0 ? (
               <p className="text-xs text-gray-light italic py-md">
-                No categories yet. Click <button type="button" onClick={() => setIsCategoryManagerOpen(true)} className="text-primary underline">Manage</button> to add some.
+                {t('finance.modal.noCategories')} <button type="button" onClick={() => setIsCategoryManagerOpen(true)} className="text-primary underline">{t('finance.modal.manage')}</button> {t('finance.modal.toAddSome')}
               </p>
             ) : (
               <div className="grid grid-cols-3 gap-sm">
@@ -823,7 +846,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                   }`}
                 >
                   <span className="text-lg">—</span>
-                  <span className="text-[10px] uppercase font-bold tracking-wider truncate w-full text-center">None</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider truncate w-full text-center">{t('finance.modal.none')}</span>
                 </button>
                 {categories.filter(c => c.type === form.type).map(cat => (
                   <button
@@ -845,9 +868,9 @@ export default function FinanceClient({ initialTransactions }: Props) {
           </div>
 
           <div className="space-y-sm">
-            <label className="text-[10px] font-bold text-gray-light tracking-widest block">DESCRIPTION / NOTES</label>
+            <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.modal.description')}</label>
             <textarea
-              placeholder="Context or tags..."
+              placeholder={t('finance.modal.descriptionPlaceholder')}
               rows={2}
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
@@ -866,12 +889,12 @@ export default function FinanceClient({ initialTransactions }: Props) {
                   className="w-4 h-4 rounded border-white/10 bg-gray-strong text-primary focus:ring-primary accent-primary"
                 />
                 <label htmlFor="is_recurring" className="text-sm font-semibold text-soft-cream cursor-pointer">
-                  Jadikan pengeluaran rutin (Langganan)
+                  {t('finance.modal.makeRecurring')}
                 </label>
               </div>
               {form.is_recurring && (
                 <div className="flex items-center gap-md pl-6">
-                  <span className="text-xs text-gray-light">Siklus:</span>
+                  <span className="text-xs text-gray-light">{t('finance.modal.cycle')}</span>
                   <div className="flex bg-gray-strong p-1 rounded-md border border-white/[0.05]">
                     {(['monthly', 'yearly', 'weekly'] as const).map((cycle) => (
                       <button
@@ -884,7 +907,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                             : 'text-gray-light hover:text-soft-cream'
                         }`}
                       >
-                        {cycle === 'monthly' ? 'Bulan' : cycle === 'yearly' ? 'Tahun' : 'Minggu'}
+                        {cycle === 'monthly' ? t('finance.modal.cycleMonthly') : cycle === 'yearly' ? t('finance.modal.cycleYearly') : t('finance.modal.cycleWeekly')}
                       </button>
                     ))}
                   </div>
@@ -895,13 +918,13 @@ export default function FinanceClient({ initialTransactions }: Props) {
 
           <details className="bg-primary/5 border border-primary/10 rounded-lg group">
             <summary className="p-md text-sm font-bold text-primary cursor-pointer flex items-center justify-between list-none">
-              ✨ Catatan Evaluasi (Mindful Spending)
+              {t('finance.modal.mindfulSpending')}
               <ChevronRight size={16} className="group-open:rotate-90 transition-transform" />
             </summary>
             
             <div className="px-md pb-md space-y-md border-t border-primary/10 pt-md">
               <div className="space-y-sm">
-                <label className="text-[10px] font-bold text-gray-light tracking-widest block">SIFAT PENGELUARAN</label>
+                <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.modal.expenseNature')}</label>
                 <div className="flex bg-gray-strong p-1 rounded-md border border-black/[0.05] dark:border-white/[0.05]">
                   <button
                     type="button"
@@ -912,7 +935,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                         : 'text-gray-light hover:text-soft-cream'
                     }`}
                   >
-                    Kebutuhan
+                    {t('finance.modal.need')}
                   </button>
                   <button
                     type="button"
@@ -923,15 +946,15 @@ export default function FinanceClient({ initialTransactions }: Props) {
                         : 'text-gray-light hover:text-soft-cream'
                     }`}
                   >
-                    Keinginan
+                    {t('finance.modal.want')}
                   </button>
                 </div>
               </div>
 
               <div className="space-y-sm">
-                <label className="text-[10px] font-bold text-gray-light tracking-widest block">MANFAAT / ALASAN BELI INI</label>
+                <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.modal.reason')}</label>
                 <textarea
-                  placeholder="Misal: Self-reward setelah gajian, alat kerja, dll..."
+                  placeholder={t('finance.modal.reasonPlaceholder')}
                   rows={2}
                   value={form.decision_notes}
                   onChange={(e) => setForm(f => ({ ...f, decision_notes: e.target.value }))}
@@ -947,7 +970,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
               onClick={() => setDeleteConfirmId(editingTransaction.id)}
               className="w-full py-md text-danger text-[10px] font-bold uppercase tracking-widest border border-danger/20 hover:bg-danger/5 rounded-md transition-all"
             >
-              DELETE THIS TRANSACTION
+              {t('finance.modal.deleteBtn')}
             </button>
           )}
         </div>

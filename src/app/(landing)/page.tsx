@@ -508,7 +508,7 @@ export default function Home() {
       {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
       <section className="py-24 md:py-40 px-md md:px-lg text-center space-y-lg md:space-y-xl relative z-10">
         <h2 className="text-4xl md:text-7xl font-display tracking-tight italic tracking-tight leading-[1.2] md:leading-[1]">
-          Ready to get <br className="hidden md:block" /> organized?
+          Ready to take <br className="hidden md:block" /> control?
         </h2>
         <div className="max-w-sm mx-auto space-y-lg pt-lg">
           <Link href="/signup">

@@ -104,7 +104,7 @@ export function InvestmentJournalClient() {
         ) : filteredJournals.length === 0 ? (
           <div className="py-24 text-center">
             <Notebook size={48} className="mx-auto text-white/20 mb-4" />
-            <h3 className="text-lg font-bold text-white">Tidak ada jurnal</h3>
+            <h3 className="text-lg font-bold text-white">{t('investment_page.journal.empty_journal')}</h3>
             <p className="text-gray-light mt-2 max-w-sm mx-auto">
               {filter === 'needs_review' 
                 ? 'Belum ada investasi yang berusia > 6 bulan untuk direview saat ini.' 
@@ -166,7 +166,7 @@ export function InvestmentJournalClient() {
                         <div className="space-y-4">
                           <div className="flex items-start gap-2 text-warning bg-warning/10 p-sm rounded-md">
                             <Question size={18} className="shrink-0 mt-0.5" />
-                            <p className="text-sm">Sudah 6 bulan berlalu. Apakah tesis investasi Anda masih valid? Bagaimana performa aset ini dibanding ekspektasi?</p>
+                            <p className="text-sm">{t('investment_page.journal.six_months_passed')}</p>
                           </div>
                           <div className="flex gap-2">
                             <Button variant="primary" size="sm" className="w-full">
@@ -178,7 +178,7 @@ export function InvestmentJournalClient() {
                         <div className="space-y-2">
                           <div className="flex items-center gap-2 text-success">
                             <Lightbulb size={16} weight="fill" />
-                            <p className="text-xs font-bold uppercase tracking-wide">Pelajaran Dipetik</p>
+                            <p className="text-xs font-bold uppercase tracking-wide">{t('investment_page.journal.lessons_title')}</p>
                           </div>
                           <p className="text-sm text-soft-cream italic border-l-2 border-success/30 pl-3">
                             "{journal.review_notes}"

@@ -5,7 +5,7 @@ export const es = {
     investments: 'Inversiones',
     timeline: 'Línea de tiempo',
     schedule: 'Horario',
-    sport: 'Deporte',
+    sport: 'Vitalidad',
     career: 'Carrera',
     reminders: 'Recordatorios',
     insights: 'Perspectivas',
@@ -17,7 +17,7 @@ export const es = {
     cancel: 'Cancelar'
   },
   sport_page: {
-    sport_fitness_title: 'Deporte y Ejercicio',
+    sport_fitness_title: 'Vitalidad',
     sport_fitness_desc: 'Haz un seguimiento de tus entrenamientos, rompe récords personales y mantén la consistencia.',
     quick_log_workout: 'Añadir Entrenamiento Rápido',
     this_week: 'Esta Semana',
@@ -490,20 +490,20 @@ export const es = {
     review_pipeline: 'Revisar canal ->'
   },
   auth: {
-    loginTitle: 'Acceder a TRASON',
-    loginSubtitle: 'Ingresa tus credenciales para continuar',
-    email: 'DIRECCIÓN DE CORREO',
-    password: 'CONTRASEÑA',
-    loginBtn: 'Entrar',
-    noAccount: '¿Aún no tienes acceso?',
-    signupLink: 'Solicitar Acceso',
-    signupTitle: 'Inicializar TRASON',
-    signupSubtitle: 'Crea tu santuario digital',
+    loginTitle: 'Bienvenido de nuevo.',
+    loginSubtitle: 'Inicia sesión para continuar.',
+    email: 'Correo electrónico',
+    password: 'Contraseña',
+    loginBtn: 'Iniciar sesión',
+    noAccount: '¿No tienes una cuenta?',
+    signupLink: 'Crear cuenta',
+    signupTitle: 'Crea tu cuenta.',
+    signupSubtitle: 'Solo toma un minuto.',
     firstName: 'Nombre',
     lastName: 'Apellido',
     signupBtn: 'Registro',
-    hasAccount: '¿Ya estás inicializado?',
-    loginLink: 'Autenticar'
+    hasAccount: '¿Ya tienes una cuenta?',
+    loginLink: 'Iniciar sesión'
   },
   common: {
     loading: 'Cargando...',

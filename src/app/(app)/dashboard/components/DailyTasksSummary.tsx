@@ -19,8 +19,8 @@ export const DailyTasksSummary = () => {
             <ListChecks size={18} className="md:w-5 md:h-5" />
           </div>
           <div>
-            <h3 className="font-sans font-medium text-gray-light text-md md:text-lg text-white">Daily Tasks</h3>
-            <p className="hidden md:block text-micro text-gray-light mt-1">Today's checklist</p>
+            <h3 className="font-sans font-medium text-gray-light text-md md:text-lg text-white">{t('dashboard.dailyTasks.title')}</h3>
+            <p className="hidden md:block text-micro text-gray-light mt-1">{t('dashboard.dailyTasks.subtitle')}</p>
           </div>
         </div>
         {totalCount > 0 && (
@@ -34,7 +34,7 @@ export const DailyTasksSummary = () => {
         {isLoading ? (
           <div className="flex justify-center py-xl"><Loading /></div>
         ) : tasks.length === 0 ? (
-          <p className="text-sm text-gray-light italic text-center py-xl opacity-60">No daily tasks yet.</p>
+          <p className="text-sm text-gray-light italic text-center py-xl opacity-60">{t('dashboard.dailyTasks.empty')}</p>
         ) : (
           <div className="space-y-sm">
             {tasks.map(task => (

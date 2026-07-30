@@ -11,6 +11,7 @@ interface ModalProps {
   children?: React.ReactNode;
   footer?: React.ReactNode;
   closeButton?: boolean;
+  baseZIndex?: number;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -21,6 +22,7 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   footer,
   closeButton = true,
+  baseZIndex = 60,
 }) => {
   const modalRef = React.useRef<HTMLDivElement>(null);
 
@@ -54,14 +56,16 @@ export const Modal: React.FC<ModalProps> = ({
     <>
       {/* Backdrop with lighter blur for mobile performance */}
       <div
-        className="fixed inset-0 bg-warm-black/60 backdrop-blur-sm z-[60] animate-fade-in"
+        className={`fixed inset-0 bg-warm-black/60 backdrop-blur-sm animate-fade-in z-[${baseZIndex}]`}
+        style={{ zIndex: baseZIndex }}
         onClick={onClose}
       />
 
       {/* Modal Container */}
       <div 
         ref={modalRef}
-        className="fixed inset-0 z-[70] flex items-center justify-center p-md pointer-events-none trason-modal"
+        className={`fixed inset-0 flex items-center justify-center p-md pointer-events-none trason-modal z-[${baseZIndex + 10}]`}
+        style={{ zIndex: baseZIndex + 10 }}
       >
         <div
           className="bg-gray-strong border border-black/10 dark:border-white/10 rounded-md shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] max-w-lg w-full max-h-[85dvh] flex flex-col pointer-events-auto animate-slide-up relative"

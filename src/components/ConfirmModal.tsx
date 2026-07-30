@@ -55,6 +55,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={title}
+      baseZIndex={100}
       footer={
         <div className="flex justify-end gap-md">
           <Button variant="ghost" size="md" onClick={onClose} disabled={isLoading}>

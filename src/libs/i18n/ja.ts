@@ -5,7 +5,7 @@ export const ja = {
     investments: '投資',
     timeline: 'タイムライン',
     schedule: 'スケジュール',
-    sport: 'スポーツ',
+    sport: '活力',
     career: 'キャリア',
     reminders: 'リマインダー',
     insights: 'インサイト',
@@ -17,7 +17,7 @@ export const ja = {
     cancel: 'キャンセル'
   },
   sport_page: {
-    sport_fitness_title: 'スポーツとフィットネス',
+    sport_fitness_title: '活力',
     sport_fitness_desc: 'ワークアウトを記録し、自己ベストを更新して、一貫性を保ちましょう。',
     quick_log_workout: 'ワークアウトをすばやく追加',
     this_week: '今週',
@@ -485,25 +485,25 @@ export const ja = {
     applied: '応募済み',
     interview: '面接',
     offer: '内定',
-    next_conversation: '次の会話',
+        next_conversation: '次の会話',
     add_first_move: '最初の動きを追加 ->',
     review_pipeline: 'パイプラインを確認 ->'
   },
   auth: {
-    loginTitle: 'TRASONにアクセス',
-    loginSubtitle: '続行するには認証情報を入力してください',
-    email: 'Eメールアドレス',
+    loginTitle: 'お帰りなさい。',
+    loginSubtitle: '続行するにはログインしてください。',
+    email: 'メールアドレス',
     password: 'パスワード',
     loginBtn: 'ログイン',
-    noAccount: 'まだアクセス権がありませんか？',
-    signupLink: 'アクセスをリクエスト',
-    signupTitle: 'TRASONを初期化',
-    signupSubtitle: 'デジタルの聖域を作成する',
+    noAccount: 'アカウントをお持ちではありませんか？',
+    signupLink: 'アカウントを作成',
+    signupTitle: 'アカウントを作成',
+    signupSubtitle: '1分で完了します。',
     firstName: '名',
     lastName: '姓',
     signupBtn: '登録',
-    hasAccount: 'すでに初期化済みですか？',
-    loginLink: '認証'
+    hasAccount: 'すでにアカウントをお持ちですか？',
+    loginLink: 'ログイン'
   },
   common: {
     loading: '読み込み中...',

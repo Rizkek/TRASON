@@ -6,6 +6,7 @@ import { Card, Button, Input, Loading, ErrorAlert } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
+import { DEFAULT_FINANCE_CATEGORIES } from '@/libs/defaultCategories';
 import { ModuleSelectionCard } from './components/ModuleSelectionCard';
 import { Globe, Clock, Wallet, TrendUp as TrendingUp, BellRinging, Briefcase, Heartbeat, Sparkle, CaretRight as ChevronRight, Check, PaintBrush } from '@phosphor-icons/react';
 
@@ -111,17 +112,7 @@ export function OnboardingClient() {
           const { categoryQueries } = await import('@/services/activity/categoryQueries');
           const existing = await categoryQueries.getCategories();
           if (!existing || existing.length === 0) {
-            await categoryQueries.seedDefaultCategories([
-              { name: 'Food & Dining', type: 'expense', icon: '🍔', is_default: true, sort_order: 1 },
-              { name: 'Transportation', type: 'expense', icon: '🚗', is_default: true, sort_order: 2 },
-              { name: 'Housing & Utilities', type: 'expense', icon: '🏠', is_default: true, sort_order: 3 },
-              { name: 'Subscriptions', type: 'expense', icon: '💳', is_default: true, sort_order: 4 },
-              { name: 'Shopping', type: 'expense', icon: '🛍️', is_default: true, sort_order: 5 },
-              { name: 'Health & Fitness', type: 'expense', icon: '💪', is_default: true, sort_order: 6 },
-              { name: 'Salary', type: 'income', icon: '💰', is_default: true, sort_order: 1 },
-              { name: 'Freelance', type: 'income', icon: '💻', is_default: true, sort_order: 2 },
-              { name: 'Investments', type: 'income', icon: '📈', is_default: true, sort_order: 3 },
-            ]);
+            await categoryQueries.seedDefaultCategories(DEFAULT_FINANCE_CATEGORIES);
           }
         } catch (err) {
           console.error('Failed to seed categories:', err);

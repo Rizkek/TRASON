@@ -26,7 +26,7 @@ export function SpendingTrend({ spendingLeaks, currency, locale }: Props) {
         <h3 className="text-[10px] md:text-xs font-bold text-gray-light tracking-widest uppercase">
           Tren Pengeluaran
         </h3>
-        <span className="text-[9px] text-gray-light">vs bulan lalu</span>
+        <span className="text-[9px] text-gray-light">{t('finance.trend.vsLastMonth')}</span>
       </div>
       <div className="space-y-sm">
         {items.map((item) => {

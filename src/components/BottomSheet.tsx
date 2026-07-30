@@ -68,7 +68,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
             w-full md:max-w-lg md:rounded-md rounded-t-xl 
             max-h-[90dvh] md:max-h-[85dvh] flex flex-col pointer-events-auto 
             animate-slide-up-sheet md:animate-slide-up relative
-            pb-[env(safe-area-inset-bottom)]"
+            pb-[env(safe-area-inset-bottom)] overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Mobile pull indicator */}
@@ -110,7 +110,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           )}
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto px-xl py-xl">{children}</div>
+          <div className="flex-1 overflow-y-auto min-h-0 px-xl py-xl">{children}</div>
 
           {/* Footer */}
           {footer && (

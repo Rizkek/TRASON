@@ -20,15 +20,33 @@ export function useTranslation() {
   // Simple key dot-notation resolver (e.g. 'nav.dashboard')
   const t = (key: string): string => {
     const keys = key.split('.');
-    let value: any = dict;
     
+    // First try the requested language dictionary
+    let value: any = dict;
     for (const k of keys) {
       if (value === undefined) break;
       value = value[k as keyof typeof value];
     }
     
+    // If not found, try the English fallback dictionary
+    if (typeof value !== 'string') {
+      let fallbackValue: any = en;
+      for (const k of keys) {
+        if (fallbackValue === undefined) break;
+        fallbackValue = fallbackValue[k as keyof typeof fallbackValue];
+      }
+      
+      if (typeof fallbackValue === 'string') {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[i18n] Missing key "${key}" for language "${language}". Using English fallback.`);
+        }
+        return fallbackValue;
+      }
+    }
+    
+    // If still not found, return the key string
     if (process.env.NODE_ENV === 'development' && typeof value !== 'string') {
-      console.warn(`[i18n] Missing key "${key}" for language "${language}"`);
+      console.warn(`[i18n] Missing key "${key}" completely.`);
     }
 
     return typeof value === 'string' ? value : key;

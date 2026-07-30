@@ -35,6 +35,7 @@ module.exports = {
         brand: ['var(--font-brand)', 'serif'],
         display: ['var(--font-display)', 'sans-serif'],
         sans: ['var(--font-sans)', 'sans-serif'],
+        mono: ['var(--font-mono)', 'monospace'],
       },
       fontSize: {
         // Legacy (to be deprecated)

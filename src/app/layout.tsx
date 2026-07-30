@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Plus_Jakarta_Sans, Cormorant_Garamond } from 'next/font/google';
+import { Geist, Geist_Mono, Plus_Jakarta_Sans, Instrument_Serif } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -8,18 +8,19 @@ import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import NextTopLoader from 'nextjs-toploader';
 
 const sans = Geist({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
+const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' });
 const display = Plus_Jakarta_Sans({ 
   subsets: ['latin'], 
   variable: '--font-display', 
   display: 'swap',
 });
-const brand = Cormorant_Garamond({
+const brand = Instrument_Serif({
+  weight: '400',
+  style: 'italic',
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
   variable: '--font-brand',
   display: 'swap',
 });
-
 const BASE_URL = 'https://www.trason.web.id';
 
 export const metadata: Metadata = {
@@ -201,9 +202,24 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const prefs = localStorage.getItem('user-preferences');
+                if (prefs) {
+                  const parsed = JSON.parse(prefs);
+                  if (parsed.state && parsed.state.language) {
+                    document.documentElement.lang = parsed.state.language;
+                  }
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
       </head>
       <body
-        className={`${sans.variable} ${display.variable} ${brand.variable} font-sans`}
+        className={`${sans.variable} ${mono.variable} ${display.variable} ${brand.variable} font-sans`}
         suppressHydrationWarning
       >
         <ErrorBoundary>

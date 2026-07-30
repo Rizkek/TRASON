@@ -282,7 +282,7 @@ export function SubscriptionsClient() {
         <div className="space-y-xl">
           <Input
             label="SERVICE NAME"
-            placeholder="Netflix, Spotify, AWS..."
+            placeholder={t('finance.subs_placeholder')}
             value={form.name}
             onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
           />
@@ -296,7 +296,7 @@ export function SubscriptionsClient() {
               onChange={(e) => setForm(f => ({ ...f, amount: e.target.value }))}
             />
             <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">CURRENCY</label>
+              <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.currency_label')}</label>
               <select
                 value={form.currency}
                 onChange={(e) => setForm(f => ({ ...f, currency: e.target.value }))}
@@ -311,7 +311,7 @@ export function SubscriptionsClient() {
 
           <div className="grid grid-cols-2 gap-md">
             <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">BILLING CYCLE</label>
+              <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.billing_cycle_label')}</label>
               <select
                 value={form.billing_cycle}
                 onChange={(e) => setForm(f => ({ ...f, billing_cycle: e.target.value as any }))}
@@ -323,7 +323,7 @@ export function SubscriptionsClient() {
               </select>
             </div>
             <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">NEXT BILLING DATE</label>
+              <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.next_billing_label')}</label>
               <input 
                 type="date" 
                 value={form.next_billing_date}
@@ -355,7 +355,7 @@ export function SubscriptionsClient() {
           </div>
 
           <div className="space-y-sm">
-            <label className="text-[10px] font-bold text-gray-light tracking-widest block">NOTES</label>
+            <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.notes_label')}</label>
             <textarea
               placeholder="Context or tags..."
               rows={2}

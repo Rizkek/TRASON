@@ -118,7 +118,7 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
               <Wallet size={20} />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-soft-cream">Global Monthly Budget</h4>
+              <h4 className="text-sm font-bold text-soft-cream">{t('finance.budget.globalMonthly')}</h4>
               <p className="text-xs text-gray-light mt-1">
                 Batas maksimal seluruh pengeluaran Anda dalam 1 bulan.
               </p>
@@ -127,7 +127,7 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
           <Input
             label={`TARGET TOTAL BULANAN (${currency})`}
             type="number"
-            placeholder="Misal: 5000000"
+            placeholder={t('finance.budget.globalPlaceholder')}
             value={globalAmount}
             onChange={(e) => setGlobalAmount(e.target.value)}
           />
@@ -139,7 +139,7 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
         <div className="space-y-md">
           <div className="flex items-center gap-sm mb-sm">
             <Target size={18} className="text-secondary" />
-            <h4 className="text-sm font-bold text-soft-cream">Predictive Category Blueprint</h4>
+            <h4 className="text-sm font-bold text-soft-cream">{t('finance.budget.predictiveBlueprint')}</h4>
           </div>
           <p className="text-xs text-gray-light">
             Biarkan sistem memantau otomatis. Tetapkan batas pengeluaran spesifik untuk setiap kategori (Opsional).
@@ -147,7 +147,7 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
           
           <div className="space-y-sm mt-md max-h-[40vh] overflow-y-auto pr-sm custom-scrollbar">
             {categories.length === 0 ? (
-              <p className="text-xs text-center text-gray-light py-md">Belum ada kategori pengeluaran.</p>
+              <p className="text-xs text-center text-gray-light py-md">{t('finance.budget.noCategories')}</p>
             ) : (
               categories.map(cat => (
                 <div key={cat.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-sm bg-black/[0.02] dark:bg-white/[0.02] p-sm rounded-lg border border-black/5 dark:border-white/5">
@@ -160,7 +160,7 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
                   <div className="w-full sm:w-[150px]">
                     <Input
                       type="number"
-                      placeholder="Target (Opsional)"
+                      placeholder={t('finance.budget.targetPlaceholder')}
                       value={categoryAmounts[cat.id] || ''}
                       onChange={(e) => handleCategoryChange(cat.id, e.target.value)}
                       className="text-right"

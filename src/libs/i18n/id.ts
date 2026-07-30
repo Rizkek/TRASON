@@ -5,7 +5,7 @@ export const id = {
     investments: 'Investasi',
     timeline: 'Linimasa',
     schedule: 'Jadwal',
-    sport: 'Olahraga',
+    sport: 'Vitalitas',
     career: 'Karier',
     reminders: 'Pengingat',
     insights: 'Wawasan',
@@ -17,7 +17,7 @@ export const id = {
     cancel: 'Batal'
   },
   sport_page: {
-    sport_fitness_title: 'Olahraga & Kebugaran',
+    sport_fitness_title: 'Vitalitas',
     sport_fitness_desc: 'Lacak olahraga Anda, pecahkan rekor pribadi, dan tetap konsisten.',
     quick_log_workout: 'Tambah Latihan Cepat',
     this_week: 'Minggu Ini',
@@ -113,6 +113,16 @@ export const id = {
       interview: 'Wawancara',
       offer: 'Tawaran'
     },
+    stats_labels: {
+      responseRate: 'Tingkat Respon',
+      resp: 'Resp.',
+      interviewRate: 'Tingkat Wawancara',
+      intv: 'Wawn.',
+      offerRate: 'Tingkat Tawaran',
+      offer: 'Tawaran',
+      avgToInterview: 'Rata-rata ke Wawancara',
+      avg: 'Rata-rata'
+    },
     tabs: {
       all: 'Semua',
       active: 'Aktif',
@@ -182,9 +192,12 @@ export const id = {
       lessons_placeholder: 'Apa yang akan Anda lakukan secara berbeda? Apa yang perlu dipelajari?',
       notes: 'Catatan',
       notes_placeholder: 'Konteks tambahan, nama pewawancara, suasana kantor...',
-      remove_entry: 'Hapus Entri',
-      remove_desc: 'Anda yakin ingin menghapus catatan jurnal ini?',
+      remove_entry: 'Hapus Jurnal',
+      remove_desc: 'Apakah Anda yakin ingin menghapus jurnal ini?',
       remove_btn: 'Hapus',
+      empty_journal: 'Tidak ada jurnal',
+      six_months_passed: 'Sudah 6 bulan berlalu. Apakah tesis investasi Anda masih valid? Bagaimana performa aset ini dibanding ekspektasi?',
+      lessons_title: 'Pelajaran Dipetik',
       options: {
         difficulty_easy: 'Mudah',
         difficulty_medium: 'Sedang',
@@ -212,8 +225,7 @@ export const id = {
   },
   reminders_page: {
     title: 'Pengingat',
-    title_highlight: 'Suaka',
-    desc: 'Dorongan lembut untuk perjalanan penuh kesadaran Anda.',
+    desc: 'Tetap kendalikan hal yang penting.',
     new_reminder: 'Pengingat Baru',
     empty_reminders: 'Belum ada pengingat. Mulai dengan menambahkan satu.',
     empty_date: 'Tidak ada jadwal untuk hari ini.',
@@ -239,8 +251,8 @@ export const id = {
       priority: 'Prioritas',
       notify_label: 'Ingatkan Saya',
       notify_help: 'Pilih kapan Anda ingin diingatkan sebelum waktu jatuh tempo',
-      notes_label: 'Catatan taktis',
-      notes_placeholder: 'Detail operasional...',
+      notes_label: 'Catatan',
+      notes_placeholder: 'Tambahkan konteks...',
       notify_options: {
         d2: '2 Hari sebelumnya',
         d1: '1 Hari sebelumnya',
@@ -363,7 +375,7 @@ export const id = {
   },
   finance: {
     title: 'Arus Keuangan',
-    subtitle: 'Kelola sumber daya dan pantau arsitektur Anda',
+    subtitle: 'Uang Anda, lebih jelas.',
     newEntry: 'Entri Baru',
     totalIncome: 'Total pemasukan',
     totalExpense: 'Total pengeluaran',
@@ -379,6 +391,11 @@ export const id = {
     service: 'Layanan',
     nextBilling: 'Tagihan Berikutnya',
     cycle: 'Siklus',
+    currency_label: 'MATA UANG',
+    billing_cycle_label: 'SIKLUS TAGIHAN',
+    next_billing_label: 'TANGGAL TAGIHAN BERIKUTNYA',
+    notes_label: 'CATATAN',
+    subs_placeholder: 'Netflix, Spotify, AWS...',
     amount: 'Jumlah',
     markAsPaid: 'Tandai Lunas',
     noSubscriptions: 'Belum ada langganan',
@@ -403,11 +420,50 @@ export const id = {
       saveBtn: 'Simpan',
       savingBtn: 'Proses...',
       deleteConfirmTitle: 'Hapus Transaksi',
-      deleteConfirmDesc: 'Apakah Anda yakin ingin menghapus transaksi ini?',
+      deleteConfirmDesc: 'Apakah Anda yakin ingin menghapus catatan keuangan ini?',
+      title: 'JUDUL',
+      titlePlaceholder: 'Kopi, Langganan, Freelance...',
+      amount: 'JUMLAH',
+      date: 'TANGGAL',
+      category: 'KATEGORI',
+      manage: 'Kelola',
+      noCategories: 'Belum ada kategori. Klik ',
+      toAddSome: ' untuk menambahkan.',
+      none: 'Kosong',
+      description: 'DESKRIPSI / CATATAN',
+      descriptionPlaceholder: 'Konteks atau tag...',
+      makeRecurring: 'Jadikan pengeluaran rutin (Langganan)',
+      cycle: 'Siklus:',
+      cycleMonthly: 'Bulan',
+      cycleYearly: 'Tahun',
+      cycleWeekly: 'Minggu',
+      mindfulSpending: '✨ Catatan Evaluasi (Mindful Spending)',
+      expenseNature: 'SIFAT PENGELUARAN',
+      need: 'Kebutuhan',
+      want: 'Keinginan',
+      reason: 'MANFAAT / ALASAN BELI INI',
+      reasonPlaceholder: 'Misal: Self-reward setelah gajian, alat kerja, dll...',
+      deleteBtn: 'HAPUS TRANSAKSI INI',
       type: {
         income: 'Pemasukan',
         expense: 'Pengeluaran'
       }
+    },
+    feed: {
+      empty: 'Belum ada transaksi',
+      category: 'Kategori',
+      notes: 'Catatan',
+      searchPlaceholder: 'Cari transaksi...'
+    },
+    trend: {
+      vsLastMonth: 'vs bulan lalu'
+    },
+    budget: {
+      globalMonthly: 'Global Monthly Budget',
+      predictiveBlueprint: 'Predictive Category Blueprint',
+      noCategories: 'Belum ada kategori pengeluaran.',
+      globalPlaceholder: 'Misal: 5000000',
+      targetPlaceholder: 'Target (Opsional)'
     }
   },
   dashboard: {
@@ -420,13 +476,26 @@ export const id = {
     greeting_morning: 'Selamat Pagi',
     greeting_afternoon: 'Selamat Siang',
     greeting_evening: 'Selamat Malam',
-    overview: 'Tinjauan sistem',
-    quickActions: 'Aksi cepat',
+    overview: 'Hari ini sekilas',
+    quickActions: 'Catat sesuatu',
     financial_analytics: 'Analisis Keuangan',
-    monthly_overview: 'Tinjauan Bulanan',
+    monthly_overview: 'Ringkasan Bulanan',
+    netWorth: {
+      emptyTitle: 'Mulai catat aset Anda',
+      connectBtn: 'Hubungkan Aset',
+      totalWealth: 'Total Kekayaan',
+      title: 'Nilai Bersih',
+      totalAssets: 'Total Aset',
+      totalLiabilities: 'Total Kewajiban'
+    },
     capture_placeholder: 'Catat olahraga, pengeluaran, pengingat, atau pemikiran...',
     capture_btn: 'Catat',
     daily_insight: 'Wawasan Harian',
+    dailyTasks: {
+      title: 'Tugas Harian',
+      subtitle: 'Daftar periksa hari ini',
+      empty: 'Belum ada tugas harian.'
+    },
     default_insight: 'Dasbor Anda menjadi lebih tajam saat Anda mencatat lebih banyak hari ini. Mulai dengan satu sinyal kecil, lalu biarkan polanya muncul.',
     open_insights: 'Wawasan',
     checking_session: 'Memeriksa sesi Anda...',
@@ -490,20 +559,20 @@ export const id = {
     review_pipeline: 'Tinjau pipeline ->'
   },
   auth: {
-    loginTitle: 'Akses TRASON',
-    loginSubtitle: 'Masukkan kredensial Anda untuk melanjutkan',
-    email: 'Alamat email',
-    password: 'Kata sandi',
+    loginTitle: 'Selamat datang kembali.',
+    loginSubtitle: 'Masuk untuk melanjutkan.',
+    email: 'Email',
+    password: 'Kata Sandi',
     loginBtn: 'Masuk',
-    noAccount: 'Belum punya akses?',
-    signupLink: 'Minta Akses',
-    signupTitle: 'Inisialisasi TRASON',
-    signupSubtitle: 'Buat tempat perlindungan digital Anda',
-    firstName: 'Nama depan',
-    lastName: 'Nama belakang',
+    noAccount: 'Belum punya akun?',
+    signupLink: 'Buat akun',
+    signupTitle: 'Buat akun Anda.',
+    signupSubtitle: 'Hanya butuh satu menit.',
+    firstName: 'Nama Depan',
+    lastName: 'Nama Belakang',
     signupBtn: 'Daftar',
-    hasAccount: 'Sudah diinisialisasi?',
-    loginLink: 'Otentikasi'
+    hasAccount: 'Sudah punya akun?',
+    loginLink: 'Masuk'
   },
   common: {
     loading: 'Memuat...',

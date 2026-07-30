@@ -5,7 +5,7 @@ export const en = {
     investments: 'Investments',
     timeline: 'Timeline',
     schedule: 'Schedule',
-    sport: 'Sport',
+    sport: 'Vitality',
     career: 'Career',
     reminders: 'Reminders',
     insights: 'Insights',
@@ -17,7 +17,7 @@ export const en = {
     cancel: 'Cancel'
   },
   sport_page: {
-    sport_fitness_title: 'Sport & Fitness',
+    sport_fitness_title: 'Vitality',
     sport_fitness_desc: 'Track your workouts, smash personal records, and stay consistent.',
     quick_log_workout: 'Quick Add Workout',
     this_week: 'This Week',
@@ -113,6 +113,16 @@ export const en = {
       interview: 'Interview',
       offer: 'Offer'
     },
+    stats_labels: {
+      responseRate: 'Response Rate',
+      resp: 'Resp.',
+      interviewRate: 'Interview Rate',
+      intv: 'Intv.',
+      offerRate: 'Offer Rate',
+      offer: 'Offer',
+      avgToInterview: 'Avg. to Interview',
+      avg: 'Avg.'
+    },
     tabs: {
       all: 'All',
       active: 'Active',
@@ -185,6 +195,9 @@ export const en = {
       remove_entry: 'Remove Entry',
       remove_desc: 'Are you sure you want to remove this journal entry?',
       remove_btn: 'Remove',
+      empty_journal: 'No journal entries',
+      six_months_passed: '6 months have passed. Is your investment thesis still valid? How is the asset performing against expectations?',
+      lessons_title: 'Lessons Learned',
       options: {
         difficulty_easy: 'Easy',
         difficulty_medium: 'Medium',
@@ -211,9 +224,8 @@ export const en = {
     delete_insight: 'Delete Insight',
   },
   reminders_page: {
-    title: 'Sanctuary',
-    title_highlight: 'Reminders',
-    desc: 'Gentle nudges for your mindful journey.',
+    title: 'Reminders',
+    desc: 'Stay on top of what matters.',
     new_reminder: 'New Reminder',
     empty_reminders: 'No reminders yet. Start by adding one.',
     empty_date: 'Nothing scheduled for this day.',
@@ -239,8 +251,8 @@ export const en = {
       priority: 'Priority',
       notify_label: 'Notify me',
       notify_help: 'Choose when you want to be reminded before the due time',
-      notes_label: 'Tactical notes',
-      notes_placeholder: 'Operational details...',
+      notes_label: 'Notes',
+      notes_placeholder: 'Add context...',
       notify_options: {
         d2: '2 Days before',
         d1: '1 Day before',
@@ -363,7 +375,7 @@ export const en = {
   },
   finance: {
     title: 'Financial Flow',
-    subtitle: 'Audit your resources and track capital architecture',
+    subtitle: 'Your money, clearly.',
     newEntry: 'Add Transaction',
     totalIncome: 'Inflow',
     totalExpense: 'Outflow',
@@ -379,6 +391,11 @@ export const en = {
     service: 'Service',
     nextBilling: 'Next Billing',
     cycle: 'Cycle',
+    currency_label: 'CURRENCY',
+    billing_cycle_label: 'BILLING CYCLE',
+    next_billing_label: 'NEXT BILLING DATE',
+    notes_label: 'NOTES',
+    subs_placeholder: 'Netflix, Spotify, AWS...',
     amount: 'Amount',
     markAsPaid: 'Mark as Paid',
     noSubscriptions: 'No subscriptions yet',
@@ -404,10 +421,49 @@ export const en = {
       savingBtn: 'Saving...',
       deleteConfirmTitle: 'Remove Entry',
       deleteConfirmDesc: 'Are you sure you want to remove this financial record?',
+      title: 'TITLE',
+      titlePlaceholder: 'Coffee, Subscription, Freelance...',
+      amount: 'AMOUNT',
+      date: 'DATE',
+      category: 'CATEGORY',
+      manage: 'Manage',
+      noCategories: 'No categories yet. Click ',
+      toAddSome: ' to add some.',
+      none: 'None',
+      description: 'DESCRIPTION / NOTES',
+      descriptionPlaceholder: 'Context or tags...',
+      makeRecurring: 'Make this a recurring expense (Subscription)',
+      cycle: 'Cycle:',
+      cycleMonthly: 'Month',
+      cycleYearly: 'Year',
+      cycleWeekly: 'Week',
+      mindfulSpending: '✨ Mindful Spending Notes',
+      expenseNature: 'NATURE OF EXPENSE',
+      need: 'Need',
+      want: 'Want',
+      reason: 'BENEFIT / REASON FOR PURCHASE',
+      reasonPlaceholder: 'e.g., Reward after payday, work tool, etc...',
+      deleteBtn: 'DELETE THIS TRANSACTION',
       type: {
         income: 'Income',
         expense: 'Expense'
       }
+    },
+    feed: {
+      empty: 'No transactions yet',
+      category: 'Category',
+      notes: 'Notes',
+      searchPlaceholder: 'Search transactions...'
+    },
+    trend: {
+      vsLastMonth: 'vs last month'
+    },
+    budget: {
+      globalMonthly: 'Global Monthly Budget',
+      predictiveBlueprint: 'Predictive Category Blueprint',
+      noCategories: 'No expense categories yet.',
+      globalPlaceholder: 'e.g., 5000000',
+      targetPlaceholder: 'Target (Optional)'
     }
   },
   dashboard: {
@@ -420,13 +476,26 @@ export const en = {
     greeting_morning: 'Good Morning',
     greeting_afternoon: 'Good Afternoon',
     greeting_evening: 'Good Evening',
-    overview: 'System overview',
-    quickActions: 'Quick actions',
+    overview: 'Today at a glance',
+    quickActions: 'Log something',
     financial_analytics: 'Financial Analytics',
     monthly_overview: 'Monthly Overview',
+    netWorth: {
+      emptyTitle: 'Start tracking your assets',
+      connectBtn: 'Connect Assets',
+      totalWealth: 'Total Wealth',
+      title: 'Net Worth',
+      totalAssets: 'Total Assets',
+      totalLiabilities: 'Total Liabilities'
+    },
     capture_placeholder: 'Capture a workout, expense, reminder, or thought...',
     capture_btn: 'Capture',
     daily_insight: 'Daily Insight',
+    dailyTasks: {
+      title: 'Daily Tasks',
+      subtitle: "Today's checklist",
+      empty: 'No daily tasks yet.'
+    },
     default_insight: 'Your dashboard gets sharper as you log more of the day. Start with one small signal, then let the pattern emerge.',
     open_insights: 'Insights',
     checking_session: 'Checking your session...',
@@ -490,20 +559,20 @@ export const en = {
     review_pipeline: 'Review pipeline ->'
   },
   auth: {
-    loginTitle: 'Access TRASON',
-    loginSubtitle: 'Authenticate to enter your sanctuary',
+    loginTitle: 'Welcome back.',
+    loginSubtitle: 'Sign in to continue.',
     email: 'Email',
     password: 'Password',
     loginBtn: 'Login',
-    noAccount: 'Need a sanctuary?',
-    signupLink: 'Initialize Here',
-    signupTitle: 'Initialize TRASON',
-    signupSubtitle: 'Commence your digital architecture',
+    noAccount: 'Don\'t have an account?',
+    signupLink: 'Create account',
+    signupTitle: 'Create your account.',
+    signupSubtitle: 'It only takes a minute.',
     firstName: 'First name',
     lastName: 'Last name',
     signupBtn: 'Sign up',
-    hasAccount: 'Already initialized?',
-    loginLink: 'Authenticate'
+    hasAccount: 'Already have an account?',
+    loginLink: 'Sign in'
   },
   common: {
     loading: 'Loading...',

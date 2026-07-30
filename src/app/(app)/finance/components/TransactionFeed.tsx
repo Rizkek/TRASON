@@ -5,6 +5,7 @@ import { Card, Badge, Loading } from '@/components';
 import { MagnifyingGlass as Search, ArrowUpRight, ArrowDownLeft, Calendar, X, PencilSimple as Edit2, Trash as Trash2} from '@phosphor-icons/react';
 import { formatCurrency, formatDate } from '@/libs/format';
 import type { Transaction, CategoryJoin } from '@/types/database';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 
 function resolveCategory(
   categories: CategoryJoin | CategoryJoin[] | null | undefined
@@ -61,6 +62,7 @@ export function TransactionFeed({
   currency,
   locale,
 }: Props) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<Transaction | null>(null);
 
   const filtered = useMemo(
@@ -87,7 +89,7 @@ export function TransactionFeed({
           />
           <input
             type="text"
-            placeholder="Cari transaksi..."
+            placeholder={t('finance.feed.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full pl-2xl pr-md py-sm bg-gray-strong/60 border border-white/[0.06] rounded-lg text-sm focus:border-primary focus:outline-none transition-all"
@@ -129,7 +131,7 @@ export function TransactionFeed({
         ) : groups.length === 0 ? (
           <div className="py-2xl flex flex-col items-center justify-center gap-md opacity-50">
             <div className="text-center">
-              <p className="text-sm font-semibold text-soft-cream">Belum ada transaksi</p>
+              <p className="text-sm font-semibold text-soft-cream">{t('finance.feed.empty')}</p>
               <p className="text-xs text-gray-light mt-xs">
                 {searchQuery || filterType !== 'all'
                   ? 'Coba ubah kata kunci atau filter'
@@ -270,7 +272,7 @@ export function TransactionFeed({
                 <div className="space-y-sm mb-lg">
                   {selectedCat && (
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-light">Kategori</span>
+                      <span className="text-gray-light">{t('finance.feed.category')}</span>
                       <Badge
                         variant={selected.type === 'income' ? 'success' : 'danger'}
                         size="sm"
@@ -281,7 +283,7 @@ export function TransactionFeed({
                   )}
                   {selected.description && (
                     <div className="flex items-start justify-between text-xs gap-md">
-                      <span className="text-gray-light shrink-0">Catatan</span>
+                      <span className="text-gray-light shrink-0">{t('finance.feed.notes')}</span>
                       <span className="text-soft-cream text-right">{selected.description}</span>
                     </div>
                   )}
