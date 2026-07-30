@@ -192,9 +192,12 @@ export const es = {
       lessons_placeholder: '¿Qué harías diferente? ¿Qué estudiar a continuación?',
       notes: 'Notas',
       notes_placeholder: 'Contexto adicional, nombre del entrevistador, ambiente de la oficina...',
-      remove_entry: 'Eliminar Entrada',
-      remove_desc: '¿Estás seguro de que deseas eliminar esta entrada del diario?',
+      remove_entry: 'Eliminar Registro',
+      remove_desc: '¿Estás seguro de que quieres eliminar este registro?',
       remove_btn: 'Eliminar',
+      empty_journal: 'No hay registros',
+      six_months_passed: 'Han pasado 6 meses. ¿Tu tesis de inversión sigue siendo válida? ¿Cómo se está desempeñando el activo según las expectativas?',
+      lessons_title: 'Lecciones Aprendidas',
       options: {
         difficulty_easy: 'Fácil',
         difficulty_medium: 'Medio',
@@ -389,7 +392,12 @@ export const es = {
     service: 'Servicio',
     nextBilling: 'Próxima Facturación',
     cycle: 'Ciclo',
-    amount: 'Cantidad',
+    currency_label: 'MONEDA',
+    billing_cycle_label: 'CICLO DE FACTURACIÓN',
+    next_billing_label: 'PRÓXIMA FECHA DE FACTURACIÓN',
+    notes_label: 'NOTAS',
+    subs_placeholder: 'Netflix, Spotify, AWS...',
+    amount: 'Monto',
     markAsPaid: 'Marcar como Pagado',
     noSubscriptions: 'No hay suscripciones aún',
     trackSubscriptions: 'Haz un seguimiento de tus pagos recurrentes aquí.',
@@ -408,16 +416,55 @@ export const es = {
       actions: 'Acciones'
     },
     modal: {
-      addTitle: 'Añadir Transacción',
+      addTitle: 'Agregar Transacción',
       editTitle: 'Editar Transacción',
       saveBtn: 'Guardar',
       savingBtn: 'Guardando...',
       deleteConfirmTitle: 'Eliminar Transacción',
       deleteConfirmDesc: '¿Estás seguro de que deseas eliminar esta transacción?',
+      title: 'TÍTULO',
+      titlePlaceholder: 'Café, Suscripción, Freelance...',
+      amount: 'CANTIDAD',
+      date: 'FECHA',
+      category: 'CATEGORÍA',
+      manage: 'Gestionar',
+      noCategories: 'Aún no hay categorías. Haz clic en ',
+      toAddSome: ' para agregar algunas.',
+      none: 'Ninguno',
+      description: 'DESCRIPCIÓN / NOTAS',
+      descriptionPlaceholder: 'Contexto o etiquetas...',
+      makeRecurring: 'Hacer que este gasto sea recurrente (Suscripción)',
+      cycle: 'Ciclo:',
+      cycleMonthly: 'Mes',
+      cycleYearly: 'Año',
+      cycleWeekly: 'Semana',
+      mindfulSpending: '✨ Notas de Gasto Consciente',
+      expenseNature: 'NATURALEZA DEL GASTO',
+      need: 'Necesidad',
+      want: 'Deseo',
+      reason: 'BENEFICIO / MOTIVO DE COMPRA',
+      reasonPlaceholder: 'ej., Recompensa después del pago, herramienta de trabajo, etc...',
+      deleteBtn: 'ELIMINAR ESTA TRANSACCIÓN',
       type: {
-        income: 'Ingresos',
-        expense: 'Gastos'
+        income: 'Ingreso',
+        expense: 'Gasto'
       }
+    },
+    feed: {
+      empty: 'No hay transacciones aún',
+      category: 'Categoría',
+      notes: 'Notas',
+      searchPlaceholder: 'Buscar transacciones...'
+    },
+    trend: {
+      vsLastMonth: 'vs el mes pasado'
+    },
+    budget: {
+      globalMonthly: 'Presupuesto Mensual Global',
+      predictiveBlueprint: 'Plan de Categoría Predictivo',
+      noCategories: 'No hay categorías de gastos aún.',
+      globalPlaceholder: 'ej., 5000000',
+      targetPlaceholder: 'Objetivo (Opcional)'
     }
   },
   dashboard: {
@@ -430,14 +477,27 @@ export const es = {
     greeting_morning: 'Buenos días',
     greeting_afternoon: 'Buenas tardes',
     greeting_evening: 'Buenas noches',
-    overview: 'VISIÓN GENERAL',
-    quickActions: 'ACCIONES RÁPIDAS',
+    overview: 'Resumen de hoy',
+    quickActions: 'Registrar algo',
     financial_analytics: 'Análisis Financiero',
     monthly_overview: 'Resumen Mensual',
+    netWorth: {
+      emptyTitle: 'Empieza a rastrear tus activos',
+      connectBtn: 'Conectar Activos',
+      totalWealth: 'Riqueza Total',
+      title: 'Valor Neto',
+      totalAssets: 'Activos Totales',
+      totalLiabilities: 'Pasivos Totales'
+    },
     capture_placeholder: 'Registra un entrenamiento, gasto, recordatorio o pensamiento...',
     capture_btn: 'Registrar',
-    daily_insight: 'Perspectiva Diaria',
-    default_insight: 'Tu panel se vuelve más nítido a medida que registras más de tu día. Comienza con una pequeña señal y deja que surja el patrón.',
+    daily_insight: 'Insight Diario',
+    dailyTasks: {
+      title: 'Tareas Diarias',
+      subtitle: 'Lista de hoy',
+      empty: 'Aún no hay tareas.'
+    },
+    default_insight: 'Tu panel se vuelve más agudo a medida que registras más de tu día. Comienza con una pequeña señal, luego deja que surja el patrón.',
     open_insights: 'Perspectivas',
     checking_session: 'Verificando tu sesión...',
     
