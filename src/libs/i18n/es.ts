@@ -91,6 +91,16 @@ export const es = {
     portfolio_worth: 'Tu cartera actualmente vale {value} en {count} posiciones rastreadas.',
     price_live: 'Precio en vivo, actualizado a las {time}',
     price_not_refreshed: 'El precio aún no se ha actualizado',
+    liquid_property_vehicle: 'Liquid, Property, Vehicle',
+    debt_mortgages: 'Debt & Mortgages',
+    life_goal: 'Life Goal',
+    buy_rationale: 'Buy Rationale',
+    financial_assets: 'Financial Assets',
+    physical_assets: 'Physical Assets',
+    liabilities: 'Liabilities',
+    original_amount: 'Original Amount',
+    remaining_amount: 'Remaining Amount',
+    interest_rate: 'Interest Rate (%)',
     scenario_bullish: 'Escenario alcista',
     scenario_neutral: 'Escenario neutral',
     scenario_bearish: 'Escenario bajista',
@@ -161,6 +171,7 @@ export const es = {
       applied_date: 'FECHA DE APLICACIÓN',
       interview_date: 'Fecha de entrevista',
       location: 'UBICACIÓN',
+      work_scheme: 'Esquema de Trabajo',
       location_placeholder: 'Remoto, Yakarta...',
       salary: 'Rango salarial',
       salary_placeholder: 'Rp 8-12jt / $3-5k',
@@ -169,8 +180,14 @@ export const es = {
       notes_placeholder: 'Notas, contactos, impresiones...',
       options: {
         job: 'Trabajo',
-        internship: 'Pasantía',
-        freelance: 'Freelance',
+        internship: 'Prácticas',
+        freelance: 'Autónomo',
+        full_time: 'Tiempo Completo',
+        part_time: 'Medio Tiempo',
+        contract: 'Contrato',
+        wfo: 'WFO (Presencial)',
+        wfh: 'WFH (Remoto)',
+        hybrid: 'Híbrido',
         low: 'Bajo',
         medium: 'Medio',
         high: 'Alto',
@@ -278,6 +295,15 @@ export const es = {
   timeline_page: {
     title: 'Horario',
     desc: 'Tu ritmo semanal',
+    weekly_log: 'Registro Semanal',
+    daily_checklist: 'Lista de Control Diaria',
+    today_timeline: 'Horario de Hoy',
+    no_activities_today: 'No hay actividades registradas hoy.',
+    done_today: 'Hecho Hoy',
+    resets_midnight: 'Se reinicia a medianoche',
+    add_task_placeholder: 'Añadir un hábito o tarea...',
+    add: 'Añadir',
+    all_done: '¡Todo listo!',
     logs_upper: 'Registros',
     logged_upper: 'Registrado',
     log_activity_btn: 'Añadir Actividad',
@@ -466,7 +492,14 @@ export const es = {
       empty: 'No hay transacciones aún',
       category: 'Categoría',
       notes: 'Notas',
-      searchPlaceholder: 'Buscar transacciones...'
+      searchPlaceholder: 'Buscar transacciones...',
+      today: 'Hoy',
+      yesterday: 'Ayer',
+      transactionHistory: 'Historial de Transacciones',
+      allShown: '· se muestran todas las transacciones ·',
+      filterAll: 'Todo',
+      filterIncome: 'Ingresos',
+      filterExpense: 'Gastos'
     },
     trend: {
       vsLastMonth: 'vs el mes pasado'
@@ -488,7 +521,10 @@ export const es = {
       namePlaceholder: 'ej. Comestibles',
       save: 'Guardar Categoría',
       saving: 'Guardando...'
-    }
+    },
+    activeSubscriptions: 'Suscripciones Activas',
+    servicesCount: 'servicios',
+    allShown: '· todo mostrado ·'
   },
   dashboard: {
     splash: {

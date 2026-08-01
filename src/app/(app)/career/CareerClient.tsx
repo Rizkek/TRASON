@@ -35,7 +35,9 @@ type CareerFormData = {
   applied_date: string;
   interview_date: string;
   location: string;
-  salary_range: string;
+  work_scheme: string;
+  salary_currency: string;
+  salary_amount: string;
   notes: string;
   url: string;
   priority: CareerApplication['priority'];
@@ -44,12 +46,14 @@ type CareerFormData = {
 const defaultForm: CareerFormData = {
   company_name: '',
   role_title: '',
-  application_type: 'job',
+  application_type: 'full_time',
   status: 'applied',
   applied_date: getLocalISODate(),
   interview_date: '',
   location: '',
-  salary_range: '',
+  work_scheme: 'wfo',
+  salary_currency: 'IDR',
+  salary_amount: '',
   notes: '',
   url: '',
   priority: 'medium',
@@ -122,7 +126,12 @@ export default function CareerClient({ initialApplications }: Props) {
     job:        { label: t('career_page.form.options.job'),        icon: <Briefcase size={12} className="inline mr-1" /> },
     internship: { label: t('career_page.form.options.internship'), icon: <GraduationCap size={12} className="inline mr-1" /> },
     freelance:  { label: t('career_page.form.options.freelance'),  icon: <Rocket size={12} className="inline mr-1" /> },
+    full_time:  { label: t('career_page.form.options.full_time'),  icon: <Briefcase size={12} className="inline mr-1" /> },
+    part_time:  { label: t('career_page.form.options.part_time'),  icon: <Clock size={12} className="inline mr-1" /> },
+    contract:   { label: t('career_page.form.options.contract'),   icon: <Briefcase size={12} className="inline mr-1" /> },
   };
+
+  const uniqueRoles = Array.from(new Set(applications.map(a => a.role_title))).filter(Boolean);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) router.push('/login');
@@ -145,6 +154,17 @@ export default function CareerClient({ initialApplications }: Props) {
 
   const openEditModal = useCallback((app: CareerApplication) => {
     setEditingApp(app);
+    let c = 'IDR';
+    let a = '';
+    if (app.salary_range) {
+      const parts = app.salary_range.trim().split(' ');
+      if (parts.length > 1 && /^[A-Z]{2,4}$/i.test(parts[0])) {
+         c = parts[0].toUpperCase();
+         a = parts.slice(1).join(' ');
+      } else {
+         a = app.salary_range;
+      }
+    }
     setForm({
       company_name: app.company_name,
       role_title: app.role_title,
@@ -153,7 +173,9 @@ export default function CareerClient({ initialApplications }: Props) {
       applied_date: app.applied_date,
       interview_date: app.interview_date?.split('T')[0] || '',
       location: app.location || '',
-      salary_range: app.salary_range || '',
+      work_scheme: app.work_scheme || 'wfo',
+      salary_currency: c,
+      salary_amount: a,
       notes: app.notes || '',
       url: app.url || '',
       priority: app.priority,
@@ -202,6 +224,7 @@ export default function CareerClient({ initialApplications }: Props) {
     setIsSaving(true);
     setPageError(null);
     try {
+      const finalSalaryRange = form.salary_amount.trim() ? `${form.salary_currency} ${form.salary_amount.trim()}` : undefined;
       const payload = {
         company_name: form.company_name.trim(),
         role_title: form.role_title.trim(),
@@ -210,7 +233,8 @@ export default function CareerClient({ initialApplications }: Props) {
         applied_date: form.applied_date,
         interview_date: form.interview_date ? new Date(form.interview_date + 'T09:00:00').toISOString() : undefined,
         location: form.location.trim() || undefined,
-        salary_range: form.salary_range.trim() || undefined,
+        work_scheme: form.work_scheme || undefined,
+        salary_range: finalSalaryRange,
         notes: form.notes.trim() || undefined,
         url: form.url.trim() || undefined,
         priority: form.priority,
@@ -684,13 +708,21 @@ export default function CareerClient({ initialApplications }: Props) {
                 error={formErrors.company_name}
                 autoFocus
               />
-              <Input
-                label={t('career_page.form.role')}
-                placeholder={t('career_page.form.role_placeholder')}
-                value={form.role_title}
-                onChange={(e) => setForm((f) => ({ ...f, role_title: e.target.value }))}
-                error={formErrors.role_title}
-              />
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('career_page.form.role')}</label>
+                <input
+                  type="text"
+                  list="role-suggestions"
+                  value={form.role_title}
+                  onChange={(e) => setForm((f) => ({ ...f, role_title: e.target.value }))}
+                  placeholder={t('career_page.form.role_placeholder')}
+                  className={`w-full h-10 bg-gray-strong border ${formErrors.role_title ? 'border-expense' : 'border-black/5 dark:border-white/5'} rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none`}
+                />
+                <datalist id="role-suggestions">
+                  {uniqueRoles.map(r => <option key={r} value={r} />)}
+                </datalist>
+                {formErrors.role_title && <p className="text-expense text-xs mt-1">{formErrors.role_title}</p>}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
@@ -766,19 +798,50 @@ export default function CareerClient({ initialApplications }: Props) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
               <Input
                 label={t('career_page.form.location')}
                 placeholder={t('career_page.form.location_placeholder')}
                 value={form.location}
                 onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
               />
-              <Input
-                label={t('career_page.form.salary')}
-                placeholder={t('career_page.form.salary_placeholder')}
-                value={form.salary_range}
-                onChange={(e) => setForm((f) => ({ ...f, salary_range: e.target.value }))}
-              />
+              <div>
+                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-work-scheme">{t('career_page.form.work_scheme')}</label>
+                <select
+                  id="modal-work-scheme"
+                  value={form.work_scheme}
+                  onChange={(e) => setForm((f) => ({ ...f, work_scheme: e.target.value }))}
+                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                >
+                  <option value="wfo">{t('career_page.form.options.wfo')}</option>
+                  <option value="wfh">{t('career_page.form.options.wfh')}</option>
+                  <option value="hybrid">{t('career_page.form.options.hybrid')}</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('career_page.form.salary')}</label>
+                <div className="flex gap-2">
+                  <select 
+                    value={form.salary_currency} 
+                    onChange={(e) => setForm(f => ({...f, salary_currency: e.target.value}))}
+                    className="w-[80px] h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-xs px-1 text-white focus:border-primary focus:outline-none"
+                  >
+                    <option value="IDR">IDR</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="SGD">SGD</option>
+                    <option value="GBP">GBP</option>
+                    <option value="AUD">AUD</option>
+                  </select>
+                  <input
+                    type="text"
+                    value={form.salary_amount}
+                    onChange={(e) => setForm(f => ({...f, salary_amount: e.target.value}))}
+                    placeholder="10,000,000"
+                    className="flex-1 h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
+                  />
+                </div>
+              </div>
             </div>
 
             <Input

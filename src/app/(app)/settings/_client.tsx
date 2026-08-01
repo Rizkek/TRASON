@@ -804,19 +804,7 @@ export function SettingsClient() {
                   onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
                 />
 
-                <div className="space-y-sm">
-                  <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('settings.profile.bio')}</label>
-                  <textarea
-                    value={profile.bio}
-                    onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
-                    placeholder={t('settings.profile.bioPlaceholder')}
-                    rows={4}
-                    className={`w-full bg-gray-strong/40 border rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none transition-all ${
-                      formErrors.bio ? 'border-danger' : 'border-soft-cream/10'
-                    }`}
-                  />
-                  {formErrors.bio && <p className="text-[10px] text-danger mt-1">{formErrors.bio}</p>}
-                </div>
+
 
                 <div className="flex justify-end pt-md">
                   <Button

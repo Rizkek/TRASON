@@ -8,7 +8,8 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { DEFAULT_FINANCE_CATEGORIES } from '@/libs/defaultCategories';
 import { ModuleSelectionCard } from './components/ModuleSelectionCard';
-import { Globe, Clock, Wallet, TrendUp as TrendingUp, BellRinging, Briefcase, Heartbeat, Sparkle, CaretRight as ChevronRight, Check, PaintBrush } from '@phosphor-icons/react';
+import { Globe, Clock, Wallet, TrendUp as TrendingUp, BellRinging, Briefcase, Heartbeat, Sparkle, CaretRight as ChevronRight, Check, PaintBrush, User as UserIcon } from '@phosphor-icons/react';
+import { supabase } from '@/services/supabaseClient';
 
 const LANGUAGE_OPTIONS = [
   { value: 'en', label: 'English' },
@@ -40,24 +41,29 @@ export function OnboardingClient() {
   const { updatePreferences, isUpdating: prefsLoading, ...preferences } = useUserPreferences();
   const { t } = useTranslation();
 
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Form State
+  const [firstName, setFirstName] = useState(user?.first_name || '');
+  const [lastName, setLastName] = useState(user?.last_name || '');
   const [language, setLanguage] = useState('en');
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC');
   const [currency, setCurrency] = useState('USD');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [selectedModules, setSelectedModules] = useState<Record<string, boolean>>({});
 
+  const initialized = React.useRef(false);
+
   useEffect(() => {
-    if (preferences) {
+    if (!initialized.current && Object.keys(preferences).length > 0) {
       if (preferences.language) setLanguage(preferences.language);
       if (preferences.timezone) setTimezone(preferences.timezone);
       if (preferences.currency) setCurrency(preferences.currency);
       if (preferences.theme) setTheme(preferences.theme as 'dark' | 'light');
       if (preferences.module_features) setSelectedModules(preferences.module_features);
+      initialized.current = true;
     }
   }, [preferences]);
 
@@ -79,6 +85,14 @@ export function OnboardingClient() {
     setIsSubmitting(true);
     setError(null);
     try {
+      // 1. Save Profile Data
+      if (firstName || lastName) {
+        await supabase.auth.updateUser({
+          data: { first_name: firstName, last_name: lastName }
+        });
+      }
+
+      // 2. Save Preferences
       const updatedPrefs = await updatePreferences({
         language,
         timezone,
@@ -99,6 +113,8 @@ export function OnboardingClient() {
         
         setUser({
           ...user,
+          first_name: firstName,
+          last_name: lastName,
           user_preferences: [{
             ...currentUserPrefs,
             ...updatedPrefs
@@ -150,7 +166,9 @@ export function OnboardingClient() {
           </h1>
           <p className="text-gray-light text-sm md:text-base max-w-md mx-auto">
             {step === 1 
-              ? "Let's personalize your digital space. Start by setting your region and language." 
+              ? "Let's set up your persona so TRASON knows what to call you." 
+              : step === 2
+              ? "Let's personalize your digital space. Start by setting your region and language."
               : "Select the modules you want to activate. You can always change this later in settings."}
           </p>
         </div>
@@ -160,11 +178,51 @@ export function OnboardingClient() {
           <div className="absolute top-0 left-0 w-full h-1 bg-black/20">
             <div 
               className="h-full bg-primary transition-all duration-500" 
-              style={{ width: step === 1 ? '50%' : '100%' }} 
+              style={{ width: step === 1 ? '33%' : step === 2 ? '66%' : '100%' }} 
             />
           </div>
 
           {step === 1 && (
+            <div className="space-y-xl animate-fade-in">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                <div className="space-y-md">
+                  <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
+                    <UserIcon size={14} className="text-primary" /> FIRST NAME
+                  </label>
+                  <input
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="E.g. John"
+                    className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-lg text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
+                  />
+                </div>
+                <div className="space-y-md">
+                  <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
+                    LAST NAME
+                  </label>
+                  <input
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="E.g. Doe (Optional)"
+                    className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-lg text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end pt-lg border-t border-white/5">
+                <Button 
+                  variant="primary" 
+                  size="lg" 
+                  onClick={() => setStep(2)}
+                  rightIcon={<ChevronRight size={18} />}
+                  disabled={!firstName.trim()}
+                >
+                  Continue
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
             <div className="space-y-xl animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
                 <div className="space-y-md">
@@ -242,11 +300,19 @@ export function OnboardingClient() {
                 </div>
               </div>
 
-              <div className="flex justify-end pt-lg border-t border-white/5">
+              <div className="flex justify-between pt-lg border-t border-white/5">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={() => setStep(1)}
+                  className="text-gray-light"
+                >
+                  Back
+                </Button>
                 <Button 
                   variant="primary" 
                   size="lg" 
-                  onClick={() => setStep(2)}
+                  onClick={() => setStep(3)}
                   rightIcon={<ChevronRight size={18} />}
                 >
                   Continue
@@ -255,7 +321,7 @@ export function OnboardingClient() {
             </div>
           )}
 
-          {step === 2 && (
+          {step === 3 && (
             <div className="space-y-xl animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-md max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
                 {MODULE_OPTIONS.map((module) => (
@@ -276,7 +342,7 @@ export function OnboardingClient() {
                 <Button 
                   variant="ghost" 
                   size="md" 
-                  onClick={() => setStep(1)}
+                  onClick={() => setStep(2)}
                   className="text-gray-light hover:text-white"
                 >
                   Back

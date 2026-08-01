@@ -12,6 +12,7 @@ export function useTranslation() {
   // Build lookup table inside the function so Webpack HMR correctly picks up
   // changes to any dictionary file. A module-level constant is frozen at
   // import time and won't reflect hot-reloaded dictionary updates.
+  // Force HMR reload
   const dictionaries: Record<string, Dictionary> = { en, id, ja, es };
 
   // Fallback to English if dictionary not found

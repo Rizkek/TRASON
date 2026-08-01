@@ -67,7 +67,7 @@ export async function GET() {
       // 4. Career Applications
       supabase
         .from('career_applications')
-        .select('status, applied_date, salary_min')
+        .select('status, applied_date, salary_range')
         .eq('user_id', user.id)
         .is('deleted_at', null),
 

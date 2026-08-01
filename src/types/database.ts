@@ -432,12 +432,13 @@ export interface CareerApplication {
   user_id: string;
   company_name: string;
   role_title: string;
-  application_type: 'job' | 'internship' | 'freelance';
+  application_type: 'job' | 'internship' | 'freelance' | 'full_time' | 'part_time' | 'contract';
   status: 'applied' | 'reviewing' | 'interview' | 'offer' | 'accepted' | 'rejected' | 'withdrawn';
   applied_date: string;
   interview_date?: string;
   response_deadline?: string;
   location?: string;
+  work_scheme?: 'wfo' | 'wfh' | 'hybrid' | string;
   salary_range?: string;
   notes?: string;
   url?: string;

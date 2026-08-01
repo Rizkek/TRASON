@@ -47,9 +47,22 @@ export const categoryQueries = {
   // Seed default categories
   async seedDefaultCategories(categories: Omit<Category, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>[]) {
     return withAuthQuery(async (userId) => {
+      // First, get existing categories for this user
+      const { data: existing } = await supabase
+        .from('categories')
+        .select('name')
+        .eq('user_id', userId);
+      
+      const existingNames = new Set(existing?.map(c => c.name) || []);
+      const toInsert = categories
+        .filter(c => !existingNames.has(c.name))
+        .map(c => ({ ...c, user_id: userId }));
+
+      if (toInsert.length === 0) return [];
+
       const { data, error } = await supabase
         .from('categories')
-        .insert(categories.map(c => ({ ...c, user_id: userId })))
+        .insert(toInsert)
         .select();
       if (error) throw error;
       return data;
