@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useCareer } from '@/hooks/useCareer';
 import { useCareerAnalytics } from '@/hooks/useCareerAnalytics';
 import { CareerApplication } from '@/types/database';
+import { ATSMatcher } from './components/ATSMatcher';
 import { getLocalISODate } from '@/libs/format';
 import { sanitizeError } from '@/libs/validation';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -86,7 +87,7 @@ export default function CareerClient({ initialApplications }: Props) {
   const [isSaving, setIsSaving] = useState(false);
   const [pageError, setPageError] = useState<string | null>(null);
 
-  const [mainTab, setMainTab] = useState<'applications' | 'journal'>('applications');
+  const [mainTab, setMainTab] = useState<'applications' | 'journal' | 'ats_matcher'>('applications');
 
   const { journals, isLoading: journalLoading, createJournal, updateJournal, deleteJournal } = useInterviewJournal();
   const [isJournalModalOpen, setIsJournalModalOpen] = useState(false);
@@ -311,7 +312,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 <Plus size={18} className="mr-2" />
                 {mainTab === 'applications' 
                   ? t('career_page.new_application') 
-                  : (t('career_page.interview_journal.new_entry') as string) || 'New Entry'}
+                  : t('career_page.interview_journal.new_entry')}
               </Button>
             </div>
           </div>
@@ -397,7 +398,17 @@ export default function CareerClient({ initialApplications }: Props) {
                   : 'text-gray-light hover:text-soft-cream'
               }`}
             >
-              {(t('career_page.interview_journal.tab') as string) || 'Journal'}
+              {t('career_page.interview_journal.tab')}
+            </button>
+            <button
+              onClick={() => setMainTab('ats_matcher')}
+              className={`px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                mainTab === 'ats_matcher'
+                  ? 'bg-warm-gold text-warm-black shadow-md'
+                  : 'text-gray-light hover:text-soft-cream'
+              }`}
+            >
+              {t('career_page.ats_matcher.title')}
             </button>
           </div>
 
@@ -533,7 +544,7 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
           )}
           </>
-          ) : (
+          ) : mainTab === 'journal' ? (
           <>
             {/* Journal UI */}
             {journalLoading ? (
@@ -631,7 +642,9 @@ export default function CareerClient({ initialApplications }: Props) {
               </div>
             )}
           </>
-          )}
+          ) : mainTab === 'ats_matcher' ? (
+            <ATSMatcher />
+          ) : null}
         </div>
 
         {/* Mobile-only FAB for New Entry */}

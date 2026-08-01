@@ -10,8 +10,7 @@ import { validateActivity, sanitizeError } from '@/libs/validation';
 import { Activity } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Plus, Trash as Trash2, Clock, Tag, Smiley, MapPin, Star, Heartbeat as ActivityIcon, CheckSquare, Square, ListChecks, Calendar, ArrowCounterClockwise, ProjectorScreenChart } from '@phosphor-icons/react';
-import { LifeEventsFeed } from './components/LifeEventsFeed';
+import { Plus, Trash as Trash2, Clock, Tag, Smiley, MapPin, Star, Heartbeat as ActivityIcon, CheckSquare, Square, ListChecks, Calendar, ArrowCounterClockwise, ProjectorScreenChart, CaretLeft, CaretRight } from '@phosphor-icons/react';
 
 
 const MOOD_OPTIONS = [
@@ -123,7 +122,11 @@ export function TimelineClient() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // Daily checklist tab
-  const [activeTab, setActiveTab] = useState<'weekly-log' | 'daily-checklist' | 'life-events'>('weekly-log');
+  const [activeTab, setActiveTab] = useState<'weekly-log' | 'daily-checklist'>('weekly-log');
+  const [mobileDayIdx, setMobileDayIdx] = useState<number>(() => {
+    const d = new Date().getDay();
+    return d === 0 ? 6 : d - 1;
+  });
   const { tasks, isLoading: isTasksLoading, completedCount, totalCount, createTask, toggleTask, deleteTask } = useDailyTasks();
   const [newTaskInput, setNewTaskInput] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
@@ -381,7 +384,7 @@ export function TimelineClient() {
                 <div className="flex items-center gap-sm">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-gradient">{completedCount}<span className="text-gray-light opacity-50 text-lg">/{totalCount}</span></p>
-                    <p className="text-[10px] text-gray-light uppercase tracking-widest">Done Today</p>
+                    <p className="text-[10px] text-gray-light uppercase tracking-widest">{t('timeline_page.done_today')}</p>
                   </div>
                 </div>
               )}
@@ -405,7 +408,7 @@ export function TimelineClient() {
                 }`}
               >
                 <Calendar size={14} />
-                Weekly Log
+                {t('timeline_page.weekly_log')}
               </button>
             )}
             {module_features?.['timeline_daily_checklist'] !== false && (
@@ -418,7 +421,7 @@ export function TimelineClient() {
                 }`}
               >
                 <ListChecks size={14} />
-                Daily Checklist
+                {t('timeline_page.daily_checklist')}
                 {totalCount > 0 && (
                   <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
                     completedCount === totalCount ? 'bg-income/20 text-income' : 'bg-black/10 dark:bg-white/10 text-gray-light'
@@ -428,23 +431,7 @@ export function TimelineClient() {
                 )}
               </button>
             )}
-            <button
-              onClick={() => setActiveTab('life-events')}
-              className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === 'life-events'
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'text-gray-light hover:text-soft-cream'
-              }`}
-            >
-              <ProjectorScreenChart size={14} />
-              Life Timeline
-            </button>
           </div>
-
-          {/* Daily Checklist Panel */}
-          {activeTab === 'life-events' && (
-            <LifeEventsFeed />
-          )}
 
           {/* Daily Checklist Panel */}
           {activeTab === 'daily-checklist' && module_features?.['timeline_daily_checklist'] !== false && (
@@ -465,14 +452,14 @@ export function TimelineClient() {
                         />
                       </div>
                       <span className="text-[10px] text-gray-light">
-                        {completedCount === totalCount && totalCount > 0 ? 'ðŸŽ‰ All done!' : `${completedCount} of ${totalCount}`}
+                        {completedCount === totalCount && totalCount > 0 ? `🎉 ${t('timeline_page.all_done')}` : `${completedCount} of ${totalCount}`}
                       </span>
                     </div>
                   )}
                 </div>
                 <div className="flex items-center gap-sm text-[9px] text-gray-light opacity-50">
                   <ArrowCounterClockwise size={11} />
-                  Resets midnight
+                  {t('timeline_page.resets_midnight')}
                 </div>
               </div>
 
@@ -499,7 +486,7 @@ export function TimelineClient() {
                   <input
                     value={newTaskInput}
                     onChange={(e) => setNewTaskInput(e.target.value)}
-                    placeholder="Add a task to repeat daily... (e.g. Morning workout, Read 20 pages)"
+                    placeholder={t('timeline_page.add_task_placeholder')}
                     disabled={isAddingTask}
                     className="flex-1 bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md px-lg py-sm text-sm text-soft-cream placeholder-gray-light/40 focus:border-primary focus:outline-none transition-all disabled:opacity-50"
                   />
@@ -509,7 +496,7 @@ export function TimelineClient() {
                     className="flex items-center gap-sm px-lg py-sm bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary rounded-md text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     <Plus size={14} />
-                    Add
+                    {t('timeline_page.add')}
                   </button>
                 </form>
                 {taskError && <p className="text-[11px] text-expense mt-sm">{taskError}</p>}
@@ -525,10 +512,10 @@ export function TimelineClient() {
                   <div className="flex flex-col items-center py-3xl gap-md text-center px-xl">
                     <ListChecks size={40} className="text-gray-light opacity-20" />
                     <p className="text-sm text-gray-light opacity-60 font-light italic">
-                      No tasks yet. Add something you want to do every day.
+                      {t('dailyTasks.empty')}
                     </p>
                     <p className="text-[10px] text-gray-light opacity-40">
-                      Tasks reset automatically at midnight â€” perfect for daily habits.
+                      {t('timeline_page.resets_midnight')}
                     </p>
                   </div>
                 ) : (
@@ -729,46 +716,63 @@ export function TimelineClient() {
               {/* Mobile Day View */}
               <div className="md:hidden p-md space-y-md min-h-[50vh]">
                 <div className="flex items-center justify-between border-b border-black/[0.05] dark:border-white/[0.05] pb-2 mb-md">
-                  <h3 className="font-bold text-soft-cream uppercase tracking-widest text-sm">
-                    Today's Timeline
+                  <button
+                    onClick={() => setMobileDayIdx((p) => (p > 0 ? p - 1 : 6))}
+                    className="p-1 hover:bg-black/5 rounded-full"
+                  >
+                    <CaretLeft size={20} />
+                  </button>
+                  <h3 className="font-bold text-soft-cream uppercase tracking-widest text-sm flex-1 text-center">
+                    {daysOfWeek[mobileDayIdx].toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })}
                   </h3>
-                  <button onClick={() => openAddModal()} className="text-primary hover:text-primary-light p-1">
-                    <Plus size={16} />
+                  <button
+                    onClick={() => setMobileDayIdx((p) => (p < 6 ? p + 1 : 0))}
+                    className="p-1 hover:bg-black/5 rounded-full"
+                  >
+                    <CaretRight size={20} />
                   </button>
                 </div>
                 {(() => {
-                  const todayDay = new Date().getDay();
-                  const todayIdx = todayDay === 0 ? 6 : todayDay - 1;
-                  const todaysActivities = grid[todayIdx] ? HOURS.flatMap(h => grid[todayIdx][h] || []) : [];
+                  const todaysActivities = grid[mobileDayIdx] ? HOURS.flatMap(h => grid[mobileDayIdx][h] || []) : [];
                   
                   if (todaysActivities.length === 0) {
                     return (
                       <div className="text-center py-xl space-y-sm">
-                        <p className="text-gray-light italic text-xs">No activities logged for today.</p>
+                        <p className="text-gray-light italic text-xs">{t('timeline_page.no_activities_today')}</p>
+                        <button onClick={() => openAddModal()} className="text-primary hover:text-primary-light flex items-center gap-1 text-sm mx-auto mt-4">
+                          <Plus size={16} /> {t('timeline_page.log_activity_btn')}
+                        </button>
                       </div>
                     );
                   }
 
-                  return todaysActivities.map(act => (
-                    <div key={act.id} onClick={() => openEditModal(act)} className="glass-card p-sm flex items-start gap-md active:bg-black/10 transition-colors">
-                      <div className="text-[10px] font-bold text-gray-light w-10 text-right pt-0.5">
-                        {formatHour(new Date(act.start_time).getHours())}
-                      </div>
-                      <div className="flex-1 border-l-2 border-primary pl-md relative group">
-                        <p className="font-bold text-sm text-soft-cream">{act.title}</p>
-                        <div className="flex flex-wrap gap-2 text-[8px] text-gray-light uppercase tracking-widest mt-1">
-                          {act.category && <span className="text-primary">{act.category}</span>}
-                          {getDurationLabel(act) && <span>• {getDurationLabel(act)}</span>}
+                  return (
+                    <>
+                      {todaysActivities.map(act => (
+                        <div key={act.id} onClick={() => openEditModal(act)} className="glass-card p-sm flex items-start gap-md active:bg-black/10 transition-colors">
+                          <div className="text-[10px] font-bold text-gray-light w-10 text-right pt-0.5 shrink-0">
+                            {formatHour(new Date(act.start_time).getHours())}
+                          </div>
+                          <div className="flex-1 border-l-2 border-primary pl-md relative group min-w-0">
+                            <p className="font-bold text-sm text-soft-cream truncate">{act.title}</p>
+                            <div className="flex flex-wrap gap-2 text-[8px] text-gray-light uppercase tracking-widest mt-1">
+                              {act.category && <span className="text-primary shrink-0">{act.category}</span>}
+                              {getDurationLabel(act) && <span className="shrink-0">• {getDurationLabel(act)}</span>}
+                            </div>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(act.id); }}
+                              className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 text-gray-light hover:text-expense transition-opacity"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
                         </div>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(act.id); }}
-                          className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 text-gray-light hover:text-expense transition-opacity"
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    </div>
-                  ));
+                      ))}
+                      <button onClick={() => openAddModal()} className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-white/10 hover:border-primary/50 text-gray-light hover:text-primary rounded-lg transition-colors text-xs font-bold uppercase tracking-widest mt-4">
+                        <Plus size={14} /> {t('timeline_page.log_activity_btn')}
+                      </button>
+                    </>
+                  );
                 })()}
               </div>
             </div>

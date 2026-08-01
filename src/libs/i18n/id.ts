@@ -73,7 +73,7 @@ export const id = {
     update_position_upper: 'Perbarui',
     save_position_upper: 'Simpan',
     asset_type: 'Tipe Aset',
-    symbol: 'Simbol',
+    symbol: 'Ticker / Kode Aset',
     display_name: 'Nama tampilan',
     buy_date: 'Tanggal beli',
     amount_upper: 'Jumlah',
@@ -91,6 +91,16 @@ export const id = {
     portfolio_worth: 'Portofolio Anda saat ini bernilai {value} di {count} posisi yang dilacak.',
     price_live: 'Harga live, diperbarui {time}',
     price_not_refreshed: 'Harga belum diperbarui',
+    liquid_property_vehicle: 'Kas, Properti, Kendaraan',
+    debt_mortgages: 'Utang & KPR',
+    life_goal: 'Target Hidup',
+    buy_rationale: 'Tujuan & Alasan Beli',
+    financial_assets: 'Aset Finansial',
+    physical_assets: 'Aset Fisik',
+    liabilities: 'Liabilitas',
+    original_amount: 'Nominal Asli',
+    remaining_amount: 'Sisa Nominal',
+    interest_rate: 'Suku Bunga (%)',
     scenario_bullish: 'Skenario bullish',
     scenario_neutral: 'Skenario netral',
     scenario_bearish: 'Skenario bearish',
@@ -128,6 +138,18 @@ export const id = {
       active: 'Aktif',
       interview: 'Wawancara',
       closed: 'Tutup'
+    },
+    ats_matcher: {
+      title: 'ATS Resume Matcher',
+      desc: 'Tempel Job Description dan CV Anda untuk mengecek skor kecocokan.',
+      jd_label: 'Job Description (Lowongan)',
+      jd_placeholder: 'Tempel kualifikasi dan deskripsi pekerjaan di sini...',
+      cv_label: 'Resume / CV Anda',
+      cv_placeholder: 'Tempel isi teks CV Anda di sini...',
+      analyze_btn: 'Analisis Kecocokan',
+      score_title: 'Skor Kecocokan (Match Score)',
+      matched_keywords: 'Kata Kunci Cocok',
+      missing_keywords: 'Kata Kunci Kurang (Missing)',
     },
     empty_all: 'Belum ada lamaran. Mulai lacak pencarian kerjamu.',
     empty_filter: 'Tidak ada lamaran {filter}.',
@@ -175,11 +197,11 @@ export const id = {
     remove_desc: 'Anda yakin ingin menghapus lamaran pekerjaan ini? Tindakan ini tidak dapat dibatalkan.',
     remove_btn: 'Hapus',
     interview_journal: {
-      tab: 'Jurnal',
-      new_entry: 'Entri Baru',
+      tab: 'Catatan Wawancara',
+      new_entry: 'Tambah Catatan',
       empty: 'Belum ada catatan wawancara. Setiap wawancara adalah kesempatan belajar.',
       edit_entry: 'Ubah Entri',
-      new_entry_modal: 'Jurnal Wawancara',
+      new_entry_modal: 'Catatan Wawancara',
       save: 'Simpan',
       company: 'Perusahaan',
       role: 'Peran',
@@ -265,6 +287,15 @@ export const id = {
   timeline_page: {
     title: 'Jadwal',
     desc: 'Irama mingguan Anda',
+    weekly_log: 'Log Mingguan',
+    daily_checklist: 'Tugas Harian',
+    today_timeline: 'Jadwal Hari Ini',
+    no_activities_today: 'Tidak ada aktivitas untuk hari ini.',
+    done_today: 'Selesai Hari Ini',
+    resets_midnight: 'Direset tengah malam',
+    add_task_placeholder: 'Tambah kebiasaan atau tugas harian...',
+    add: 'Tambah',
+    all_done: 'Selesai semua!',
     logs_upper: 'Log',
     logged_upper: 'Dicatat',
     log_activity_btn: 'Tambah Aktivitas',
@@ -453,7 +484,14 @@ export const id = {
       empty: 'Belum ada transaksi',
       category: 'Kategori',
       notes: 'Catatan',
-      searchPlaceholder: 'Cari transaksi...'
+      searchPlaceholder: 'Cari transaksi...',
+      today: 'Hari Ini',
+      yesterday: 'Kemarin',
+      transactionHistory: 'Riwayat Transaksi',
+      allShown: '· semua transaksi ditampilkan ·',
+      filterAll: 'Semua',
+      filterIncome: 'Pemasukan',
+      filterExpense: 'Pengeluaran'
     },
     trend: {
       vsLastMonth: 'vs bulan lalu'
@@ -475,7 +513,10 @@ export const id = {
       namePlaceholder: 'mis. Groceries',
       save: 'Simpan Kategori',
       saving: 'Menyimpan...'
-    }
+    },
+    activeSubscriptions: 'Langganan Aktif',
+    servicesCount: 'layanan',
+    allShown: '· semua ditampilkan ·'
   },
   dashboard: {
     splash: {

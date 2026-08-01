@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon } from '@/components';
@@ -9,9 +9,11 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useCategory } from '@/hooks/useCategory';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import { Plus, ArrowLeft, CreditCard, DotsThreeVertical as MoreVertical, Calendar, Sparkle, Repeat } from '@phosphor-icons/react';
+import { Plus, ArrowLeft, CreditCard, DotsThreeVertical as MoreVertical, Calendar, Info, Repeat } from '@phosphor-icons/react';
 import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
 import { Subscription } from '@/types/database';
+
+const SUB_PAGE_SIZE = 5;
 
 export function SubscriptionsClient() {
   const router = useRouter();
@@ -28,6 +30,8 @@ export function SubscriptionsClient() {
   const [editingSub, setEditingSub] = useState<Subscription | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(SUB_PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   
   const [form, setForm] = useState({
     name: '',
@@ -129,6 +133,24 @@ export function SubscriptionsClient() {
     return sum + monthlyAmount;
   }, 0);
 
+  const hasMore = visibleCount < subscriptions.length;
+  const visibleSubs = subscriptions.slice(0, visibleCount);
+
+  const loadMore = useCallback(() => {
+    setVisibleCount((prev) => Math.min(prev + SUB_PAGE_SIZE, subscriptions.length));
+  }, [subscriptions.length]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !hasMore) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) loadMore(); },
+      { rootMargin: '100px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, loadMore]);
+
   if (authLoading) {
     return (
       <Layout>
@@ -174,7 +196,8 @@ export function SubscriptionsClient() {
           </div>
         </Card>
 
-        <Card className="overflow-hidden border-none shadow-2xl">
+        {/* Desktop table */}
+        <Card className="hidden md:block overflow-hidden border-none shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -242,7 +265,7 @@ export function SubscriptionsClient() {
                   <tr>
                     <td colSpan={4} className="py-2xl text-center">
                       <div className="flex flex-col items-center justify-center opacity-50">
-                        <Sparkle size={32} className="text-gray-light mb-md" />
+                        <Info size={32} className="text-gray-light mb-md" />
                         <p className="text-sm text-soft-cream">{t('finance.noSubscriptions') || 'No subscriptions yet'}</p>
                         <p className="text-xs text-gray-light">{t('finance.trackSubscriptions') || 'Track your recurring payments here.'}</p>
                       </div>
@@ -253,6 +276,79 @@ export function SubscriptionsClient() {
             </table>
           </div>
         </Card>
+
+        {/* Mobile card list with infinite scroll */}
+        <div className="md:hidden">
+          {isSubscriptionsLoading ? (
+            <div className="py-2xl flex justify-center"><Loading /></div>
+          ) : subscriptions.length === 0 ? (
+            <Card className="overflow-hidden">
+              <div className="py-2xl flex flex-col items-center justify-center gap-md opacity-50">
+                <Info size={32} className="text-gray-light" />
+                <p className="text-sm text-soft-cream">{t('finance.noSubscriptions') || 'No subscriptions yet'}</p>
+                <p className="text-xs text-gray-light">{t('finance.trackSubscriptions') || 'Track your recurring payments here.'}</p>
+              </div>
+            </Card>
+          ) : (
+            <Card className="overflow-hidden">
+              <div className="px-md pt-md pb-xs flex items-center justify-between">
+                <h3 className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.activeSubscriptions')}</h3>
+                <span className="text-[9px] text-gray-light">{subscriptions.length} {t('finance.servicesCount')}</span>
+              </div>
+              {visibleSubs.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => openEditModal(s)}
+                  className={`w-full flex items-center gap-md px-md py-sm hover:bg-white/[0.03] active:bg-white/[0.05] transition-colors border-b border-white/[0.03] last:border-0 text-left ${!s.is_active ? 'opacity-50' : ''}`}
+                >
+                  {/* Icon */}
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <CreditCard size={16} />
+                  </div>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-soft-cream truncate">{s.name}</p>
+                    <div className="flex items-center gap-xs mt-[2px]">
+                      <Calendar size={9} className="text-gray-light shrink-0" />
+                      <span className="text-[10px] text-gray-light truncate">
+                        {formatDate(s.next_billing_date)} · <span className="capitalize">{s.billing_cycle}</span>
+                      </span>
+                    </div>
+                  </div>
+                  {/* Amount + paid button */}
+                  <div className="flex flex-col items-end gap-xs shrink-0">
+                    <p className="text-sm font-bold text-soft-cream tabular-nums">
+                      {formatCurrency(s.amount, s.currency, locale)}
+                    </p>
+                    {s.is_active && (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); markAsPaid(s); }}
+                        className="text-[9px] font-bold uppercase tracking-widest text-primary border border-primary/30 rounded-full px-xs py-[2px] hover:bg-primary/10 transition-all"
+                      >
+                        Paid
+                      </button>
+                    )}
+                  </div>
+                </button>
+              ))}
+
+              {/* Infinite scroll sentinel */}
+              {hasMore && (
+                <div ref={sentinelRef} className="flex justify-center py-lg">
+                  <Loading />
+                </div>
+              )}
+
+              {!hasMore && subscriptions.length > SUB_PAGE_SIZE && (
+                <p className="text-center text-[10px] text-gray-light py-lg tracking-widest uppercase">
+                  {t('finance.allShown')}
+                </p>
+              )}
+            </Card>
+          )}
+        </div>
       </div>
 
       <div className="md:hidden fixed bottom-24 right-4 z-40">

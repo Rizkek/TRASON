@@ -91,6 +91,16 @@ export const ja = {
     portfolio_worth: '現在のポートフォリオは、追跡されている{count}個のポジションで{value}の価値があります。',
     price_live: 'ライブ価格、{time}に更新',
     price_not_refreshed: '価格はまだ更新されていません',
+    liquid_property_vehicle: '現金・不動産・車両',
+    debt_mortgages: '負債・住宅ローン',
+    life_goal: '人生目標',
+    buy_rationale: '購入の理由と目的',
+    financial_assets: '金融資産',
+    physical_assets: '実物資産',
+    liabilities: '負債',
+    original_amount: '元の金額',
+    remaining_amount: '残額',
+    interest_rate: '金利 (%)',
     scenario_bullish: '強気シナリオ',
     scenario_neutral: '中立シナリオ',
     scenario_bearish: '弱気シナリオ',
@@ -127,7 +137,19 @@ export const ja = {
       all: 'すべて',
       active: '進行中',
       interview: '面接',
-      closed: '終了'
+      closed: '完了'
+    },
+    ats_matcher: {
+      title: 'ATS Resume Matcher',
+      desc: 'Paste a Job Description and your CV to check the match score.',
+      jd_label: 'Job Description',
+      jd_placeholder: 'Paste the job qualifications and description here...',
+      cv_label: 'Your Resume / CV',
+      cv_placeholder: 'Paste the text of your CV here...',
+      analyze_btn: 'Analyze Match',
+      score_title: 'Match Score',
+      matched_keywords: 'Matched Keywords',
+      missing_keywords: 'Missing Keywords',
     },
     empty_all: '応募はまだありません。求職活動の記録を始めましょう。',
     empty_filter: '{filter}の応募はありません。',
@@ -175,11 +197,11 @@ export const ja = {
     remove_desc: 'この求人応募を削除してもよろしいですか？この操作は元に戻せません。',
     remove_btn: '削除',
     interview_journal: {
-      tab: 'ジャーナル',
-      new_entry: '新しいエントリ',
+      tab: '面接メモ',
+      new_entry: 'メモを追加',
       empty: '面接のメモはまだありません。すべての面接は学ぶ機会です。',
       edit_entry: 'エントリを編集',
-      new_entry_modal: '面接ジャーナル',
+      new_entry_modal: '面接メモ',
       save: '保存',
       company: '会社',
       role: '役割',
@@ -266,6 +288,15 @@ export const ja = {
   timeline_page: {
     title: 'スケジュール',
     desc: 'あなたの毎週のリズム',
+    weekly_log: 'ウィークリーログ',
+    daily_checklist: 'デイリーチェックリスト',
+    today_timeline: '今日のスケジュール',
+    no_activities_today: '今日の活動は記録されていません。',
+    done_today: '今日完了',
+    resets_midnight: '深夜にリセット',
+    add_task_placeholder: '毎日の習慣やタスクを追加...',
+    add: '追加',
+    all_done: 'すべて完了！',
     logs_upper: '記録',
     logged_upper: '記録済み',
     log_activity_btn: '活動を追加',
@@ -454,7 +485,14 @@ export const ja = {
       empty: 'トランザクションはまだありません',
       category: 'カテゴリー',
       notes: 'メモ',
-      searchPlaceholder: 'トランザクションを検索...'
+      searchPlaceholder: 'トランザクションを検索...',
+      today: '今日',
+      yesterday: '昨日',
+      transactionHistory: '取引履歴',
+      allShown: '· すべての取引を表示 ·',
+      filterAll: 'すべて',
+      filterIncome: '収入',
+      filterExpense: '支出'
     },
     trend: {
       vsLastMonth: '先月比'
@@ -476,7 +514,10 @@ export const ja = {
       namePlaceholder: '例: 食料品',
       save: 'カテゴリを保存',
       saving: '保存中...'
-    }
+    },
+    activeSubscriptions: 'アクティブなサブスクリプション',
+    servicesCount: 'サービス',
+    allShown: '· すべて表示済み ·'
   },
   dashboard: {
     splash: {

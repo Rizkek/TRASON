@@ -73,6 +73,18 @@ export function InvestmentsClient() {
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  
+  const [activeTab, setActiveTab] = useState<'financial' | 'physical' | 'liabilities'>('financial');
+
+  // Filter positions by tab
+  const filteredPositions = useMemo(() => {
+    return calculatedPositions.filter(pos => {
+      if (activeTab === 'financial') return ['stock', 'crypto', 'gold'].includes(pos.asset_type);
+      if (activeTab === 'physical') return ['property', 'vehicle'].includes(pos.asset_type);
+      if (activeTab === 'liabilities') return ['debt'].includes(pos.asset_type);
+      return true;
+    });
+  }, [calculatedPositions, activeTab]);
 
   // SWR automatically handles portfolio fetching on mount
 
@@ -112,13 +124,16 @@ export function InvestmentsClient() {
     setFormError(null);
     setFormErrors({});
 
+    const isPhysicalOrDebt = ['property', 'vehicle', 'debt'].includes(form.asset_type);
+
     const errors: Record<string, string> = {};
-    if (!form.symbol.trim()) errors.symbol = 'Symbol is required';
-    if (!form.amount) errors.amount = 'Amount is required';
-    else if (isNaN(Number(form.amount.replace(/,/g, '')))) errors.amount = 'Amount must be a valid number';
+    if (!isPhysicalOrDebt && !form.symbol.trim()) errors.symbol = 'Symbol is required';
     
-    if (!form.buy_price) errors.buy_price = 'Buy price is required';
-    else if (isNaN(Number(form.buy_price.replace(/,/g, '')))) errors.buy_price = 'Buy price must be a valid number';
+    if (!form.amount && !isPhysicalOrDebt) errors.amount = 'Amount is required';
+    else if (form.amount && isNaN(Number(form.amount.replace(/,/g, '')))) errors.amount = 'Amount must be a valid number';
+    
+    if (!form.buy_price) errors.buy_price = 'Price is required';
+    else if (isNaN(Number(form.buy_price.replace(/,/g, '')))) errors.buy_price = 'Price must be a valid number';
 
     if (form.manual_current_price && isNaN(Number(form.manual_current_price.replace(/,/g, '')))) {
       errors.manual_current_price = 'Must be a valid number';
@@ -129,19 +144,19 @@ export function InvestmentsClient() {
       return;
     }
 
-    // Remove the annoying asset prefix validation
-
     setIsSaving(true);
     try {
+      const isManualPriceSource = isPhysicalOrDebt || form.manual_current_price;
+      
       const payload = {
         asset_type: form.asset_type,
-        symbol: form.symbol.trim().toUpperCase(),
+        symbol: form.symbol.trim().toUpperCase() || `${form.asset_type.substring(0, 3).toUpperCase()}-${Date.now().toString().slice(-4)}`,
         display_name: form.display_name.trim() || null,
-        amount: Number(form.amount.replace(/,/g, '')),
+        amount: isPhysicalOrDebt && !form.amount ? 1 : Number(form.amount.replace(/,/g, '')),
         buy_price: Number(form.buy_price.replace(/,/g, '')),
         buy_date: form.buy_date,
         quote_currency: 'USD',
-        price_source: form.manual_current_price
+        price_source: isManualPriceSource
           ? 'manual'
           : form.asset_type === 'crypto'
             ? 'coingecko'
@@ -234,38 +249,66 @@ export function InvestmentsClient() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-md md:gap-lg">
           <Card className="p-xl bg-gradient-to-br from-black/20 to-black/5 border-primary/20 backdrop-blur-md">
-            <p className="text-micro text-primary/80 uppercase tracking-widest font-semibold mb-sm">{t('dashboard.net_worth')}</p>
+            <p className="text-micro text-primary/80 uppercase tracking-widest font-semibold mb-sm">{t('dashboard.netWorth.title')}</p>
             <p className="text-3xl font-sans font-bold tracking-tight tabular-nums text-white">{formatCurrency(summary?.netWorth || 0, currency, locale)}</p>
           </Card>
           <Card className="p-xl bg-black/20 border-white/5">
-            <p className="text-micro text-gray-light mb-sm uppercase tracking-widest">{t('dashboard.total_assets')}</p>
+            <p className="text-micro text-gray-light mb-sm uppercase tracking-widest">{t('dashboard.netWorth.totalAssets')}</p>
             <p className="text-2xl font-bold tabular-nums text-white">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</p>
-            <p className="text-xs text-gray-light mt-1">Liquid, Property, Vehicle</p>
+            <p className="text-xs text-gray-light mt-1">{t('investment_page.liquid_property_vehicle')}</p>
           </Card>
           <Card className="p-xl bg-black/20 border-white/5">
-            <p className="text-micro text-gray-light mb-sm uppercase tracking-widest">{t('dashboard.total_liabilities')}</p>
+            <p className="text-micro text-gray-light mb-sm uppercase tracking-widest">{t('dashboard.netWorth.totalLiabilities')}</p>
             <p className="text-2xl font-bold tabular-nums text-white">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</p>
-            <p className="text-xs text-gray-light mt-1">Debt & Mortgages</p>
+            <p className="text-xs text-gray-light mt-1">{t('investment_page.debt_mortgages')}</p>
           </Card>
         </div>
 
         <Card className="overflow-hidden">
-          <div className="px-lg py-md border-b border-black/5 dark:border-white/5 flex items-center justify-between">
+          <div className="px-lg py-md border-b border-black/5 dark:border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-md">
             <div>
               <h3 className="text-sm font-bold tracking-tight">{t('investment_page.portfolio_tracker')}</h3>
               <p className="text-xs text-gray-light mt-1">{t('investment_page.portfolio_tracker_desc')}</p>
             </div>
-            {summary?.topPerformer ? (
-              <Badge variant="success" size="sm">
-                <TrendingUp size={12} className="mr-1" />
-                {t('investment_page.top_performer')} {summary.topPerformer.symbol}
-              </Badge>
-            ) : null}
+            
+            {/* Tabs */}
+            <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar w-max">
+              <button
+                onClick={() => setActiveTab('financial')}
+                className={`px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                  activeTab === 'financial'
+                    ? 'bg-primary text-white shadow-md'
+                    : 'text-gray-light hover:text-soft-cream'
+                }`}
+              >
+                {t('investment_page.financial_assets')}
+              </button>
+              <button
+                onClick={() => setActiveTab('physical')}
+                className={`px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                  activeTab === 'physical'
+                    ? 'bg-primary text-white shadow-md'
+                    : 'text-gray-light hover:text-soft-cream'
+                }`}
+              >
+                {t('investment_page.physical_assets')}
+              </button>
+              <button
+                onClick={() => setActiveTab('liabilities')}
+                className={`px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                  activeTab === 'liabilities'
+                    ? 'bg-expense text-white shadow-md'
+                    : 'text-gray-light hover:text-soft-cream'
+                }`}
+              >
+                {t('investment_page.liabilities')}
+              </button>
+            </div>
           </div>
 
           {isLoading ? (
             <div className="flex justify-center py-2xl"><Loading /></div>
-          ) : calculatedPositions.length > 0 ? (
+          ) : filteredPositions.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -274,12 +317,11 @@ export function InvestmentsClient() {
                     <th className="px-sm py-sm">{t('investment_page.amount')}</th>
                     <th className="px-sm py-sm">{t('investment_page.avg_cost')}</th>
                     <th className="px-sm py-sm">{t('investment_page.value')}</th>
-                    <th className="px-sm py-sm text-center">Life Goal</th>
                     <th className="px-sm py-sm text-right">{t('investment_page.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {calculatedPositions.map((position) => {
+                  {filteredPositions.map((position) => {
                     const isLive = !!position.last_valued_at;
                     const lastUpdated = position.last_valued_at
                       ? new Date(position.last_valued_at).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone })
@@ -310,11 +352,6 @@ export function InvestmentsClient() {
                       <td className="px-sm py-md text-xs text-soft-cream">{formatCurrency(position.buy_price, currency, locale)}</td>
                       <td className="px-sm py-md text-xs font-bold text-white">
                         {formatCurrency(position.current_value, currency, locale)}
-                      </td>
-                      <td className="px-sm py-md text-center">
-                        <Badge variant="default" size="sm" className="text-[9px]">
-                          Unassigned
-                        </Badge>
                       </td>
                       <td className="px-sm py-md text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -414,9 +451,6 @@ export function InvestmentsClient() {
 
       >
         <div className="space-y-lg">
-          <Alert type="warning" title="System Notice: Real-time Sync">
-            Modul sinkronisasi <i>real-time</i> saat ini dioptimalkan untuk instrumen <strong>Stock (Saham) global</strong> dan <strong>Gold (Emas)</strong>. Untuk menjaga integritas arsitektur sistem, koneksi otomatis ke bursa <strong>Cryptocurrency</strong> sedang dalam fase audit dan peningkatan stabilitas. Anda tetap dapat mencatat portofolio Crypto secara presisi menggunakan fitur <strong>Manual Price</strong>.
-          </Alert>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
             <div className="space-y-sm">
               <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('investment_page.asset_type')}</label>
@@ -425,17 +459,29 @@ export function InvestmentsClient() {
                 onChange={(e) => setForm((prev) => ({ ...prev, asset_type: e.target.value as AssetType }))}
                 className="w-full h-12 bg-gray-strong border border-black/5 dark:border-white/5 rounded-md px-md text-sm text-white focus:border-primary focus:outline-none"
               >
-                <option value="stock">Stock</option>
-                <option value="crypto">Crypto</option>
-                <option value="gold">Gold</option>
+                <optgroup label={t('investment_page.financial_assets')}>
+                  <option value="stock">Stock</option>
+                  <option value="crypto">Crypto</option>
+                  <option value="gold">Gold</option>
+                </optgroup>
+                <optgroup label={t('investment_page.physical_assets')}>
+                  <option value="property">Property</option>
+                  <option value="vehicle">Vehicle</option>
+                </optgroup>
+                <optgroup label={t('investment_page.liabilities')}>
+                  <option value="debt">Debt / Mortgage</option>
+                </optgroup>
               </select>
             </div>
-            <Input
-              label={t('investment_page.symbol')}
-              placeholder={form.asset_type === 'gold' ? 'XAU' : 'AAPL / BTC'}
-              value={form.symbol}
-              onChange={(e) => setForm((prev) => ({ ...prev, symbol: e.target.value }))}
-            />
+            {!['property', 'vehicle', 'debt'].includes(form.asset_type) && (
+              <Input
+                label={t('investment_page.symbol')}
+                placeholder={form.asset_type === 'gold' ? 'XAU' : 'AAPL / BTC'}
+                value={form.symbol}
+                onChange={(e) => setForm((prev) => ({ ...prev, symbol: e.target.value }))}
+                error={formErrors.symbol}
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
@@ -454,21 +500,25 @@ export function InvestmentsClient() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+            {!['property', 'vehicle', 'debt'].includes(form.asset_type) && (
+              <Input
+                label={t('investment_page.amount_upper')}
+                type="number"
+                step="0.0001"
+                placeholder="1.25"
+                value={form.amount}
+                onChange={(e) => setForm((prev) => ({ ...prev, amount: e.target.value }))}
+                error={formErrors.amount}
+              />
+            )}
             <Input
-              label={t('investment_page.amount_upper')}
-              type="number"
-              step="0.0001"
-              placeholder="1.25"
-              value={form.amount}
-              onChange={(e) => setForm((prev) => ({ ...prev, amount: e.target.value }))}
-            />
-            <Input
-              label={t('investment_page.buy_price_usd')}
+              label={form.asset_type === 'debt' ? t('investment_page.original_amount') : ['property', 'vehicle'].includes(form.asset_type) ? t('investment_page.avg_cost') : t('investment_page.buy_price_usd')}
               type="number"
               step="0.0001"
               placeholder="0.00"
               value={form.buy_price}
               onChange={(e) => setForm((prev) => ({ ...prev, buy_price: e.target.value }))}
+              error={formErrors.buy_price}
             />
           </div>
 
@@ -483,20 +533,21 @@ export function InvestmentsClient() {
           )}
 
           <Input
-            label={t('investment_page.manual_price')}
+            label={form.asset_type === 'debt' ? t('investment_page.remaining_amount') : form.asset_type === 'property' || form.asset_type === 'vehicle' ? t('investment_page.value') : t('investment_page.manual_price')}
             type="number"
             step="0.01"
-            placeholder="Useful if API pricing is unavailable (e.g., IPOs)"
+            placeholder={form.asset_type === 'debt' ? "Current remaining balance" : "Useful if API pricing is unavailable"}
             value={form.manual_current_price}
             onChange={(e) => setForm((prev) => ({ ...prev, manual_current_price: e.target.value }))}
-            helpText={t('investment_page.manual_price_help')}
+            helpText={form.asset_type === 'debt' ? 'Amount left to pay' : t('investment_page.manual_price_help')}
+            error={formErrors.manual_current_price}
           />
 
           {/* Investment Journal Section */}
           <div className="pt-sm border-t border-white/5 space-y-md">
             <div>
               <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase mb-sm block">
-                Investment Journal: Kenapa Membeli?
+                {t('investment_page.buy_rationale')}
               </label>
               <div className="flex flex-wrap gap-xs">
                 {[

@@ -129,6 +129,18 @@ export const es = {
       interview: 'Entrevista',
       closed: 'Cerrado'
     },
+    ats_matcher: {
+      title: 'ATS Resume Matcher',
+      desc: 'Paste a Job Description and your CV to check the match score.',
+      jd_label: 'Job Description',
+      jd_placeholder: 'Paste the job qualifications and description here...',
+      cv_label: 'Your Resume / CV',
+      cv_placeholder: 'Paste the text of your CV here...',
+      analyze_btn: 'Analyze Match',
+      score_title: 'Match Score',
+      matched_keywords: 'Matched Keywords',
+      missing_keywords: 'Missing Keywords',
+    },
     empty_all: 'Aún no hay solicitudes. Comienza a rastrear tu búsqueda de empleo.',
     empty_filter: 'No hay solicitudes de {filter}.',
     high_priority: 'Alta prioridad',

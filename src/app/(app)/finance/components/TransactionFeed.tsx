@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Card, Badge, Loading } from '@/components';
 import { MagnifyingGlass as Search, ArrowUpRight, ArrowDownLeft, Calendar, X, PencilSimple as Edit2, Trash as Trash2} from '@phosphor-icons/react';
 import { formatCurrency, formatDate } from '@/libs/format';
@@ -15,17 +15,19 @@ function resolveCategory(
   return categories;
 }
 
-function getDateLabel(dateStr: string): string {
+// Date label is computed once per render based on locale strings passed from parent,
+// but for simplicity we keep a module-level helper and pass t() at call site.
+function getDateLabel(dateStr: string, todayLabel: string, yesterdayLabel: string): string {
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   const txDate = new Date(dateStr + 'T00:00:00');
-  if (txDate.toDateString() === today.toDateString()) return 'Hari Ini';
-  if (txDate.toDateString() === yesterday.toDateString()) return 'Kemarin';
+  if (txDate.toDateString() === today.toDateString()) return todayLabel;
+  if (txDate.toDateString() === yesterday.toDateString()) return yesterdayLabel;
   return formatDate(dateStr);
 }
 
-function groupByDate(transactions: Transaction[]): { label: string; date: string; items: Transaction[] }[] {
+function groupByDate(transactions: Transaction[], todayLabel: string, yesterdayLabel: string): { label: string; date: string; items: Transaction[] }[] {
   const map = new Map<string, Transaction[]>();
   for (const t of transactions) {
     const d = t.date.split('T')[0];
@@ -34,8 +36,10 @@ function groupByDate(transactions: Transaction[]): { label: string; date: string
   }
   return Array.from(map.entries())
     .sort(([a], [b]) => b.localeCompare(a))
-    .map(([date, items]) => ({ label: getDateLabel(date), date, items }));
+    .map(([date, items]) => ({ label: getDateLabel(date, todayLabel, yesterdayLabel), date, items }));
 }
+
+const PAGE_SIZE = 8;
 
 interface Props {
   transactions: Transaction[];
@@ -64,6 +68,11 @@ export function TransactionFeed({
 }: Props) {
   const { t } = useTranslation();
   const [selected, setSelected] = useState<Transaction | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const todayLabel = t('finance.feed.today');
+  const yesterdayLabel = t('finance.feed.yesterday');
 
   const filtered = useMemo(
     () =>
@@ -75,7 +84,41 @@ export function TransactionFeed({
     [transactions, searchQuery, filterType]
   );
 
-  const groups = useMemo(() => groupByDate(filtered), [filtered]);
+  // Reset visible count whenever filters/search changes
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchQuery, filterType]);
+
+  const allGroups = useMemo(() => groupByDate(filtered, todayLabel, yesterdayLabel), [filtered, todayLabel, yesterdayLabel]);
+
+  // Flatten to item-level for counting, then re-group only visible slice
+  const visibleItems = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
+  const visibleGroups = useMemo(() => groupByDate(visibleItems, todayLabel, yesterdayLabel), [visibleItems, todayLabel, yesterdayLabel]);
+
+  const hasMore = visibleCount < filtered.length;
+
+  const loadMore = useCallback(() => {
+    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filtered.length));
+  }, [filtered.length]);
+
+  // Intersection Observer — watches the sentinel div at the bottom
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { rootMargin: '120px' } // trigger 120px before reaching bottom
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, loadMore]);
+
   const selectedCat = selected ? resolveCategory(selected.categories) : null;
 
   return (
@@ -107,7 +150,7 @@ export function TransactionFeed({
                   : 'bg-white/[0.05] text-gray-light hover:bg-white/[0.1] hover:text-soft-cream'
               }`}
             >
-              {type === 'all' ? 'Semua' : type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
+              {type === 'all' ? t('finance.feed.filterAll') : type === 'income' ? t('finance.feed.filterIncome') : t('finance.feed.filterExpense')}
             </button>
           ))}
         </div>
@@ -117,10 +160,10 @@ export function TransactionFeed({
       <Card className="overflow-hidden">
         <div className="px-md pt-md pb-xs flex items-center justify-between">
           <h3 className="text-[10px] md:text-xs font-bold text-gray-light tracking-widest uppercase">
-            Riwayat Transaksi
+            {t('finance.feed.transactionHistory')}
           </h3>
           {filtered.length > 0 && (
-            <span className="text-[9px] text-gray-light">{filtered.length} transaksi</span>
+            <span className="text-[9px] text-gray-light">{filtered.length} {t('finance.table.transaction').toLowerCase()}</span>
           )}
         </div>
 
@@ -128,20 +171,20 @@ export function TransactionFeed({
           <div className="py-2xl flex justify-center">
             <Loading />
           </div>
-        ) : groups.length === 0 ? (
+        ) : visibleGroups.length === 0 ? (
           <div className="py-2xl flex flex-col items-center justify-center gap-md opacity-50">
             <div className="text-center">
               <p className="text-sm font-semibold text-soft-cream">{t('finance.feed.empty')}</p>
               <p className="text-xs text-gray-light mt-xs">
                 {searchQuery || filterType !== 'all'
-                  ? 'Coba ubah kata kunci atau filter'
-                  : 'Mulai catat pemasukan atau pengeluaranmu'}
+                  ? t('finance.feed.filterAll')
+                  : t('moduleCommon.emptyDesc')}
               </p>
             </div>
           </div>
         ) : (
           <div className="pb-xs">
-            {groups.map((group) => (
+            {visibleGroups.map((group) => (
               <div key={group.date}>
                 {/* Date group header */}
                 <div className="px-md py-xs mt-sm flex items-center gap-sm">
@@ -196,6 +239,20 @@ export function TransactionFeed({
                 })}
               </div>
             ))}
+
+            {/* Infinite scroll sentinel */}
+            {hasMore && (
+              <div ref={sentinelRef} className="flex justify-center py-lg">
+                <Loading />
+              </div>
+            )}
+
+            {/* End of list indicator */}
+            {!hasMore && allGroups.length > 0 && visibleCount >= filtered.length && filtered.length > PAGE_SIZE && (
+              <p className="text-center text-[10px] text-gray-light py-lg tracking-widest uppercase">
+                {t('finance.feed.allShown')}
+              </p>
+            )}
           </div>
         )}
       </Card>

@@ -73,7 +73,7 @@ export const en = {
     update_position_upper: 'Update',
     save_position_upper: 'Save',
     asset_type: 'Asset Type',
-    symbol: 'Symbol',
+    symbol: 'Ticker / Asset Code',
     display_name: 'Display name',
     buy_date: 'Buy date',
     amount_upper: 'Amount',
@@ -91,6 +91,16 @@ export const en = {
     portfolio_worth: 'Your portfolio is currently worth {value} across {count} tracked positions.',
     price_live: 'Live price, updated {time}',
     price_not_refreshed: 'Price not refreshed yet',
+    liquid_property_vehicle: 'Liquid, Property, Vehicle',
+    debt_mortgages: 'Debt & Mortgages',
+    life_goal: 'Life Goal',
+    buy_rationale: 'Buy Rationale',
+    financial_assets: 'Financial Assets',
+    physical_assets: 'Physical Assets',
+    liabilities: 'Liabilities',
+    original_amount: 'Original Amount',
+    remaining_amount: 'Remaining Amount',
+    interest_rate: 'Interest Rate (%)',
     scenario_bullish: 'Bullish scenario',
     scenario_neutral: 'Neutral scenario',
     scenario_bearish: 'Bearish scenario',
@@ -128,6 +138,18 @@ export const en = {
       active: 'Active',
       interview: 'Interview',
       closed: 'Closed'
+    },
+    ats_matcher: {
+      title: 'ATS Resume Matcher',
+      desc: 'Paste a Job Description and your CV to check the match score.',
+      jd_label: 'Job Description',
+      jd_placeholder: 'Paste the job qualifications and description here...',
+      cv_label: 'Your Resume / CV',
+      cv_placeholder: 'Paste the text of your CV here...',
+      analyze_btn: 'Analyze Match',
+      score_title: 'Match Score',
+      matched_keywords: 'Matched Keywords',
+      missing_keywords: 'Missing Keywords',
     },
     empty_all: 'No applications yet. Start tracking your job search.',
     empty_filter: 'No {filter} applications.',
@@ -175,11 +197,11 @@ export const en = {
     remove_desc: 'Are you sure you want to remove this job application? This action cannot be undone.',
     remove_btn: 'Remove',
     interview_journal: {
-      tab: 'Journal',
-      new_entry: 'New Entry',
+      tab: 'Interview Notes',
+      new_entry: 'Add Note',
       empty: 'No interview notes yet. Every interview is a learning opportunity.',
       edit_entry: 'Edit Entry',
-      new_entry_modal: 'Interview Journal',
+      new_entry_modal: 'Interview Notes',
       save: 'Save',
       company: 'Company',
       role: 'Role',
@@ -265,6 +287,15 @@ export const en = {
   timeline_page: {
     title: 'Schedule',
     desc: 'Your weekly rhythm',
+    weekly_log: 'Weekly Log',
+    daily_checklist: 'Daily Checklist',
+    today_timeline: "Today's Timeline",
+    no_activities_today: 'No activities logged for today.',
+    done_today: 'Done Today',
+    resets_midnight: 'Resets midnight',
+    add_task_placeholder: 'Add a daily habit or task...',
+    add: 'Add',
+    all_done: 'All done!',
     logs_upper: 'Logs',
     logged_upper: 'Logged',
     log_activity_btn: 'Add Activity',
@@ -453,7 +484,14 @@ export const en = {
       empty: 'No transactions yet',
       category: 'Category',
       notes: 'Notes',
-      searchPlaceholder: 'Search transactions...'
+      searchPlaceholder: 'Search transactions...',
+      today: 'Today',
+      yesterday: 'Yesterday',
+      transactionHistory: 'Transaction History',
+      allShown: '· all transactions shown ·',
+      filterAll: 'All',
+      filterIncome: 'Income',
+      filterExpense: 'Expense'
     },
     trend: {
       vsLastMonth: 'vs last month'
@@ -475,7 +513,10 @@ export const en = {
       namePlaceholder: 'e.g. Groceries',
       save: 'Save Category',
       saving: 'Saving...'
-    }
+    },
+    activeSubscriptions: 'Active Subscriptions',
+    servicesCount: 'services',
+    allShown: '· all shown ·'
   },
   dashboard: {
     splash: {
