@@ -12,14 +12,14 @@ import { getLocalISODate } from '@/libs/format';
 import { sanitizeError } from '@/libs/validation';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare } from '@phosphor-icons/react';
+import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare, FunnelSimple, CheckCircle, Users, XCircle, Newspaper, Robot } from '@phosphor-icons/react';
 import { useInterviewJournal } from '@/hooks/useInterviewJournal';
 
 const FILTER_TABS = [
-  { id: 'all',      labelKey: 'all' },
-  { id: 'active',   labelKey: 'active' },
-  { id: 'interview',labelKey: 'interview' },
-  { id: 'closed',   labelKey: 'closed' },
+  { id: 'all',       labelKey: 'all',       icon: FunnelSimple },
+  { id: 'active',    labelKey: 'active',    icon: CheckCircle },
+  { id: 'interview', labelKey: 'interview', icon: Users },
+  { id: 'closed',    labelKey: 'closed',    icon: XCircle },
 ] as const;
 
 type FilterTab = typeof FILTER_TABS[number]['id'];
@@ -406,33 +406,39 @@ export default function CareerClient({ initialApplications }: Props) {
           <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-fit gap-0.5">
             <button
               onClick={() => setMainTab('applications')}
-              className={`px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+              title={t('career_page.tabs.all').replace('All', 'Applications').replace('Semua', 'Lamaran')}
+              className={`flex items-center gap-1.5 px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                 mainTab === 'applications'
                   ? 'bg-warm-gold text-warm-black shadow-md'
                   : 'text-gray-light hover:text-soft-cream'
               }`}
             >
-              {t('career_page.tabs.all').replace('All', 'Applications').replace('Semua', 'Lamaran')}
+              <Briefcase size={14} weight="bold" />
+              <span className="hidden md:inline">{t('career_page.tabs.all').replace('All', 'Applications').replace('Semua', 'Lamaran')}</span>
             </button>
             <button
               onClick={() => setMainTab('journal')}
-              className={`px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+              title={t('career_page.interview_journal.tab')}
+              className={`flex items-center gap-1.5 px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                 mainTab === 'journal'
                   ? 'bg-warm-gold text-warm-black shadow-md'
                   : 'text-gray-light hover:text-soft-cream'
               }`}
             >
-              {t('career_page.interview_journal.tab')}
+              <Newspaper size={14} weight="bold" />
+              <span className="hidden md:inline">{t('career_page.interview_journal.tab')}</span>
             </button>
             <button
               onClick={() => setMainTab('ats_matcher')}
-              className={`px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+              title={t('career_page.ats_matcher.title')}
+              className={`flex items-center gap-1.5 px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                 mainTab === 'ats_matcher'
                   ? 'bg-warm-gold text-warm-black shadow-md'
                   : 'text-gray-light hover:text-soft-cream'
               }`}
             >
-              {t('career_page.ats_matcher.title')}
+              <Robot size={14} weight="bold" />
+              <span className="hidden md:inline">{t('career_page.ats_matcher.title')}</span>
             </button>
           </div>
 
@@ -440,21 +446,26 @@ export default function CareerClient({ initialApplications }: Props) {
             <>
               {/* Filter Tabs */}
           <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-full gap-0.5" role="tablist" aria-label="Application filter">
-            {FILTER_TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveFilter(tab.id)}
-                role="tab"
-                aria-selected={activeFilter === tab.id}
-                className={`px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
-                  activeFilter === tab.id
-                    ? 'bg-warm-gold text-warm-black shadow-md'
-                    : 'text-gray-light hover:text-soft-cream'
-                }`}
-              >
-                {t(`career_page.tabs.${tab.labelKey}`)}
-              </button>
-            ))}
+            {FILTER_TABS.map((tab) => {
+              const TabIcon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveFilter(tab.id)}
+                  role="tab"
+                  aria-selected={activeFilter === tab.id}
+                  title={t(`career_page.tabs.${tab.labelKey}`)}
+                  className={`flex items-center gap-1.5 px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                    activeFilter === tab.id
+                      ? 'bg-warm-gold text-warm-black shadow-md'
+                      : 'text-gray-light hover:text-soft-cream'
+                  }`}
+                >
+                  <TabIcon size={14} weight="bold" />
+                  <span className="hidden md:inline">{t(`career_page.tabs.${tab.labelKey}`)}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Application Cards */}

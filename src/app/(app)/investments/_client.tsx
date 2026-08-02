@@ -7,7 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useInvestment } from '@/hooks/useInvestment';
 import { validateTransaction, sanitizeError } from '@/libs/validation';
 import { InvestmentPosition } from '@/types/database';
-import { Briefcase, Coins, Bank as Landmark, Plus, ArrowsClockwise, Shield, Trash as Trash2, TrendUp as TrendingUp, TrendDown as TrendingDown, WifiHigh as Wifi, WifiX as WifiOff } from '@phosphor-icons/react';
+import { Briefcase, Coins, Bank as Landmark, Plus, ArrowsClockwise, Shield, Trash as Trash2, TrendUp as TrendingUp, TrendDown as TrendingDown, WifiHigh as Wifi, WifiX as WifiOff, CurrencyDollar, Buildings, Warning } from '@phosphor-icons/react';
 import { formatCurrency, formatNumber, getLocalISODate } from '@/libs/format';
 import { formatSignedCurrency, formatSignedPercent } from '@/services/finance/investmentService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -275,33 +275,39 @@ export function InvestmentsClient() {
             <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar w-max">
               <button
                 onClick={() => setActiveTab('financial')}
-                className={`px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                title={t('investment_page.financial_assets')}
+                className={`flex items-center gap-1.5 px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
                   activeTab === 'financial'
                     ? 'bg-primary text-white shadow-md'
                     : 'text-gray-light hover:text-soft-cream'
                 }`}
               >
-                {t('investment_page.financial_assets')}
+                <CurrencyDollar size={13} weight="bold" />
+                <span className="hidden md:inline">{t('investment_page.financial_assets')}</span>
               </button>
               <button
                 onClick={() => setActiveTab('physical')}
-                className={`px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                title={t('investment_page.physical_assets')}
+                className={`flex items-center gap-1.5 px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
                   activeTab === 'physical'
                     ? 'bg-primary text-white shadow-md'
                     : 'text-gray-light hover:text-soft-cream'
                 }`}
               >
-                {t('investment_page.physical_assets')}
+                <Buildings size={13} weight="bold" />
+                <span className="hidden md:inline">{t('investment_page.physical_assets')}</span>
               </button>
               <button
                 onClick={() => setActiveTab('liabilities')}
-                className={`px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                title={t('investment_page.liabilities')}
+                className={`flex items-center gap-1.5 px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
                   activeTab === 'liabilities'
                     ? 'bg-expense text-white shadow-md'
                     : 'text-gray-light hover:text-soft-cream'
                 }`}
               >
-                {t('investment_page.liabilities')}
+                <Warning size={13} weight="bold" />
+                <span className="hidden md:inline">{t('investment_page.liabilities')}</span>
               </button>
             </div>
           </div>

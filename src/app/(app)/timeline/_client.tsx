@@ -397,10 +397,11 @@ export function TimelineClient() {
           </div>
 
           {/* Tab Switcher */}
-          <div className="flex items-center gap-lg bg-black/[0.02] dark:bg-white/[0.02] p-md rounded-lg mb-xl w-max border border-black/[0.05] dark:border-white/[0.05]">
+          <div className="flex items-center gap-sm bg-black/[0.02] dark:bg-white/[0.02] p-md rounded-lg mb-xl w-max border border-black/[0.05] dark:border-white/[0.05]">
             {module_features?.['timeline_weekly_log'] !== false && (
               <button
                 onClick={() => setActiveTab('weekly-log')}
+                title={t('timeline_page.weekly_log')}
                 className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
                   activeTab === 'weekly-log'
                     ? 'bg-primary text-white shadow-lg'
@@ -408,12 +409,13 @@ export function TimelineClient() {
                 }`}
               >
                 <Calendar size={14} />
-                {t('timeline_page.weekly_log')}
+                <span className="hidden md:inline">{t('timeline_page.weekly_log')}</span>
               </button>
             )}
             {module_features?.['timeline_daily_checklist'] !== false && (
               <button
                 onClick={() => setActiveTab('daily-checklist')}
+                title={t('timeline_page.daily_checklist')}
                 className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
                   activeTab === 'daily-checklist'
                     ? 'bg-primary text-white shadow-lg'
@@ -421,7 +423,7 @@ export function TimelineClient() {
                 }`}
               >
                 <ListChecks size={14} />
-                {t('timeline_page.daily_checklist')}
+                <span className="hidden md:inline">{t('timeline_page.daily_checklist')}</span>
                 {totalCount > 0 && (
                   <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
                     completedCount === totalCount ? 'bg-income/20 text-income' : 'bg-black/10 dark:bg-white/10 text-gray-light'

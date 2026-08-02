@@ -202,7 +202,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const menuItems: { label: string; href: string; icon: any; moduleId?: ModuleId }[] = useMemo(() => [
     { label: 'Dashboard', href: '/dashboard', icon: SYS_ICONS.dashboard }, // Core, always visible
     { label: 'Finance', href: '/finance', icon: SYS_ICONS.finance.main, moduleId: 'finance' as ModuleId },
-    { label: 'Investments', href: '/investments', icon: SYS_ICONS.career, moduleId: 'investments' as ModuleId },
+    { label: 'Investments', href: '/investments', icon: SYS_ICONS.investments, moduleId: 'investments' as ModuleId },
     { label: 'Timeline', href: '/timeline', icon: SYS_ICONS.timeline, moduleId: 'timeline' as ModuleId },
     { label: 'Sport', href: '/sport', icon: SYS_ICONS.sport, moduleId: 'sport' as ModuleId },
     { label: 'Career', href: '/career', icon: SYS_ICONS.career, moduleId: 'career' as ModuleId },

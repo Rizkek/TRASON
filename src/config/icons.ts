@@ -3,7 +3,7 @@ import {
   Briefcase,
   Target,
   ArrowsClockwise,
-  GitCommit,
+  CalendarBlank,
   Receipt,
   Faders,
   User,
@@ -25,6 +25,7 @@ import {
   WifiX,
   BellSlash,
   List,
+  TrendUp,
 } from '@phosphor-icons/react';
 
 // Central dictionary for all TRASON icons to ensure consistency
@@ -39,9 +40,10 @@ export const SYS_ICONS = {
     currency: CurrencyCircleDollar,
   },
   career: Briefcase,
+  investments: TrendUp,   // Distinct from Career's Briefcase
   goals: Target,
   habit: ArrowsClockwise, // Replaced Flame
-  timeline: GitCommit, // Replaced Clock
+  timeline: CalendarBlank, // More intuitive than GitCommit
   sport: Barbell,
   insights: ChartPolar, // Replaced Lightbulb
   
