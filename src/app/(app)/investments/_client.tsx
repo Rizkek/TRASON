@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, Alert, ErrorAlert, ConfirmModal } from '@/components';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, Alert, ErrorAlert, ConfirmModal, Select, DatePicker } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useInvestment } from '@/hooks/useInvestment';
 import { validateTransaction, sanitizeError } from '@/libs/validation';
@@ -224,7 +224,7 @@ export function InvestmentsClient() {
         <div className="space-y-xl animate-fade-in">
           <div className="flex items-start justify-between gap-md flex-wrap">
           <div className="space-y-sm max-w-2xl">
-            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-gradient">{t('investment_page.investment_analyst_title')}</h1>
+            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('investment_page.investment_analyst_title')}</h1>
             <p className="text-subtext flex items-center gap-sm">
               {t('investment_page.investment_analyst_desc')}
             </p>
@@ -458,27 +458,34 @@ export function InvestmentsClient() {
       >
         <div className="space-y-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
-            <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('investment_page.asset_type')}</label>
-              <select
-                value={form.asset_type}
-                onChange={(e) => setForm((prev) => ({ ...prev, asset_type: e.target.value as AssetType }))}
-                className="w-full h-12 bg-gray-strong border border-black/5 dark:border-white/5 rounded-md px-md text-sm text-white focus:border-primary focus:outline-none"
-              >
-                <optgroup label={t('investment_page.financial_assets')}>
-                  <option value="stock">Stock</option>
-                  <option value="crypto">Crypto</option>
-                  <option value="gold">Gold</option>
-                </optgroup>
-                <optgroup label={t('investment_page.physical_assets')}>
-                  <option value="property">Property</option>
-                  <option value="vehicle">Vehicle</option>
-                </optgroup>
-                <optgroup label={t('investment_page.liabilities')}>
-                  <option value="debt">Debt / Mortgage</option>
-                </optgroup>
-              </select>
-            </div>
+            <Select
+              label={t('investment_page.asset_type')}
+              value={form.asset_type}
+              onValueChange={(val) => setForm((prev) => ({ ...prev, asset_type: val as AssetType }))}
+              options={[
+                {
+                  label: t('investment_page.financial_assets'),
+                  options: [
+                    { value: 'stock', label: 'Stock' },
+                    { value: 'crypto', label: 'Crypto' },
+                    { value: 'gold', label: 'Gold' },
+                  ],
+                },
+                {
+                  label: t('investment_page.physical_assets'),
+                  options: [
+                    { value: 'property', label: 'Property' },
+                    { value: 'vehicle', label: 'Vehicle' },
+                  ],
+                },
+                {
+                  label: t('investment_page.liabilities'),
+                  options: [
+                    { value: 'debt', label: 'Debt / Mortgage' },
+                  ],
+                },
+              ]}
+            />
             {!['property', 'vehicle', 'debt'].includes(form.asset_type) && (
               <Input
                 label={t('investment_page.symbol')}
@@ -497,11 +504,10 @@ export function InvestmentsClient() {
               value={form.display_name}
               onChange={(e) => setForm((prev) => ({ ...prev, display_name: e.target.value }))}
             />
-            <Input
+            <DatePicker
               label={t('investment_page.buy_date')}
-              type="date"
               value={form.buy_date}
-              onChange={(e) => setForm((prev) => ({ ...prev, buy_date: e.target.value }))}
+              onChange={(val) => setForm((prev) => ({ ...prev, buy_date: val }))}
             />
           </div>
 

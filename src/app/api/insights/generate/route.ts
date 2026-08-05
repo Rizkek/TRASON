@@ -6,7 +6,7 @@ import { getAuthenticatedUser } from '@/utils/supabase/server';
 
 // Tambah maxDuration agar Vercel memberi waktu lebih untuk AI generation
 // Free: max 10s, Pro: max 60s — set 25s sebagai kompromi
-export const maxDuration = 25;
+export const maxDuration = 45;
 export const dynamic = 'force-dynamic';
 
 const insightsSchema = z.object({
@@ -27,9 +27,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
   }
 
-  // AbortController dengan timeout 22 detik (sedikit di bawah maxDuration)
+  // AbortController dengan timeout 40 detik
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 22000);
+  const timeoutId = setTimeout(() => controller.abort(), 40000);
 
   try {
     const { userContextText, language } = await req.json();

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, Button, Input, Loading, ErrorAlert } from '@/components';
+import { Card, Button, Input, Loading, ErrorAlert, Select } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -162,7 +162,7 @@ export function OnboardingClient() {
 
         <div className="text-center space-y-sm mb-xl">
           <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-white">
-            Welcome to <span className="text-gradient">TRASON</span>
+            Welcome to TRASON
           </h1>
           <p className="text-gray-light text-sm md:text-base max-w-md mx-auto">
             {step === 1 
@@ -225,35 +225,25 @@ export function OnboardingClient() {
           {step === 2 && (
             <div className="space-y-xl animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-                <div className="space-y-md">
-                  <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
-                    <Globe size={14} className="text-primary" /> LANGUAGE
-                  </label>
-                  <select
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                    className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-lg text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
-                  >
-                    {LANGUAGE_OPTIONS.map((l) => (
-                      <option key={l.value} value={l.value} className="bg-gray-strong">{l.label}</option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label="LANGUAGE"
+                  value={language}
+                  onValueChange={(val) => setLanguage(val)}
+                  options={LANGUAGE_OPTIONS.map((l) => ({
+                    value: l.value,
+                    label: l.label,
+                  }))}
+                />
                 
-                <div className="space-y-md">
-                  <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
-                    <Clock size={14} className="text-secondary" /> TIMEZONE
-                  </label>
-                  <select
-                    value={timezone}
-                    onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-lg text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
-                  >
-                    {TIMEZONE_OPTIONS.map((t) => (
-                      <option key={t} value={t} className="bg-gray-strong">{t}</option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label="TIMEZONE"
+                  value={timezone}
+                  onValueChange={(val) => setTimezone(val)}
+                  options={TIMEZONE_OPTIONS.map((t) => ({
+                    value: t,
+                    label: t,
+                  }))}
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-lg pt-4 border-t border-white/5">

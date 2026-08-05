@@ -53,7 +53,7 @@ export const SportSummary = ({ summary, isLoading }: Props) => {
             {/* Stats */}
             <div className="flex items-center gap-md md:gap-xl">
               <div>
-                <p className="text-xl md:text-2xl font-bold text-gradient">{totalSessions}</p>
+                <p className="text-xl md:text-2xl font-bold text-gradient-static">{totalSessions}</p>
                 <p className="text-[10px] text-gray-light uppercase tracking-widest">{t('dashboard.sessions')}</p>
               </div>
               {totalMinutes > 0 && (

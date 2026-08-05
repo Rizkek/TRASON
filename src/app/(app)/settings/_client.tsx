@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Layout, Card, Button, Input, Loading, Alert, ErrorAlert, ConfirmModal } from '@/components';
+import { Layout, Card, Button, Input, Loading, Alert, ErrorAlert, ConfirmModal, Select } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { User, supabase } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -757,7 +757,7 @@ export function SettingsClient() {
                         {isUploadingAvatar ? (
                           <Loading />
                         ) : profile.avatar_url ? (
-                          <Image src={profile.avatar_url} alt="Avatar" fill className="object-cover" />
+                          <Image src={profile.avatar_url} alt="Avatar" fill sizes="96px" className="object-cover" />
                         ) : (
                           profile.first_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'
                         )}
@@ -849,46 +849,36 @@ export function SettingsClient() {
                         {t('settings.interface.themePreview')}
                       </p>
                     </div>
-                    <div className="space-y-sm">
-                      <label className="text-[10px] font-bold text-gray-light tracking-widest flex items-center gap-sm">
-                        <Globe size={12} className="text-secondary" /> {t('settings.interface.language')}
-                      </label>
-                      <select
-                        value={prefs.language}
-                        onChange={(e) => {
-                          const newLang = e.target.value;
-                          setPrefs((p) => ({ ...p, language: newLang }));
-                        }}
-                        className="w-full h-12 bg-gray-strong/40 border border-soft-cream/10 rounded-md px-lg text-sm text-soft-cream focus:border-primary focus:outline-none"
-                      >
-                        {LANGUAGE_OPTIONS.map((l) => (
-                          <option key={l.value} value={l.value} className="bg-gray-strong">{l.label}</option>
-                        ))}
-                      </select>
-                    </div>
+                    <Select
+                      label={t('settings.interface.language')}
+                      value={prefs.language}
+                      onValueChange={(newLang) => setPrefs((p) => ({ ...p, language: newLang }))}
+                      options={LANGUAGE_OPTIONS.map((l) => ({
+                        value: l.value,
+                        label: l.label,
+                      }))}
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
-                    <div className="space-y-sm">
-                      <label className="text-[10px] font-bold text-gray-light tracking-widest">{t('settings.interface.currency')}</label>
-                      <select
-                        value={prefs.currency}
-                        onChange={(e) => setPrefs((p) => ({ ...p, currency: e.target.value }))}
-                        className="w-full h-12 bg-gray-strong/40 border border-soft-cream/10 rounded-md px-lg text-sm text-soft-cream focus:border-primary focus:outline-none"
-                      >
-                        {CURRENCY_OPTIONS.map((c) => <option key={c} value={c} className="bg-gray-strong">{c}</option>)}
-                      </select>
-                    </div>
-                    <div className="space-y-sm">
-                      <label className="text-[10px] font-bold text-gray-light tracking-widest">{t('settings.interface.timezone')}</label>
-                      <select
-                        value={prefs.timezone}
-                        onChange={(e) => setPrefs((p) => ({ ...p, timezone: e.target.value }))}
-                        className="w-full h-12 bg-gray-strong/40 border border-soft-cream/10 rounded-md px-lg text-sm text-soft-cream focus:border-primary focus:outline-none"
-                      >
-                        {TIMEZONE_OPTIONS.map((tz) => <option key={tz} value={tz} className="bg-gray-strong">{tz}</option>)}
-                      </select>
-                    </div>
+                    <Select
+                      label={t('settings.interface.currency')}
+                      value={prefs.currency}
+                      onValueChange={(val) => setPrefs((p) => ({ ...p, currency: val }))}
+                      options={CURRENCY_OPTIONS.map((c) => ({
+                        value: c,
+                        label: c,
+                      }))}
+                    />
+                    <Select
+                      label={t('settings.interface.timezone')}
+                      value={prefs.timezone}
+                      onValueChange={(val) => setPrefs((p) => ({ ...p, timezone: val }))}
+                      options={TIMEZONE_OPTIONS.map((tz) => ({
+                        value: tz,
+                        label: tz,
+                      }))}
+                    />
                   </div>
                 </div>
               </Card>
@@ -957,17 +947,17 @@ export function SettingsClient() {
                   </div>
 
                   {prefs.email_digest_enabled && (
-                    <div className="space-y-sm animate-fade-in pl-14">
-                      <label className="text-[10px] font-bold text-gray-light tracking-widest">{t('settings.alerts.frequency')}</label>
-                      <select
+                    <div className="animate-fade-in pl-14 max-w-xs">
+                      <Select
+                        label={t('settings.alerts.frequency')}
                         value={prefs.digest_frequency}
-                        onChange={(e) => setPrefs((p) => ({ ...p, digest_frequency: e.target.value }))}
-                        className="w-full md:w-64 h-10 bg-gray-strong/40 border border-soft-cream/10 rounded-md px-md text-sm text-soft-cream focus:border-primary focus:outline-none"
-                      >
-                        <option value="daily" className="bg-gray-strong">{t('settings.alerts.daily')}</option>
-                        <option value="weekly" className="bg-gray-strong">{t('settings.alerts.weekly')}</option>
-                        <option value="monthly" className="bg-gray-strong">{t('settings.alerts.monthly')}</option>
-                      </select>
+                        onValueChange={(val) => setPrefs((p) => ({ ...p, digest_frequency: val }))}
+                        options={[
+                          { value: 'daily', label: t('settings.alerts.daily') },
+                          { value: 'weekly', label: t('settings.alerts.weekly') },
+                          { value: 'monthly', label: t('settings.alerts.monthly') },
+                        ]}
+                      />
                     </div>
                   )}
                 </div>

@@ -82,7 +82,7 @@ export const SportPageClient: React.FC = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-md">
             <div>
-              <h1 className="text-4xl font-sans font-bold tracking-tight font-bold text-gradient mb-2">{t('sport_page.sport_fitness_title')}</h1>
+              <h1 className="text-4xl font-sans font-bold tracking-tight text-soft-cream mb-2">{t('sport_page.sport_fitness_title')}</h1>
               <p className="text-gray-light text-sm tracking-wide">
                 {t('sport_page.sport_fitness_desc')}
               </p>

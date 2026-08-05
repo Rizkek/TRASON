@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal } from '@/components';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, Select } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useActivity } from '@/hooks/useActivity';
 import { useDailyTasks } from '@/hooks/useDailyTasks';
@@ -360,7 +360,7 @@ export function TimelineClient() {
           {/* Header */}
           <div className="flex items-start justify-between flex-wrap gap-md">
             <div className="space-y-xs">
-              <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-gradient">{t('timeline_page.title')}</h1>
+              <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('timeline_page.title')}</h1>
               <p className="text-subtext flex items-center gap-sm">
                 {t('timeline_page.desc')}
               </p>
@@ -369,7 +369,7 @@ export function TimelineClient() {
               {activeTab === 'weekly-log' && module_features?.['timeline_weekly_log'] !== false && activities.length > 0 && (
                 <div className="flex items-center gap-xl text-center">
                   <div>
-                    <p className="text-2xl font-bold text-gradient">{activities.length}</p>
+                    <p className="text-2xl font-bold text-gradient-static">{activities.length}</p>
                     <p className="text-[10px] text-gray-light uppercase tracking-widest">{t('timeline_page.logs_upper')}</p>
                   </div>
                   <div>
@@ -383,7 +383,7 @@ export function TimelineClient() {
               {activeTab === 'daily-checklist' && module_features?.['timeline_daily_checklist'] !== false && totalCount > 0 && (
                 <div className="flex items-center gap-sm">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-gradient">{completedCount}<span className="text-gray-light opacity-50 text-lg">/{totalCount}</span></p>
+                    <p className="text-2xl font-bold text-gradient-static">{completedCount}<span className="text-gray-light opacity-50 text-lg">/{totalCount}</span></p>
                     <p className="text-[10px] text-gray-light uppercase tracking-widest">{t('timeline_page.done_today')}</p>
                   </div>
                 </div>
@@ -807,19 +807,18 @@ export function TimelineClient() {
             />
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-md">
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-day">{t('timeline_page.form.day')}</label>
-                <select
+              <div className="space-y-1.5">
+                <Select
                   id="form-day"
-                  value={form.dayIndex}
-                  onChange={(e) => setForm((f) => ({ ...f, dayIndex: +e.target.value }))}
+                  label={t('timeline_page.form.day')}
+                  value={String(form.dayIndex)}
+                  onValueChange={(val) => setForm((f) => ({ ...f, dayIndex: +val }))}
                   disabled={form.applyToAllDays}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none disabled:opacity-50"
-                >
-                  {daysOfWeek.map((d, i) => (
-                    <option key={i} value={i}>{d.toLocaleDateString(locale, { weekday: 'long' })}</option>
-                  ))}
-                </select>
+                  options={daysOfWeek.map((d, i) => ({
+                    value: String(i),
+                    label: d.toLocaleDateString(locale, { weekday: 'long' }),
+                  }))}
+                />
                 {!editingActivity && (
                   <div className="mt-2 flex items-center gap-2">
                     <input
@@ -835,66 +834,65 @@ export function TimelineClient() {
                   </div>
                 )}
               </div>
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-hour">{t('timeline_page.form.hour')}</label>
-                <select
-                  id="form-hour"
-                  value={form.start_hour}
-                  onChange={(e) => setForm((f) => ({ ...f, start_hour: +e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                >
-                  {HOURS.map((h) => <option key={h} value={h}>{formatHour(h)}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-min">{t('timeline_page.form.min')}</label>
-                <select
-                  id="form-min"
-                  value={form.start_minute}
-                  onChange={(e) => setForm((f) => ({ ...f, start_minute: +e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                >
-                  {[0, 15, 30, 45].map((m) => <option key={m} value={m}>{String(m).padStart(2, '0')}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-dur">{t('timeline_page.form.duration')}</label>
-                <select
-                  id="form-dur"
-                  value={form.duration_minutes}
-                  onChange={(e) => setForm((f) => ({ ...f, duration_minutes: +e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                >
-                  {[15, 30, 45, 60, 90, 120, 180, 240].map((m) => <option key={m} value={m}>{m < 60 ? `${m}m` : `${m / 60}h`}</option>)}
-                </select>
-              </div>
+              <Select
+                id="form-hour"
+                label={t('timeline_page.form.hour')}
+                value={String(form.start_hour)}
+                onValueChange={(val) => setForm((f) => ({ ...f, start_hour: +val }))}
+                options={HOURS.map((h) => ({
+                  value: String(h),
+                  label: formatHour(h),
+                }))}
+              />
+              <Select
+                id="form-min"
+                label={t('timeline_page.form.min')}
+                value={String(form.start_minute)}
+                onValueChange={(val) => setForm((f) => ({ ...f, start_minute: +val }))}
+                options={[0, 15, 30, 45].map((m) => ({
+                  value: String(m),
+                  label: String(m).padStart(2, '0'),
+                }))}
+              />
+              <Select
+                id="form-dur"
+                label={t('timeline_page.form.duration')}
+                value={String(form.duration_minutes)}
+                onValueChange={(val) => setForm((f) => ({ ...f, duration_minutes: +val }))}
+                options={[15, 30, 45, 60, 90, 120, 180, 240].map((m) => ({
+                  value: String(m),
+                  label: m < 60 ? `${m}m` : `${m / 60}h`,
+                }))}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-md">
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-cat">{t('timeline_page.form.category')}</label>
-                <select
-                  id="form-cat"
-                  value={form.category}
-                  onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                >
-                  <option value="">{t('timeline_page.form.uncategorized')}</option>
-                  {CATEGORY_OPTIONS.map((c) => <option key={c} value={c}>{t(`timeline_page.form.categories.${c}`)}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="form-mood">{t('timeline_page.form.mood')}</label>
-                <select
-                  id="form-mood"
-                  value={form.mood}
-                  onChange={(e) => setForm((f) => ({ ...f, mood: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                >
-                  <option value="">{t('timeline_page.form.none')}</option>
-                  {MOOD_OPTIONS.map((m) => <option key={m.value} value={m.value}>{m.emoji} {t(`timeline_page.form.moods.${m.labelKey}`)}</option>)}
-                </select>
-              </div>
+              <Select
+                id="form-cat"
+                label={t('timeline_page.form.category')}
+                value={form.category || 'none'}
+                onValueChange={(val) => setForm((f) => ({ ...f, category: val === 'none' ? '' : val }))}
+                options={[
+                  { value: 'none', label: t('timeline_page.form.uncategorized') },
+                  ...CATEGORY_OPTIONS.map((c) => ({
+                    value: c,
+                    label: t(`timeline_page.form.categories.${c}`),
+                  })),
+                ]}
+              />
+              <Select
+                id="form-mood"
+                label={t('timeline_page.form.mood')}
+                value={form.mood || 'none'}
+                onValueChange={(val) => setForm((f) => ({ ...f, mood: val === 'none' ? '' : val }))}
+                options={[
+                  { value: 'none', label: t('timeline_page.form.none') },
+                  ...MOOD_OPTIONS.map((m) => ({
+                    value: m.value,
+                    label: `${m.emoji} ${t(`timeline_page.form.moods.${m.labelKey}`)}`,
+                  })),
+                ]}
+              />
             </div>
 
             <div>

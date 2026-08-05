@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Button, Loading, Modal, Input, ErrorAlert, Calendar as CalendarUI } from '@/components';
+import { Layout, Button, Loading, Modal, Input, ErrorAlert, Calendar as CalendarUI, DatePicker } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useReminder } from '@/hooks/useReminder';
 
@@ -406,12 +406,10 @@ export function RemindersClient() {
             className="bg-black/[0.03] dark:bg-white/[0.03]"
           />
           <div className="grid grid-cols-2 gap-md">
-            <Input 
+            <DatePicker 
               label={t('reminders_page.form.date')} 
-              type="date" 
               value={form.dueDate} 
-              onChange={e => setForm({...form, dueDate: e.target.value})}
-              className="bg-black/[0.03] dark:bg-white/[0.03]"
+              onChange={(val) => setForm(f => ({ ...f, dueDate: val }))}
             />
             <Input 
               label={t('reminders_page.form.time')} 

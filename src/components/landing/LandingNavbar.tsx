@@ -59,7 +59,7 @@ export function LandingNavbar() {
           <div className="w-10 h-10 flex items-center justify-center transform transition-transform duration-500 hover:scale-105">
             <Compass size={24} className="text-warm-gold" />
           </div>
-          <span className="text-2xl font-serif font-bold tracking-tight">TRASON</span>
+          <span className="text-2xl font-display font-extrabold tracking-tight">TRASON</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -126,7 +126,7 @@ export function LandingNavbar() {
 
       {/* Mobile Nav */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-warm-black/95 backdrop-blur-xl border-b border-white/10 py-md px-lg flex flex-col gap-sm shadow-2xl overflow-y-auto max-h-[80vh]">
+        <div className="md:hidden absolute top-full left-0 w-full bg-warm-black/95 backdrop-blur-xl border-b border-white/10 py-md px-lg flex flex-col gap-sm shadow-2xl overflow-y-auto max-h-[80vh] animate-in fade-in-0 slide-in-from-top-2 duration-200">
           {navItems.map((item) => (
             item.items ? (
               <div key={item.name} className="flex flex-col gap-1 py-2">

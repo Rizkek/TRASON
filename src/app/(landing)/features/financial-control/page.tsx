@@ -4,7 +4,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { CurrencyCircleDollar, TrendUp as TrendingUp, TrendDown as TrendingDown, Wallet, ArrowUpRight, ChartBar, ArrowRight } from '@phosphor-icons/react/dist/ssr';
+import { CurrencyCircleDollar, TrendUp as TrendingUp, TrendDown as TrendingDown, Wallet, ArrowUpRight, ChartBar, ArrowRight, CaretDown } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -93,12 +93,13 @@ export default function FinancialControlPage() {
                
                {/* Chart Area */}
                <div className="lg:col-span-2 bg-white/5 border border-white/5 rounded-3xl p-8 relative overflow-hidden group">
-                 <div className="flex justify-between items-center mb-8 relative z-10">
-                   <h3 className="font-bold text-white text-lg">Cash Flow Trajectory</h3>
-                   <select className="bg-black/50 border border-white/10 rounded-lg px-3 py-1 text-sm text-gray-light outline-none">
-                     <option>Last 6 Months</option>
-                   </select>
-                 </div>
+                  <div className="flex justify-between items-center mb-8 relative z-10">
+                    <h3 className="font-bold text-white text-lg">Cash Flow Trajectory</h3>
+                    <div className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-light flex items-center gap-1.5 cursor-default">
+                      <span>Last 6 Months</span>
+                      <CaretDown size={12} className="text-gray-light/60" />
+                    </div>
+                  </div>
                  
                  {/* Simulated Chart */}
                  <div className="h-64 flex items-end justify-between gap-2 relative z-10">

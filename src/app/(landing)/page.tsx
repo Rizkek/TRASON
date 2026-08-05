@@ -169,7 +169,7 @@ export default function Home() {
         <div className="text-center space-y-md z-10 px-lg max-w-2xl">
           <h2
             key={motionStep}
-            className="text-2xl md:text-4xl font-display tracking-tight text-warm-gold animate-fade-in italic"
+            className="text-2xl md:text-4xl font-display tracking-tight text-gradient animate-fade-in italic"
           >
             {mounted ? motionTexts[motionStep] : motionTexts[0]}
           </h2>
@@ -221,16 +221,14 @@ export default function Home() {
           </div>
 
           {/* H1 — emotional value proposition */}
-          <h1 className="text-5xl md:text-7xl lg:text-[6.5rem] font-display font-extrabold leading-[1.1] md:leading-[1.05] tracking-tight">
+          <h1 className="text-5xl md:text-7xl lg:text-[6.5rem] font-display font-extrabold leading-[1.1] md:leading-[1.05] tracking-tight text-gradient">
             Your Personal{' '}
             <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-warm-gold via-soft-cream to-warm-gold bg-[length:200%_auto] animate-shimmer">
-              Operating System.
-            </span>
+            Operating System.
           </h1>
 
           {/* Sub-headline — features */}
-          <p className="text-lg md:text-2xl text-gray-light/80 max-w-2xl mx-auto leading-relaxed font-sans font-normal animate-slide-up [animation-delay:0.2s]">
+          <p className="text-lg md:text-2xl text-gray-light max-w-2xl mx-auto leading-relaxed font-sans font-normal animate-slide-up [animation-delay:0.2s]">
             Manage your finances, career, habits, and daily life from one calm workspace.
           </p>
 
@@ -248,7 +246,7 @@ export default function Home() {
                 />
               </button>
             </Link>
-            <Link href="/preview">
+            <Link href="/showcase/live-dashboard">
               <button
                 id="hero-cta-secondary"
                 className="w-full sm:w-auto bg-black/[0.03] dark:bg-white/[0.03] border border-black/[0.1] dark:border-white/[0.1] hover:bg-black/[0.08] text-soft-cream px-3xl py-4 rounded-xl font-medium transition-all backdrop-blur-sm text-lg flex items-center justify-center gap-sm"
@@ -301,10 +299,10 @@ export default function Home() {
       <section className="py-16 md:py-32 px-md md:px-lg relative z-10">
         <div className="max-w-5xl mx-auto text-center space-y-2xl">
           <div className="space-y-sm">
-            <h2 className="text-3xl md:text-5xl font-display tracking-tight text-gray-light">
-              Too many apps, too much friction.
+            <h2 className="text-3xl md:text-5xl font-display tracking-tight text-soft-cream">
+              Too many apps, <span className="text-warm-gold">too much friction.</span>
             </h2>
-            <p className="text-gray-light/60 text-lg max-w-2xl mx-auto">
+            <p className="text-gray-light/70 text-lg max-w-2xl mx-auto">
               You budget in a spreadsheet, track habits in a separate app, log workouts elsewhere, 
               and hope everything stays in sync. It never does.
             </p>
@@ -320,10 +318,10 @@ export default function Home() {
               const Icon = app.icon;
               return (
                 <div key={i} className="flex flex-col items-center gap-sm group cursor-default">
-                  <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-center shadow-xl transform -rotate-3 group-hover:rotate-0 transition-all duration-300 text-white/20 ${app.colorClass}`}>
+                  <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center shadow-xl transform -rotate-3 group-hover:rotate-0 group-hover:scale-105 transition-all duration-300 ease-out text-white/30 ${app.colorClass}`}>
                     <Icon size={32} strokeWidth={1.5} />
                   </div>
-                  <span className="text-xs text-gray-light/40 font-bold uppercase tracking-wider group-hover:text-gray-light/80 transition-colors">{app.name}</span>
+                  <span className="text-xs text-gray-light/50 font-bold uppercase tracking-wider group-hover:text-gray-light transition-colors">{app.name}</span>
                 </div>
               );
             })}
@@ -334,12 +332,12 @@ export default function Home() {
       {/* ── SOLUTION + DASHBOARD PREVIEW ─────────────────────────────────── */}
       <section className="py-16 md:py-32 px-md md:px-lg relative z-10 bg-gradient-to-b from-transparent via-warm-gold/[0.02] to-transparent border-y border-white/[0.02]">
         <div className="max-w-5xl mx-auto text-center space-y-xl">
-          <h2 className="text-4xl md:text-6xl font-display tracking-tight text-warm-gold">
+          <h2 className="text-4xl md:text-6xl font-display tracking-tight text-gradient">
             One dashboard for{' '}
-            <br />
+            <br className="hidden sm:block" />
             everything that matters.
           </h2>
-          <p className="text-xl text-gray-light/80 font-light max-w-2xl mx-auto">
+          <p className="text-xl text-gray-light/90 font-light max-w-2xl mx-auto leading-relaxed">
             One login. One dashboard. All the clarity you need to make better decisions about
             your money, energy, and career — every single day.
           </p>
@@ -365,7 +363,7 @@ export default function Home() {
               <div className="col-span-2 space-y-xl">
                 <div className="space-y-sm">
                   <h3 className="text-3xl font-display tracking-tight text-white flex gap-2 items-baseline">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-warm-gold to-soft-cream">Good Evening</span>, User
+                    <span className="text-gradient">Good Evening</span>, Alex
                   </h3>
                   <div className="flex items-center gap-3 text-xs text-gray-light/60">
                     <span>Friday, October 24</span>
@@ -430,9 +428,9 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 space-y-sm">
             <h2 className="text-3xl md:text-5xl font-display tracking-tight">
-              Everything you need. Nothing you don&apos;t.
+              <span className="text-gradient">Everything you need.</span> Nothing you don&apos;t.
             </h2>
-            <p className="text-gray-light/60 text-lg max-w-xl mx-auto">
+            <p className="text-gray-light/70 text-lg max-w-xl mx-auto">
               Four core modules, fully integrated, all free to start.
             </p>
           </div>
@@ -442,8 +440,8 @@ export default function Home() {
               const Icon = f.icon;
               return (
                 <Link key={f.label} href={f.href} className="group">
-                  <article className={`h-full bg-black/20 border border-white/5 rounded-2xl p-8 transition-all duration-300 cursor-pointer ${f.border} ${f.bg}`}>
-                    <div className={`w-11 h-11 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center mb-5 ${f.color} transition-colors`}>
+                  <article className={`h-full bg-black/20 border border-white/10 hover:border-white/20 rounded-2xl p-8 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[0_15px_35px_rgba(0,0,0,0.4)] ${f.border} ${f.bg}`}>
+                    <div className={`w-11 h-11 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center mb-5 ${f.color} transition-colors group-hover:scale-110 duration-300`}>
                       <Icon size={22} />
                     </div>
                     <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${f.color}`}>{f.label}</p>
@@ -465,6 +463,9 @@ export default function Home() {
       {/* ── SOCIAL PROOF / FOUNDER NOTE ───────────────────────────────────── */}
       <section className="py-16 md:py-24 px-md md:px-lg relative z-10 bg-gradient-to-b from-transparent via-black/20 to-transparent">
         <div className="max-w-3xl mx-auto text-center space-y-8">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-warm-gold/10 text-warm-gold text-[10px] font-bold uppercase tracking-widest border border-warm-gold/20">
+            Founder&apos;s Note
+          </div>
           <blockquote className="text-2xl md:text-3xl font-display tracking-tight italic text-gray-light/90 leading-relaxed">
             &ldquo;I built TRASON because I was tired of maintaining 6 different apps just to understand my own life.
             I wanted one calm place where everything made sense.&rdquo;
@@ -507,7 +508,7 @@ export default function Home() {
 
       {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
       <section className="py-24 md:py-40 px-md md:px-lg text-center space-y-lg md:space-y-xl relative z-10">
-        <h2 className="text-4xl md:text-7xl font-display tracking-tight italic tracking-tight leading-[1.2] md:leading-[1]">
+        <h2 className="text-4xl md:text-7xl font-display tracking-tight italic leading-[1.2] md:leading-[1] text-gradient">
           Ready to take <br className="hidden md:block" /> control?
         </h2>
         <div className="max-w-sm mx-auto space-y-lg pt-lg">

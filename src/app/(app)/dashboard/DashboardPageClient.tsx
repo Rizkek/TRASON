@@ -172,7 +172,7 @@ export function DashboardClient() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg md:mb-xl">
           <div className="space-y-sm">
             <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-white flex flex-wrap items-baseline gap-x-xs">
-              <span className="text-gradient">{greeting},</span>
+              <span className="text-soft-cream">{greeting},</span>
               <span>{user?.first_name || user?.name?.split(' ')[0] || 'User'}</span>
             </h1>
             <div className="flex items-center gap-md text-gray-very-light opacity-60 mt-xs">

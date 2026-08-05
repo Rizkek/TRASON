@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal } from '@/components';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, Select, DatePicker } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useCareer } from '@/hooks/useCareer';
 import { useCareerAnalytics } from '@/hooks/useCareerAnalytics';
@@ -37,7 +37,8 @@ type CareerFormData = {
   location: string;
   work_scheme: string;
   salary_currency: string;
-  salary_amount: string;
+  salary_min: string;
+  salary_max: string;
   notes: string;
   url: string;
   priority: CareerApplication['priority'];
@@ -53,7 +54,8 @@ const defaultForm: CareerFormData = {
   location: '',
   work_scheme: 'wfo',
   salary_currency: 'IDR',
-  salary_amount: '',
+  salary_min: '',
+  salary_max: '',
   notes: '',
   url: '',
   priority: 'medium',
@@ -155,14 +157,21 @@ export default function CareerClient({ initialApplications }: Props) {
   const openEditModal = useCallback((app: CareerApplication) => {
     setEditingApp(app);
     let c = 'IDR';
-    let a = '';
+    let sMin = '';
+    let sMax = '';
     if (app.salary_range) {
-      const parts = app.salary_range.trim().split(' ');
+      let raw = app.salary_range.trim();
+      const parts = raw.split(' ');
       if (parts.length > 1 && /^[A-Z]{2,4}$/i.test(parts[0])) {
          c = parts[0].toUpperCase();
-         a = parts.slice(1).join(' ');
+         raw = parts.slice(1).join(' ');
+      }
+      if (raw.includes('-')) {
+        const [min, max] = raw.split('-').map(s => s.trim());
+        sMin = min || '';
+        sMax = max || '';
       } else {
-         a = app.salary_range;
+        sMin = raw;
       }
     }
     setForm({
@@ -175,7 +184,8 @@ export default function CareerClient({ initialApplications }: Props) {
       location: app.location || '',
       work_scheme: app.work_scheme || 'wfo',
       salary_currency: c,
-      salary_amount: a,
+      salary_min: sMin,
+      salary_max: sMax,
       notes: app.notes || '',
       url: app.url || '',
       priority: app.priority,
@@ -224,7 +234,17 @@ export default function CareerClient({ initialApplications }: Props) {
     setIsSaving(true);
     setPageError(null);
     try {
-      const finalSalaryRange = form.salary_amount.trim() ? `${form.salary_currency} ${form.salary_amount.trim()}` : undefined;
+      let finalSalaryRange: string | undefined = undefined;
+      const minVal = form.salary_min.trim();
+      const maxVal = form.salary_max.trim();
+      if (minVal && maxVal) {
+        finalSalaryRange = `${form.salary_currency} ${minVal} - ${maxVal}`;
+      } else if (minVal) {
+        finalSalaryRange = `${form.salary_currency} ${minVal}`;
+      } else if (maxVal) {
+        finalSalaryRange = `${form.salary_currency} Up to ${maxVal}`;
+      }
+
       const payload = {
         company_name: form.company_name.trim(),
         role_title: form.role_title.trim(),
@@ -737,76 +757,66 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-type">{t('career_page.form.type')}</label>
-                <select
-                  id="modal-type"
-                  value={form.application_type}
-                  onChange={(e) => setForm((f) => ({ ...f, application_type: e.target.value as any }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                >
-                  {Object.entries(TYPE_CONFIG).map(([val, cfg]) => (
-                    <option key={val} value={val}>{cfg.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-status">{t('career_page.form.status')}</label>
-                <select
-                  id="modal-status"
-                  value={form.status}
-                  onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as any }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                >
-                  <optgroup label="In Progress">
-                    {ACTIVE_STATUSES.map((val) => (
-                      <option key={val} value={val}>{STATUS_CONFIG[val].label}</option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Closed">
-                    {CLOSED_STATUSES.map((val) => (
-                      <option key={val} value={val}>{STATUS_CONFIG[val].label}</option>
-                    ))}
-                  </optgroup>
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-priority">{t('career_page.form.priority')}</label>
-                <select
-                  id="modal-priority"
-                  value={form.priority}
-                  onChange={(e) => setForm((f) => ({ ...f, priority: e.target.value as any }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                >
-                  <option value="low">{t('career_page.form.options.low')}</option>
-                  <option value="medium">{t('career_page.form.options.medium')}</option>
-                  <option value="high">{t('career_page.form.options.high')}</option>
-                </select>
-              </div>
+              <Select
+                id="modal-type"
+                label={t('career_page.form.type')}
+                value={form.application_type}
+                onValueChange={(val) => setForm((f) => ({ ...f, application_type: val as any }))}
+                options={Object.entries(TYPE_CONFIG).map(([val, cfg]) => ({
+                  value: val,
+                  label: cfg.label,
+                }))}
+              />
+              <Select
+                id="modal-status"
+                label={t('career_page.form.status')}
+                value={form.status}
+                onValueChange={(val) => setForm((f) => ({ ...f, status: val as any }))}
+                options={[
+                  {
+                    label: 'In Progress',
+                    options: ACTIVE_STATUSES.map((val) => ({
+                      value: val,
+                      label: STATUS_CONFIG[val].label,
+                    })),
+                  },
+                  {
+                    label: 'Closed',
+                    options: CLOSED_STATUSES.map((val) => ({
+                      value: val,
+                      label: STATUS_CONFIG[val].label,
+                    })),
+                  },
+                ]}
+              />
+              <Select
+                id="modal-priority"
+                label={t('career_page.form.priority')}
+                value={form.priority}
+                onValueChange={(val) => setForm((f) => ({ ...f, priority: val as any }))}
+                options={[
+                  { value: 'low', label: t('career_page.form.options.low') },
+                  { value: 'medium', label: t('career_page.form.options.medium') },
+                  { value: 'high', label: t('career_page.form.options.high') },
+                ]}
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-applied">{t('career_page.form.applied_date')}</label>
-                <input
-                  id="modal-applied"
-                  type="date"
-                  value={form.applied_date}
-                  onChange={(e) => setForm((f) => ({ ...f, applied_date: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                />
-                {formErrors.applied_date && <p className="text-expense text-xs mt-1">{formErrors.applied_date}</p>}
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-interview">{t('career_page.form.interview_date')}</label>
-                <input
-                  id="modal-interview"
-                  type="date"
-                  value={form.interview_date}
-                  onChange={(e) => setForm((f) => ({ ...f, interview_date: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                />
-              </div>
+              <DatePicker
+                id="modal-applied"
+                label={t('career_page.form.applied_date')}
+                value={form.applied_date}
+                onChange={(val) => setForm((f) => ({ ...f, applied_date: val }))}
+                error={formErrors.applied_date}
+              />
+              <DatePicker
+                id="modal-interview"
+                label={t('career_page.form.interview_date')}
+                value={form.interview_date}
+                onChange={(val) => setForm((f) => ({ ...f, interview_date: val }))}
+                placeholder="Optional interview date"
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
@@ -816,61 +826,71 @@ export default function CareerClient({ initialApplications }: Props) {
                 value={form.location}
                 onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
               />
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block" htmlFor="modal-work-scheme">{t('career_page.form.work_scheme')}</label>
-                <select
-                  id="modal-work-scheme"
-                  value={form.work_scheme}
-                  onChange={(e) => setForm((f) => ({ ...f, work_scheme: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                >
-                  <option value="wfo">{t('career_page.form.options.wfo')}</option>
-                  <option value="wfh">{t('career_page.form.options.wfh')}</option>
-                  <option value="hybrid">{t('career_page.form.options.hybrid')}</option>
-                </select>
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('career_page.form.salary')}</label>
-                <div className="flex gap-2">
-                  <select 
-                    value={form.salary_currency} 
-                    onChange={(e) => setForm(f => ({...f, salary_currency: e.target.value}))}
-                    className="w-[80px] h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-xs px-1 text-white focus:border-primary focus:outline-none"
-                  >
-                    <option value="IDR">IDR</option>
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="SGD">SGD</option>
-                    <option value="GBP">GBP</option>
-                    <option value="AUD">AUD</option>
-                  </select>
-                  <input
-                    type="text"
-                    value={form.salary_amount}
-                    onChange={(e) => setForm(f => ({...f, salary_amount: e.target.value}))}
-                    placeholder="10,000,000"
-                    className="flex-1 h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                  />
-                </div>
+              <Select
+                id="modal-work-scheme"
+                label={t('career_page.form.work_scheme')}
+                value={form.work_scheme}
+                onValueChange={(val) => setForm((f) => ({ ...f, work_scheme: val }))}
+                options={[
+                  { value: 'wfo', label: t('career_page.form.options.wfo') },
+                  { value: 'wfh', label: t('career_page.form.options.wfh') },
+                  { value: 'hybrid', label: t('career_page.form.options.hybrid') },
+                ]}
+              />
+              <Input
+                label={t('career_page.form.url')}
+                placeholder={t('career_page.form.url_placeholder')}
+                value={form.url}
+                onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
+                error={formErrors.url}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">{t('career_page.form.salary')}</label>
+              <div className="flex items-center gap-2">
+                <Select
+                  value={form.salary_currency}
+                  onValueChange={(val) => setForm((f) => ({ ...f, salary_currency: val }))}
+                  options={[
+                    { value: 'IDR', label: 'IDR' },
+                    { value: 'USD', label: 'USD' },
+                    { value: 'EUR', label: 'EUR' },
+                    { value: 'SGD', label: 'SGD' },
+                    { value: 'GBP', label: 'GBP' },
+                    { value: 'AUD', label: 'AUD' },
+                  ]}
+                  className="w-[85px] shrink-0"
+                />
+                <input
+                  type="text"
+                  value={form.salary_min}
+                  onChange={(e) => setForm((f) => ({ ...f, salary_min: e.target.value }))}
+                  placeholder={t('career_page.form.salary_min_placeholder') || 'Min (e.g. 10.000.000)'}
+                  className="flex-1 min-w-0 h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                />
+                <span className="text-gray-light/50 font-bold select-none text-xs">—</span>
+                <input
+                  type="text"
+                  value={form.salary_max}
+                  onChange={(e) => setForm((f) => ({ ...f, salary_max: e.target.value }))}
+                  placeholder={t('career_page.form.salary_max_placeholder') || 'Max (e.g. 15.000.000)'}
+                  className="flex-1 min-w-0 h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                />
               </div>
             </div>
 
-            <Input
-              label={t('career_page.form.url')}
-              placeholder={t('career_page.form.url_placeholder')}
-              value={form.url}
-              onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
-              error={formErrors.url}
-            />
-
-            <textarea
-              value={form.notes}
-              onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-              placeholder={t('career_page.form.notes_placeholder')}
-              rows={3}
-              aria-label="Notes"
-              className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
-            />
+            <div className="space-y-1">
+              <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">Catatan / Keterangan</label>
+              <textarea
+                value={form.notes}
+                onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+                placeholder={t('career_page.form.notes_placeholder')}
+                rows={3}
+                aria-label="Notes"
+                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              />
+            </div>
           </div>
         </Modal>
         )}
@@ -916,46 +936,32 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block">
-                  {(t('career_page.interview_journal.date') as string) || 'Interview Date'}
-                </label>
-                <input
-                  type="date"
-                  value={journalForm.interview_date}
-                  onChange={(e) => setJournalForm((f: any) => ({ ...f, interview_date: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block">
-                  {(t('career_page.interview_journal.difficulty') as string) || 'Difficulty'}
-                </label>
-                <select
-                  value={journalForm.difficulty}
-                  onChange={(e) => setJournalForm((f: any) => ({ ...f, difficulty: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                >
-                  <option value="easy">{(t('career_page.interview_journal.options.difficulty_easy') as string) || 'Easy'}</option>
-                  <option value="medium">{(t('career_page.interview_journal.options.difficulty_medium') as string) || 'Medium'}</option>
-                  <option value="hard">{(t('career_page.interview_journal.options.difficulty_hard') as string) || 'Hard'}</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-gray-light mb-1 block">
-                  {(t('career_page.interview_journal.outcome') as string) || 'Outcome'}
-                </label>
-                <select
-                  value={journalForm.outcome}
-                  onChange={(e) => setJournalForm((f: any) => ({ ...f, outcome: e.target.value }))}
-                  className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none"
-                >
-                  <option value="pending">{(t('career_page.interview_journal.options.outcome_pending') as string) || 'Pending'}</option>
-                  <option value="pass">{(t('career_page.interview_journal.options.outcome_pass') as string) || 'Passed'}</option>
-                  <option value="fail">{(t('career_page.interview_journal.options.outcome_fail') as string) || 'Failed'}</option>
-                  <option value="unknown">{(t('career_page.interview_journal.options.outcome_unknown') as string) || 'Unknown'}</option>
-                </select>
-              </div>
+              <DatePicker
+                label={(t('career_page.interview_journal.date') as string) || 'Interview Date'}
+                value={journalForm.interview_date}
+                onChange={(val) => setJournalForm((f: any) => ({ ...f, interview_date: val }))}
+              />
+              <Select
+                label={(t('career_page.interview_journal.difficulty') as string) || 'Difficulty'}
+                value={journalForm.difficulty}
+                onValueChange={(val) => setJournalForm((f: any) => ({ ...f, difficulty: val }))}
+                options={[
+                  { value: 'easy', label: (t('career_page.interview_journal.options.difficulty_easy') as string) || 'Easy' },
+                  { value: 'medium', label: (t('career_page.interview_journal.options.difficulty_medium') as string) || 'Medium' },
+                  { value: 'hard', label: (t('career_page.interview_journal.options.difficulty_hard') as string) || 'Hard' },
+                ]}
+              />
+              <Select
+                label={(t('career_page.interview_journal.outcome') as string) || 'Outcome'}
+                value={journalForm.outcome}
+                onValueChange={(val) => setJournalForm((f: any) => ({ ...f, outcome: val }))}
+                options={[
+                  { value: 'pending', label: (t('career_page.interview_journal.options.outcome_pending') as string) || 'Pending' },
+                  { value: 'pass', label: (t('career_page.interview_journal.options.outcome_pass') as string) || 'Passed' },
+                  { value: 'fail', label: (t('career_page.interview_journal.options.outcome_fail') as string) || 'Failed' },
+                  { value: 'unknown', label: (t('career_page.interview_journal.options.outcome_unknown') as string) || 'Unknown' },
+                ]}
+              />
             </div>
 
             <div>

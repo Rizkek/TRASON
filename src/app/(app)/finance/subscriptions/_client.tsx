@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon } from '@/components';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon, Select, DatePicker } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useCategory } from '@/hooks/useCategory';
@@ -173,7 +173,7 @@ export function SubscriptionsClient() {
 
         <div className="flex items-start justify-between flex-wrap gap-md">
           <div className="space-y-sm">
-            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-gradient">{t('finance.subscriptions') || 'Subscriptions'}</h1>
+            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('finance.subscriptions') || 'Subscriptions'}</h1>
             <p className="text-subtext flex items-center gap-sm">
               {t('finance.manageSubscriptions') || 'Manage your recurring payments.'}
             </p>
@@ -385,48 +385,40 @@ export function SubscriptionsClient() {
 
           <div className="grid grid-cols-2 gap-md">
             <Input
-              label="AMOUNT"
+              label={t('finance.amount_label')}
               type="number"
+              step="any"
               placeholder="0.00"
               value={form.amount}
               onChange={(e) => setForm(f => ({ ...f, amount: e.target.value }))}
             />
-            <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.currency_label')}</label>
-              <select
-                value={form.currency}
-                onChange={(e) => setForm(f => ({ ...f, currency: e.target.value }))}
-                className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm px-md text-sm text-soft-cream focus:border-primary focus:outline-none"
-              >
-                {['USD', 'IDR', 'EUR', 'GBP'].map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label={t('finance.currency_label')}
+              value={form.currency}
+              onValueChange={(val) => setForm(f => ({ ...f, currency: val }))}
+              options={['USD', 'IDR', 'EUR', 'GBP'].map(c => ({
+                value: c,
+                label: c,
+              }))}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-md">
-            <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.billing_cycle_label')}</label>
-              <select
-                value={form.billing_cycle}
-                onChange={(e) => setForm(f => ({ ...f, billing_cycle: e.target.value as any }))}
-                className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm px-md text-sm text-soft-cream focus:border-primary focus:outline-none"
-              >
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-                <option value="weekly">Weekly</option>
-              </select>
-            </div>
-            <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.next_billing_label')}</label>
-              <input 
-                type="date" 
-                value={form.next_billing_date}
-                onChange={(e) => setForm(f => ({ ...f, next_billing_date: e.target.value }))}
-                className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm px-md text-sm text-soft-cream focus:border-primary focus:outline-none"
-              />
-            </div>
+            <Select
+              label={t('finance.billing_cycle_label')}
+              value={form.billing_cycle}
+              onValueChange={(val) => setForm(f => ({ ...f, billing_cycle: val as any }))}
+              options={[
+                { value: 'monthly', label: 'Monthly' },
+                { value: 'yearly', label: 'Yearly' },
+                { value: 'weekly', label: 'Weekly' },
+              ]}
+            />
+            <DatePicker
+              label={t('finance.next_billing_label')}
+              value={form.next_billing_date}
+              onChange={(val) => setForm(f => ({ ...f, next_billing_date: val }))}
+            />
           </div>
 
           <div className="space-y-sm">

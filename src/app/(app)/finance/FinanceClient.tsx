@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon, BottomSheet } from '@/components';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon, BottomSheet, DatePicker } from '@/components';
 import { CategoryManagerModal } from './components/CategoryManagerModal';
 import { BudgetManagerModal } from './components/BudgetManagerModal';
 import { TransactionFeed } from './components/TransactionFeed';
@@ -343,7 +343,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
       <div className="space-y-xl animate-fade-in">
         <div className="flex items-start justify-between flex-wrap gap-md">
           <div className="space-y-sm w-full md:w-auto flex-1">
-            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-gradient">{t('finance.title')}</h1>
+            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('finance.title')}</h1>
             <div className="flex items-center gap-md">
               <p className="text-subtext flex items-center gap-sm">
                 {t('finance.subtitle')}
@@ -789,26 +789,21 @@ export default function FinanceClient({ initialTransactions }: Props) {
               }}
               error={formErrors.amount}
             />
-            <div className="space-y-sm">
-              <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.modal.date')}</label>
-              <input 
-                type="date" 
-                title="Select date"
-                value={form.date}
-                onChange={(e) => {
-                  setForm(f => ({ ...f, date: e.target.value }));
-                  if (formErrors.date) {
-                    setFormErrors(prev => {
-                      const copy = { ...prev };
-                      delete copy.date;
-                      return copy;
-                    });
-                  }
-                }}
-                className="w-full h-10 bg-gray-strong border border-black/5 dark:border-white/5 rounded-sm px-md text-sm text-soft-cream focus:border-primary focus:outline-none"
-              />
-              {formErrors.date && <p className="text-xs text-danger">{formErrors.date}</p>}
-            </div>
+            <DatePicker
+              label={t('finance.modal.date')}
+              value={form.date}
+              onChange={(val) => {
+                setForm(f => ({ ...f, date: val }));
+                if (formErrors.date) {
+                  setFormErrors(prev => {
+                    const copy = { ...prev };
+                    delete copy.date;
+                    return copy;
+                  });
+                }
+              }}
+              error={formErrors.date}
+            />
           </div>
 
           <div className="space-y-sm">

@@ -13,20 +13,38 @@ export function LandingFooter() {
         <div className="space-y-md col-span-1 md:col-span-1">
           <div className="flex items-center gap-sm">
             <Logo size={32} variant="gold" />
-            <span className="font-serif text-2xl font-bold tracking-tight text-soft-cream">TRASON</span>
+            <span className="font-display text-2xl font-extrabold tracking-tight text-soft-cream">TRASON</span>
           </div>
           <p className="text-sm text-gray-light font-light leading-relaxed">
             The unified personal operating system designed to eliminate app fatigue and centralize your financial, career, and vitality data.
           </p>
-          <div className="flex items-center gap-md pt-sm">
-            <a href="https://wa.me/62895417240107" target="_blank" rel="noopener noreferrer" className="text-gray-light hover:text-warm-gold transition-colors">
-              <MessageCircle size={18} />
+          <div className="flex items-center gap-2 pt-sm">
+            <a
+              href="https://wa.me/62895417240107"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-xl bg-white/5 border border-white/5 hover:border-warm-gold/40 hover:bg-warm-gold/10 hover:text-warm-gold text-gray-light flex items-center justify-center transition-all duration-300 group"
+              aria-label="WhatsApp"
+            >
+              <MessageCircle size={18} className="group-hover:scale-110 transition-transform" />
             </a>
-            <a href="https://github.com/Rizkek/TRASON" target="_blank" rel="noopener noreferrer" className="text-gray-light hover:text-warm-gold transition-colors">
-              <GithubLogo size={18} />
+            <a
+              href="https://github.com/Rizkek/TRASON"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-xl bg-white/5 border border-white/5 hover:border-warm-gold/40 hover:bg-warm-gold/10 hover:text-warm-gold text-gray-light flex items-center justify-center transition-all duration-300 group"
+              aria-label="GitHub"
+            >
+              <GithubLogo size={18} className="group-hover:scale-110 transition-transform" />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-light hover:text-warm-gold transition-colors">
-              <LinkedinLogo size={18} />
+            <a
+              href="https://linkedin.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-xl bg-white/5 border border-white/5 hover:border-warm-gold/40 hover:bg-warm-gold/10 hover:text-warm-gold text-gray-light flex items-center justify-center transition-all duration-300 group"
+              aria-label="LinkedIn"
+            >
+              <LinkedinLogo size={18} className="group-hover:scale-110 transition-transform" />
             </a>
           </div>
         </div>

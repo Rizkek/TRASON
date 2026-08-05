@@ -341,7 +341,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <NotificationToggle />
             <button onClick={() => setIsBottomSheetOpen(true)} className="relative w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-[10px] font-bold text-white shadow-lg overflow-hidden shrink-0">
               {(user as any)?.avatar_url ? (
-                <Image src={(user as any).avatar_url} alt="Avatar" fill className="object-cover" />
+                <Image src={(user as any).avatar_url} alt="Avatar" fill sizes="28px" className="object-cover" />
               ) : (
                 user?.first_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'
               )}
