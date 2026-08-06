@@ -7,19 +7,20 @@ import { useAuthStore } from '@/store/authStore';
 import { useActivity } from '@/hooks/useActivity';
 import { useDailyTasks } from '@/hooks/useDailyTasks';
 import { validateActivity, sanitizeError } from '@/libs/validation';
-import { Activity } from '@/services/supabaseClient';
+import { Activity, Reminder } from '@/services/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Plus, Trash as Trash2, Clock, Tag, Smiley, MapPin, Star, Heartbeat as ActivityIcon, CheckSquare, Square, ListChecks, Calendar, ArrowCounterClockwise, ProjectorScreenChart, CaretLeft, CaretRight } from '@phosphor-icons/react';
+import { useReminder } from '@/hooks/useReminder';
+import { Plus, Trash as Trash2, Clock, Tag, Smiley, MapPin, Star, Heartbeat as ActivityIcon, CheckSquare, Square, ListChecks, Calendar, ArrowCounterClockwise, ProjectorScreenChart, CaretLeft, CaretRight, Bell, Warning, Repeat } from '@phosphor-icons/react';
 
 
 const MOOD_OPTIONS = [
-  { labelKey: 'happy', emoji: 'ðŸ˜Š', value: 'Happy' },
-  { labelKey: 'neutral', emoji: 'ðŸ˜', value: 'Neutral' },
-  { labelKey: 'tired', emoji: 'ðŸ˜´', value: 'Tired' },
-  { labelKey: 'energized', emoji: 'ðŸ’ª', value: 'Energized' },
-  { labelKey: 'stressed', emoji: 'ðŸ˜¤', value: 'Stressed' },
-  { labelKey: 'calm', emoji: 'ðŸ§˜', value: 'Calm' },
+  { labelKey: 'happy', emoji: '😊', value: 'Happy' },
+  { labelKey: 'neutral', emoji: '😐', value: 'Neutral' },
+  { labelKey: 'tired', emoji: '😴', value: 'Tired' },
+  { labelKey: 'energized', emoji: '💪', value: 'Energized' },
+  { labelKey: 'stressed', emoji: '😤', value: 'Stressed' },
+  { labelKey: 'calm', emoji: '🧘', value: 'Calm' },
 ];
 
 const CATEGORY_OPTIONS = ['work', 'study', 'exercise', 'sport', 'meals', 'social', 'rest', 'personal', 'other'];
@@ -48,19 +49,20 @@ function getCurrentWeekBounds() {
   const now = new Date();
   const day = now.getDay();
   const diffToMon = day === 0 ? -6 : 1 - day;
-  const mon = new Date(now);
-  mon.setDate(now.getDate() + diffToMon);
-  mon.setHours(0, 0, 0, 0);
-  const sun = new Date(mon);
-  sun.setDate(mon.getDate() + 6);
-  sun.setHours(23, 59, 59, 999);
-  return { start: mon, end: sun };
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMon);
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
+
+  return { start, end };
 }
 
-function getDaysOfWeek(start: Date) {
+function getDaysOfWeek(start: Date): Date[] {
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(start);
-    d.setDate(d.getDate() + i);
+    d.setDate(start.getDate() + i);
     return d;
   });
 }
@@ -77,6 +79,7 @@ interface ActivityFormData {
   location: string;
   rating: number;
   applyToAllDays: boolean;
+  isWeeklyRoutine: boolean;
 }
 
 const defaultForm: ActivityFormData = {
@@ -94,6 +97,7 @@ const defaultForm: ActivityFormData = {
   location: '',
   rating: 0,
   applyToAllDays: false,
+  isWeeklyRoutine: false,
 };
 
 const CELL_HEIGHT = 64; // px per hour row
@@ -112,6 +116,7 @@ export function TimelineClient() {
     weekStart,
     weekEnd
   );
+  const { reminders } = useReminder(weekStart, weekEnd);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -181,6 +186,7 @@ export function TimelineClient() {
     const start = new Date(activity.start_time);
     const end = activity.end_time ? new Date(activity.end_time) : null;
     const jsDay = start.getDay();
+    const isRoutine = Boolean((activity.metadata as any)?.is_weekly_routine || (activity as any).is_weekly_template);
     
     setEditingActivity(activity);
     setForm({
@@ -195,6 +201,7 @@ export function TimelineClient() {
       location: activity.location || '',
       rating: activity.rating || 0,
       applyToAllDays: false,
+      isWeeklyRoutine: isRoutine,
     });
     setIsModalOpen(true);
   }, []);
@@ -224,6 +231,10 @@ export function TimelineClient() {
           duration_minutes: form.duration_minutes,
           location: form.location.trim() || undefined,
           rating: form.rating || undefined,
+          metadata: {
+            ...(editingActivity?.metadata || {}),
+            is_weekly_routine: form.isWeeklyRoutine,
+          },
         };
 
         const validation = validateActivity(payload);
@@ -254,6 +265,9 @@ export function TimelineClient() {
               duration_minutes: form.duration_minutes,
               location: form.location.trim() || undefined,
               rating: form.rating || undefined,
+              metadata: {
+                is_weekly_routine: form.isWeeklyRoutine,
+              },
             };
 
             const validation = validateActivity(payload);
@@ -282,6 +296,9 @@ export function TimelineClient() {
             duration_minutes: form.duration_minutes,
             location: form.location.trim() || undefined,
             rating: form.rating || undefined,
+            metadata: {
+              is_weekly_routine: form.isWeeklyRoutine,
+            },
           };
 
           const validation = validateActivity(payload);
@@ -325,12 +342,18 @@ export function TimelineClient() {
 
   if (!isAuthenticated) return null;
 
-  // Build lookup: day index (0=Mon) â†’ hour â†’ activities
+  // Build lookup: day index (0=Mon) -> hour -> activities & reminders
   const grid: Record<number, Record<number, Activity[]>> = {};
+  const remindersGrid: Record<number, Record<number, Reminder[]>> = {};
   for (let d = 0; d < 7; d++) {
     grid[d] = {};
-    for (let h = 0; h < 24; h++) grid[d][h] = [];
+    remindersGrid[d] = {};
+    for (let h = 0; h < 24; h++) {
+      grid[d][h] = [];
+      remindersGrid[d][h] = [];
+    }
   }
+
   activities.forEach((act) => {
     // Hide auto-generated daily_tasks summaries from the visual grid
     if (act.category === 'daily_tasks') return;
@@ -342,6 +365,21 @@ export function TimelineClient() {
       const h = start.getHours();
       if (!grid[dayIdx][h]) grid[dayIdx][h] = [];
       grid[dayIdx][h].push(act);
+    }
+  });
+
+  reminders.forEach((rem) => {
+    if (!rem.due_date || rem.status === 'completed' || rem.status === 'cancelled') return;
+    const remDate = new Date(rem.due_date);
+    const dayIdx = daysOfWeek.findIndex((d) => d.toDateString() === remDate.toDateString());
+    if (dayIdx >= 0) {
+      let h = 9;
+      if (rem.due_time) {
+        const parsedH = parseInt(rem.due_time.split(':')[0], 10);
+        if (!isNaN(parsedH)) h = parsedH;
+      }
+      if (!remindersGrid[dayIdx][h]) remindersGrid[dayIdx][h] = [];
+      remindersGrid[dayIdx][h].push(rem);
     }
   });
 
@@ -644,44 +682,88 @@ export function TimelineClient() {
                         {daysOfWeek.map((day, dayIdx) => {
                           const isToday = day.toDateString() === new Date().toDateString();
                           const cellActivities = grid[dayIdx][hour] || [];
+                          const cellReminders = remindersGrid[dayIdx][hour] || [];
+                          const hasClash = cellActivities.length > 0 && cellReminders.length > 0;
 
                           return (
                             <div
                               key={dayIdx}
                               role="gridcell"
-                              className={`border-r border-b border-black/[0.03] dark:border-white/[0.03] last:border-r-0 p-0.5 cursor-pointer group relative ${
+                              className={`border-r border-b border-black/[0.03] dark:border-white/[0.03] last:border-r-0 p-1 cursor-pointer group relative ${
                                 isToday ? 'bg-primary/[0.02]' : 'hover:bg-black/[0.01] dark:bg-white/[0.01]'
                               }`}
                               onClick={() => {
-                                if (cellActivities.length === 0) openAddModal(day, hour);
+                                if (cellActivities.length === 0 && cellReminders.length === 0) openAddModal(day, hour);
                               }}
                               aria-label={`${day.toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' })} at ${formatHour(hour)}`}
                             >
                               {/* Empty slot hint */}
-                              {cellActivities.length === 0 && (
+                              {cellActivities.length === 0 && cellReminders.length === 0 && (
                                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                   <Plus size={12} className="text-primary opacity-50" />
                                 </div>
                               )}
 
+                              {/* Clash indicator */}
+                              {hasClash && (
+                                <div className="flex items-center gap-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded px-1.5 py-0.5 mb-1 text-[8px] font-bold">
+                                  <Warning size={10} className="shrink-0" />
+                                  <span className="truncate">Bentrok ({cellReminders.length} Pengingat)</span>
+                                </div>
+                              )}
+
+                              {/* Reminder cards */}
+                              {cellReminders.map((rem) => (
+                                <div
+                                  key={rem.id}
+                                  className="rounded p-1 mb-1 text-left border-l-2 border-amber-400 bg-amber-500/10 text-soft-cream relative group/rem"
+                                  title={`Pengingat: ${rem.title}${rem.due_time ? ' (' + rem.due_time + ')' : ''}`}
+                                >
+                                  <div className="flex items-center gap-1">
+                                    <Bell size={10} className="text-amber-400 shrink-0" />
+                                    <p className="text-[9px] font-bold text-amber-200 truncate leading-tight flex-1">
+                                      {rem.title}
+                                    </p>
+                                  </div>
+                                  {rem.due_time && (
+                                    <span className="text-[8px] text-amber-300/70 font-mono block mt-0.5">
+                                      {rem.due_time}
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+
                               {/* Activity cards */}
-                              {cellActivities.map((act) => (
+                              {cellActivities.map((act) => {
+                                const isRoutine = Boolean((act.metadata as any)?.is_weekly_routine || (act as any).is_weekly_template);
+                                return (
                                 <div
                                   key={act.id}
                                   onClick={(e) => { e.stopPropagation(); openEditModal(act); }}
-                                  className="rounded p-1 mb-0.5 cursor-pointer group/card hover:brightness-110 transition-all text-left relative overflow-hidden"
+                                  className={`rounded p-1 mb-0.5 cursor-pointer group/card hover:brightness-110 transition-all text-left relative overflow-hidden ${
+                                    isRoutine ? 'border-dashed' : ''
+                                  }`}
                                   style={{
-                                    background: `linear-gradient(135deg, #4e4feb22, #4e4feb11)`,
-                                    borderLeft: '2px solid #4e4feb',
+                                    background: isRoutine 
+                                      ? `linear-gradient(135deg, rgba(78,79,235,0.15), rgba(78,79,235,0.05))` 
+                                      : `linear-gradient(135deg, #4e4feb22, #4e4feb11)`,
+                                    borderLeft: isRoutine ? '2px dashed #818cf8' : '2px solid #4e4feb',
                                   }}
                                   role="button"
                                   tabIndex={0}
                                   onKeyDown={(e) => e.key === 'Enter' && openEditModal(act)}
                                   aria-label={`${act.title}, ${act.category || 'activity'}`}
                                 >
-                                  <p className="text-[9px] font-bold text-soft-cream truncate leading-tight">
-                                    {act.title}
-                                  </p>
+                                  <div className="flex items-center gap-1">
+                                    {isRoutine && (
+                                      <span title="Jadwal Rutin Mingguan" className="inline-flex items-center shrink-0">
+                                        <Repeat size={10} className="text-indigo-300" />
+                                      </span>
+                                    )}
+                                    <p className="text-[9px] font-bold text-soft-cream truncate leading-tight flex-1">
+                                      {act.title}
+                                    </p>
+                                  </div>
                                   <div className="flex items-center gap-1 mt-0.5">
                                     {act.category && (
                                       <span className="text-[8px] text-primary opacity-80 uppercase tracking-wide">
@@ -703,7 +785,8 @@ export function TimelineClient() {
                                     <Trash2 size={9} />
                                   </button>
                                 </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           );
                         })}
@@ -736,8 +819,9 @@ export function TimelineClient() {
                 </div>
                 {(() => {
                   const todaysActivities = grid[mobileDayIdx] ? HOURS.flatMap(h => grid[mobileDayIdx][h] || []) : [];
+                  const todaysReminders = remindersGrid[mobileDayIdx] ? HOURS.flatMap(h => remindersGrid[mobileDayIdx][h] || []) : [];
                   
-                  if (todaysActivities.length === 0) {
+                  if (todaysActivities.length === 0 && todaysReminders.length === 0) {
                     return (
                       <div className="text-center py-xl space-y-sm">
                         <p className="text-gray-light italic text-xs">{t('timeline_page.no_activities_today')}</p>
@@ -750,14 +834,37 @@ export function TimelineClient() {
 
                   return (
                     <>
-                      {todaysActivities.map(act => (
+                      {/* Reminders section in mobile */}
+                      {todaysReminders.map(rem => (
+                        <div key={rem.id} className="p-sm rounded-lg border border-amber-500/30 bg-amber-500/10 flex items-start gap-md">
+                          <Bell size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-sm text-amber-200 truncate">{rem.title}</p>
+                              <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-bold uppercase tracking-wider">Pengingat</span>
+                            </div>
+                            {rem.due_time && (
+                              <p className="text-xs text-amber-300/80 font-mono mt-0.5">Waktu: {rem.due_time}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Activities */}
+                      {todaysActivities.map(act => {
+                        const isRoutine = Boolean((act.metadata as any)?.is_weekly_routine || (act as any).is_weekly_template);
+                        return (
                         <div key={act.id} onClick={() => openEditModal(act)} className="glass-card p-sm flex items-start gap-md active:bg-black/10 transition-colors">
                           <div className="text-[10px] font-bold text-gray-light w-10 text-right pt-0.5 shrink-0">
                             {formatHour(new Date(act.start_time).getHours())}
                           </div>
-                          <div className="flex-1 border-l-2 border-primary pl-md relative group min-w-0">
-                            <p className="font-bold text-sm text-soft-cream truncate">{act.title}</p>
+                          <div className={`flex-1 border-l-2 ${isRoutine ? 'border-indigo-400 border-dashed' : 'border-primary'} pl-md relative group min-w-0`}>
+                            <div className="flex items-center gap-1.5">
+                              {isRoutine && <Repeat size={12} className="text-indigo-400 shrink-0" />}
+                              <p className="font-bold text-sm text-soft-cream truncate">{act.title}</p>
+                            </div>
                             <div className="flex flex-wrap gap-2 text-[8px] text-gray-light uppercase tracking-widest mt-1">
+                              {isRoutine && <span className="text-indigo-300 bg-indigo-500/20 px-1 rounded shrink-0">Rutin</span>}
                               {act.category && <span className="text-primary shrink-0">{act.category}</span>}
                               {getDurationLabel(act) && <span className="shrink-0">• {getDurationLabel(act)}</span>}
                             </div>
@@ -769,7 +876,8 @@ export function TimelineClient() {
                             </button>
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                       <button onClick={() => openAddModal()} className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-white/10 hover:border-primary/50 text-gray-light hover:text-primary rounded-lg transition-colors text-xs font-bold uppercase tracking-widest mt-4">
                         <Plus size={14} /> {t('timeline_page.log_activity_btn')}
                       </button>
@@ -797,6 +905,28 @@ export function TimelineClient() {
           }
         >
           <div className="space-y-xl">
+            {/* Weekly Routine Template selector */}
+            <div className="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <Repeat size={18} className="text-indigo-400 shrink-0" />
+                <div>
+                  <label htmlFor="routine-checkbox" className="text-xs font-bold text-soft-cream cursor-pointer block">
+                    Jadwal Rutin Mingguan (Template)
+                  </label>
+                  <p className="text-[10px] text-gray-light">
+                    Aktivitas berulang tiap minggu (misal: jam kerja, kuliah, olahraga, standup).
+                  </p>
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                id="routine-checkbox"
+                checked={form.isWeeklyRoutine}
+                onChange={(e) => setForm((f) => ({ ...f, isWeeklyRoutine: e.target.checked }))}
+                className="w-4 h-4 rounded border-indigo-400 text-indigo-500 focus:ring-indigo-400 bg-black/20"
+              />
+            </div>
+
             <Input
               label={t('timeline_page.form.title')}
               placeholder={t('timeline_page.form.title_placeholder')}

@@ -12,8 +12,9 @@ import { getLocalISODate } from '@/libs/format';
 import { sanitizeError } from '@/libs/validation';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare, FunnelSimple, CheckCircle, Users, XCircle, Newspaper, Robot } from '@phosphor-icons/react';
+import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare, FunnelSimple, CheckCircle, Users, XCircle, Newspaper, Robot, Bell } from '@phosphor-icons/react';
 import { useInterviewJournal } from '@/hooks/useInterviewJournal';
+import { useReminder } from '@/hooks/useReminder';
 
 const FILTER_TABS = [
   { id: 'all',       labelKey: 'all',       icon: FunnelSimple },
@@ -42,6 +43,7 @@ type CareerFormData = {
   notes: string;
   url: string;
   priority: CareerApplication['priority'];
+  sync_to_reminder?: boolean;
 };
 
 const defaultForm: CareerFormData = {
@@ -59,6 +61,7 @@ const defaultForm: CareerFormData = {
   notes: '',
   url: '',
   priority: 'medium',
+  sync_to_reminder: true,
 };
 
 function validateCareerForm(form: CareerFormData): Record<string, string> {
@@ -83,6 +86,7 @@ export default function CareerClient({ initialApplications }: Props) {
 
   const { applications, stats, isLoading, error, createApplication, updateApplication, deleteApplication } = useCareer(initialApplications);
   const { analytics } = useCareerAnalytics();
+  const { createReminder } = useReminder();
 
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -265,6 +269,27 @@ export default function CareerClient({ initialApplications }: Props) {
       } else {
         await createApplication(payload as any);
       }
+
+      // Auto-create linked reminder if interview_date is provided and checked
+      if (form.interview_date && form.sync_to_reminder) {
+        try {
+          await createReminder({
+            title: `Wawancara: ${form.role_title} @ ${form.company_name}`,
+            description: `Wawancara kerja untuk posisi ${form.role_title} di ${form.company_name}.\nLokasi: ${form.location || form.work_scheme || 'WFO'}\nCatatan: ${form.notes || '-'}`,
+            due_date: form.interview_date,
+            due_time: '09:00',
+            due_datetime: new Date(form.interview_date + 'T09:00:00').toISOString(),
+            category: 'career',
+            priority: 'high',
+            status: 'pending',
+            is_recurring: false,
+            notify_times: [60, 180, 1440],
+          });
+        } catch (remErr) {
+          console.warn('[Career] Failed to auto-create reminder:', remErr);
+        }
+      }
+
       setIsModalOpen(false);
     } catch (err) {
       setPageError(sanitizeError(err));
@@ -698,7 +723,7 @@ export default function CareerClient({ initialApplications }: Props) {
             )}
           </>
           ) : mainTab === 'ats_matcher' ? (
-            <ATSMatcher />
+            <ATSMatcher applications={applications} />
           ) : null}
         </div>
 
@@ -737,23 +762,16 @@ export default function CareerClient({ initialApplications }: Props) {
                 value={form.company_name}
                 onChange={(e) => setForm((f) => ({ ...f, company_name: e.target.value }))}
                 error={formErrors.company_name}
-                autoFocus
+                required
               />
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('career_page.form.role')}</label>
-                <input
-                  type="text"
-                  list="role-suggestions"
-                  value={form.role_title}
-                  onChange={(e) => setForm((f) => ({ ...f, role_title: e.target.value }))}
-                  placeholder={t('career_page.form.role_placeholder')}
-                  className={`w-full h-10 bg-gray-strong border ${formErrors.role_title ? 'border-expense' : 'border-black/5 dark:border-white/5'} rounded-sm text-sm px-sm text-white focus:border-primary focus:outline-none`}
-                />
-                <datalist id="role-suggestions">
-                  {uniqueRoles.map(r => <option key={r} value={r} />)}
-                </datalist>
-                {formErrors.role_title && <p className="text-expense text-xs mt-1">{formErrors.role_title}</p>}
-              </div>
+              <Input
+                label={t('career_page.form.role')}
+                placeholder={t('career_page.form.role_placeholder')}
+                value={form.role_title}
+                onChange={(e) => setForm((f) => ({ ...f, role_title: e.target.value }))}
+                error={formErrors.role_title}
+                required
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
@@ -761,39 +779,36 @@ export default function CareerClient({ initialApplications }: Props) {
                 id="modal-type"
                 label={t('career_page.form.type')}
                 value={form.application_type}
-                onValueChange={(val) => setForm((f) => ({ ...f, application_type: val as any }))}
-                options={Object.entries(TYPE_CONFIG).map(([val, cfg]) => ({
-                  value: val,
-                  label: cfg.label,
-                }))}
+                onValueChange={(val) => setForm((f) => ({ ...f, application_type: val as CareerApplication['application_type'] }))}
+                options={[
+                  { value: 'job', label: t('career_page.form.options.job') },
+                  { value: 'internship', label: t('career_page.form.options.internship') },
+                  { value: 'freelance', label: t('career_page.form.options.freelance') },
+                  { value: 'full_time', label: t('career_page.form.options.full_time') },
+                  { value: 'part_time', label: t('career_page.form.options.part_time') },
+                  { value: 'contract', label: t('career_page.form.options.contract') },
+                ]}
               />
               <Select
                 id="modal-status"
                 label={t('career_page.form.status')}
                 value={form.status}
-                onValueChange={(val) => setForm((f) => ({ ...f, status: val as any }))}
+                onValueChange={(val) => setForm((f) => ({ ...f, status: val as CareerApplication['status'] }))}
                 options={[
-                  {
-                    label: 'In Progress',
-                    options: ACTIVE_STATUSES.map((val) => ({
-                      value: val,
-                      label: STATUS_CONFIG[val].label,
-                    })),
-                  },
-                  {
-                    label: 'Closed',
-                    options: CLOSED_STATUSES.map((val) => ({
-                      value: val,
-                      label: STATUS_CONFIG[val].label,
-                    })),
-                  },
+                  { value: 'applied', label: t('career_page.form.options.status_applied') },
+                  { value: 'reviewing', label: t('career_page.form.options.status_reviewing') },
+                  { value: 'interview', label: t('career_page.form.options.status_interview') },
+                  { value: 'offer', label: t('career_page.form.options.status_offer') },
+                  { value: 'accepted', label: t('career_page.form.options.status_accepted') },
+                  { value: 'rejected', label: t('career_page.form.options.status_rejected') },
+                  { value: 'withdrawn', label: t('career_page.form.options.status_withdrawn') },
                 ]}
               />
               <Select
                 id="modal-priority"
                 label={t('career_page.form.priority')}
                 value={form.priority}
-                onValueChange={(val) => setForm((f) => ({ ...f, priority: val as any }))}
+                onValueChange={(val) => setForm((f) => ({ ...f, priority: val as CareerApplication['priority'] }))}
                 options={[
                   { value: 'low', label: t('career_page.form.options.low') },
                   { value: 'medium', label: t('career_page.form.options.medium') },
@@ -802,21 +817,39 @@ export default function CareerClient({ initialApplications }: Props) {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-              <DatePicker
-                id="modal-applied"
-                label={t('career_page.form.applied_date')}
-                value={form.applied_date}
-                onChange={(val) => setForm((f) => ({ ...f, applied_date: val }))}
-                error={formErrors.applied_date}
-              />
-              <DatePicker
-                id="modal-interview"
-                label={t('career_page.form.interview_date')}
-                value={form.interview_date}
-                onChange={(val) => setForm((f) => ({ ...f, interview_date: val }))}
-                placeholder="Optional interview date"
-              />
+            <div className="space-y-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                <DatePicker
+                  id="modal-applied"
+                  label={t('career_page.form.applied_date')}
+                  value={form.applied_date}
+                  onChange={(val) => setForm((f) => ({ ...f, applied_date: val }))}
+                  error={formErrors.applied_date}
+                />
+                <DatePicker
+                  id="modal-interview"
+                  label={t('career_page.form.interview_date')}
+                  value={form.interview_date}
+                  onChange={(val) => setForm((f) => ({ ...f, interview_date: val }))}
+                  placeholder="Optional interview date"
+                />
+              </div>
+
+              {form.interview_date && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 border border-primary/20 rounded-lg animate-fade-in">
+                  <input
+                    type="checkbox"
+                    id="sync-reminder-cb"
+                    checked={form.sync_to_reminder ?? true}
+                    onChange={(e) => setForm((f) => ({ ...f, sync_to_reminder: e.target.checked }))}
+                    className="w-4 h-4 rounded border-primary/40 text-primary focus:ring-primary bg-black/20"
+                  />
+                  <label htmlFor="sync-reminder-cb" className="text-xs text-soft-cream font-medium cursor-pointer flex items-center gap-1.5">
+                    <Bell size={14} className="text-primary" />
+                    <span>Tambahkan otomatis ke Pengingat / Kalender (notifikasi 1 jam & 1 hari sebelum)</span>
+                  </label>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
@@ -881,7 +914,9 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
 
             <div className="space-y-1">
-              <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">Catatan / Keterangan</label>
+              <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">
+                {t('career_page.form.notes_label') || 'Catatan / Keterangan'}
+              </label>
               <textarea
                 value={form.notes}
                 onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}

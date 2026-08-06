@@ -30,6 +30,7 @@
     "chart.js": "^4.5.1",
     "next": "^15.5.19",
     "nextjs-toploader": "^3.9.17",
+    "pdfjs-dist": "^6.2.108",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.3.1",
     "react-day-picker": "^10.0.1",

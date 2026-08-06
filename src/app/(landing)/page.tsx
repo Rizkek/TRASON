@@ -89,9 +89,9 @@ const FEATURES = [
     headline: 'Manage your professional growth.',
     body: 'Track job applications, interviews, offers, and skills in a unified career pipeline. Never miss a follow-up again.',
     href: '/features/career-architect',
-    color: 'text-blue-400',
-    border: 'group-hover:border-blue-400/40',
-    bg: 'group-hover:bg-blue-400/5',
+    color: 'text-warm-gold',
+    border: 'group-hover:border-warm-gold/40',
+    bg: 'group-hover:bg-warm-gold/5',
   },
   {
     icon: Bell,
@@ -271,7 +271,7 @@ export default function Home() {
             Privacy First
           </span>
           <span className="flex items-center gap-2">
-            <Lock size={14} className="text-blue-400" />
+            <Lock size={14} className="text-warm-gold" />
             Your Data, Your Control
           </span>
           <span className="flex items-center gap-2">

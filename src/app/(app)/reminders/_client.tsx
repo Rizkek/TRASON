@@ -133,27 +133,12 @@ export function RemindersClient() {
   };
 
   const handleSave = async () => {
-    if (!form.title) return;
-    
-    setIsSaving(true);
-    // Parse date in local timezone reliably
-    const [y, m, d] = form.dueDate.split('-').map(Number);
-    const [h, min] = form.dueTime.split(':').map(Number);
-    const dueDate = new Date(y, m - 1, d, h, min, 0);
-    
-    const payload = {
-      title: form.title,
-      description: form.description,
-      due_date: form.dueDate,
-      due_time: form.dueTime,
-      due_datetime: dueDate.toISOString(),
-      priority: form.priority,
-      status: editingReminder ? editingReminder.status : 'pending',
-      is_recurring: false,
-      notify_times: form.notifyTimes.length > 0 ? form.notifyTimes : [0, 60, 180, 360],
-    };
+    if (!form.title.trim()) {
+      setFormErrors({ title: 'Judul pengingat wajib diisi' });
+      return;
+    }
 
-    // Validate
+    // Validate first before setting loading state
     const validation = validateReminder({
       ...form,
       due_datetime: form.dueDate && form.dueTime ? `${form.dueDate}T${form.dueTime}` : undefined,
@@ -161,12 +146,30 @@ export function RemindersClient() {
     });
     if (!validation.isValid) {
       setFormErrors(validation.errors);
-      setIsSaving(false);
       return;
     }
 
+    setIsSaving(true);
     setFormErrors({});
     setError(null);
+
+    // Parse date in local timezone reliably
+    const [y, m, d] = form.dueDate.split('-').map(Number);
+    const [h, min] = form.dueTime.split(':').map(Number);
+    const dueDate = new Date(y, m - 1, d, h || 0, min || 0, 0);
+
+    const payload = {
+      title: form.title.trim(),
+      description: form.description.trim() || undefined,
+      due_date: form.dueDate,
+      due_time: form.dueTime,
+      due_datetime: dueDate.toISOString(),
+      priority: form.priority,
+      status: editingReminder ? editingReminder.status : 'pending',
+      is_recurring: false,
+      notify_times: form.notifyTimes,
+    };
+
     try {
       if (editingReminder) {
         await updateReminder(editingReminder.id, payload);
@@ -398,11 +401,14 @@ export function RemindersClient() {
         }
       >
         <div className="space-y-xl py-md">
+          {error && <ErrorAlert error={error} onDismiss={() => setError(null)} />}
           <Input 
             label={t('reminders_page.form.title_label')} 
             value={form.title} 
             onChange={e => setForm({...form, title: e.target.value})}
             placeholder={t('reminders_page.form.title_placeholder')}
+            error={formErrors.title}
+            required
             className="bg-black/[0.03] dark:bg-white/[0.03]"
           />
           <div className="grid grid-cols-2 gap-md">
@@ -410,12 +416,14 @@ export function RemindersClient() {
               label={t('reminders_page.form.date')} 
               value={form.dueDate} 
               onChange={(val) => setForm(f => ({ ...f, dueDate: val }))}
+              error={formErrors.dueDate}
             />
             <Input 
               label={t('reminders_page.form.time')} 
               type="time" 
               value={form.dueTime} 
               onChange={e => setForm({...form, dueTime: e.target.value})}
+              error={formErrors.dueTime}
               className="bg-black/[0.03] dark:bg-white/[0.03]"
             />
           </div>

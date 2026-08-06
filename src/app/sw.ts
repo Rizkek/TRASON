@@ -55,17 +55,81 @@ const networkWithFallback = {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>You're offline – TRASON</title>
   <style>
-    body { margin: 0; display: flex; flex-direction: column; align-items: center;
-           justify-content: center; min-height: 100dvh; font-family: system-ui, sans-serif;
-           background: #0f0f11; color: #e5e5e5; text-align: center; padding: 2rem; }
-    h1  { font-size: 1.5rem; margin-bottom: 0.5rem; }
-    p   { color: #9ca3af; max-width: 320px; }
-    button { margin-top: 1.5rem; padding: 0.6rem 1.4rem; border: none;
-             border-radius: 8px; background: #6366f1; color: #fff;
-             font-size: 1rem; cursor: pointer; }
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0B0F14;
+      color: #F8FAFC;
+      text-align: center;
+      padding: 2rem;
+      box-sizing: border-box;
+    }
+    .icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: rgba(244, 201, 93, 0.08);
+      border: 1px solid rgba(244, 201, 93, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 0 24px rgba(244, 201, 93, 0.15);
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #F4C95D;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    p {
+      color: #94A3B8;
+      max-width: 320px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.65rem 1.6rem;
+      border: none;
+      border-radius: 9999px;
+      background: #F4C95D;
+      color: #0B0F14;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(244, 201, 93, 0.25);
+      transition: all 0.2s ease;
+    }
+    button:hover {
+      background: #E3B84D;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(244, 201, 93, 0.35);
+    }
+    button:active {
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body>
+  <div class="icon-wrap">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F4C95D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="1" y1="1" x2="23" y2="23"></line>
+      <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+      <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+      <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+      <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+      <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+      <line x1="12" y1="20" x2="12.01" y2="20"></line>
+    </svg>
+  </div>
   <h1>You're offline</h1>
   <p>TRASON couldn't load this page because there's no internet connection.</p>
   <button onclick="location.reload()">Try again</button>

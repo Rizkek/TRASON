@@ -113,7 +113,7 @@ function OfflineBanner() {
       className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-sm px-lg py-sm animate-fade-in backdrop-blur-md border-b text-[10px] font-bold tracking-[0.15em] uppercase ${
         justReconnected
           ? 'bg-success/10 border-success/20 text-soft-cream'
-          : 'bg-warning/[0.08] border-warning/20 text-soft-cream'
+          : 'bg-warm-gold/[0.08] border-warm-gold/20 text-soft-cream'
       }`}
     >
       {justReconnected ? (
@@ -123,8 +123,8 @@ function OfflineBanner() {
         </>
       ) : (
         <>
-          <TrasonIcon icon={SYS_ICONS.offline} size={11} className="text-warning opacity-80" />
-          <span className="text-warning/90">Offline — changes will sync when connected</span>
+          <TrasonIcon icon={SYS_ICONS.offline} size={11} className="text-warm-gold opacity-90" />
+          <span className="text-warm-gold/90">Offline — changes will sync when connected</span>
         </>
       )}
     </div>
