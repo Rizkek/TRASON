@@ -6,6 +6,12 @@ import { DayPicker } from 'react-day-picker';
 import { CalendarBlank, CaretLeft, CaretRight, X, Check } from '@phosphor-icons/react';
 import { formatDateOnly } from '@/libs/date';
 
+export interface HolidayItem {
+  date: string;
+  name: string;
+  is_cuti_bersama: boolean;
+}
+
 export interface DatePickerProps {
   value?: string | Date;
   onChange?: (dateStr: string) => void;
@@ -17,6 +23,7 @@ export interface DatePickerProps {
   id?: string;
   minDate?: Date;
   maxDate?: Date;
+  holidays?: HolidayItem[];
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
@@ -30,8 +37,10 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   id,
   minDate,
   maxDate,
+  holidays = [],
 }) => {
   const [open, setOpen] = useState(false);
+  const [viewMonth, setViewMonth] = useState<Date | undefined>(undefined);
   
   // Parse value to Date
   const parseDate = (val?: string | Date): Date | undefined => {
@@ -84,6 +93,28 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         day: 'numeric',
       })
     : '';
+
+  // Parse holidays into Date sets
+  const holidayDates = holidays
+    .filter((h) => !h.is_cuti_bersama)
+    .map((h) => {
+      const [y, m, d] = h.date.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    });
+
+  const cutiDates = holidays
+    .filter((h) => h.is_cuti_bersama)
+    .map((h) => {
+      const [y, m, d] = h.date.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    });
+
+  // Holidays for the current viewed month
+  const currentViewMonth = viewMonth ?? selectedDate ?? new Date();
+  const monthHolidays = holidays.filter((h) => {
+    const [y, m] = h.date.split('-').map(Number);
+    return y === currentViewMonth.getFullYear() && m === currentViewMonth.getMonth() + 1;
+  });
 
   return (
     <div className={`w-full space-y-1.5 ${className}`}>
@@ -232,18 +263,71 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 opacity: 0.2;
                 cursor: not-allowed;
               }
+              /* Holiday day styles */
+              .rdp-day.rdp-holiday .rdp-day_button {
+                border: 1px solid rgba(248, 113, 113, 0.5) !important;
+                color: #fca5a5 !important;
+                font-weight: 700;
+                background: rgba(239, 68, 68, 0.08);
+              }
+              .rdp-day.rdp-holiday.rdp-selected .rdp-day_button {
+                background: #ef4444 !important;
+                color: #fff !important;
+              }
+              /* Cuti bersama day styles */
+              .rdp-day.rdp-cuti .rdp-day_button {
+                border: 1px solid rgba(251, 191, 36, 0.5) !important;
+                color: #fbbf24 !important;
+                font-weight: 700;
+                background: rgba(245, 158, 11, 0.08);
+              }
+              .rdp-day.rdp-cuti.rdp-selected .rdp-day_button {
+                background: #f59e0b !important;
+                color: #000 !important;
+              }
             `}</style>
 
             <DayPicker
               mode="single"
               selected={selectedDate}
               onSelect={handleSelect}
+              month={viewMonth}
+              onMonthChange={setViewMonth}
               disabled={[
                 ...(minDate ? [{ before: minDate }] : []),
                 ...(maxDate ? [{ after: maxDate }] : []),
               ]}
+              modifiers={{
+                holiday: holidayDates,
+                cuti: cutiDates,
+              }}
+              modifiersClassNames={{
+                holiday: 'rdp-holiday',
+                cuti: 'rdp-cuti',
+              }}
               showOutsideDays
             />
+
+            {/* Holiday info for current month */}
+            {monthHolidays.length > 0 && (
+              <div className="mt-2 pt-2 border-t border-white/8 space-y-1">
+                {monthHolidays.map((h) => {
+                  const [y, m, d] = h.date.split('-').map(Number);
+                  const dateObj = new Date(y, m - 1, d);
+                  return (
+                    <div key={h.date} className="flex items-center gap-1.5">
+                      <span className="text-[10px]">{h.is_cuti_bersama ? '🏖️' : '🔴'}</span>
+                      <span className={`text-[10px] font-semibold ${
+                        h.is_cuti_bersama ? 'text-amber-300' : 'text-rose-300'
+                      }`}>
+                        {d} —
+                      </span>
+                      <span className="text-[10px] text-gray-light truncate">{h.name}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Quick Action Footer */}
             <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">

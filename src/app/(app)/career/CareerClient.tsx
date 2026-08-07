@@ -15,6 +15,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare, FunnelSimple, CheckCircle, Users, XCircle, Newspaper, Robot, Bell, Money } from '@phosphor-icons/react';
 import { useInterviewJournal } from '@/hooks/useInterviewJournal';
 import { useReminder } from '@/hooks/useReminder';
+import { useHolidays } from '@/hooks/useHolidays';
 
 const FILTER_TABS = [
   { id: 'all',       labelKey: 'all',       icon: FunnelSimple },
@@ -87,6 +88,7 @@ export default function CareerClient({ initialApplications }: Props) {
   const { applications, stats, isLoading, error, createApplication, updateApplication, deleteApplication } = useCareer(initialApplications);
   const { analytics } = useCareerAnalytics();
   const { createReminder } = useReminder();
+  const { holidays } = useHolidays();
 
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -114,7 +116,6 @@ export default function CareerClient({ initialApplications }: Props) {
   });
   const [deleteJournalConfirmId, setDeleteJournalConfirmId] = useState<string | null>(null);
 
-  // Status and Type configurations using translation hook
   const STATUS_CONFIG: Record<
     CareerApplication['status'],
     { label: string; color: string; badgeVariant: 'default' | 'success' | 'warning' | 'danger' | 'income' | 'expense' | 'activity' | 'insight' | 'info' | undefined }
@@ -282,7 +283,6 @@ export default function CareerClient({ initialApplications }: Props) {
         await createApplication(payload as any);
       }
 
-      // Auto-create linked reminder if interview_date is provided and checked
       if (form.interview_date && form.sync_to_reminder) {
         try {
           await createReminder({
@@ -375,7 +375,6 @@ export default function CareerClient({ initialApplications }: Props) {
       <Layout>
         <div className="space-y-xl animate-fade-in pb-4xl">
 
-          {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-lg">
             <div className="space-y-xs">
               <h1 className="text-5xl font-sans font-bold tracking-tight">
@@ -398,7 +397,6 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
           </div>
 
-          {/* Stats Row */}
           {!isLoading && (
             <div className="flex flex-row justify-between gap-sm md:gap-md overflow-x-auto snap-x no-scrollbar pb-2">
               {[
@@ -415,7 +413,6 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
           )}
 
-          {/* Analytics Bar — Rule-based Intelligence */}
           {!isLoading && analytics && analytics.totalApplications > 0 && (
             <Card className="p-sm md:p-lg border border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02]">
               <div className="flex items-center gap-md sm:gap-xl overflow-x-auto snap-x no-scrollbar flex-nowrap pb-1">
@@ -459,7 +456,6 @@ export default function CareerClient({ initialApplications }: Props) {
             </Card>
           )}
 
-          {/* Main Tabs */}
           <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-fit gap-0.5">
             <button
               onClick={() => setMainTab('applications')}
@@ -501,7 +497,6 @@ export default function CareerClient({ initialApplications }: Props) {
 
           {mainTab === 'applications' ? (
             <>
-              {/* Filter Tabs */}
           <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-full gap-0.5" role="tablist" aria-label="Application filter">
             {FILTER_TABS.map((tab) => {
               const TabIcon = tab.icon;
@@ -525,7 +520,6 @@ export default function CareerClient({ initialApplications }: Props) {
             })}
           </div>
 
-          {/* Application Cards */}
           {isLoading ? (
             <div className="flex justify-center py-2xl"><Loading /></div>
           ) : filteredApps.length === 0 ? (
@@ -549,7 +543,6 @@ export default function CareerClient({ initialApplications }: Props) {
                     role="article"
                     aria-label={`${app.company_name} — ${app.role_title}`}
                   >
-                    {/* Left: Info */}
                     <div className="flex-1 min-w-0 space-y-sm">
                       <div className="flex flex-wrap items-center gap-sm">
                         <Badge
@@ -605,7 +598,6 @@ export default function CareerClient({ initialApplications }: Props) {
                       )}
                     </div>
 
-                    {/* Right: Actions */}
                     <div className="flex items-center gap-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
                       {app.url && (
                         <a
@@ -641,7 +633,6 @@ export default function CareerClient({ initialApplications }: Props) {
           </>
           ) : mainTab === 'journal' ? (
           <>
-            {/* Journal UI */}
             {journalLoading ? (
               <div className="flex justify-center py-2xl"><Loading /></div>
             ) : journals.length === 0 ? (
@@ -685,7 +676,6 @@ export default function CareerClient({ initialApplications }: Props) {
                           </div>
                         </div>
                         
-                        {/* Right: Actions */}
                         <div className="flex items-center gap-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => openEditJournalModal(journal)}
@@ -742,7 +732,6 @@ export default function CareerClient({ initialApplications }: Props) {
           ) : null}
         </div>
 
-        {/* Mobile-only FAB for New Entry */}
         <div className="md:hidden fixed bottom-24 right-4 z-40">
           <Button 
             variant="primary" 
@@ -754,7 +743,6 @@ export default function CareerClient({ initialApplications }: Props) {
           </Button>
         </div>
 
-        {/* Add / Edit Modal */}
         {isModalOpen && (
         <Modal
           isOpen={isModalOpen}
@@ -845,6 +833,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   value={form.applied_date}
                   onChange={(val) => setForm((f) => ({ ...f, applied_date: val }))}
                   error={formErrors.applied_date}
+                  holidays={holidays}
                 />
                 <DatePicker
                   id="modal-interview"
@@ -852,6 +841,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   value={form.interview_date}
                   onChange={(val) => setForm((f) => ({ ...f, interview_date: val }))}
                   placeholder="Optional interview date"
+                  holidays={holidays}
                 />
               </div>
 
@@ -917,7 +907,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 )}
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="grid grid-cols-[96px_1fr_auto_1fr] items-center gap-2">
                 <Select
                   value={form.salary_currency}
                   onValueChange={(val) => setForm((f) => ({ ...f, salary_currency: val }))}
@@ -929,22 +919,21 @@ export default function CareerClient({ initialApplications }: Props) {
                     { value: 'GBP', label: 'GBP' },
                     { value: 'AUD', label: 'AUD' },
                   ]}
-                  className="w-[85px] shrink-0"
                 />
                 <input
                   type="text"
                   value={form.salary_min}
                   onChange={(e) => setForm((f) => ({ ...f, salary_min: e.target.value }))}
-                  placeholder={t('career_page.form.salary_min_placeholder') || 'Min (e.g. 10.000.000)'}
-                  className="flex-1 min-w-0 h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
+                  placeholder={t('career_page.form.salary_min_placeholder') || 'Min'}
+                  className="w-full h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
                 />
-                <span className="text-gray-light/50 font-bold select-none text-xs">—</span>
+                <span className="text-gray-light/50 font-bold select-none text-xs px-1">—</span>
                 <input
                   type="text"
                   value={form.salary_max}
                   onChange={(e) => setForm((f) => ({ ...f, salary_max: e.target.value }))}
-                  placeholder={t('career_page.form.salary_max_placeholder') || 'Max (e.g. 15.000.000)'}
-                  className="flex-1 min-w-0 h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
+                  placeholder={t('career_page.form.salary_max_placeholder') || 'Max'}
+                  className="w-full h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
                 />
               </div>
 
@@ -1054,6 +1043,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 label={(t('career_page.interview_journal.date') as string) || 'Interview Date'}
                 value={journalForm.interview_date}
                 onChange={(val) => setJournalForm((f: any) => ({ ...f, interview_date: val }))}
+                holidays={holidays}
               />
               <Select
                 label={(t('career_page.interview_journal.difficulty') as string) || 'Difficulty'}
