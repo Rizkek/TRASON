@@ -9,7 +9,7 @@ import {
   fetchInvestmentQuotes,
   generateInvestmentInsights,
 } from '@/services/finance/investmentService';
-import { InvestmentPosition } from '@/services/supabaseClient';
+import { InvestmentPosition } from '@/services/supabase/supabaseClient';
 import {
   InvestmentInsightResponse,
   InvestmentPortfolioSummary,

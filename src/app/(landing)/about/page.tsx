@@ -2,7 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { FaqItem } from './FaqItem';
+import { FaqItem } from '@/components/landing/FaqItem';
 
 export const metadata: Metadata = {
   title: 'About TRASON – Philosophy & FAQ',

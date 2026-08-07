@@ -7,7 +7,7 @@ import { Button, Input, Alert, Loading, Logo } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { sanitizeError, validateEmail } from '@/libs/validation';
-import { supabase } from '@/services/supabaseClient';
+import { supabase } from '@/services/supabase/supabaseClient';
 import { Compass, ArrowLeft, Quotes, Eye, EyeSlash as EyeOff } from '@phosphor-icons/react';
 
 export default function LoginPage() {

@@ -142,18 +142,39 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
                 <button
                   type="button"
                   onClick={() => setShowIconPicker(!showIconPicker)}
-                  className="w-12 h-12 flex items-center justify-center bg-gray-strong border border-black/5 dark:border-white/5 rounded-md text-2xl hover:border-primary transition-colors focus:outline-none focus:ring-1 focus:ring-primary/30"
+                  className="w-12 h-12 flex items-center justify-center bg-gray-strong border border-black/5 dark:border-white/5 rounded-md text-2xl hover:border-primary transition-colors focus:outline-none focus:ring-1 focus:ring-primary/30 relative group"
+                  title="Klik untuk memilih icon"
                 >
                   <CategoryIcon name={form.icon} />
+                  <span className="absolute -bottom-1 -right-1 text-[8px] bg-primary/20 text-primary px-1 rounded font-bold border border-primary/30">
+                    Ubah
+                  </span>
                 </button>
               </div>
-              <div className="flex-1">
+              <div className="flex-1 space-y-1">
                 <Input
                   label={t('finance.categories.nameLabel')}
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder={t('finance.categories.namePlaceholder')}
                 />
+                {(() => {
+                  const currentSuggestion = ICON_NAME_SUGGESTIONS[form.icon];
+                  const suggestedText = currentSuggestion?.[language as keyof typeof currentSuggestion] || currentSuggestion?.id || currentSuggestion?.en;
+                  if (!suggestedText || form.name === suggestedText) return null;
+                  return (
+                    <div className="flex items-center gap-1.5 pt-0.5">
+                      <span className="text-[10px] text-gray-light/60">Saran nama:</span>
+                      <button
+                        type="button"
+                        onClick={() => setForm((prev) => ({ ...prev, name: suggestedText }))}
+                        className="text-[10px] text-primary hover:underline font-medium bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20 transition-all"
+                      >
+                        Gunakan &quot;{suggestedText}&quot; ↵
+                      </button>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
 
@@ -165,24 +186,39 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
                       {category.name}
                     </div>
                     <div className="grid grid-cols-5 sm:grid-cols-7 gap-xs">
-                      {category.icons.map(iconName => (
-                        <button
-                          key={iconName}
-                          type="button"
-                          onClick={() => {
-                            const suggestion = ICON_NAME_SUGGESTIONS[iconName];
-                            setForm({ 
-                              ...form, 
-                              icon: iconName,
-                              name: form.name === '' ? (suggestion?.[language as keyof typeof suggestion] || suggestion?.en || '') : form.name
-                            });
-                            setShowIconPicker(false);
-                          }}
-                          className={`p-2 rounded-md flex items-center justify-center transition-colors ${form.icon === iconName ? 'bg-primary/20 text-primary' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-light hover:text-white'}`}
-                        >
-                          <CategoryIcon name={iconName} />
-                        </button>
-                      ))}
+                      {category.icons.map(iconName => {
+                        const suggestion = ICON_NAME_SUGGESTIONS[iconName];
+                        const iconTitle = suggestion?.[language as keyof typeof suggestion] || suggestion?.id || suggestion?.en || iconName;
+                        return (
+                          <button
+                            key={iconName}
+                            type="button"
+                            title={iconTitle}
+                            onClick={() => {
+                              const newSuggestedName = suggestion?.[language as keyof typeof suggestion] || suggestion?.id || suggestion?.en || iconName;
+                              
+                              setForm(prev => {
+                                // Auto replace if: adding new, or name is empty, or name matches any known default icon suggestion
+                                const isCurrentAuto = !prev.name.trim() || 
+                                  !editingId ||
+                                  Object.values(ICON_NAME_SUGGESTIONS).some(s => 
+                                    Object.values(s).includes(prev.name.trim())
+                                  );
+
+                                return { 
+                                  ...prev, 
+                                  icon: iconName,
+                                  name: isCurrentAuto ? newSuggestedName : prev.name
+                                };
+                              });
+                              setShowIconPicker(false);
+                            }}
+                            className={`p-2 rounded-md flex items-center justify-center transition-colors group relative ${form.icon === iconName ? 'bg-primary/20 text-primary ring-1 ring-primary' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-light hover:text-white'}`}
+                          >
+                            <CategoryIcon name={iconName} />
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}

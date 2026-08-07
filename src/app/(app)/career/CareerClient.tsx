@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, Select, DatePicker } from '@/components';
+import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, Select, DatePicker, CreatableAutocomplete } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useCareer } from '@/hooks/useCareer';
 import { useCareerAnalytics } from '@/hooks/useCareerAnalytics';
@@ -12,7 +12,7 @@ import { getLocalISODate } from '@/libs/format';
 import { sanitizeError } from '@/libs/validation';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare, FunnelSimple, CheckCircle, Users, XCircle, Newspaper, Robot, Bell } from '@phosphor-icons/react';
+import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare, FunnelSimple, CheckCircle, Users, XCircle, Newspaper, Robot, Bell, Money } from '@phosphor-icons/react';
 import { useInterviewJournal } from '@/hooks/useInterviewJournal';
 import { useReminder } from '@/hooks/useReminder';
 
@@ -137,7 +137,19 @@ export default function CareerClient({ initialApplications }: Props) {
     contract:   { label: t('career_page.form.options.contract'),   icon: <Briefcase size={12} className="inline mr-1" /> },
   };
 
-  const uniqueRoles = Array.from(new Set(applications.map(a => a.role_title))).filter(Boolean);
+  const uniqueCompanies = Array.from(
+    new Set([
+      ...applications.map((a) => a.company_name),
+      ...journals.map((j: any) => j.company_name),
+    ])
+  ).filter(Boolean);
+
+  const uniqueRoles = Array.from(
+    new Set([
+      ...applications.map((a) => a.role_title),
+      ...journals.map((j: any) => j.role_title),
+    ])
+  ).filter(Boolean);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) router.push('/login');
@@ -579,7 +591,10 @@ export default function CareerClient({ initialApplications }: Props) {
                           </span>
                         )}
                         {app.salary_range && (
-                          <span>{app.salary_range}</span>
+                          <span className="inline-flex items-center gap-1 text-emerald-400 font-mono text-[11px] bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">
+                            <Money size={12} className="shrink-0 text-emerald-400" />
+                            {app.salary_range}
+                          </span>
                         )}
                       </div>
 
@@ -756,19 +771,23 @@ export default function CareerClient({ initialApplications }: Props) {
         >
           <div className="space-y-xl">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-              <Input
+              <CreatableAutocomplete
                 label={t('career_page.form.company')}
                 placeholder={t('career_page.form.company_placeholder')}
                 value={form.company_name}
-                onChange={(e) => setForm((f) => ({ ...f, company_name: e.target.value }))}
+                onChange={(val) => setForm((f) => ({ ...f, company_name: val }))}
+                type="company"
+                customHistory={uniqueCompanies}
                 error={formErrors.company_name}
                 required
               />
-              <Input
+              <CreatableAutocomplete
                 label={t('career_page.form.role')}
                 placeholder={t('career_page.form.role_placeholder')}
                 value={form.role_title}
-                onChange={(e) => setForm((f) => ({ ...f, role_title: e.target.value }))}
+                onChange={(val) => setForm((f) => ({ ...f, role_title: val }))}
+                type="role"
+                customHistory={uniqueRoles}
                 error={formErrors.role_title}
                 required
               />
@@ -879,8 +898,24 @@ export default function CareerClient({ initialApplications }: Props) {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">{t('career_page.form.salary')}</label>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">
+                  {t('career_page.form.salary')}
+                </label>
+                {(form.salary_min.trim() || form.salary_max.trim()) && (
+                  <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                    <Money size={12} />
+                    {form.salary_currency}{' '}
+                    {form.salary_min && form.salary_max
+                      ? `${form.salary_min} – ${form.salary_max}`
+                      : form.salary_min
+                      ? `${form.salary_min}`
+                      : `Up to ${form.salary_max}`}
+                  </span>
+                )}
+              </div>
+
               <div className="flex items-center gap-2">
                 <Select
                   value={form.salary_currency}
@@ -900,7 +935,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   value={form.salary_min}
                   onChange={(e) => setForm((f) => ({ ...f, salary_min: e.target.value }))}
                   placeholder={t('career_page.form.salary_min_placeholder') || 'Min (e.g. 10.000.000)'}
-                  className="flex-1 min-w-0 h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                  className="flex-1 min-w-0 h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
                 />
                 <span className="text-gray-light/50 font-bold select-none text-xs">—</span>
                 <input
@@ -908,8 +943,46 @@ export default function CareerClient({ initialApplications }: Props) {
                   value={form.salary_max}
                   onChange={(e) => setForm((f) => ({ ...f, salary_max: e.target.value }))}
                   placeholder={t('career_page.form.salary_max_placeholder') || 'Max (e.g. 15.000.000)'}
-                  className="flex-1 min-w-0 h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                  className="flex-1 min-w-0 h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
                 />
+              </div>
+
+              {/* Quick Salary Presets */}
+              <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                <span className="text-[10px] text-gray-light/60 font-medium">Preset cepat:</span>
+                {form.salary_currency === 'IDR' ? (
+                  [
+                    { label: '5-10 Jt', min: '5.000.000', max: '10.000.000' },
+                    { label: '10-20 Jt', min: '10.000.000', max: '20.000.000' },
+                    { label: '20-35 Jt', min: '20.000.000', max: '35.000.000' },
+                    { label: '35-50 Jt', min: '35.000.000', max: '50.000.000' },
+                  ].map((p) => (
+                    <button
+                      key={p.label}
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, salary_min: p.min, salary_max: p.max }))}
+                      className="text-[10px] px-2 py-0.5 rounded bg-white/5 hover:bg-primary/20 hover:text-primary text-gray-light border border-white/10 transition-colors font-mono"
+                    >
+                      {p.label}
+                    </button>
+                  ))
+                ) : (
+                  [
+                    { label: '2k-4k', min: '2,000', max: '4,000' },
+                    { label: '4k-8k', min: '4,000', max: '8,000' },
+                    { label: '8k-12k', min: '8,000', max: '12,000' },
+                    { label: '12k+', min: '12,000', max: '20,000' },
+                  ].map((p) => (
+                    <button
+                      key={p.label}
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, salary_min: p.min, salary_max: p.max }))}
+                      className="text-[10px] px-2 py-0.5 rounded bg-white/5 hover:bg-primary/20 hover:text-primary text-gray-light border border-white/10 transition-colors font-mono"
+                    >
+                      {p.label}
+                    </button>
+                  ))
+                )}
               </div>
             </div>
 
@@ -957,16 +1030,20 @@ export default function CareerClient({ initialApplications }: Props) {
         >
           <div className="space-y-xl">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-              <Input
+              <CreatableAutocomplete
                 label={(t('career_page.interview_journal.company') as string) || 'Company'}
                 value={journalForm.company_name}
-                onChange={(e) => setJournalForm((f: any) => ({ ...f, company_name: e.target.value }))}
+                onChange={(val) => setJournalForm((f: any) => ({ ...f, company_name: val }))}
+                type="company"
+                customHistory={uniqueCompanies}
                 autoFocus
               />
-              <Input
+              <CreatableAutocomplete
                 label={(t('career_page.interview_journal.role') as string) || 'Role'}
                 value={journalForm.role_title}
-                onChange={(e) => setJournalForm((f: any) => ({ ...f, role_title: e.target.value }))}
+                onChange={(val) => setJournalForm((f: any) => ({ ...f, role_title: val }))}
+                type="role"
+                customHistory={uniqueRoles}
               />
             </div>
 

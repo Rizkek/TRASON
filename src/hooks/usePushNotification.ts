@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState, useEffect } from 'react';
-import { supabase } from '@/services/supabaseClient';
+import { supabase } from '@/services/supabase/supabaseClient';
 
 interface PushNotificationState {
   isSupported: boolean;

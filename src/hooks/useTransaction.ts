@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import useSWR, { mutate as globalMutate } from 'swr';
 import { transactionQueries } from '@/services/finance/transactionQueries';
-import { Transaction } from '@/services/supabaseClient';
+import { Transaction } from '@/services/supabase/supabaseClient';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { executeMutation } from "@/libs/api/mutationBuilder";

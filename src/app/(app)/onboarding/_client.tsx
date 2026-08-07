@@ -9,7 +9,7 @@ import { useTranslation } from '@/libs/i18n/useTranslation';
 import { DEFAULT_FINANCE_CATEGORIES } from '@/libs/defaultCategories';
 import { ModuleSelectionCard } from './components/ModuleSelectionCard';
 import { Globe, Clock, Wallet, TrendUp as TrendingUp, BellRinging, Briefcase, Heartbeat, Sparkle, CaretRight as ChevronRight, Check, PaintBrush, User as UserIcon } from '@phosphor-icons/react';
-import { supabase } from '@/services/supabaseClient';
+import { supabase } from '@/services/supabase/supabaseClient';
 
 const LANGUAGE_OPTIONS = [
   { value: 'en', label: 'English' },

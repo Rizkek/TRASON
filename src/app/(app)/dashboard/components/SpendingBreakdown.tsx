@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { Card } from '@/components';
-import { Transaction } from '@/services/supabaseClient';
+import { Transaction } from '@/services/supabase/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { formatCurrency } from '@/libs/format';

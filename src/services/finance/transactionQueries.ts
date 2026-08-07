@@ -1,17 +1,6 @@
-import {
-  supabase,
-  User,
-  Category,
-  Transaction,
-  Activity,
-  Habit,
-  Reminder,
-  Insight,
-  UserPreferences
-} from '../supabase/supabaseClient';
+import { supabase, Transaction } from '../supabase/supabaseClient';
 import { handleQueryError, logError } from '@/libs/apiErrors';
 import { formatDateOnly } from '@/libs/date';
-import type { DailyTask } from '@/types/database';
 import { withAuthQuery } from "@/services/supabase/queryBuilder";
 
 export const transactionQueries = {

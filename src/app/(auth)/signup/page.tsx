@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Alert, Logo } from '@/components';
-import { supabase } from '@/services/supabaseClient';
+import { supabase } from '@/services/supabase/supabaseClient';
 import { userQueries } from '@/services/core/userQueries';
 import { validateEmail, validatePassword, sanitizeError } from '@/libs/validation';
 import { Compass, ArrowLeft, Stack, CheckCircle, Warning as AlertTriangle, Spinner as Loader2, XCircle, Eye, EyeSlash as EyeOff } from '@phosphor-icons/react';

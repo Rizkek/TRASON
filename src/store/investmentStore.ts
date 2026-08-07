@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { InvestmentPosition } from '@/services/supabaseClient';
+import { InvestmentPosition } from '@/services/supabase/supabaseClient';
 import {
   CalculatedInvestmentPosition,
   InvestmentInsightResponse,

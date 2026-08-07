@@ -1,5 +1,5 @@
 import { calculateInvestmentPosition, calculatePortfolioSummary } from '../finance/investmentService';
-import { InvestmentPosition } from '@/services/supabaseClient';
+import { InvestmentPosition } from '@/services/supabase/supabaseClient';
 
 describe('InvestmentService', () => {
   const mockPosition: InvestmentPosition = {

@@ -8,11 +8,11 @@ import { useTranslation } from '@/libs/i18n/useTranslation';
 
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { ChartPieSlice as PieChart, Heartbeat, CheckSquare, Table, TrendUp as TrendingUp, Target, ArrowUpRight, Command, ShieldCheck, GithubLogo, Lightning as Zap, CurrencyCircleDollar, Briefcase, Bell, CaretDown as ChevronDown, CaretUp as ChevronUp, Lock } from '@phosphor-icons/react';
+import { FaqItem } from '@/components/landing/FaqItem';
+import { ChartPieSlice as PieChart, Heartbeat, CheckSquare, Table, TrendUp as TrendingUp, Target, ArrowUpRight, Command, ShieldCheck, GithubLogo, Lightning as Zap, CurrencyCircleDollar, Briefcase, Bell, Lock } from '@phosphor-icons/react';
 
 const SPLASH_STORAGE_KEY = 'trason_home_splash_seen';
 
-// ─── Inline FAQ (accordion) ───────────────────────────────────────────────────
 const FAQS = [
   {
     q: 'Is my data safe and private?',
@@ -23,43 +23,14 @@ const FAQS = [
     a: 'The core Personal OS is free forever. We plan to introduce optional Pro features for power users in the future, but all essential modules — finance, habits, career, and reminders — will always remain free.',
   },
   {
-    q: 'How is TRASON different from Notion or a spreadsheet?',
-    a: 'Notion and Excel are blank canvases. You spend hours building systems that eventually break. TRASON provides pre-built, opinionated workflows designed specifically for personal finance, habits, and career tracking — all interconnected out of the box. No setup required.',
-  },
-  {
     q: 'Can I use TRASON on my phone?',
     a: 'Yes! TRASON is a fully responsive Progressive Web App (PWA). You can install it on your home screen and use it like a native app on iOS and Android, even without an internet connection.',
   },
   {
-    q: 'Is TRASON suitable for students and fresh graduates?',
-    a: 'Absolutely. TRASON was designed with students, fresh graduates, and young professionals in mind. Whether you are managing your first salary, tracking job applications, or building your first financial habits — TRASON meets you where you are.',
+    q: 'How is TRASON different from Notion or a spreadsheet?',
+    a: 'Notion and Excel are blank canvases. You spend hours building systems that eventually break. TRASON provides pre-built, opinionated workflows designed specifically for personal finance, habits, and career tracking — all interconnected out of the box. No setup required.',
   },
 ];
-
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border border-white/5 rounded-xl bg-black/20 overflow-hidden">
-      <button
-        className="w-full text-left px-6 py-5 flex justify-between items-center font-bold text-gray-light hover:text-white transition-colors gap-4"
-        onClick={() => setOpen(!open)}
-        aria-expanded={open}
-      >
-        <span>{q}</span>
-        {open ? (
-          <ChevronUp size={20} className="text-warm-gold shrink-0" />
-        ) : (
-          <ChevronDown size={20} className="text-gray-light shrink-0" />
-        )}
-      </button>
-      {open && (
-        <div className="px-6 pb-5 text-gray-light/80 leading-relaxed text-sm">
-          {a}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ─── Feature cards data ───────────────────────────────────────────────────────
 const FEATURES = [

@@ -1,9 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CaretDown as ChevronDown, CaretUp as ChevronUp } from '@phosphor-icons/react';
+import { CaretDown as ChevronDown } from '@phosphor-icons/react';
 
-export function FaqItem({ q, a }: { q: string; a: string }) {
+export interface FaqItemProps {
+  q: string;
+  a: string;
+}
+
+export function FaqItem({ q, a }: FaqItemProps) {
   const [open, setOpen] = useState(false);
 
   return (

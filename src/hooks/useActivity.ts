@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import useSWR, { mutate as globalMutate } from 'swr';
 import { activityQueries } from '@/services/activity/activityQueries';
-import { Activity } from '@/services/supabaseClient';
+import { Activity } from '@/services/supabase/supabaseClient';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { executeMutation } from "@/libs/api/mutationBuilder";

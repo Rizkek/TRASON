@@ -4,7 +4,7 @@
 import { useCallback } from 'react';
 import useSWR, { mutate as globalMutate } from 'swr';
 import { reminderQueries } from '@/services/core/reminderQueries';
-import { Reminder } from '@/services/supabaseClient';
+import { Reminder } from '@/services/supabase/supabaseClient';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS } from '@/libs/cacheKeys';
 import { executeMutation } from "@/libs/api/mutationBuilder";

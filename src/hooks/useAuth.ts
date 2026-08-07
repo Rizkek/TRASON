@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import { supabase, User } from '@/services/supabaseClient';
+import { supabase, User } from '@/services/supabase/supabaseClient';
 import { userQueries } from '@/services/core/userQueries';
 import { logError, handleQueryError } from '@/libs/apiErrors';
 

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '@/types/index';
-import { supabase } from '@/services/supabaseClient';
+import { supabase } from '@/services/supabase/supabaseClient';
 
 // Helper to extract language from a user object (handles array or single pref)
 const extractLanguage = (user: any): string | undefined => {
