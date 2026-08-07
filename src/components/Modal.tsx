@@ -13,7 +13,21 @@ interface ModalProps {
   footer?: React.ReactNode;
   closeButton?: boolean;
   baseZIndex?: number;
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | 'fit' | 'full';
 }
+
+const maxWidthMap = {
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+  '2xl': 'max-w-2xl',
+  '3xl': 'max-w-3xl',
+  '4xl': 'max-w-4xl',
+  '5xl': 'max-w-5xl',
+  fit: 'max-w-fit',
+  full: 'max-w-[95vw]',
+};
 
 export const Modal: React.FC<ModalProps> = ({
   isOpen,
@@ -24,6 +38,7 @@ export const Modal: React.FC<ModalProps> = ({
   footer,
   closeButton = true,
   baseZIndex = 60,
+  maxWidth = 'lg',
 }) => {
   const modalRef = React.useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -74,7 +89,7 @@ export const Modal: React.FC<ModalProps> = ({
         style={{ zIndex: baseZIndex + 10 }}
       >
         <div
-          className="bg-gray-strong border border-black/10 dark:border-white/10 rounded-md shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] max-w-lg w-full max-h-[85dvh] flex flex-col pointer-events-auto animate-slide-up relative"
+          className={`bg-gray-strong border border-black/10 dark:border-white/10 rounded-md shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] ${maxWidthMap[maxWidth]} w-full max-h-[85dvh] flex flex-col pointer-events-auto animate-slide-up relative`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top highlight glow */}

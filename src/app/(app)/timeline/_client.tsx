@@ -400,6 +400,7 @@ export function TimelineClient() {
               createTask={createTask}
               toggleTask={toggleTask}
               deleteTask={deleteTask}
+              getHolidayForDate={getHolidayForDate}
             />
           )}
 

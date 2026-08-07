@@ -759,17 +759,18 @@ export default function CareerClient({ initialApplications }: Props) {
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title={editingApp ? t('career_page.edit_app') : t('career_page.new_app')}
+          title={editingApp ? (t('career_page.edit_app') as string) : (t('career_page.new_app') as string)}
+          maxWidth="2xl"
           footer={
             <div className="flex gap-md justify-end">
               <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)}>{t('investment_page.cancel_upper')}</Button>
               <Button variant="primary" size="md" onClick={handleSave} disabled={isSaving}>
-                {isSaving ? t('investment_page.saving_upper') : t('career_page.save')}
+                {isSaving ? t('investment_page.saving_upper') : (t('career_page.save_btn') as string)}
               </Button>
             </div>
           }
         >
-          <div className="space-y-xl">
+          <div className="space-y-md">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
               <CreatableAutocomplete
                 label={t('career_page.form.company')}
@@ -837,7 +838,7 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
 
             <div className="space-y-sm">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
                 <DatePicker
                   id="modal-applied"
                   label={t('career_page.form.applied_date')}
@@ -871,7 +872,7 @@ export default function CareerClient({ initialApplications }: Props) {
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm">
               <Input
                 label={t('career_page.form.location')}
                 placeholder={t('career_page.form.location_placeholder')}
@@ -1019,6 +1020,7 @@ export default function CareerClient({ initialApplications }: Props) {
           isOpen={isJournalModalOpen}
           onClose={() => setIsJournalModalOpen(false)}
           title={(t('career_page.interview_journal.new_entry_modal') as string) || 'Interview Journal'}
+          maxWidth="2xl"
           footer={
             <div className="flex gap-md justify-end">
               <Button variant="ghost" size="md" onClick={() => setIsJournalModalOpen(false)}>{t('investment_page.cancel_upper')}</Button>
@@ -1028,8 +1030,8 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
           }
         >
-          <div className="space-y-xl">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+          <div className="space-y-md">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
               <CreatableAutocomplete
                 label={(t('career_page.interview_journal.company') as string) || 'Company'}
                 value={journalForm.company_name}
@@ -1047,7 +1049,7 @@ export default function CareerClient({ initialApplications }: Props) {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm">
               <DatePicker
                 label={(t('career_page.interview_journal.date') as string) || 'Interview Date'}
                 value={journalForm.interview_date}
