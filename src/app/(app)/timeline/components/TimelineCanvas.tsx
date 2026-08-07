@@ -304,29 +304,29 @@ export function TimelineCanvas({
           .filter((x) => !!x.holiday);
         if (weekHolidays.length === 0) return null;
         return (
-          <div className="hidden md:flex items-start gap-md px-xl py-md border-t border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/20 flex-wrap">
-            <div className="flex items-center gap-xs text-[10px] font-bold text-gray-light uppercase tracking-widest shrink-0 pt-px">
-              <CalendarCheck size={12} className="text-primary" />
-              Hari Libur Minggu Ini
+          <div className="hidden md:flex items-center gap-md px-xl py-sm border-t border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/20 flex-wrap">
+            <div className="flex items-center gap-xs text-[10px] font-bold text-gray-light uppercase tracking-widest shrink-0">
+              <CalendarCheck size={11} className="text-primary" />
+              Hari Libur
             </div>
-            <div className="flex flex-wrap gap-sm">
+            <div className="flex flex-wrap gap-xs">
               {weekHolidays.map(({ day, holiday }) => (
                 <div
                   key={day.toDateString()}
-                  className={`flex items-center gap-1.5 px-sm py-1 rounded-md text-[11px] font-medium border ${
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium border whitespace-nowrap ${
                     holiday!.is_cuti_bersama
                       ? 'bg-amber-500/10 text-amber-200 border-amber-500/20'
                       : 'bg-rose-500/10 text-rose-200 border-rose-500/20'
                   }`}
                 >
-                  <span>{holiday!.is_cuti_bersama ? '🏖️' : '🔴'}</span>
+                  <span className="text-[11px]">{holiday!.is_cuti_bersama ? '🏖️' : '🔴'}</span>
                   <span className="font-semibold">
                     {day.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })}
                   </span>
-                  <span className="text-[10px] opacity-75">—</span>
-                  <span className="text-[10px]">{holiday!.name}</span>
+                  <span className="opacity-50">·</span>
+                  <span>{holiday!.name}</span>
                   {holiday!.is_cuti_bersama && (
-                    <span className="text-[9px] uppercase tracking-wider font-bold bg-amber-500/20 text-amber-300 px-1 rounded">Cuti</span>
+                    <span className="text-[9px] uppercase font-bold bg-amber-500/20 text-amber-300 px-1 rounded ml-0.5">Cuti</span>
                   )}
                 </div>
               ))}
