@@ -12,6 +12,8 @@ import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Bell, BellSlash as BellOff, CheckCircle, Clock, Plus, Trash as Trash2, PencilSimple as Edit2, List, Calendar as CalendarIcon } from '@phosphor-icons/react';
 import { getLocalISODate } from '@/libs/format';
+import { formatDateOnly } from '@/libs/date';
+import { useHolidays } from '@/hooks/useHolidays';
 
 
 export function RemindersClient() {
@@ -21,6 +23,7 @@ export function RemindersClient() {
   const { reminders = [], isLoading: isRemindersLoading, createReminder, updateReminder, deleteReminder, markReminderDone, unmarkReminderDone } = useReminder();
   const { t } = useTranslation();
   const { locale, timezone } = useUserPreferences();
+  const { holidays } = useHolidays();
 
   const { module_features } = useUserPreferences();
 
@@ -89,7 +92,7 @@ export function RemindersClient() {
     setSelectedDate(date);
     setForm(prev => ({
       ...prev,
-      dueDate: date.toISOString().split('T')[0]
+      dueDate: formatDateOnly(date) // timezone-safe: gunakan local date, bukan UTC
     }));
   };
 
@@ -98,7 +101,7 @@ export function RemindersClient() {
     setForm({
       title: '',
       description: '',
-      dueDate: selectedDate.toISOString().split('T')[0],
+      dueDate: formatDateOnly(selectedDate),
       dueTime: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
       priority: 'medium',
       notifyTimes: [60, 180, 360],
@@ -263,6 +266,7 @@ export function RemindersClient() {
                 onDateSelect={handleDateSelect} 
                 events={reminders}
                 locale={locale}
+                holidays={holidays}
               />
             ) : (
               <div className="space-y-md">
@@ -417,6 +421,7 @@ export function RemindersClient() {
               value={form.dueDate} 
               onChange={(val) => setForm(f => ({ ...f, dueDate: val }))}
               error={formErrors.dueDate}
+              holidays={holidays}
             />
             <Input 
               label={t('reminders_page.form.time')} 
