@@ -43,6 +43,15 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/timeline',
+        destination: '/schedule',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

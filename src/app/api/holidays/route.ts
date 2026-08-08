@@ -53,7 +53,6 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const targetYear = searchParams.get('year') || new Date().getFullYear().toString();
-    console.log(`[API /api/holidays] Fetching holidays for year: ${targetYear}`);
 
     let holidays: HolidayItem[] = [];
 

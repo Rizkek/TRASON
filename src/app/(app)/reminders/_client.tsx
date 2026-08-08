@@ -137,7 +137,7 @@ export function RemindersClient() {
 
   const handleSave = async () => {
     if (!form.title.trim()) {
-      setFormErrors({ title: 'Judul pengingat wajib diisi' });
+      setFormErrors({ title: t('reminders_page.title_required') || 'Judul pengingat wajib diisi' });
       return;
     }
 
@@ -293,14 +293,14 @@ export function RemindersClient() {
                 {!remindersActiveEnabled && !remindersHistoryEnabled ? (
                   <div className="glass-card p-4xl text-center space-y-md">
                     <BellOff size={48} className="mx-auto text-gray-light opacity-20" />
-                    <p className="text-gray-light font-light italic">Reminders are disabled in settings.</p>
+                    <p className="text-gray-light font-light italic">{t('reminders_page.disabled_in_settings')}</p>
                   </div>
                 ) : ((filter === 'active' && remindersActiveEnabled) || (filter === 'history' && remindersHistoryEnabled)) && (
                   reminders.filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed').length === 0 ? (
                     <div className="glass-card p-4xl text-center space-y-md">
                       <Bell size={48} className="mx-auto text-deep-sage opacity-20" />
                       <p className="text-gray-light font-light italic">
-                        {filter === 'active' ? t('reminders_page.empty_reminders') : 'No completed reminders yet.'}
+                        {filter === 'active' ? t('reminders_page.empty_reminders') : t('reminders_page.empty_history')}
                       </p>
                     </div>
                   ) : (

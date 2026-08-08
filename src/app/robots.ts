@@ -26,6 +26,7 @@ export default function robots(): MetadataRoute.Robots {
           '/dashboard',
           '/finance',
           '/investments',
+          '/schedule',
           '/timeline',
           '/reminders',
           '/insights',

@@ -94,14 +94,6 @@ export const Calendar: React.FC<CalendarProps> = ({
             {d}
           </span>
           <div className="flex items-center gap-1">
-            {holiday && (
-              <span 
-                className={`w-2 h-2 rounded-full ${
-                  holiday.is_cuti_bersama ? 'bg-amber-400' : 'bg-rose-500 animate-pulse'
-                }`}
-                title={holiday.name}
-              />
-            )}
             {dateEvents.some(e => e.status !== 'completed') && (
               <div className="w-1.5 h-1.5 bg-warm-gold rounded-full shadow-[0_0_8px_rgba(212,165,116,0.6)]" />
             )}
@@ -116,7 +108,6 @@ export const Calendar: React.FC<CalendarProps> = ({
                 ? 'bg-amber-500/15 text-amber-200 border-amber-500/30'
                 : 'bg-rose-500/15 text-rose-200 border-rose-500/30'
             }`}>
-              {holiday.is_cuti_bersama ? '🏖️ ' : '🔴 '}
               {holiday.name}
             </div>
           </div>
@@ -200,14 +191,13 @@ export const Calendar: React.FC<CalendarProps> = ({
               return (
                 <div
                   key={h.date}
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border ${
+                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium border ${
                     h.is_cuti_bersama
                       ? 'bg-amber-500/10 text-amber-200 border-amber-500/20'
                       : 'bg-rose-500/10 text-rose-200 border-rose-500/20'
                   }`}
                 >
-                  <span>{h.is_cuti_bersama ? '🏖️' : '🔴'}</span>
-                  <span className="font-bold">{d}</span>
+                  <span className="font-bold font-mono">{d}</span>
                   <span>{h.name}</span>
                 </div>
               );

@@ -143,11 +143,10 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
                   type="button"
                   onClick={() => setShowIconPicker(!showIconPicker)}
                   className="w-12 h-12 flex items-center justify-center bg-gray-strong border border-black/5 dark:border-white/5 rounded-md text-2xl hover:border-primary transition-colors focus:outline-none focus:ring-1 focus:ring-primary/30 relative group"
-                  title="Klik untuk memilih icon"
                 >
                   <CategoryIcon name={form.icon} />
                   <span className="absolute -bottom-1 -right-1 text-[8px] bg-primary/20 text-primary px-1 rounded font-bold border border-primary/30">
-                    Ubah
+                    {t('finance.categories.change_icon')}
                   </span>
                 </button>
               </div>
@@ -164,13 +163,13 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
                   if (!suggestedText || form.name === suggestedText) return null;
                   return (
                     <div className="flex items-center gap-1.5 pt-0.5">
-                      <span className="text-[10px] text-gray-light/60">Saran nama:</span>
+                      <span className="text-[10px] text-gray-light/60">{t('finance.categories.suggested_name')}</span>
                       <button
                         type="button"
                         onClick={() => setForm((prev) => ({ ...prev, name: suggestedText }))}
                         className="text-[10px] text-primary hover:underline font-medium bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20 transition-all"
                       >
-                        Gunakan &quot;{suggestedText}&quot; ↵
+                        {t('finance.categories.use_suggestion').replace('{name}', suggestedText)} ↵
                       </button>
                     </div>
                   );

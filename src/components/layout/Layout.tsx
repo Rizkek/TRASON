@@ -203,7 +203,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     { label: 'Dashboard', href: '/dashboard', icon: SYS_ICONS.dashboard }, // Core, always visible
     { label: 'Finance', href: '/finance', icon: SYS_ICONS.finance.main, moduleId: 'finance' as ModuleId },
     { label: 'Investments', href: '/investments', icon: SYS_ICONS.investments, moduleId: 'investments' as ModuleId },
-    { label: 'Timeline', href: '/timeline', icon: SYS_ICONS.timeline, moduleId: 'timeline' as ModuleId },
+    { label: 'Schedule', href: '/schedule', icon: SYS_ICONS.timeline, moduleId: 'timeline' as ModuleId },
     { label: 'Sport', href: '/sport', icon: SYS_ICONS.sport, moduleId: 'sport' as ModuleId },
     { label: 'Career', href: '/career', icon: SYS_ICONS.career, moduleId: 'career' as ModuleId },
     { label: 'Reminders', href: '/reminders', icon: SYS_ICONS.notifications, moduleId: 'reminders' as ModuleId },
@@ -262,7 +262,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <h1 className="text-2xl font-serif font-bold tracking-tight text-gradient">
             TRASON
           </h1>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-gray-light mt-1 font-medium">Elevate Your Life</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-gray-light mt-1 font-medium">Personal Operating System</p>
         </div>
 
         <nav className="flex-1 px-md py-xl space-y-2">
@@ -394,7 +394,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className={`p-1.5 rounded-lg transition-all duration-200 ${isBottomSheetOpen ? 'bg-primary/15' : ''}`}>
               <TrasonIcon icon={SYS_ICONS.menu} size={22} />
             </div>
-            <span className="text-[10px] mt-0.5 font-medium tracking-wide">More</span>
+            <span className="text-[10px] mt-0.5 font-medium tracking-wide">{t('nav.more') || 'More'}</span>
           </button>
         </nav>
       </div>
@@ -417,7 +417,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             {/* Header */}
             <div className="flex items-center justify-between px-lg py-md border-b border-soft-cream/5">
-              <span className="font-semibold text-soft-cream text-sm tracking-wide">All Modules</span>
+              <span className="font-semibold text-soft-cream text-sm tracking-wide">{t('modules.title') || 'All Modules'}</span>
               <button
                 onClick={() => setIsBottomSheetOpen(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-soft-cream/5 hover:bg-soft-cream/10 transition-colors text-gray-light hover:text-soft-cream"
@@ -492,7 +492,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     className="flex items-center gap-xs text-gray-light hover:text-danger transition-colors text-xs font-medium px-sm py-xs rounded-lg hover:bg-danger/10"
                   >
                     <TrasonIcon icon={SYS_ICONS.logout} size={16} />
-                    <span>Logout</span>
+                    <span>{t('nav.logout')}</span>
                   </button>
                 </div>
               </div>

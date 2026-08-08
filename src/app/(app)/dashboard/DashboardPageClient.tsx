@@ -1,43 +1,34 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Badge, Button, Loading, ErrorAlert } from '@/components';
+import { Layout, Button, Loading } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useTransaction } from '@/hooks/useTransaction';
-import { useActivity } from '@/hooks/useActivity';
 import { useReminder } from '@/hooks/useReminder';
-import { useInvestment } from '@/hooks/useInvestment';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useBudget } from '@/hooks/useBudget';
-import { InvestmentInsightResponse } from '@/services/finance/investmentService';
+import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
+import { useCareer } from '@/hooks/useCareer';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getDateRange } from '@/libs/date';
-import { formatCurrency } from '@/libs/format';
-
-// Setup SWR Dates
-const CURRENT_DATE = new Date();
-
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { 
-  Calendar, 
-  Clock,
-  Warning,
-  CaretLeft,
-  CaretRight
+  Warning, 
+  CaretLeft, 
+  CaretRight, 
+  CaretDown, 
+  CaretUp,
+  ChartLineUp
 } from '@phosphor-icons/react';
-import { SYS_ICONS } from '@/config/icons';
 import { TrasonIcon } from '@/components/ui/TrasonIcon';
-
-// Extracted Components
-import { DashboardHeader } from './components/DashboardHeader';
-import { DailyTasksSummary } from './components/DailyTasksSummary';
-import { RemindersSidebar } from './components/RemindersSidebar';
-import { NetWorthSummary } from './components/NetWorthSummary';
-import { SportSummary } from './components/SportSummary';
-import { CareerSummary } from './components/CareerSummary';
-import { DailyBriefingCard } from './components/DailyBriefingCard';
-import { LifeScoreCard } from './components/LifeScoreCard';
 import dynamic from 'next/dynamic';
+
+// Components
+import { UpNextCard } from './components/UpNextCard';
+import { CurrentStateCard } from './components/CurrentStateCard';
+import { DailyTasksSummary } from './components/DailyTasksSummary';
+import { LifeScoreCard } from './components/LifeScoreCard';
 
 const FinancialChart = dynamic(() => import('./components/FinancialChart').then(mod => mod.FinancialChart), {
   ssr: false,
@@ -47,47 +38,8 @@ const SpendingBreakdown = dynamic(() => import('./components/SpendingBreakdown')
   ssr: false,
   loading: () => <div className="h-64 w-full bg-slate-800 animate-pulse rounded-xl" />
 });
-import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
-import { useCareer } from '@/hooks/useCareer';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
 
-function QuickCaptureInput() {
-  const { t } = useTranslation();
-  const [value, setValue] = React.useState('');
-
-  const handleSubmit = () => {
-    if (!value.trim()) return;
-    // Handle the quick capture submission here
-    console.log('Captured:', value);
-    setValue('');
-  };
-
-  return (
-    <Card className="p-sm md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
-      <div className="flex flex-row gap-sm md:gap-md">
-        <div className="flex-1 relative group">
-          <div className="absolute left-md top-1/2 -translate-y-1/2 text-primary">
-            <TrasonIcon icon={SYS_ICONS.insights} size={16} className="md:w-[18px] md:h-[18px]" />
-          </div>
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-            placeholder={t('dashboard.capture_placeholder')}
-            className="w-full pl-xl md:pl-2xl pr-md md:pr-lg py-sm md:py-lg bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-gray-light"
-          />
-        </div>
-        <Button variant="primary" size="md" className="hidden md:flex" onClick={handleSubmit}>
-          {t('dashboard.capture_btn')}
-        </Button>
-        <Button variant="primary" size="sm" className="md:hidden px-3" onClick={handleSubmit}>
-          <TrasonIcon icon={SYS_ICONS.add} size={20} />
-        </Button>
-      </div>
-    </Card>
-  );
-}
+const CURRENT_DATE = new Date();
 
 export function DashboardClient() {
   const router = useRouter();
@@ -96,30 +48,29 @@ export function DashboardClient() {
   const user = useAuthStore((s) => s.user);
   const { t } = useTranslation();
   const preferences = useUserPreferences();
-  const { locale, timezone, module_features, isOnboarded } = preferences;
-  const [financeMonth, setFinanceMonth] = React.useState(CURRENT_DATE.getMonth());
-  const [financeYear, setFinanceYear] = React.useState(CURRENT_DATE.getFullYear());
+  const { locale, timezone, module_features } = preferences;
+
+  // Chart collapse toggle state (Default collapsed for calm command center feel)
+  const [showFinancialChart, setShowFinancialChart] = useState(false);
+  const [financeMonth, setFinanceMonth] = useState(CURRENT_DATE.getMonth());
+  const [financeYear, setFinanceYear] = useState(CURRENT_DATE.getFullYear());
   const { start: financeStart, end: financeEnd } = useMemo(() => getDateRange(financeMonth, financeYear), [financeMonth, financeYear]);
 
-  // SWR automatically handles all data fetching in background
+  // SWR Hooks
   const { transactions } = useTransaction(financeStart, financeEnd);
-  const { activities } = useActivity(CURRENT_DATE);
-  const { reminders } = useReminder();
-  const { summary: investmentSummary, insights: investmentInsights } = useInvestment();
-  const typedInsights = investmentInsights as InvestmentInsightResponse | null;
+  const { reminders, isLoading: remindersLoading } = useReminder();
   const { summary: sportSummary, isLoading: sportLoading } = useWeeklySportSummary();
   const { stats: careerStats, nextInterview, isLoading: careerLoading } = useCareer();
-  // Use module_features from Supabase-synced preferences (same source as sidebar)
-  // Defaults to true if key is absent (matching DEFAULT_MODULE_STATUS behavior)
+  const { subscriptions } = useSubscription();
+  const { globalBudget } = useBudget();
+
+  // Module enablement flags
   const isFinanceEnabled = module_features?.['finance'] !== false;
   const isSportEnabled = module_features?.['sport'] !== false;
   const isCareerEnabled = module_features?.['career'] !== false;
   const isTimelineEnabled = module_features?.['timeline'] !== false;
   const isRemindersEnabled = module_features?.['reminders'] !== false;
 
-  const { subscriptions } = useSubscription();
-  const { globalBudget } = useBudget();
-  
   const totalExpense = useMemo(() => {
     return transactions
       .filter(t => t.type === 'expense')
@@ -134,15 +85,28 @@ export function DashboardClient() {
 
   const greeting = useMemo(() => {
     const hours = new Date().getHours();
-    return hours < 12 ? t('dashboard.greeting_morning') : hours < 18 ? t('dashboard.greeting_afternoon') : t('dashboard.greeting_evening');
+    return hours < 12 
+      ? t('dashboard.greeting_morning') 
+      : hours < 18 
+      ? t('dashboard.greeting_afternoon') 
+      : t('dashboard.greeting_evening');
   }, [t]);
 
   const todayDate = useMemo(() => {
-    return new Date().toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric', timeZone: timezone });
+    return new Date().toLocaleDateString(locale || 'en-US', { 
+      weekday: 'long', 
+      month: 'long', 
+      day: 'numeric', 
+      timeZone: timezone 
+    });
   }, [locale, timezone]);
 
   const todayTime = useMemo(() => {
-    return new Date().toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone });
+    return new Date().toLocaleTimeString(locale || 'en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      timeZone: timezone 
+    });
   }, [locale, timezone]);
 
   useEffect(() => {
@@ -150,8 +114,6 @@ export function DashboardClient() {
       router.push('/login');
     }
   }, [authLoading, isAuthenticated, router]);
-
-
 
   if (authLoading) {
     return (
@@ -167,135 +129,132 @@ export function DashboardClient() {
 
   return (
     <Layout>
-      <div className="space-y-sm md:space-y-xl animate-fade-in">
-        {/* Hero Greeting */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg md:mb-xl">
-          <div className="space-y-sm">
-            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-white flex flex-wrap items-baseline gap-x-xs">
+      <div className="space-y-4 md:space-y-6 animate-fade-in max-w-7xl mx-auto pb-12">
+        {/* 1. Contextual Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pt-1 pb-2">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-display font-extrabold tracking-tight text-white flex flex-wrap items-baseline gap-x-2">
               <span className="text-soft-cream">{greeting},</span>
               <span>{user?.first_name || user?.name?.split(' ')[0] || 'User'}</span>
             </h1>
-            <div className="flex items-center gap-md text-gray-very-light opacity-60 mt-xs">
-              <p className="text-token-micro uppercase tracking-widest">{todayDate}</p>
-              <div className="w-1 h-1 rounded-full bg-gray-light" />
-              <p className="text-token-micro tabular-nums">{todayTime}</p>
+            <div className="flex items-center gap-2 text-gray-light/70 text-xs mt-1">
+              <span className="uppercase tracking-wider font-medium">{todayDate}</span>
+              <span className="w-1 h-1 rounded-full bg-gray-light/40" />
+              <span className="font-mono tabular-nums">{todayTime}</span>
             </div>
           </div>
         </div>
 
-        {/* Narrative Summary Card */}
-        <DashboardHeader user={user} activities={activities} transactions={transactions} />
-
-        {/* Quick Action Input - Isolated to prevent dashboard re-renders on keystroke */}
-        <QuickCaptureInput />
-
-        {/* Due Subscriptions Alert */}
+        {/* 2. Needs Attention (Conditional Alerts) */}
         {isFinanceEnabled && dueSubscriptions.length > 0 && (
-          <div className="bg-warning/10 border border-warning/30 rounded-xl p-md flex items-start sm:items-center gap-md">
-            <div className="bg-warning/20 p-sm rounded-full text-warning shrink-0">
-              <TrasonIcon icon={Warning} size={20} />
-            </div>
-            <div className="flex-1">
-              <p className="text-warning text-sm font-bold">
-                You have {dueSubscriptions.length} subscription{dueSubscriptions.length > 1 ? 's' : ''} due for payment.
-              </p>
-              <p className="text-xs text-warning/80 mt-1">
-                {dueSubscriptions.map(s => s.name).join(', ')}
-              </p>
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3.5 flex items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="bg-amber-500/20 p-2 rounded-lg text-amber-400 shrink-0">
+                <TrasonIcon icon={Warning} size={18} />
+              </div>
+              <div>
+                <p className="text-amber-300 text-xs font-bold">
+                  {dueSubscriptions.length === 1
+                    ? t('dashboard.subscriptions_due_single')
+                    : t('dashboard.subscriptions_due_multiple').replace('{count}', dueSubscriptions.length.toString())}
+                </p>
+                <p className="text-[11px] text-amber-300/80 mt-0.5 truncate max-w-md">
+                  {dueSubscriptions.map(s => s.name).join(', ')}
+                </p>
+              </div>
             </div>
             <Button 
               variant="outline" 
               size="sm" 
               onClick={() => router.push('/finance/subscriptions')}
-              className="shrink-0 border-warning/30 text-warning hover:bg-warning/10"
+              className="shrink-0 border-amber-500/40 text-amber-300 hover:bg-amber-500/20 text-xs px-3 py-1"
             >
-              Review
+              {t('dashboard.review')}
             </Button>
           </div>
         )}
 
-        {/* Life Score — Primary Intelligence Widget */}
+        {/* 3. Up Next (Schedule & Reminders) */}
+        {isRemindersEnabled && (
+          <UpNextCard reminders={reminders} isLoading={remindersLoading} />
+        )}
+
+        {/* 4. Current State (Finance, Vitality, Career Pillars) */}
+        <CurrentStateCard
+          totalExpense={totalExpense}
+          globalBudget={globalBudget}
+          sportSummary={sportSummary}
+          careerStats={careerStats}
+          nextInterview={nextInterview}
+          isFinanceEnabled={isFinanceEnabled}
+          isSportEnabled={isSportEnabled}
+          isCareerEnabled={isCareerEnabled}
+          sportLoading={sportLoading}
+          careerLoading={careerLoading}
+        />
+
+        {/* 5. Today's Action Checklist */}
+        {isTimelineEnabled && preferences?.module_features?.['timeline_daily_checklist'] !== false && (
+          <DailyTasksSummary />
+        )}
+
+        {/* 6. Life Score (Compact Overview) */}
         <LifeScoreCard />
 
-        {/* Financial Flow and Daily Tasks - Compact Grid */}
-        {(isFinanceEnabled || (isTimelineEnabled && preferences?.module_features?.['timeline_daily_checklist'] !== false)) && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-md md:gap-xl">
-            {isFinanceEnabled && (
-              <>
-                <div className="lg:col-span-3 flex items-center justify-between bg-black/[0.02] dark:bg-white/[0.02] p-2 rounded-xl border border-black/5 dark:border-white/5 w-fit">
-                  <button onClick={() => {
-                    if (financeMonth === 0) { setFinanceMonth(11); setFinanceYear(y => y - 1); }
-                    else { setFinanceMonth(m => m - 1); }
-                  }} className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-md text-gray-light">
-                    <TrasonIcon icon={CaretLeft} size={20} />
+        {/* 7. Collapsible Financial Analytics (Deep Dive) */}
+        {isFinanceEnabled && (
+          <div className="pt-2">
+            <div className="flex items-center justify-between border-t border-black/[0.05] dark:border-white/[0.05] pt-4">
+              <button
+                onClick={() => setShowFinancialChart(!showFinancialChart)}
+                className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream transition-colors py-1 px-2 rounded-lg hover:bg-white/5"
+              >
+                <ChartLineUp size={16} className="text-primary" />
+                <span>
+                  {showFinancialChart ? t('dashboard.toggle_chart_hide') : t('dashboard.toggle_chart_show')}
+                </span>
+                {showFinancialChart ? <CaretUp size={14} /> : <CaretDown size={14} />}
+              </button>
+
+              {showFinancialChart && (
+                <div className="flex items-center bg-black/[0.02] dark:bg-white/[0.02] p-1 rounded-lg border border-black/5 dark:border-white/5">
+                  <button 
+                    onClick={() => {
+                      if (financeMonth === 0) { setFinanceMonth(11); setFinanceYear(y => y - 1); }
+                      else { setFinanceMonth(m => m - 1); }
+                    }} 
+                    className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded text-gray-light"
+                    aria-label="Previous month"
+                  >
+                    <TrasonIcon icon={CaretLeft} size={16} />
                   </button>
-                  <span className="text-xs font-bold text-soft-cream w-[140px] text-center tracking-wide">
-                    {new Date(financeYear, financeMonth).toLocaleString(locale || 'en-US', { month: 'long', year: 'numeric' })}
+                  <span className="text-xs font-bold text-soft-cream px-2 tracking-wide font-mono">
+                    {new Date(financeYear, financeMonth).toLocaleString(locale || 'en-US', { month: 'short', year: 'numeric' })}
                   </span>
-                  <button onClick={() => {
-                    if (financeMonth === 11) { setFinanceMonth(0); setFinanceYear(y => y + 1); }
-                    else { setFinanceMonth(m => m + 1); }
-                  }} className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-md text-gray-light">
-                    <TrasonIcon icon={CaretRight} size={20} />
+                  <button 
+                    onClick={() => {
+                      if (financeMonth === 11) { setFinanceMonth(0); setFinanceYear(y => y + 1); }
+                      else { setFinanceMonth(m => m + 1); }
+                    }} 
+                    className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded text-gray-light"
+                    aria-label="Next month"
+                  >
+                    <TrasonIcon icon={CaretRight} size={16} />
                   </button>
                 </div>
-                
-                {/* Global Budget Mini Widget */}
-                {globalBudget && (
-                  <div className="lg:col-span-3 bg-[#141414] border border-white/5 rounded-2xl p-md relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-sm mb-sm">
-                      <div className="flex items-center gap-sm">
-                        <div className="p-1.5 bg-primary/10 rounded-lg text-primary">
-                          <TrasonIcon icon={SYS_ICONS.finance.main} size={16} />
-                        </div>
-                        <h3 className="text-sm font-bold text-soft-cream">Monthly Budget</h3>
-                      </div>
-                      <p className="text-xs font-mono text-gray-light">
-                        {formatCurrency(totalExpense, preferences?.currency || 'USD', locale)} / {formatCurrency(globalBudget.amount, preferences?.currency || 'USD', locale)}
-                      </p>
-                    </div>
-                    <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden mt-xs">
-                      <div 
-                        className={`h-full rounded-full transition-all duration-1000 ${
-                          (totalExpense / globalBudget.amount) > 0.9 ? 'bg-danger' : 
-                          (totalExpense / globalBudget.amount) > 0.75 ? 'bg-warning' : 'bg-primary'
-                        }`}
-                        style={{ width: `${Math.min((totalExpense / globalBudget.amount) * 100, 100)}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
+              )}
+            </div>
 
+            {showFinancialChart && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-3 animate-fade-in">
                 <div className="lg:col-span-2">
                   <FinancialChart transactions={transactions} month={financeMonth} year={financeYear} />
                 </div>
                 <div>
                   <SpendingBreakdown transactions={transactions} />
                 </div>
-              </>
-            )}
-            {isTimelineEnabled && preferences?.module_features?.['timeline_daily_checklist'] !== false && (
-              <div className="lg:col-span-3">
-                <DailyTasksSummary />
               </div>
             )}
-            {investmentSummary && (
-              <div className="lg:col-span-3 mb-md">
-                <NetWorthSummary summary={investmentSummary} />
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Modules Summary Grid */}
-        {(isRemindersEnabled || isSportEnabled || isCareerEnabled) && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md md:gap-xl">
-            {isRemindersEnabled && preferences?.module_features?.['reminders_active'] !== false && (
-              <RemindersSidebar reminders={reminders} />
-            )}
-            {isSportEnabled && <SportSummary summary={sportSummary} isLoading={sportLoading} />}
-            {isCareerEnabled && <CareerSummary stats={careerStats} nextInterview={nextInterview} isLoading={careerLoading} />}
           </div>
         )}
       </div>

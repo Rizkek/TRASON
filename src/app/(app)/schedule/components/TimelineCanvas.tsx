@@ -5,13 +5,7 @@ import { Loading } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Activity, Reminder } from '@/services/supabase/supabaseClient';
 import { HOURS, CELL_HEIGHT, formatHour, getDurationLabel } from './types';
-import { Plus, Trash as Trash2, CaretLeft, CaretRight, Bell, Warning, Repeat, CalendarCheck } from '@phosphor-icons/react';
-
-interface Holiday {
-  date: string;
-  name: string;
-  is_cuti_bersama: boolean;
-}
+import { Plus, Trash as Trash2, CaretLeft, CaretRight, Bell, Warning, Repeat } from '@phosphor-icons/react';
 
 interface TimelineCanvasProps {
   locale: string;
@@ -21,7 +15,6 @@ interface TimelineCanvasProps {
   grid: Record<number, Record<number, Activity[]>>;
   remindersGrid: Record<number, Record<number, Reminder[]>>;
   isLoading: boolean;
-  getHolidayForDate: (date: Date) => Holiday | undefined;
   onOpenAddModal: (date?: Date, hour?: number) => void;
   onOpenEditModal: (activity: Activity) => void;
   onConfirmDelete: (activityId: string) => void;
@@ -37,7 +30,6 @@ export function TimelineCanvas({
   grid,
   remindersGrid,
   isLoading,
-  getHolidayForDate,
   onOpenAddModal,
   onOpenEditModal,
   onConfirmDelete,
@@ -76,49 +68,28 @@ export function TimelineCanvas({
             <div className="border-r border-black/[0.03] dark:border-white/[0.03]" />
             {daysOfWeek.map((day, idx) => {
               const isToday = day.toDateString() === new Date().toDateString();
-              const holiday = getHolidayForDate(day);
               return (
                 <div
                   key={idx}
                   className={`px-sm py-md text-center border-r border-black/[0.03] dark:border-white/[0.03] last:border-r-0 relative transition-colors ${
-                    isToday ? 'bg-primary/10' : holiday ? 'bg-rose-500/10' : ''
+                    isToday ? 'bg-primary/10' : ''
                   }`}
-                  title={
-                    holiday
-                      ? `${holiday.name} (${holiday.is_cuti_bersama ? 'Cuti Bersama' : 'Libur Nasional'})`
-                      : undefined
-                  }
                 >
                   {isToday && (
                     <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                   )}
                   <p
                     className={`text-[11px] font-bold uppercase tracking-[0.15em] ${
-                      isToday ? 'text-primary' : holiday ? 'text-rose-400 font-extrabold' : 'text-gray-light'
+                      isToday ? 'text-primary' : 'text-gray-light'
                     }`}
                   >
                     {day.toLocaleDateString(locale, { weekday: 'short' })}
                   </p>
                   <p
-                    className={`text-[10px] font-mono mt-0.5 ${
-                      holiday ? 'text-rose-300 font-bold' : 'text-gray-light/60'
-                    }`}
+                    className="text-[10px] font-mono mt-0.5 text-gray-light/60"
                   >
                     {day.getDate()}
                   </p>
-                  {holiday && (
-                    <div className="mt-1 flex items-center justify-center">
-                      <span
-                        className={`text-[8px] px-1 py-0.5 rounded truncate max-w-[95%] font-semibold block ${
-                          holiday.is_cuti_bersama
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                            : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                        }`}
-                      >
-                        {holiday.is_cuti_bersama ? '🏖️ Cuti' : '🔴 Libur'}
-                      </span>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -297,44 +268,6 @@ export function TimelineCanvas({
         </div>
       </div>
 
-      {/* Holiday Info Panel (Desktop) */}
-      {(() => {
-        const weekHolidays = daysOfWeek
-          .map((d) => ({ day: d, holiday: getHolidayForDate(d) }))
-          .filter((x) => !!x.holiday);
-        if (weekHolidays.length === 0) return null;
-        return (
-          <div className="hidden md:flex items-center gap-md px-xl py-sm border-t border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/20 flex-wrap">
-            <div className="flex items-center gap-xs text-[10px] font-bold text-gray-light uppercase tracking-widest shrink-0">
-              <CalendarCheck size={11} className="text-primary" />
-              Hari Libur
-            </div>
-            <div className="flex flex-wrap gap-xs">
-              {weekHolidays.map(({ day, holiday }) => (
-                <div
-                  key={day.toDateString()}
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium border whitespace-nowrap ${
-                    holiday!.is_cuti_bersama
-                      ? 'bg-amber-500/10 text-amber-200 border-amber-500/20'
-                      : 'bg-rose-500/10 text-rose-200 border-rose-500/20'
-                  }`}
-                >
-                  <span className="text-[11px]">{holiday!.is_cuti_bersama ? '🏖️' : '🔴'}</span>
-                  <span className="font-semibold">
-                    {day.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })}
-                  </span>
-                  <span className="opacity-50">·</span>
-                  <span>{holiday!.name}</span>
-                  {holiday!.is_cuti_bersama && (
-                    <span className="text-[9px] uppercase font-bold bg-amber-500/20 text-amber-300 px-1 rounded ml-0.5">Cuti</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })()}
-
       <div className="md:hidden p-md space-y-md min-h-[50vh]">
         <div className="flex items-center justify-between border-b border-black/[0.05] dark:border-white/[0.05] pb-2 mb-md">
           <button
@@ -358,8 +291,6 @@ export function TimelineCanvas({
           </button>
         </div>
         {(() => {
-          const mobileDay = daysOfWeek[mobileDayIdx];
-          const mobileHoliday = mobileDay ? getHolidayForDate(mobileDay) : undefined;
           const todaysActivities = grid[mobileDayIdx]
             ? HOURS.flatMap((h) => grid[mobileDayIdx][h] || [])
             : [];
@@ -369,26 +300,6 @@ export function TimelineCanvas({
 
           return (
             <>
-              {/* Mobile Holiday Banner */}
-              {mobileHoliday && (
-                <div
-                  className={`p-sm rounded-lg border flex items-center gap-2 mb-sm ${
-                    mobileHoliday.is_cuti_bersama
-                      ? 'border-amber-500/30 bg-amber-500/10 text-amber-200'
-                      : 'border-rose-500/30 bg-rose-500/10 text-rose-200'
-                  }`}
-                >
-                  <span className="text-base">{mobileHoliday.is_cuti_bersama ? '🏖️' : '🔴'}</span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold truncate">{mobileHoliday.name}</p>
-                    <p className="text-[10px] opacity-75">
-                      {mobileHoliday.is_cuti_bersama
-                        ? 'Cuti Bersama Resmi'
-                        : 'Hari Libur Nasional Indonesia'}
-                    </p>
-                  </div>
-                </div>
-              )}
 
               {todaysActivities.length === 0 && todaysReminders.length === 0 && (
                 <div className="text-center py-xl space-y-sm">

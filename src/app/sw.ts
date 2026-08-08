@@ -18,7 +18,7 @@ declare const self: ServiceWorkerGlobalScope;
 // Dynamic app routes and API routes must ALWAYS go to the network.
 // These routes use cookies/auth and cannot be served from cache.
 const NETWORK_ONLY_ROUTES = [
-  /^\/(dashboard|finance|timeline|sport|career|reminders|investments|insights|settings|onboarding)(\/.*)?$/,
+  /^\/(dashboard|finance|schedule|timeline|sport|career|reminders|investments|insights|settings|onboarding)(\/.*)?$/,
   /^\/api\//,
 ];
 

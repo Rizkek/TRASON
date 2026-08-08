@@ -15,7 +15,6 @@ interface DailyTasksPanelProps {
   createTask: (data: { title: string; description?: string; category?: string }) => Promise<any>;
   toggleTask: (id: string, completed: boolean) => Promise<any>;
   deleteTask: (id: string) => Promise<any>;
-  getHolidayForDate?: (date: Date) => { date: string; name: string; is_cuti_bersama: boolean } | undefined;
 }
 
 export function DailyTasksPanel({
@@ -27,7 +26,6 @@ export function DailyTasksPanel({
   createTask,
   toggleTask,
   deleteTask,
-  getHolidayForDate,
 }: DailyTasksPanelProps) {
   const { t } = useTranslation();
   const [newTaskInput, setNewTaskInput] = useState('');
@@ -59,16 +57,6 @@ export function DailyTasksPanel({
             <ListChecks size={15} className="text-primary" />
             {new Date().toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' })}
           </h2>
-          {getHolidayForDate && getHolidayForDate(new Date()) && (
-            <div className={`text-[10px] inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full font-bold ${
-              getHolidayForDate(new Date())?.is_cuti_bersama
-                ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
-                : 'bg-rose-500/10 text-rose-300 border border-rose-500/20'
-            }`}>
-              <span>{getHolidayForDate(new Date())?.is_cuti_bersama ? '🏖️' : '🔴'}</span>
-              <span>{getHolidayForDate(new Date())?.name}</span>
-            </div>
-          )}
           {totalCount > 0 && (
             <div className="flex items-center gap-sm">
               <div className="flex-1 h-1.5 bg-black/[0.05] dark:bg-white/[0.05] rounded-full overflow-hidden" style={{ width: '120px' }}>

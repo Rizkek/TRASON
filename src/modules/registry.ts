@@ -25,7 +25,7 @@ export const MODULE_METADATA: Record<ModuleId, ModuleMetadata> = {
   },
   timeline: {
     id: 'timeline',
-    name: 'Timeline',
+    name: 'Schedule',
     description: 'Daily activities and schedule management',
     icon: 'Clock',
     color: '#8b5cf6', // violet-500

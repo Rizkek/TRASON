@@ -63,34 +63,6 @@ export function TimelineClient() {
     deleteTask,
   } = useDailyTasks();
 
-  // Indonesian National Holidays state
-  const [holidays, setHolidays] = useState<Array<{ date: string; name: string; is_cuti_bersama: boolean }>>([]);
-
-  useEffect(() => {
-    const year = weekStart.getFullYear();
-    fetch(`/api/timeline/holidays?year=${year}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data.holidays)) {
-          setHolidays(data.holidays);
-        }
-      })
-      .catch(() => {
-        // Silently continue if offline
-      });
-  }, [weekStart]);
-
-  const getHolidayForDate = useCallback(
-    (date: Date) => {
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, '0');
-      const d = String(date.getDate()).padStart(2, '0');
-      const key = `${y}-${m}-${d}`;
-      return holidays.find((h) => h.date === key);
-    },
-    [holidays]
-  );
-
   useEffect(() => {
     // Auto-redirect if current tab is deactivated
     if (activeTab === 'weekly-log' && module_features?.['timeline_weekly_log'] === false) {
@@ -400,7 +372,6 @@ export function TimelineClient() {
               createTask={createTask}
               toggleTask={toggleTask}
               deleteTask={deleteTask}
-              getHolidayForDate={getHolidayForDate}
             />
           )}
 
@@ -414,7 +385,6 @@ export function TimelineClient() {
               grid={grid}
               remindersGrid={remindersGrid}
               isLoading={isLoading}
-              getHolidayForDate={getHolidayForDate}
               onOpenAddModal={openAddModal}
               onOpenEditModal={openEditModal}
               onConfirmDelete={(id) => setDeleteConfirmId(id)}

@@ -96,14 +96,14 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Budget Planner"
+      title={t('finance.budget.title')}
       footer={
         <div className="flex gap-md justify-end w-full">
           <Button variant="ghost" onClick={onClose} disabled={isSaving}>
-            Batal
+            {t('common.cancel')}
           </Button>
           <Button variant="primary" onClick={handleSave} disabled={isSaving} className="w-full">
-            {isSaving ? 'Menyimpan...' : 'Simpan Plan'}
+            {isSaving ? t('common.loading') : t('common.save')}
           </Button>
         </div>
       }
@@ -120,12 +120,12 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
             <div>
               <h4 className="text-sm font-bold text-soft-cream">{t('finance.budget.globalMonthly')}</h4>
               <p className="text-xs text-gray-light mt-1">
-                Batas maksimal seluruh pengeluaran Anda dalam 1 bulan.
+                {t('finance.budget.global_desc')}
               </p>
             </div>
           </div>
           <Input
-            label={`TARGET TOTAL BULANAN (${currency})`}
+            label={t('finance.budget.target_label').replace('{currency}', currency || 'USD')}
             type="number"
             placeholder={t('finance.budget.globalPlaceholder')}
             value={globalAmount}
@@ -142,7 +142,7 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
             <h4 className="text-sm font-bold text-soft-cream">{t('finance.budget.predictiveBlueprint')}</h4>
           </div>
           <p className="text-xs text-gray-light">
-            Biarkan sistem memantau otomatis. Tetapkan batas pengeluaran spesifik untuk setiap kategori (Opsional).
+            {t('finance.budget.category_desc')}
           </p>
           
           <div className="space-y-sm mt-md max-h-[40vh] overflow-y-auto pr-sm custom-scrollbar">

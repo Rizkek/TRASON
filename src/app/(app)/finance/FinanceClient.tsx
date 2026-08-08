@@ -364,7 +364,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
             <div className="md:hidden pt-sm">
               <Link href="/finance/subscriptions">
                 <Button variant="outline" size="sm" leftIcon={<Calendar size={14} />} className="w-full justify-center">
-                  Subscriptions
+                  {t('finance.activeSubscriptions') || 'Subscriptions'}
                 </Button>
               </Link>
             </div>
@@ -372,7 +372,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
           <div className="hidden md:flex gap-md">
             <Link href="/finance/subscriptions">
               <Button variant="outline" size="md" leftIcon={<Calendar size={18} />}>
-                Subscriptions
+                {t('finance.activeSubscriptions') || 'Subscriptions'}
               </Button>
             </Link>
             <Button variant="primary" size="md" onClick={openAddModal} leftIcon={<Plus size={18} />}>
@@ -389,14 +389,14 @@ export default function FinanceClient({ initialTransactions }: Props) {
               <div>
                 <div className="flex items-center gap-sm">
                   <Wallet size={16} className="text-primary" />
-                  <h3 className="text-sm font-bold text-soft-cream">Global Monthly Budget</h3>
+                  <h3 className="text-sm font-bold text-soft-cream">{t('finance.budget.globalMonthly')}</h3>
                 </div>
                 <p className="text-xs text-gray-light mt-1">
                   {formatCurrency(totalExpense, currency || 'USD', locale)} / {formatCurrency(globalBudget.amount, currency || 'USD', locale)}
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={() => setIsBudgetModalOpen(true)}>
-                Ubah Target
+                {t('finance.budget.set_target')}
               </Button>
             </div>
             
@@ -410,7 +410,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
               ></div>
             </div>
             <p className="text-[10px] text-right mt-2 font-mono text-gray-light">
-              {Math.round((totalExpense / globalBudget.amount) * 100)}% digunakan
+              {t('finance.budget.used_percentage').replace('{percent}', String(Math.round((totalExpense / globalBudget.amount) * 100)))}
             </p>
           </div>
         )}
@@ -418,10 +418,10 @@ export default function FinanceClient({ initialTransactions }: Props) {
         {!globalBudget && (
           <div className="bg-[#141414] border border-white/5 border-dashed rounded-2xl p-sm md:p-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-sm">
             <p className="text-xs md:text-sm text-gray-light flex items-center gap-2">
-              <Wallet size={14} className="shrink-0" /> Belum ada target pengeluaran bulan ini.
+              <Wallet size={14} className="shrink-0" /> {t('finance.budget.no_target_set')}
             </p>
             <Button variant="outline" size="sm" onClick={() => setIsBudgetModalOpen(true)} className="w-full sm:w-auto">
-              Atur Target
+              {t('finance.budget.set_target')}
             </Button>
           </div>
         )}
@@ -539,7 +539,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
               <div className="p-1 bg-accent-gold/10 rounded-md shrink-0 text-accent-gold">
                 <Wallet size={12} />
               </div>
-              <p className="text-[9px] md:text-micro tracking-widest uppercase truncate">Dompet</p>
+              <p className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.wallet')}</p>
             </div>
             <div className="flex items-end justify-between mt-sm">
               <div className="min-w-0">

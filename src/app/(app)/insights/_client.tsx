@@ -11,7 +11,7 @@ import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useCareer } from '@/hooks/useCareer';
 import { useReminder } from '@/hooks/useReminder';
 import { useActivity } from '@/hooks/useActivity';
-import { Lightbulb, TrendUp as TrendingUp, TrendDown as TrendingDown, Lightning as Zap, Target, ChartBar, Calendar, Stack, Trash as Trash2 } from '@phosphor-icons/react';
+import { Lightbulb, TrendUp as TrendingUp, TrendDown as TrendingDown, Lightning as Zap, Target, ChartBar, Calendar, Stack, Trash as Trash2, ArrowCounterClockwise } from '@phosphor-icons/react';
 import { Sparkle } from '@phosphor-icons/react';
 import { formatDate } from '@/libs/format';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -28,6 +28,7 @@ export function InsightsClient() {
   const [dbInsights, setDbInsights] = useState<any[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
   // Active module hooks to collect complete life context
@@ -178,6 +179,13 @@ User Context Profile (TRASON Unified Life OS):
       const data = await res.json();
       
       if (data.insights && userId) {
+        // 0. Reset and delete all previous insights permanently from Supabase & local state
+        try {
+          await insightQueries.clearAllInsights();
+        } catch (err) {
+          console.warn('Failed to clear previous insights before writing new ones:', err);
+        }
+
         // Save generated AI insights to public.insights table in Supabase
         const savedInsights = await Promise.all(
           data.insights.map(async (i: any) => {
@@ -215,7 +223,8 @@ User Context Profile (TRASON Unified Life OS):
             }
           })
         );
-        setDbInsights(prev => [...savedInsights, ...prev]);
+        // Replace previous insights completely with fresh generated ones
+        setDbInsights(savedInsights);
       }
     } catch (err: any) {
       const msg = err?.name === 'AbortError'
@@ -225,6 +234,21 @@ User Context Profile (TRASON Unified Life OS):
       console.error('[handleGenerateAI]', err);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleResetAll = async () => {
+    if (dbInsights.length === 0) return;
+    if (!window.confirm(t('insights_page.reset_insights_confirm'))) return;
+
+    setIsResetting(true);
+    try {
+      await insightQueries.clearAllInsights();
+      setDbInsights([]);
+    } catch (err) {
+      console.error('Failed to reset insights:', err);
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -293,10 +317,20 @@ User Context Profile (TRASON Unified Life OS):
               {t('insights_page.desc')}
             </p>
           </div>
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-sm">
+            {dbInsights.length > 0 && (
+              <button 
+                onClick={handleResetAll}
+                disabled={isResetting || isGenerating}
+                className="px-md py-md bg-white/5 hover:bg-danger/10 text-gray-light hover:text-danger border border-white/10 hover:border-danger/30 font-bold rounded-lg flex items-center gap-sm disabled:opacity-50 transition-all text-xs"
+              >
+                <ArrowCounterClockwise size={16} />
+                <span>{isResetting ? t('insights_page.resetting') : t('insights_page.reset_insights')}</span>
+              </button>
+            )}
             <button 
               onClick={handleGenerateAI}
-              disabled={isGenerating}
+              disabled={isGenerating || isResetting}
               className="px-lg py-md bg-primary text-black font-bold rounded-lg flex items-center gap-sm hover:opacity-90 disabled:opacity-50 transition-all"
             >
               {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkle size={16} /> {t('insights_page.ask_ai')}</>}
@@ -418,12 +452,22 @@ User Context Profile (TRASON Unified Life OS):
         </div>
       </div>
 
-      {/* Mobile-only Ask AI Floating Button */}
-      <div className="md:hidden fixed bottom-4 left-4 right-4 z-40">
+      {/* Mobile-only Action Floating Buttons */}
+      <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 flex items-center gap-2">
+        {dbInsights.length > 0 && (
+          <button 
+            onClick={handleResetAll}
+            disabled={isResetting || isGenerating}
+            className="p-3 bg-black/80 backdrop-blur-md text-gray-light hover:text-danger border border-white/10 rounded-xl flex items-center justify-center shrink-0 disabled:opacity-50 transition-all shadow-lg"
+            title={t('insights_page.reset_insights')}
+          >
+            <ArrowCounterClockwise size={18} />
+          </button>
+        )}
         <button 
           onClick={handleGenerateAI}
-          disabled={isGenerating}
-          className="w-full py-sm  bg-primary text-black font-bold rounded-xl flex items-center justify-center gap-sm shadow-[0_4px_20px_rgba(244,201,93,0.4)] disabled:opacity-50 transition-all"
+          disabled={isGenerating || isResetting}
+          className="flex-1 py-sm bg-primary text-black font-bold rounded-xl flex items-center justify-center gap-sm shadow-[0_4px_20px_rgba(244,201,93,0.4)] disabled:opacity-50 transition-all"
         >
           {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkle size={18} /> <span className="text-sm">{t('insights_page.ask_ai')}</span></>}
         </button>

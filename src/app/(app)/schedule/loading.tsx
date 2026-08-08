@@ -1,6 +1,6 @@
 import React from 'react';
 import { LogoLoading } from '@/components';
 
-export default function TimelineLoading() {
+export default function ScheduleLoading() {
   return <LogoLoading />;
 }

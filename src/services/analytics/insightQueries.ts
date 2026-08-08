@@ -62,16 +62,32 @@ export const insightQueries = {
   // Delete insight
   async deleteInsight(id: string) {
     try {
-  return await withAuthQuery(async (userId) => {
-  const { error } = await supabase
+      return await withAuthQuery(async (userId) => {
+        const { error } = await supabase
           .from('insights')
           .delete()
           .eq('id', id)
           .eq('user_id', userId);
-  if (error) throw error;
-  });
-  } catch (err) {
+        if (error) throw error;
+      });
+    } catch (err) {
       logError(err, 'insightQueries.deleteInsight');
+      throw handleQueryError(err);
+    }
+  },
+
+  // Clear / reset all insights for current user (permanent deletion)
+  async clearAllInsights() {
+    try {
+      return await withAuthQuery(async (userId) => {
+        const { error } = await supabase
+          .from('insights')
+          .delete()
+          .eq('user_id', userId);
+        if (error) throw error;
+      });
+    } catch (err) {
+      logError(err, 'insightQueries.clearAllInsights');
       throw handleQueryError(err);
     }
   },

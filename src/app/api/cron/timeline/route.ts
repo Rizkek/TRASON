@@ -118,9 +118,9 @@ export async function GET(request: Request) {
       : `You have ${missingTasks.length} tasks left today. Keep going!`;
 
     const payload = JSON.stringify({
-      title: `Timeline Reminder`,
+      title: `Schedule Reminder`,
       body: bodyText,
-      url: '/timeline'
+      url: '/schedule'
     });
 
     // Helper to log safe endpoint info (last 15 chars or just domain)

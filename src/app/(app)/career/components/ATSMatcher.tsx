@@ -177,11 +177,11 @@ export function ATSMatcher({ applications = [] }: Props) {
               <h2 className="text-xl font-bold text-soft-cream flex items-center gap-2">
                 {t('career_page.ats_matcher.title')}
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary font-bold tracking-wider uppercase">
-                  Smart Parser
+                  {t('career_page.ats_matcher.tag')}
                 </span>
               </h2>
               <p className="text-xs md:text-sm text-gray-light mt-1 max-w-2xl font-light">
-                {t('career_page.ats_matcher.desc')} Dukungan file PDF/TXT, frasa teknis multi-kata, dan Bahasa Indonesia.
+                {t('career_page.ats_matcher.desc')}
               </p>
             </div>
           </div>
@@ -191,12 +191,12 @@ export function ATSMatcher({ applications = [] }: Props) {
             <div className="w-full sm:w-64 shrink-0">
               <Select
                 id="select-saved-app"
-                label="Isi dari Lamaran Tersimpan"
+                label={t('career_page.ats_matcher.from_saved_app')}
                 value={selectedAppId}
                 onValueChange={handleSelectApplication}
-                placeholder="Pilih lamaran..."
+                placeholder={t('career_page.ats_matcher.select_app_placeholder')}
                 options={[
-                  { value: '', label: '— Masukkan manual / file —' },
+                  { value: '', label: t('career_page.ats_matcher.manual_entry') },
                   ...applications.map(app => ({
                     value: app.id,
                     label: `${app.company_name} (${app.role_title})`,
@@ -239,14 +239,14 @@ export function ATSMatcher({ applications = [] }: Props) {
                   className="px-2.5 py-1 rounded bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 text-[10px] font-bold text-soft-cream flex items-center gap-1.5 transition-all disabled:opacity-50"
                 >
                   <UploadSimple size={12} />
-                  {isExtractingJd ? 'Membaca PDF...' : 'Unggah File (PDF/TXT)'}
+                  {isExtractingJd ? t('career_page.ats_matcher.reading_file') : t('career_page.ats_matcher.upload_file')}
                 </button>
                 {jdText && (
                   <button
                     type="button"
                     onClick={() => setJdText('')}
                     className="p-1 rounded text-gray-light hover:text-expense transition-colors"
-                    title="Hapus teks JD"
+                    title={t('career_page.ats_matcher.clear_jd')}
                   >
                     <X size={12} />
                   </button>
@@ -268,7 +268,7 @@ export function ATSMatcher({ applications = [] }: Props) {
                   className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-lg text-center opacity-40 hover:opacity-70 transition-opacity"
                 >
                   <FileText size={28} className="text-gray-light mb-1" />
-                  <p className="text-xs text-gray-light">Tarik & lepas file PDF lowongan atau ketik langsung</p>
+                  <p className="text-xs text-gray-light">{t('career_page.ats_matcher.drag_jd_hint')}</p>
                 </div>
               )}
             </div>
@@ -297,14 +297,14 @@ export function ATSMatcher({ applications = [] }: Props) {
                   className="px-2.5 py-1 rounded bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 text-[10px] font-bold text-soft-cream flex items-center gap-1.5 transition-all disabled:opacity-50"
                 >
                   <UploadSimple size={12} />
-                  {isExtractingCv ? 'Membaca PDF...' : 'Unggah Resume (PDF/TXT)'}
+                  {isExtractingCv ? t('career_page.ats_matcher.reading_file') : t('career_page.ats_matcher.upload_file')}
                 </button>
                 {cvText && (
                   <button
                     type="button"
                     onClick={() => setCvText('')}
                     className="p-1 rounded text-gray-light hover:text-expense transition-colors"
-                    title="Hapus teks CV"
+                    title={t('career_page.ats_matcher.clear_cv')}
                   >
                     <X size={12} />
                   </button>
@@ -326,7 +326,7 @@ export function ATSMatcher({ applications = [] }: Props) {
                   className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-lg text-center opacity-40 hover:opacity-70 transition-opacity"
                 >
                   <FileText size={28} className="text-gray-light mb-1" />
-                  <p className="text-xs text-gray-light">Tarik & lepas file CV / Resume PDF Anda</p>
+                  <p className="text-xs text-gray-light">{t('career_page.ats_matcher.drag_cv_hint')}</p>
                 </div>
               )}
             </div>
@@ -382,10 +382,10 @@ export function ATSMatcher({ applications = [] }: Props) {
               <Lightbulb size={16} className="text-primary shrink-0" />
               <span>
                 {result.score >= 75
-                  ? 'Kecocokan sangat tinggi! CV Anda siap dikirim.'
+                  ? t('career_page.ats_matcher.score_high_tip')
                   : result.score >= 45
-                  ? 'Cukup baik, tambahkan kata kunci teknis di bawah.'
-                  : 'Kecocokan rendah. Sesuaikan CV dengan kata kunci lowongan.'}
+                  ? t('career_page.ats_matcher.score_mid_tip')
+                  : t('career_page.ats_matcher.score_low_tip')}
               </span>
             </div>
           </div>
@@ -401,7 +401,7 @@ export function ATSMatcher({ applications = [] }: Props) {
                 </h3>
                 <div className="flex flex-wrap gap-1.5 max-h-[220px] overflow-y-auto no-scrollbar p-1">
                   {result.matched.length === 0 ? (
-                    <p className="text-xs text-gray-light italic">Belum ada kata kunci yang cocok ditemukan.</p>
+                    <p className="text-xs text-gray-light italic">{t('career_page.ats_matcher.no_matched_found')}</p>
                   ) : (
                     result.matched.map(kw => (
                       <span
@@ -426,10 +426,10 @@ export function ATSMatcher({ applications = [] }: Props) {
                     <button
                       onClick={handleCopyMissing}
                       className="text-[10px] uppercase font-bold text-gray-light hover:text-primary flex items-center gap-1 transition-colors"
-                      title="Salin semua kata kunci yang kurang"
+                      title={t('career_page.ats_matcher.copy_missing')}
                     >
                       {copied ? <Check size={12} className="text-success" /> : <Copy size={12} />}
-                      {copied ? 'Tersalin' : 'Salin'}
+                      {copied ? t('career_page.ats_matcher.copied') : t('career_page.ats_matcher.copy_missing')}
                     </button>
                   )}
                 </div>
@@ -437,7 +437,7 @@ export function ATSMatcher({ applications = [] }: Props) {
                 <div className="flex flex-wrap gap-1.5 max-h-[220px] overflow-y-auto no-scrollbar p-1">
                   {result.missing.length === 0 ? (
                     <p className="text-xs text-success italic flex items-center gap-1">
-                      <Sparkle size={14} weight="fill" /> Semua kualifikasi lowongan sudah ada di CV Anda!
+                      <Sparkle size={14} weight="fill" /> {t('career_page.ats_matcher.all_matched')}
                     </p>
                   ) : (
                     result.missing.map(kw => (
