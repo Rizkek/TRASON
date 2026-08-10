@@ -47,7 +47,9 @@ function isNetworkError(err: unknown): boolean {
     msg.includes('networkerror') ||
     msg.includes('network request failed') ||
     msg.includes('load failed') ||
-    msg.includes('the internet connection appears to be offline')
+    msg.includes('the internet connection appears to be offline') ||
+    msg.includes('rate limit') ||
+    msg.includes('too many requests')
   );
 }
 
@@ -94,11 +96,30 @@ export const useAuth = () => {
 
       authLog('initAuth', '▶ Starting auth initialization');
 
-      authInitPromise = (async () => {
+    authInitPromise = (async () => {
         try {
           authLog('initAuth', 'getSession() → calling Supabase...');
           const t0 = performance.now();
-          const { data: { session } } = await supabase.auth.getSession();
+
+          let sessionResult;
+          try {
+            sessionResult = await supabase.auth.getSession();
+          } catch (sessionErr: any) {
+            const isRateLimit =
+              sessionErr?.message?.toLowerCase().includes('rate limit') ||
+              sessionErr?.status === 429 ||
+              sessionErr?.message?.toLowerCase().includes('too many requests');
+
+            if (isRateLimit) {
+              authLog('initAuth', '⏳ Rate limit hit on getSession() — waiting 3s then retrying once...', undefined, 'warn');
+              await new Promise(r => setTimeout(r, 3000));
+              sessionResult = await supabase.auth.getSession();
+            } else {
+              throw sessionErr;
+            }
+          }
+
+          const { data: { session } } = sessionResult;
           authLog('initAuth', `getSession() → done in ${(performance.now() - t0).toFixed(0)}ms`, {
             hasSession: !!session,
             userId: session?.user?.id ?? null,
@@ -316,9 +337,20 @@ export const useAuth = () => {
 
     initAuth();
 
+    // Safety net: if initAuth somehow hangs (e.g. HMR stale flag, unhandled error,
+    // or rate limit retry takes too long), force-clear the loading state after 12s.
+    // This ensures the loading screen never stays stuck forever.
+    const safetyTimeout = setTimeout(() => {
+      if (isMountedRef.current && useAuthStore.getState().isLoading) {
+        authLog('safetyTimeout', '⚠ isLoading still true after 12s — force-clearing', undefined, 'warn');
+        useAuthStore.getState().setLoading(false);
+      }
+    }, 12000);
+
     return () => {
       authLog('cleanup', 'Component unmounting — unsubscribing auth listener');
       isMountedRef.current = false;
+      clearTimeout(safetyTimeout);
       authListener?.subscription.unsubscribe();
     };
   // stableRef.current is a guard that ensures this effect body only runs once.
