@@ -124,21 +124,34 @@ export const usePushNotification = () => {
         throw new Error('Not authenticated');
       }
 
-      // Save subscription to Supabase
+      // Deactivate all OLD subscriptions for this user before inserting the new one.
+      // This prevents stale endpoints from accumulating in the DB — browsers can
+      // generate a brand-new endpoint when the SW is reinstalled or cache is cleared,
+      // leaving old entries with is_active=true that will cause cron push failures.
+      await supabase
+        .from('push_subscriptions')
+        .update({ is_active: false })
+        .eq('user_id', user.id)
+        .neq('endpoint', subscription.endpoint);
+
+      // Upsert the current (fresh) subscription
       const { error } = await supabase
         .from('push_subscriptions')
-        .upsert([
-          {
-            user_id: user.id,
-            endpoint: subscription.endpoint,
-            // Use forEach-based encoding to avoid RangeError on large buffers
-            p256dh: arrayBufferToBase64(subscription.getKey('p256dh')!),
-            auth: arrayBufferToBase64(subscription.getKey('auth')!),
-            user_agent: navigator.userAgent,
-            is_active: true,
-            last_used_at: new Date().toISOString(),
-          },
-        ], { onConflict: 'endpoint' });
+        .upsert(
+          [
+            {
+              user_id: user.id,
+              endpoint: subscription.endpoint,
+              // Use forEach-based encoding to avoid RangeError on large buffers
+              p256dh: arrayBufferToBase64(subscription.getKey('p256dh')!),
+              auth: arrayBufferToBase64(subscription.getKey('auth')!),
+              user_agent: navigator.userAgent,
+              is_active: true,
+              last_used_at: new Date().toISOString(),
+            },
+          ],
+          { onConflict: 'endpoint' }
+        );
 
       if (error) throw error;
 

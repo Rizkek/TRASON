@@ -24,7 +24,6 @@ export const reminderQueries = {
             .eq('user_id', userId)
             .eq('status', 'pending')
             .is('deleted_at', null)
-            .or('due_datetime.is.null,due_datetime.gte.now()')
             .order('due_datetime', { ascending: true });
     if (error) throw error;
     return data;

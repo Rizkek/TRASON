@@ -30,8 +30,8 @@ export async function GET(request: Request) {
   }
 
   if (!resendApiKey) {
-    console.error(`[CRON-DIGEST] Resend API Key missing!`);
-    return NextResponse.json({ error: 'Resend credentials missing' }, { status: 500 });
+    console.warn(`[CRON-DIGEST] Resend API Key not configured — email digest is disabled. Skipping.`);
+    return NextResponse.json({ success: true, sent: 0, message: 'Email digest disabled (RESEND_API_KEY not set)' });
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);

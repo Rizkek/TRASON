@@ -35,34 +35,35 @@ export function useDailyTasks(): UseDailyTasksReturn {
   const createTask = useCallback(
     async (taskData: Pick<DailyTask, 'title' | 'description' | 'category'>) => {
       return await executeMutation(
-            (async () => {
+        (async () => {
           const optimisticTask: any = { 
-                    ...taskData, 
-                    id: `temp-${Date.now()}`, 
-                    sort_order: tasks.length,
-                    completed_today: false,
-                    created_at: new Date().toISOString()
-                  };
+            ...taskData, 
+            id: `temp-${Date.now()}`, 
+            sort_order: tasks.length, // this is slightly stale potentially but it's fine for sort_order
+            completed_today: false,
+            created_at: new Date().toISOString()
+          };
           await mutate(
-                    async (current) => {
-                      const newTask = await dailyTaskQueries.createTask({
-                        ...taskData,
-                        sort_order: tasks.length,
-                      });
-                      return current ? [...current, newTask] : [newTask];
-                    },
-                    {
-                      optimisticData: [...tasks, optimisticTask],
-                      rollbackOnError: true,
-                      revalidate: false,
-                    }
-                  );
-          return optimisticTask;
-            })(),
-            'useDailyTasks.createTask'
+            async (current: DailyTask[] | undefined) => {
+              const newTask = await dailyTaskQueries.createTask({
+                ...taskData,
+                sort_order: current ? current.length : 0,
+              });
+              return current ? [...current, newTask] : [newTask];
+            },
+            {
+              optimisticData: (current: DailyTask[] | undefined) =>
+                current ? [...current, optimisticTask] : [optimisticTask],
+              rollbackOnError: true,
+              revalidate: false,
+            }
           );
+          return optimisticTask;
+        })(),
+        'useDailyTasks.createTask'
+      );
     },
-    [tasks, mutate]
+    [tasks.length, mutate]
   );
 
   const toggleTask = useCallback(
@@ -70,15 +71,16 @@ export function useDailyTasks(): UseDailyTasksReturn {
       return await executeMutation(
         (async () => {
           await mutate(
-            async (current) => {
-              if (!current) return current;
-              await dailyTaskQueries.toggleTask(id, completed);
-              return current.map((t) => (t.id === id ? { ...t, completed_today: completed } : t));
+            async (current: DailyTask[] | undefined) => {
+              const updatedData = await dailyTaskQueries.toggleTask(id, completed);
+              if (!current) return [updatedData];
+              return current.map((t) => (t.id === id ? updatedData : t));
             },
             {
-              optimisticData: tasks.map((t) =>
-                t.id === id ? { ...t, completed_today: completed } : t
-              ),
+              optimisticData: (current: DailyTask[] | undefined) =>
+                current ? current.map((t) =>
+                  t.id === id ? { ...t, completed_today: completed } : t
+                ) : [],
               rollbackOnError: true,
               revalidate: false,
             }
@@ -87,7 +89,7 @@ export function useDailyTasks(): UseDailyTasksReturn {
         'useDailyTasks.toggleTask'
       );
     },
-    [tasks, mutate]
+    [mutate]
   );
 
   const deleteTask = useCallback(
@@ -95,13 +97,14 @@ export function useDailyTasks(): UseDailyTasksReturn {
       return await executeMutation(
         (async () => {
           await mutate(
-            async (current) => {
-              if (!current) return current;
+            async (current: DailyTask[] | undefined) => {
               await dailyTaskQueries.deleteTask(id);
+              if (!current) return current;
               return current.filter((t) => t.id !== id);
             },
             {
-              optimisticData: tasks.filter((t) => t.id !== id),
+              optimisticData: (current: DailyTask[] | undefined) =>
+                current ? current.filter((t) => t.id !== id) : [],
               rollbackOnError: true,
               revalidate: false,
             }
@@ -110,7 +113,7 @@ export function useDailyTasks(): UseDailyTasksReturn {
         'useDailyTasks.deleteTask'
       );
     },
-    [tasks, mutate]
+    [mutate]
   );
 
   return {
