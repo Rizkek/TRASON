@@ -321,7 +321,7 @@ export function RemindersClient() {
                             <h4 className={`text-lg font-medium ${reminder.status === 'completed' ? 'line-through opacity-40' : ''}`}>{reminder.title}</h4>
                             <div className="flex items-center gap-md text-micro text-gray-light uppercase tracking-widest mt-1">
                               <Clock size={12} />
-                              <span>{new Date(reminder.due_datetime || reminder.due_date || '').toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone })}</span>
+                              <span>{(() => { const raw = reminder.due_datetime || reminder.due_date; if (!raw) return '—'; const d = new Date(raw); return isNaN(d.getTime()) ? '—' : d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone || 'UTC' }); })()}</span>
                               <span>•</span>
                               <span className={reminder.priority === 'high' ? 'text-expense font-bold' : ''}>{t(`career_page.form.options.${reminder.priority}`)}</span>
                             </div>

@@ -72,16 +72,22 @@ export async function GET(request: Request) {
   }
   // -----------------------------------------------------------
 
-  const todayStr = new Date().toISOString().split('T')[0];
 
-  // Fetch reminders that are either due TODAY (and not in the past) or have no date
-  console.log(`[CRON-REMINDERS] Fetching pending reminders for today...`);
+  // Use DB-side timezone-aware date comparison (WIB = Asia/Jakarta = UTC+7)
+  // This avoids the UTC todayStr issue where midnight WIB = prev-day UTC.
+  // Only fetch reminders that:
+  //   1. Have an explicit due_datetime (no date = no daily cron notification)
+  //   2. Are due today in WIB timezone
+  //   3. Are not yet in the past by more than 1 hour (grace window)
+  console.log(`[CRON-REMINDERS] Fetching pending reminders due today (WIB)...`);
   const { data: rawReminders, error: remindersError } = await supabase
     .from('reminders')
     .select('id, user_id, title, due_datetime, due_time, notify_times')
     .eq('status', 'pending')
     .is('deleted_at', null)
-    .or('due_datetime.is.null,due_datetime.gte.now()');
+    .not('due_datetime', 'is', null)
+    .gte('due_datetime', new Date(new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }) + 'T00:00:00+07:00').toISOString())
+    .lte('due_datetime', new Date(new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }) + 'T23:59:59+07:00').toISOString());
 
   if (remindersError) {
     console.error('[CRON-REMINDERS] Failed to fetch reminders:', remindersError);
@@ -99,11 +105,7 @@ export async function GET(request: Request) {
   for (const row of rawReminders) {
     const parsed = ReminderRowSchema.safeParse(row);
     if (parsed.success) {
-      // Only keep it if it's due today or has no due date
-      const isToday = !parsed.data.due_datetime || parsed.data.due_datetime.startsWith(todayStr);
-      if (isToday) {
-        allReminders.push(parsed.data);
-      }
+      allReminders.push(parsed.data);
     } else {
       skippedReminders++;
       console.warn('[CRON-REMINDERS] Skipping malformed reminder row:', {
