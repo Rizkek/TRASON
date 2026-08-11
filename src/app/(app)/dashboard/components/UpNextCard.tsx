@@ -36,7 +36,6 @@ export const UpNextCard: React.FC<UpNextCardProps> = ({ reminders, isLoading }) 
     <Card className="p-md md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
       <div className="flex items-center justify-between mb-md pb-xs border-b border-black/[0.05] dark:border-white/[0.05]">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-primary" />
           <h2 className="text-xs font-bold uppercase tracking-widest text-soft-cream">
             {t('dashboard.up_next')}
           </h2>

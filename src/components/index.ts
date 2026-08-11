@@ -12,6 +12,7 @@ export * from './ui/CreatableAutocomplete';
 export * from './ui/CategoryIcon';
 export * from './ui/NavIcon';
 export * from './ui/TrasonIcon';
+export * from './ui/Toast';
 
 export * from './Modal';
 export * from './ConfirmModal';

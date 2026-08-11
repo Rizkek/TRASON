@@ -837,7 +837,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 />
                 <DatePicker
                   id="modal-interview"
-                  label={t('career_page.form.interview_date')}
+                  label={`${t('career_page.form.interview_date')} (Opsional)`}
                   value={form.interview_date}
                   onChange={(val) => setForm((f) => ({ ...f, interview_date: val }))}
                   placeholder="Optional interview date"
@@ -864,7 +864,7 @@ export default function CareerClient({ initialApplications }: Props) {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm">
               <Input
-                label={t('career_page.form.location')}
+                label={`${t('career_page.form.location')} (Opsional)`}
                 placeholder={t('career_page.form.location_placeholder')}
                 value={form.location}
                 onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
@@ -881,7 +881,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 ]}
               />
               <Input
-                label={t('career_page.form.url')}
+                label={`${t('career_page.form.url')} (Opsional)`}
                 placeholder={t('career_page.form.url_placeholder')}
                 value={form.url}
                 onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
@@ -892,7 +892,7 @@ export default function CareerClient({ initialApplications }: Props) {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">
-                  {t('career_page.form.salary')}
+                  {t('career_page.form.salary')} <span className="font-normal opacity-70 normal-case">(Opsional)</span>
                 </label>
                 {(form.salary_min.trim() || form.salary_max.trim()) && (
                   <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
@@ -978,7 +978,7 @@ export default function CareerClient({ initialApplications }: Props) {
 
             <div className="space-y-1">
               <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">
-                {t('career_page.form.notes_label') || 'Catatan / Keterangan'}
+                {t('career_page.form.notes_label') || 'Catatan / Keterangan'} <span className="font-normal opacity-70 normal-case">(Opsional)</span>
               </label>
               <textarea
                 value={form.notes}

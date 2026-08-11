@@ -740,7 +740,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
               <button
                 key={type}
                 type="button"
-                onClick={() => setForm(f => ({ ...f, type }))}
+                onClick={() => form.type !== type && setForm(f => ({ ...f, type, category_id: '' }))}
                 className={`flex-1 py-md text-[10px] font-bold rounded-sm transition-all uppercase tracking-widest ${
                   form.type === type 
                     ? type === 'income' ? 'bg-success text-white' : 'bg-danger text-white'
@@ -863,7 +863,9 @@ export default function FinanceClient({ initialTransactions }: Props) {
           </div>
 
           <div className="space-y-sm">
-            <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.modal.description')}</label>
+            <label className="text-[10px] font-bold text-gray-light tracking-widest block">
+              {t('finance.modal.description')} <span className="font-normal opacity-70">(Opsional)</span>
+            </label>
             <textarea
               placeholder={t('finance.modal.descriptionPlaceholder')}
               rows={2}
@@ -947,7 +949,9 @@ export default function FinanceClient({ initialTransactions }: Props) {
               </div>
 
               <div className="space-y-sm">
-                <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.modal.reason')}</label>
+                <label className="text-[10px] font-bold text-gray-light tracking-widest block">
+                  {t('finance.modal.reason')} <span className="font-normal opacity-70">(Opsional)</span>
+                </label>
                 <textarea
                   placeholder={t('finance.modal.reasonPlaceholder')}
                   rows={2}

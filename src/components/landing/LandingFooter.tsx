@@ -8,12 +8,11 @@ export function LandingFooter() {
   return (
     <footer className="py-20 px-lg border-t border-black/[0.05] dark:border-white/[0.05] bg-black/20">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-xl">
-        
         {/* Brand & Description */}
         <div className="space-y-md col-span-1 md:col-span-1">
           <div className="flex items-center gap-sm">
-            <Logo size={32} variant="gold" />
-            <span className="font-display text-2xl font-extrabold tracking-tight text-soft-cream">TRASON</span>
+            <Logo size={32} />
+            <span className="font-brand text-2xl font-extrabold tracking-tight text-soft-cream">TRASON</span>
           </div>
           <p className="text-sm text-gray-light font-light leading-relaxed">
             The unified personal operating system designed to eliminate app fatigue and centralize your financial, career, and vitality data.

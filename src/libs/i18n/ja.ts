@@ -1,4 +1,4 @@
-export const ja = {
+﻿export const ja = {
   nav: {
     dashboard: 'ダッシュボード',
     finance: 'ファイナンス',
@@ -504,7 +504,7 @@ export const ja = {
       cycleMonthly: '月',
       cycleYearly: '年',
       cycleWeekly: '週',
-      mindfulSpending: '✨ 支出の振り返りメモ',
+      mindfulSpending: '支出の振り返りメモ',
       expenseNature: '支出の性質',
       need: '必要',
       want: '欲しい',

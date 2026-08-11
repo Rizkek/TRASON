@@ -212,9 +212,9 @@ export function TimelineCanvas({
                                 }`}
                                 style={{
                                   background: isRoutine
-                                    ? `linear-gradient(135deg, rgba(78,79,235,0.15), rgba(78,79,235,0.05))`
-                                    : `linear-gradient(135deg, #4e4feb22, #4e4feb11)`,
-                                  borderLeft: isRoutine ? '2px dashed #818cf8' : '2px solid #4e4feb',
+                                    ? `linear-gradient(135deg, rgb(var(--color-primary) / 0.15), rgb(var(--color-primary) / 0.05))`
+                                    : `linear-gradient(135deg, rgb(var(--color-primary) / 0.1), rgb(var(--color-primary) / 0.05))`,
+                                  borderLeft: isRoutine ? '2px dashed rgb(var(--color-primary))' : '2px solid rgb(var(--color-primary) / 0.5)',
                                 }}
                                 role="button"
                                 tabIndex={0}
@@ -224,7 +224,7 @@ export function TimelineCanvas({
                                 <div className="flex items-center gap-1">
                                   {isRoutine && (
                                     <span title="Jadwal Rutin Mingguan" className="inline-flex items-center shrink-0">
-                                      <Repeat size={10} className="text-indigo-300" />
+                                      <Repeat size={10} className="text-primary" />
                                     </span>
                                   )}
                                   <p className="text-[9px] font-bold text-soft-cream truncate leading-tight flex-1">

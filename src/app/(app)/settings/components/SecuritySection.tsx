@@ -126,6 +126,7 @@ export function SecuritySection({
         confirmText={t('settings.security.confirmDeleteBtn')}
         cancelText={t('nav.cancel')}
         isDangerous={true}
+        requireInput="TRASON"
       />
     </>
   );

@@ -1,4 +1,4 @@
-export const es = {
+﻿export const es = {
   nav: {
     dashboard: 'Panel',
     finance: 'Finanzas',
@@ -504,7 +504,7 @@ export const es = {
       cycleMonthly: 'Mes',
       cycleYearly: 'Año',
       cycleWeekly: 'Semana',
-      mindfulSpending: '✨ Notas de Gasto Consciente',
+      mindfulSpending: 'Notas de Gasto Consciente',
       expenseNature: 'Naturaleza del Gasto',
       need: 'Necesidad',
       want: 'Deseo',

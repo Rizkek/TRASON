@@ -5,6 +5,7 @@ import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { SmartInput } from '@/components/SmartInput';
 import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
+import { ThemeSync } from '@/components/layout/ThemeSync';
 import NextTopLoader from 'nextjs-toploader';
 
 const sans = Geist({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
@@ -235,6 +236,7 @@ export default function RootLayout({
             shadow="0 0 10px #F4C95D,0 0 5px #F4C95D"
           />
           <AuthProvider>
+            <ThemeSync />
             {children}
             <SmartInput />
             <PwaInstallPrompt />

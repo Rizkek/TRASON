@@ -11,6 +11,14 @@ const extractLanguage = (user: any): string | undefined => {
   return pref?.language;
 };
 
+// Helper to extract theme from a user object
+const extractTheme = (user: any): string | undefined => {
+  const prefs = user?.user_preferences;
+  if (!prefs) return undefined;
+  const pref = Array.isArray(prefs) ? prefs[0] : prefs;
+  return pref?.theme;
+};
+
 interface AuthState {
   user: User | null;
   accessToken: string | null;
@@ -22,11 +30,13 @@ interface AuthState {
    *  Kept separate from user.user_preferences so Zustand's strict-equality
    *  check reliably triggers a re-render when the language changes. */
   activeLanguage: string;
+  activeTheme: string;
 
   // Actions
   setUser: (user: User) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
   setActiveLanguage: (lang: string) => void;
+  setActiveTheme: (theme: string) => void;
   logout: () => void;
   signOut: () => Promise<void>;
   clearError: () => void;
@@ -44,21 +54,28 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       error: null,
       activeLanguage: 'en',
+      activeTheme: 'dark',
 
-      // When a full user profile is set, also sync activeLanguage automatically
       setUser: (user) =>
         set((state) => {
-          const extracted = extractLanguage(user);
-          const newLang = extracted || state.activeLanguage || 'en';
+          const extractedLang = extractLanguage(user);
+          const newLang = extractedLang || state.activeLanguage || 'en';
+          const extractedTheme = extractTheme(user);
+          const newTheme = extractedTheme || state.activeTheme || 'dark';
           return {
             user,
             isAuthenticated: true,
             activeLanguage: newLang,
+            activeTheme: newTheme,
           };
         }),
 
       setActiveLanguage: (lang) => {
         set({ activeLanguage: lang });
+      },
+
+      setActiveTheme: (theme) => {
+        set({ activeTheme: theme });
       },
 
       setTokens: (accessToken, refreshToken) =>
@@ -73,6 +90,7 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isLoading: false,
           activeLanguage: 'en',
+          activeTheme: 'dark',
         }),
 
       // Full sign-out: tells Supabase to invalidate the token, then clears local state
@@ -92,6 +110,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             isLoading: false,
             activeLanguage: 'en',
+            activeTheme: 'dark',
           });
         }
       },
@@ -106,6 +125,7 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
         activeLanguage: state.activeLanguage,
+        activeTheme: state.activeTheme,
       }),
       // Always keep actions from the live store — never let serialized localStorage data
       // overwrite them (functions serialize to null in JSON, breaking the actions).
@@ -116,6 +136,7 @@ export const useAuthStore = create<AuthState>()(
         setUser: currentState.setUser,
         setTokens: currentState.setTokens,
         setActiveLanguage: currentState.setActiveLanguage,
+        setActiveTheme: currentState.setActiveTheme,
         logout: currentState.logout,
         signOut: currentState.signOut,
         clearError: currentState.clearError,

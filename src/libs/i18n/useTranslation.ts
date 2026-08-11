@@ -1,4 +1,4 @@
-import { useUserPreferences } from '@/hooks/useUserPreferences';
+﻿import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { en } from './en';
 import { id } from './id';
 import { ja } from './ja';

@@ -97,23 +97,6 @@ export function ActivityModal({
                 label: d.toLocaleDateString(locale, { weekday: 'long' }),
               }))}
             />
-            {!editingActivity && (
-              <div className="mt-2 flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="form-apply-all"
-                  checked={form.applyToAllDays}
-                  onChange={(e) => setForm((f) => ({ ...f, applyToAllDays: e.target.checked }))}
-                  className="accent-primary rounded-sm bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10"
-                />
-                <label
-                  htmlFor="form-apply-all"
-                  className="text-[10px] text-gray-light uppercase tracking-wider cursor-pointer select-none"
-                >
-                  {t('timeline_page.form.repeat_everyday')}
-                </label>
-              </div>
-            )}
           </div>
           <Select
             id="form-hour"
@@ -178,7 +161,7 @@ export function ActivityModal({
 
         <div>
           <label className="text-[10px] font-bold text-gray-light mb-2 block">
-            {t('timeline_page.form.rating')}
+            {t('timeline_page.form.rating')} <span className="font-normal opacity-70">(Opsional)</span>
           </label>
           <div className="flex gap-md" role="group" aria-label="Rating">
             {[1, 2, 3, 4, 5].map((s) => (
@@ -202,7 +185,7 @@ export function ActivityModal({
         <div className="relative">
           <MapPin size={14} className="absolute left-md top-1/2 -translate-y-1/2 text-primary" />
           <input
-            placeholder={t('timeline_page.form.location')}
+            placeholder={`${t('timeline_page.form.location')} (Opsional)`}
             value={form.location}
             onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
             aria-label="Location"
@@ -213,7 +196,7 @@ export function ActivityModal({
         <textarea
           value={form.description}
           onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-          placeholder={t('timeline_page.form.notes')}
+          placeholder={`${t('timeline_page.form.notes')} (Opsional)`}
           rows={3}
           aria-label="Notes"
           className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"

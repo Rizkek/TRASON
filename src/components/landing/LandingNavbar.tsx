@@ -56,10 +56,10 @@ export function LandingNavbar() {
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'py-sm backdrop-blur-xl bg-warm-black/80 border-b border-black/[0.05] dark:border-white/[0.05] shadow-2xl' : 'py-md bg-transparent'}`}>
       <div className="max-w-7xl mx-auto px-lg md:px-2xl flex justify-between items-center">
         <Link href="/" className="flex items-center gap-sm group cursor-pointer">
-          <div className="w-10 h-10 flex items-center justify-center transform transition-transform duration-500 hover:scale-105">
-            <Compass size={24} className="text-warm-gold" />
+          <div className="transform transition-transform duration-500 hover:scale-105">
+            <Logo size={32} />
           </div>
-          <span className="text-2xl font-display font-extrabold tracking-tight">TRASON</span>
+          <span className="text-2xl font-brand font-extrabold tracking-tight">TRASON</span>
         </Link>
 
         {/* Desktop Nav */}

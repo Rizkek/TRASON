@@ -1,4 +1,4 @@
-export const en = {
+﻿export const en = {
   nav: {
     dashboard: 'Dashboard',
     finance: 'Finance',
@@ -504,7 +504,7 @@ export const en = {
       cycleMonthly: 'Month',
       cycleYearly: 'Year',
       cycleWeekly: 'Week',
-      mindfulSpending: '✨ Mindful Spending Notes',
+      mindfulSpending: 'Mindful Spending Notes',
       expenseNature: 'Nature of Expense',
       need: 'Need',
       want: 'Want',
@@ -544,7 +544,7 @@ export const en = {
       used_percentage: '{percent}% used',
       global_desc: 'Monthly limit for your overall expenses.',
       category_desc: 'Set specific spending limits for individual categories (optional).',
-      target_label: 'MONTHLY TARGET ({currency})'
+      target_label: 'Monthly Target ({currency})'
     },
     categories: {
       manageTitle: 'Manage {type} Categories',

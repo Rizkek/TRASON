@@ -1,4 +1,4 @@
-export const id = {
+﻿export const id = {
   nav: {
     dashboard: 'Dasbor',
     finance: 'Keuangan',
@@ -504,7 +504,7 @@ export const id = {
       cycleMonthly: 'Bulan',
       cycleYearly: 'Tahun',
       cycleWeekly: 'Minggu',
-      mindfulSpending: '✨ Catatan Evaluasi (Mindful Spending)',
+      mindfulSpending: 'Catatan Evaluasi (Mindful Spending)',
       expenseNature: 'Sifat Pengeluaran',
       need: 'Kebutuhan',
       want: 'Keinginan',
@@ -544,7 +544,7 @@ export const id = {
       used_percentage: '{percent}% digunakan',
       global_desc: 'Batas maksimal seluruh pengeluaran Anda dalam 1 bulan.',
       category_desc: 'Tetapkan batas pengeluaran spesifik untuk setiap kategori (opsional).',
-      target_label: 'TARGET BULANAN ({currency})'
+      target_label: 'Target Bulanan ({currency})'
     },
     categories: {
       manageTitle: 'Kelola Kategori {type}',

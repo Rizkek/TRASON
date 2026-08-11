@@ -22,7 +22,6 @@ export const DailyTasksSummary = () => {
     <Card className="p-md md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] flex flex-col">
       <div className="flex items-center justify-between mb-md pb-xs border-b border-black/[0.05] dark:border-white/[0.05]">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-secondary" />
           <h2 className="text-xs font-bold uppercase tracking-widest text-soft-cream">
             {t('dashboard.dailyTasks.title')}
           </h2>

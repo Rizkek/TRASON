@@ -220,7 +220,7 @@ export default function Home() {
             <Link href="/showcase/live-dashboard">
               <button
                 id="hero-cta-secondary"
-                className="w-full sm:w-auto bg-black/[0.03] dark:bg-white/[0.03] border border-black/[0.1] dark:border-white/[0.1] hover:bg-black/[0.08] text-soft-cream px-3xl py-4 rounded-xl font-medium transition-all backdrop-blur-sm text-lg flex items-center justify-center gap-sm"
+                className="w-full sm:w-auto bg-black/[0.03] dark:bg-white/[0.03] border border-black/[0.1] dark:border-white/[0.1] hover:bg-black/[0.08] dark:hover:bg-white/[0.08] text-soft-cream px-3xl py-4 rounded-xl font-medium transition-all backdrop-blur-sm text-lg flex items-center justify-center gap-sm"
               >
                 See Live Demo
               </button>
@@ -289,7 +289,7 @@ export default function Home() {
               const Icon = app.icon;
               return (
                 <div key={i} className="flex flex-col items-center gap-sm group cursor-default">
-                  <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center shadow-xl transform -rotate-3 group-hover:rotate-0 group-hover:scale-105 transition-all duration-300 ease-out text-white/30 ${app.colorClass}`}>
+                  <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-black/[0.03] dark:bg-black/40 border border-black/[0.05] dark:border-white/10 flex items-center justify-center shadow-xl transform -rotate-3 group-hover:rotate-0 group-hover:scale-105 transition-all duration-300 ease-out text-warm-black/30 dark:text-white/30 ${app.colorClass}`}>
                     <Icon size={32} strokeWidth={1.5} />
                   </div>
                   <span className="text-xs text-gray-light/50 font-bold uppercase tracking-wider group-hover:text-gray-light transition-colors">{app.name}</span>
@@ -319,7 +319,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-warm-gold/10 blur-2xl md:blur-[100px] rounded-[3rem] group-hover:bg-warm-gold/20 transition-all duration-700" />
           <div className="relative w-full bg-gray-strong/90 backdrop-blur-xl md:backdrop-blur-3xl rounded-[2rem] border border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] overflow-hidden transform rotate-x-12 group-hover:rotate-x-0 transition-transform duration-1000">
             {/* Top bar */}
-            <div className="h-12 border-b border-white/5 flex items-center px-lg gap-sm bg-black/40">
+            <div className="h-12 border-b border-black/[0.05] dark:border-white/5 flex items-center px-lg gap-sm bg-black/[0.02] dark:bg-black/40">
               <div className="flex gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-red-500/50" />
                 <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
@@ -333,7 +333,7 @@ export default function Home() {
             <div className="p-xl grid grid-cols-1 md:grid-cols-3 gap-xl">
               <div className="col-span-2 space-y-xl">
                 <div className="space-y-sm">
-                  <h3 className="text-3xl font-display tracking-tight text-white flex gap-2 items-baseline">
+                  <h3 className="text-3xl font-display tracking-tight text-soft-cream flex gap-2 items-baseline">
                     <span className="text-gradient">Good Evening</span>, Alex
                   </h3>
                   <div className="flex items-center gap-3 text-xs text-gray-light/60">
@@ -348,7 +348,7 @@ export default function Home() {
                   <div className="flex justify-between items-start z-10 relative">
                     <div>
                       <p className="text-xs text-gray-light/60 font-bold uppercase tracking-widest">Financial Flow</p>
-                      <div className="text-2xl font-display tracking-tight text-white mt-1">$4,250.00</div>
+                      <div className="text-2xl font-display tracking-tight text-soft-cream mt-1">$4,250.00</div>
                     </div>
                     <div className="flex gap-2">
                       <span className="px-2 py-1 rounded bg-green-500/10 text-green-400 text-xs flex items-center gap-1">
@@ -411,12 +411,12 @@ export default function Home() {
               const Icon = f.icon;
               return (
                 <Link key={f.label} href={f.href} className="group">
-                  <article className={`h-full bg-black/20 border border-white/10 hover:border-white/20 rounded-2xl p-8 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[0_15px_35px_rgba(0,0,0,0.4)] ${f.border} ${f.bg}`}>
-                    <div className={`w-11 h-11 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center mb-5 ${f.color} transition-colors group-hover:scale-110 duration-300`}>
+                  <article className={`h-full card p-8 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[0_15px_35px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_15px_35px_rgba(0,0,0,0.4)] ${f.border} ${f.bg}`}>
+                    <div className={`w-11 h-11 rounded-xl bg-black/[0.03] dark:bg-white/5 border border-black/[0.05] dark:border-white/5 flex items-center justify-center mb-5 ${f.color} transition-colors group-hover:scale-110 duration-300`}>
                       <Icon size={22} />
                     </div>
                     <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${f.color}`}>{f.label}</p>
-                    <h3 className="text-xl font-display tracking-tight text-white mb-3 group-hover:text-soft-cream transition-colors">
+                    <h3 className="text-xl font-display tracking-tight text-soft-cream mb-3 group-hover:text-warm-gold transition-colors">
                       {f.headline}
                     </h3>
                     <p className="text-sm text-gray-light/70 leading-relaxed">{f.body}</p>

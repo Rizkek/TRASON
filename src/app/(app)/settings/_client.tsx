@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Loading, Alert, ErrorAlert } from '@/components';
+import { Layout, Loading, Toast, ErrorAlert } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { supabase } from '@/services/supabase/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -72,17 +72,7 @@ export function SettingsClient() {
     digest_frequency: 'weekly',
   });
 
-  // Apply theme instantly (Optimistic UI)
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (prefs.theme === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else if (prefs.theme === 'light') {
-      root.classList.add('light');
-      root.classList.remove('dark');
-    }
-  }, [prefs.theme]);
+  // Theme is now synchronized globally via ThemeSync component based on useAuthStore activeTheme
 
   useEffect(() => {
     if (authLoading) return;
@@ -336,9 +326,12 @@ export function SettingsClient() {
           </div>
 
           {message && (
-            <Alert type={message.type} className="glow-primary">
-              {message.text}
-            </Alert>
+            <Toast
+              type={message.type}
+              message={message.text}
+              onClose={() => setMessage(null)}
+              duration={4000}
+            />
           )}
 
           <div className="flex gap-sm overflow-x-auto pb-md no-scrollbar">
