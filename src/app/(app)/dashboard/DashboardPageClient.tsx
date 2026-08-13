@@ -32,11 +32,11 @@ import { LifeScoreCard } from './components/LifeScoreCard';
 
 const FinancialChart = dynamic(() => import('./components/FinancialChart').then(mod => mod.FinancialChart), {
   ssr: false,
-  loading: () => <div className="h-64 w-full bg-slate-800 animate-pulse rounded-xl" />
+  loading: () => <div className="h-64 w-full bg-black/5 dark:bg-white/5 animate-pulse rounded-xl" />
 });
 const SpendingBreakdown = dynamic(() => import('./components/SpendingBreakdown').then(mod => mod.SpendingBreakdown), {
   ssr: false,
-  loading: () => <div className="h-64 w-full bg-slate-800 animate-pulse rounded-xl" />
+  loading: () => <div className="h-64 w-full bg-black/5 dark:bg-white/5 animate-pulse rounded-xl" />
 });
 
 const CURRENT_DATE = new Date();
@@ -74,6 +74,12 @@ export function DashboardClient() {
   const totalExpense = useMemo(() => {
     return transactions
       .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+  }, [transactions]);
+
+  const totalIncome = useMemo(() => {
+    return transactions
+      .filter(t => t.type === 'income')
       .reduce((sum, t) => sum + t.amount, 0);
   }, [transactions]);
 
@@ -133,8 +139,8 @@ export function DashboardClient() {
         {/* 1. Contextual Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pt-1 pb-2">
           <div>
-            <h1 className="text-2xl md:text-3xl font-display font-extrabold tracking-tight text-white flex flex-wrap items-baseline gap-x-2">
-              <span className="text-soft-cream">{greeting},</span>
+            <h1 className="text-2xl md:text-3xl font-display font-extrabold tracking-tight text-soft-cream flex flex-wrap items-baseline gap-x-2">
+              <span className="opacity-80">{greeting},</span>
               <span>{user?.first_name || user?.name?.split(' ')[0] || 'User'}</span>
             </h1>
             <div className="flex items-center gap-2 text-gray-light/70 text-xs mt-1">
@@ -181,6 +187,7 @@ export function DashboardClient() {
 
         {/* 4. Current State (Finance, Vitality, Career Pillars) */}
         <CurrentStateCard
+          totalIncome={totalIncome}
           totalExpense={totalExpense}
           globalBudget={globalBudget}
           sportSummary={sportSummary}

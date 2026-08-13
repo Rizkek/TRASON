@@ -6,6 +6,10 @@
 :root {
   --font-cormorant: 'Cormorant Garamond', serif;
   --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-brand: 'Instrument Serif', serif;
 
   /* TRASON New Color Palette - WCAG Compliant */
   /* Using RGB format (R G B) for Tailwind opacity modifiers to work */

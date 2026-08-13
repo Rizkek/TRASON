@@ -59,8 +59,8 @@ export function NotificationsSection({
 
         <div className="flex items-center justify-between p-lg rounded-md border bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
           <div className="flex items-center gap-md">
-            <div className="w-10 h-10 rounded-lg bg-accent-purple/10 flex items-center justify-center">
-              <Globe size={20} className="text-accent-purple" />
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Globe size={20} className="text-primary" />
             </div>
             <div>
               <h4 className="text-sm font-medium text-soft-cream">{t('settings.alerts.email')}</h4>

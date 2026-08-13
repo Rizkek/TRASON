@@ -10,8 +10,6 @@ export type ModuleId = 'finance' | 'investments' | 'timeline' | 'insights' | 're
 // Module metadata
 export interface ModuleMetadata {
   id: ModuleId;
-  name: string;
-  description: string;
   icon: string;
   color: string;
   order: number;

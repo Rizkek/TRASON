@@ -166,7 +166,7 @@ export function SettingsClient() {
     if (!file || !user?.id) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      showMessage('error', 'Image must be smaller than 5MB');
+      showMessage('error', (t('settings.messages.avatar_size_error') as string) || 'Image must be smaller than 5MB');
       return;
     }
 
@@ -179,7 +179,7 @@ export function SettingsClient() {
       await userQueries.updateUserProfile({ avatar_url: publicUrl });
       setUser({ ...user, avatar_url: publicUrl } as any);
 
-      showMessage('success', 'Avatar updated successfully!');
+      showMessage('success', (t('settings.messages.avatar_success') as string) || 'Avatar updated');
     } catch (err) {
       showMessage('error', sanitizeError(err));
     } finally {
@@ -195,7 +195,7 @@ export function SettingsClient() {
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
-      showMessage('error', 'Validation failed. Check your inputs.');
+      showMessage('error', (t('settings.messages.validation_error') as string) || 'Validation failed');
       return;
     }
 
@@ -206,7 +206,7 @@ export function SettingsClient() {
       await userQueries.updateUserProfile(profile);
       const updated = await userQueries.getUserWithPreferences();
       if (updated) setUser(updated as any);
-      showMessage('success', 'Identity updated and persisted!');
+      showMessage('success', (t('settings.messages.profile_success') as string) || 'Profile saved');
     } catch (err) {
       showMessage('error', sanitizeError(err));
     } finally {
@@ -266,9 +266,9 @@ export function SettingsClient() {
       }
 
       if (pushWarning) {
-        showMessage('success', `Preferences saved! (Push: ${pushWarning})`);
+        showMessage('success', `${(t('settings.messages.prefs_success') as string) || 'Preferences saved'} (Push: ${pushWarning})`);
       } else {
-        showMessage('success', 'Digital environment sync successful!');
+        showMessage('success', (t('settings.messages.prefs_success') as string) || 'Preferences saved');
       }
     } catch (err) {
       showMessage('error', sanitizeError(err));

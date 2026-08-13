@@ -25,6 +25,7 @@ export interface UserPreferences {
   email_digest_enabled: boolean;
   digest_frequency: string;
   module_features?: Record<string, boolean>;
+  onboarding_done?: boolean;
   created_at: string;
   updated_at: string;
 }

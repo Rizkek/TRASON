@@ -46,9 +46,9 @@ const FEATURES = [
   },
   {
     icon: Heartbeat,
-    label: 'Habits',
+    label: 'Sport',
     headline: 'Build routines that actually stick.',
-    body: 'GitHub-style heatmaps for your habits. Flexible schedules, streak tracking, and guilt-free recovery when life happens.',
+    body: 'GitHub-style heatmaps for your sessions. Flexible schedules, streak tracking, and guilt-free recovery when life happens.',
     href: '/features/vitality-habits',
     color: 'text-rose-400',
     border: 'group-hover:border-rose-400/40',
@@ -274,7 +274,7 @@ export default function Home() {
               Too many apps, <span className="text-warm-gold">too much friction.</span>
             </h2>
             <p className="text-gray-light/70 text-lg max-w-2xl mx-auto">
-              You budget in a spreadsheet, track habits in a separate app, log workouts elsewhere, 
+              You budget in a spreadsheet, log workouts elsewhere, log workouts elsewhere, 
               and hope everything stays in sync. It never does.
             </p>
           </div>
@@ -282,7 +282,7 @@ export default function Home() {
           <div className="flex flex-wrap justify-center gap-lg md:gap-2xl opacity-80 transition-all duration-700">
             {[
               { name: 'Finance Tracker', icon: PieChart, colorClass: 'group-hover:text-amber-400 group-hover:border-amber-400/50 group-hover:bg-amber-400/10' },
-              { name: 'Habit App', icon: Heartbeat, colorClass: 'group-hover:text-rose-400 group-hover:border-rose-400/50 group-hover:bg-rose-400/10' },
+              { name: 'Fitness App', icon: Heartbeat, colorClass: 'group-hover:text-rose-400 group-hover:border-rose-400/50 group-hover:bg-rose-400/10' },
               { name: 'To-Do List', icon: CheckSquare, colorClass: 'group-hover:text-blue-400 group-hover:border-blue-400/50 group-hover:bg-blue-400/10' },
               { name: 'Spreadsheets', icon: Table, colorClass: 'group-hover:text-emerald-400 group-hover:border-emerald-400/50 group-hover:bg-emerald-400/10' },
             ].map((app, i) => {

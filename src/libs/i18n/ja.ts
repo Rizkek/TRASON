@@ -1,4 +1,4 @@
-﻿export const ja = {
+export const ja = {
   nav: {
     dashboard: 'ダッシュボード',
     finance: 'ファイナンス',
@@ -12,7 +12,7 @@
     settings: '設定',
     logout: 'ログアウト',
     logoutConfirmTitle: 'ログアウト',
-    logoutConfirmDesc: 'ログアウトしてもよろしいですか？ログインページにリダイレクトされます。',
+    logoutConfirmDesc: 'ログアウトしてもよろしいですか？',
     logoutConfirmBtn: 'ログアウト',
     cancel: 'キャンセル',
     more: 'その他'
@@ -42,7 +42,7 @@
   },
   investment_page: {
     investment_analyst_title: '投資',
-    investment_analyst_desc: 'パーソナルスペースをトレーディング画面に変えることなく、株、暗号資産、金を追跡します。',
+    investment_analyst_desc: '株、暗号資産、金を追跡します。',
     refresh_prices: '価格を更新',
     add_position: 'ポジションを追加',
     portfolio_value: 'ポートフォリオ価値',
@@ -62,7 +62,7 @@
     tracked_position: '追跡中のポジション',
     update_label: '更新',
     edit: '編集',
-    investment_empty_state_desc: '株、暗号資産、または金を追加します。このモジュールは、現在のシステムを置き換えることなく、価値、未実現損益、および軽量な洞察を表示します。',
+    investment_empty_state_desc: 'ポートフォリオを追跡するためにポジションを追加します。',
     add_first_position: '最初のポジションを追加',
     stocks_upper: '株式',
     crypto_upper: '暗号資産',
@@ -270,7 +270,7 @@
     no_insights_desc: '日々の活動や財務記録を記録した後にインサイトを生成します。',
     system_idle: '待機中',
     architect_perspective_title: "概要",
-    architect_perspective_desc: 'TRASONは日々のリズムとリソース管理を統合し、明確な概要を提供します。記録を続けて長期的なパターンを見つけましょう。',
+    architect_perspective_desc: '記録を続けて長期的なパターンを見つけましょう。',
     delete_insight: 'インサイトを削除',
     reset_insights: 'すべてクリア',
     reset_insights_confirm: '以前のすべてのインサイト履歴を完全に消去してもよろしいですか？',
@@ -323,7 +323,7 @@
     title: 'スケジュール',
     desc: 'あなたの毎週のリズム',
     weekly_log: 'ウィークリーログ',
-    daily_checklist: 'デイリーチェックリスト',
+    daily_checklist: 'タスク',
     today_timeline: '今日のスケジュール',
     no_activities_today: '今日の活動は記録されていません。',
     done_today: '今日完了',
@@ -437,6 +437,17 @@
       deleteConfirmTitle: 'アカウント削除',
       deleteConfirmDesc: '本当にアカウントを削除してもよろしいですか？この操作は元に戻せません。',
       confirmDeleteBtn: 'はい、アカウントを削除します'
+    },
+    messages: {
+      avatar_size_error: '画像は5MB以下である必要があります。',
+      avatar_success: 'アバターが更新されました。',
+      validation_error: 'すべての必須項目を入力してください。',
+      profile_success: 'プロフィールが保存されました。',
+      prefs_success: '設定が保存されました。',
+      password_error_required: '新しいパスワードが必要です。',
+      password_error_length: 'パスワードは8文字以上である必要があります。',
+      password_error_match: 'パスワードが一致しません。',
+      password_success: 'パスワードが更新されました。'
     }
   },
   finance: {
@@ -590,11 +601,11 @@
     capture_btn: '記録',
     daily_insight: 'デイリーインサイト',
     dailyTasks: {
-      title: '毎日のタスク',
-      subtitle: '今日のチェックリスト',
+      title: 'タスク',
+      subtitle: '今日のタスク',
       empty: 'タスクはまだありません。'
     },
-    default_insight: '記録を増やすほど、ダッシュボードは鮮明になります。小さなシグナルから始め、パターンを見つけましょう。',
+    default_insight: '活動を記録すると、ダッシュボードにインサイトが表示されます。',
     open_insights: 'インサイト',
     checking_session: 'セッションを確認中...',
     up_next: '次の予定',
@@ -657,7 +668,7 @@
     gold: '金',
     
     vitality_this_week: '今週のバイタリティ',
-    sport_empty_desc: '運動はまだ記録されていません。誠実な1セッションから始めましょう。',
+    sport_empty_desc: 'セッションは記録されていません。ワークアウトの記録から始めましょう。',
     sessions: 'セッション',
     moved: '運動時間',
     log_first_session: '最初のセッションを記録 ->',
@@ -665,7 +676,7 @@
     
     career_pipeline: 'キャリアパイプライン',
     active: '進行中',
-    career_empty_desc: 'キャリアの動きはまだ記録されていません。',
+    career_empty_desc: '応募はありません。進行状況を追跡するため応募を追加してください。',
     applied: '応募済み',
     interview: '面接',
     offer: '内定',
@@ -737,8 +748,34 @@
     disabled_count: '無効なモジュール',
     all_sub_off_warning: 'すべてのサブ機能がオフです — モジュールに表示されるコンテンツがありません',
     timeline_weekly_log: '週次ログ',
-    timeline_daily_checklist: 'デイリーチェックリスト',
+    timeline_daily_checklist: 'タスク',
     reminders_active: 'アクティブなリマインダー',
     reminders_history: '履歴',
+    finance_desc: 'Track income and expenses, manage budgets',
+    investments_desc: 'Portfolio tracking and investment insights',
+    timeline_desc: 'Daily activities and schedule management',
+    reminders_desc: 'Task reminders and notifications',
+    insights_desc: 'AI-powered analytics and recommendations',
+    sport_desc: 'Track workouts, activity streaks, and fitness habits',
+    career_desc: 'Track job applications, interviews, and opportunities',
+  },
+
+  onboarding: {
+    welcome: 'Welcome to TRASON',
+    step1_desc: "Let's set up your persona so TRASON knows what to call you.",
+    step2_desc: "Let's personalize your digital space. Start by setting your region and language.",
+    step3_desc: "Select the modules you want to activate. You can always change this later in settings.",
+    first_name: 'First name',
+    first_name_ph: 'e.g., John',
+    last_name: 'Last name',
+    last_name_ph: 'e.g., Doe (optional)',
+    language: 'Language',
+    timezone: 'Timezone',
+    currency: 'Primary currency',
+    theme: 'Theme',
+    back: 'Back',
+    continue: 'Continue',
+    finalizing: 'Finalizing...',
+    complete: 'Complete Setup'
   }
 };

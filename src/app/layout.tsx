@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono, Plus_Jakarta_Sans, Instrument_Serif } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -8,20 +7,6 @@ import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import { ThemeSync } from '@/components/layout/ThemeSync';
 import NextTopLoader from 'nextjs-toploader';
 
-const sans = Geist({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
-const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' });
-const display = Plus_Jakarta_Sans({ 
-  subsets: ['latin'], 
-  variable: '--font-display', 
-  display: 'swap',
-});
-const brand = Instrument_Serif({
-  weight: '400',
-  style: 'italic',
-  subsets: ['latin'],
-  variable: '--font-brand',
-  display: 'swap',
-});
 const BASE_URL = 'https://www.trason.web.id';
 
 export const metadata: Metadata = {
@@ -196,6 +181,9 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@200..800&display=swap" rel="stylesheet" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <link rel="icon" href="/favicon.png" type="image/png" />
@@ -220,7 +208,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${sans.variable} ${mono.variable} ${display.variable} ${brand.variable} font-sans`}
+        className="font-sans"
         suppressHydrationWarning
       >
         <ErrorBoundary>

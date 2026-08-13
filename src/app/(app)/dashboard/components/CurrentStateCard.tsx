@@ -19,6 +19,7 @@ import { CareerStats } from '@/hooks/useCareer';
 import { CareerApplication, Budget } from '@/types/database';
 
 interface CurrentStateCardProps {
+  totalIncome: number;
   totalExpense: number;
   globalBudget: Budget | null;
   sportSummary: WeeklySportSummary;
@@ -32,6 +33,7 @@ interface CurrentStateCardProps {
 }
 
 export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
+  totalIncome,
   totalExpense,
   globalBudget,
   sportSummary,
@@ -71,7 +73,7 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <div className="p-1.5 rounded-lg bg-primary/20 text-primary">
                   <Wallet size={16} />
                 </div>
                 <span className="text-xs font-bold tracking-tight text-gray-light uppercase">
@@ -81,24 +83,32 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
               <ArrowRight size={14} className="text-gray-light opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </div>
 
-            <div className="space-y-1">
-              <div className="text-lg md:text-xl font-bold font-mono text-soft-cream">
-                {formatCurrency(totalExpense, currency, locale)}
+            <div className="space-y-2">
+              <div className="flex justify-between items-end">
+                <div>
+                  <div className="text-[10px] text-gray-light uppercase tracking-wider">{t('dashboard.income')}</div>
+                  <div className="text-sm md:text-md font-bold font-mono text-emerald-400">
+                    {formatCurrency(totalIncome, currency, locale)}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[10px] text-gray-light uppercase tracking-wider">{t('dashboard.expenses')}</div>
+                  <div className="text-sm md:text-md font-bold font-mono text-rose-400">
+                    {formatCurrency(totalExpense, currency, locale)}
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-[11px] text-gray-light">
-                {globalBudget ? (
+
+              {globalBudget && (
+                <div className="flex items-center justify-between text-[11px] text-gray-light pt-1 border-t border-white/5">
                   <span className="truncate">
                     {Math.round((totalExpense / globalBudget.amount) * 100)}% {t('dashboard.budget_used')}
                   </span>
-                ) : (
-                  <span>{t('dashboard.monthly_overview')}</span>
-                )}
-                {globalBudget && (
                   <span className="text-[10px] opacity-70 font-mono">
                     max {formatCurrency(globalBudget.amount, currency, locale)}
                   </span>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             {globalBudget && (
@@ -188,7 +198,7 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
                   </span>
                   {careerStats.interview > 0 && (
                     <span className="text-xs font-bold text-purple-400 bg-purple-400/10 px-1.5 py-0.5 rounded-full">
-                      {careerStats.interview} intv
+                      {careerStats.interview} {t('dashboard.interview')}
                     </span>
                   )}
                 </div>

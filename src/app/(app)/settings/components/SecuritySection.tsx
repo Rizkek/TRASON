@@ -33,15 +33,15 @@ export function SecuritySection({
     setFormErrors({});
 
     const errors: Record<string, string> = {};
-    if (!security.new_password) errors.new_password = 'New password is required';
+    if (!security.new_password) errors.new_password = (t('settings.messages.password_error_required') as string) || 'New password is required';
     if (security.new_password.length < 8)
-      errors.new_password = 'Password must be at least 8 characters';
+      errors.new_password = (t('settings.messages.password_error_length') as string) || 'Password must be at least 8 characters';
     if (security.new_password !== security.confirm_password)
-      errors.confirm_password = 'Passwords do not match';
+      errors.confirm_password = (t('settings.messages.password_error_match') as string) || 'Passwords do not match';
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
-      showMessage('error', 'Security override rejected. Check key requirements.');
+      showMessage('error', (t('settings.messages.validation_error') as string) || 'Validation failed');
       return;
     }
 
@@ -52,7 +52,7 @@ export function SecuritySection({
       });
       if (pwError) throw pwError;
       setSecurity({ current_password: '', new_password: '', confirm_password: '' });
-      showMessage('success', 'Security keys rotated successfully!');
+      showMessage('success', (t('settings.messages.password_success') as string) || 'Password updated');
     } catch (err) {
       setError(sanitizeError(err));
     } finally {

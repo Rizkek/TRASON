@@ -71,8 +71,8 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
         display: false
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        titleColor: '#FFFFFF',
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: '#CBD5E1',
         bodyColor: '#94A3B8',
         bodyFont: { size: 12 },
         titleFont: { size: 14, weight: 'bold' as const },
@@ -106,10 +106,10 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
   };
 
   return (
-    <Card className="p-md md:p-xl bg-gradient-to-br from-[#0F172A]/80 to-[#020617]/80 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group h-full">
+    <Card className="p-md md:p-xl bg-black/[0.03] dark:bg-black/40 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group h-full">
       <div className="flex justify-between items-start mb-md">
         <div>
-          <h3 className="font-sans font-medium text-gray-light text-md md:text-lg text-white">Spending Breakdown</h3>
+          <h3 className="font-sans font-medium text-md md:text-lg text-soft-cream">{t('dashboard.spending_breakdown') || 'Spending Breakdown'}</h3>
           <p className="text-[10px] md:text-micro text-gray-light mt-1">Percentage based analysis</p>
         </div>
       </div>
@@ -122,7 +122,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
             <Doughnut data={doughnutData} options={options} />
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span className="text-[10px] text-gray-light uppercase tracking-widest">Total</span>
-              <span className="text-sm font-bold text-white">
+              <span className="text-sm font-bold text-soft-cream">
                 {formatCurrency(chartData.totalExpense, currency, locale)}
               </span>
             </div>
@@ -135,7 +135,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
                     <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
                     <span className="text-gray-light truncate">{item.name}</span>
                   </div>
-                  <span className="text-white font-bold shrink-0">
+                  <span className="text-soft-cream font-bold shrink-0">
                     {chartData.totalExpense > 0 ? ((item.value / chartData.totalExpense) * 100).toFixed(0) : 0}%
                   </span>
                 </div>

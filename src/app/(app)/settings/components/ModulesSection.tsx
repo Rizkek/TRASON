@@ -92,7 +92,7 @@ export const ModuleItem = React.memo(function ModuleItem({
               {allSubFeaturesOff ? (
                 <span className="text-orange-400">{t('modules.all_sub_off_warning')}</span>
               ) : (
-                metadata.description
+                t(`modules.${id}_desc`)
               )}
             </p>
           </div>

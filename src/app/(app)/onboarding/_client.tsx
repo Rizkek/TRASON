@@ -10,6 +10,7 @@ import { DEFAULT_FINANCE_CATEGORIES } from '@/libs/defaultCategories';
 import { ModuleSelectionCard } from './components/ModuleSelectionCard';
 import { Globe, Clock, Wallet, TrendUp as TrendingUp, BellRinging, Briefcase, Heartbeat, Sparkle, CaretRight as ChevronRight, Check, PaintBrush, User as UserIcon } from '@phosphor-icons/react';
 import { supabase } from '@/services/supabase/supabaseClient';
+import { DEFAULT_MODULE_STATUS, getAllModules } from '@/modules/registry';
 
 const LANGUAGE_OPTIONS = [
   { value: 'en', label: 'English' },
@@ -25,15 +26,6 @@ const TIMEZONE_OPTIONS = [
 
 const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'IDR', 'JPY', 'SGD', 'AUD', 'CAD'];
 
-const MODULE_OPTIONS = [
-  { id: 'finance', title: 'Finance', description: 'Track your income, expenses, and manage your budget effectively.', icon: Wallet, color: '#22c55e' },
-  { id: 'investments', title: 'Investments', description: 'Monitor your portfolio, stocks, crypto, and asset allocation.', icon: TrendingUp, color: '#8b5cf6' },
-  { id: 'sport', title: 'Sport & Workout', description: 'Plan workout routines, track progress, and log exercise sessions.', icon: Heartbeat, color: '#ef4444' },
-  { id: 'career', title: 'Career Tracker', description: 'Manage job applications, interview schedules, and career growth.', icon: Briefcase, color: '#f97316' },
-  { id: 'timeline', title: 'Timeline & Tasks', description: 'Daily checklists, weekly logs, and habit tracking.', icon: Clock, color: '#3b82f6' },
-  { id: 'reminders', title: 'Smart Reminders', description: 'Never miss an event with priority-based alerts and notifications.', icon: BellRinging, color: '#f59e0b' },
-  { id: 'insights', title: 'AI Insights', description: 'Get intelligent analytics and suggestions across all your data.', icon: Sparkle, color: '#eab308' },
-];
 
 export function OnboardingClient() {
   const router = useRouter();
@@ -52,7 +44,7 @@ export function OnboardingClient() {
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC');
   const [currency, setCurrency] = useState('USD');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [selectedModules, setSelectedModules] = useState<Record<string, boolean>>({});
+  const [selectedModules, setSelectedModules] = useState<Record<string, boolean>>(DEFAULT_MODULE_STATUS);
 
   const initialized = React.useRef(false);
 
@@ -62,22 +54,15 @@ export function OnboardingClient() {
       if (preferences.timezone) setTimezone(preferences.timezone);
       if (preferences.currency) setCurrency(preferences.currency);
       if (preferences.theme) setTheme(preferences.theme as 'dark' | 'light');
-      if (preferences.module_features) setSelectedModules(preferences.module_features);
+      if (preferences.module_features) setSelectedModules({ ...DEFAULT_MODULE_STATUS, ...preferences.module_features });
       initialized.current = true;
     }
   }, [preferences]);
 
   const handleToggleModule = (id: string) => {
     setSelectedModules((prev) => {
-      // By default, toggling adds/removes the key or flips its boolean
-      const isCurrentlyEnabled = prev[id] !== false; // If undefined, we assume it's disabled initially during onboarding, wait.
-      // Actually, if it's not in prev, we are enabling it.
-      const isPresent = id in prev;
-      if (!isPresent || !prev[id]) {
-        return { ...prev, [id]: true };
-      } else {
-        return { ...prev, [id]: false };
-      }
+      const isCurrentlyEnabled = prev[id] ?? true;
+      return { ...prev, [id]: !isCurrentlyEnabled };
     });
   };
 
@@ -98,10 +83,8 @@ export function OnboardingClient() {
         timezone,
         currency,
         theme,
-        module_features: {
-          ...selectedModules,
-          onboarding_done: true,
-        },
+        onboarding_done: true,
+        module_features: selectedModules,
       });
 
       // Sync Zustand immediately so other pages know we're onboarded
@@ -162,7 +145,7 @@ export function OnboardingClient() {
 
         <div className="text-center space-y-sm mb-xl">
           <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-white">
-            Welcome to TRASON
+            {t('onboarding.welcome')}
           </h1>
           <p className="text-gray-light text-sm md:text-base max-w-md mx-auto">
             {step === 1 
@@ -186,24 +169,24 @@ export function OnboardingClient() {
             <div className="space-y-xl animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
                 <div className="space-y-md">
-                  <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
-                    <UserIcon size={14} className="text-primary" /> FIRST NAME
+                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-sm">
+                    <UserIcon size={14} className="text-primary" /> {t("onboarding.first_name")}
                   </label>
                   <input
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="E.g. John"
+                    placeholder={t("onboarding.first_name_ph")}
                     className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-lg text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
                   />
                 </div>
                 <div className="space-y-md">
-                  <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
-                    LAST NAME
+                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-sm">
+                    {t("onboarding.last_name")}
                   </label>
                   <input
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    placeholder="E.g. Doe (Optional)"
+                    placeholder={t("onboarding.last_name_ph")}
                     className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-lg text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
                   />
                 </div>
@@ -215,9 +198,7 @@ export function OnboardingClient() {
                   onClick={() => setStep(2)}
                   rightIcon={<ChevronRight size={18} />}
                   disabled={!firstName.trim()}
-                >
-                  Continue
-                </Button>
+                >{t("onboarding.continue")}</Button>
               </div>
             </div>
           )}
@@ -226,7 +207,7 @@ export function OnboardingClient() {
             <div className="space-y-xl animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
                 <Select
-                  label="LANGUAGE"
+                  label={t("onboarding.language")}
                   value={language}
                   onValueChange={(val) => setLanguage(val)}
                   options={LANGUAGE_OPTIONS.map((l) => ({
@@ -236,7 +217,7 @@ export function OnboardingClient() {
                 />
                 
                 <Select
-                  label="TIMEZONE"
+                  label={t("onboarding.timezone")}
                   value={timezone}
                   onValueChange={(val) => setTimezone(val)}
                   options={TIMEZONE_OPTIONS.map((t) => ({
@@ -248,8 +229,8 @@ export function OnboardingClient() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-lg pt-4 border-t border-white/5">
                 <div className="space-y-md">
-                  <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
-                    <Wallet size={14} className="text-warm-gold" /> PRIMARY CURRENCY
+                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-sm">
+                    <Wallet size={14} className="text-warm-gold" /> {t("onboarding.currency")}
                   </label>
                   <div className="flex flex-wrap gap-sm">
                     {CURRENCY_OPTIONS.map((c) => (
@@ -269,8 +250,8 @@ export function OnboardingClient() {
                 </div>
 
                 <div className="space-y-md">
-                  <label className="text-xs font-bold text-gray-light tracking-widest flex items-center gap-sm">
-                    <PaintBrush size={14} className="text-primary" /> THEME
+                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-sm">
+                    <PaintBrush size={14} className="text-primary" /> {t("onboarding.theme")}
                   </label>
                   <div className="flex gap-sm">
                     {['dark', 'light'].map((th) => (
@@ -296,17 +277,13 @@ export function OnboardingClient() {
                   size="lg" 
                   onClick={() => setStep(1)}
                   className="text-gray-light"
-                >
-                  Back
-                </Button>
+                >{t("onboarding.back")}</Button>
                 <Button 
                   variant="primary" 
                   size="lg" 
                   onClick={() => setStep(3)}
                   rightIcon={<ChevronRight size={18} />}
-                >
-                  Continue
-                </Button>
+                >{t("onboarding.continue")}</Button>
               </div>
             </div>
           )}
@@ -314,18 +291,21 @@ export function OnboardingClient() {
           {step === 3 && (
             <div className="space-y-xl animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-md max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-                {MODULE_OPTIONS.map((module) => (
-                  <ModuleSelectionCard
-                    key={module.id}
-                    id={module.id}
-                    title={module.title}
-                    description={module.description}
-                    icon={module.icon}
-                    color={module.color}
-                    isSelected={selectedModules[module.id] === true}
-                    onToggle={handleToggleModule}
-                  />
-                ))}
+                {getAllModules().map((module) => {
+                  const Icon = { Wallet, TrendingUp, Heartbeat, Briefcase, Clock, BellRinging, Sparkle, Dumbbell: Heartbeat, Bell: BellRinging, Lightbulb: Sparkle }[module.icon] || Globe;
+                  return (
+                    <ModuleSelectionCard
+                      key={module.id}
+                      id={module.id}
+                      title={t(`nav.${module.id}`)}
+                      description={t(`modules.${module.id}_desc`)}
+                      icon={Icon}
+                      color={module.color}
+                      isSelected={selectedModules[module.id] !== false}
+                      onToggle={handleToggleModule}
+                    />
+                  );
+                })}
               </div>
 
               <div className="flex justify-between items-center pt-lg border-t border-white/5">
@@ -334,9 +314,7 @@ export function OnboardingClient() {
                   size="md" 
                   onClick={() => setStep(2)}
                   className="text-gray-light hover:text-white"
-                >
-                  Back
-                </Button>
+                >{t("onboarding.back")}</Button>
                 <Button 
                   variant="primary" 
                   size="lg" 
@@ -344,7 +322,7 @@ export function OnboardingClient() {
                   disabled={isSubmitting}
                   rightIcon={<Check size={18} />}
                 >
-                  {isSubmitting ? 'Finalizing...' : 'Complete Setup'}
+                  {isSubmitting ? t('onboarding.finalizing') : t('onboarding.complete')}
                 </Button>
               </div>
             </div>

@@ -70,7 +70,7 @@ export const Input = memo(
             />
 
             {effectiveRight && (
-              <div className="absolute right-3 flex items-center pointer-events-none text-gray-light">
+              <div className={`absolute right-3 flex items-center text-gray-light ${!suffix ? 'pointer-events-none' : ''}`}>
                 {effectiveRight}
               </div>
             )}

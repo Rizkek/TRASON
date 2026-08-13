@@ -48,7 +48,7 @@ export function LifeScoreCard() {
     lifeScore.overall >= 40 ? t('life_score.labels.needs_attention') : t('life_score.labels.critical');
 
   return (
-    <Card className="p-3.5 md:p-4 bg-gradient-to-r from-gray-strong/60 via-black/40 to-gray-strong/60 border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden">
+    <Card className="p-3.5 md:p-4 bg-black/[0.03] dark:bg-black/40 border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Left: Overall Score and Label */}
         <div className="flex items-center gap-3">
@@ -60,7 +60,7 @@ export function LifeScoreCard() {
               <span className="text-xs font-bold uppercase tracking-widest text-soft-cream">
                 {t('life_score.ui.title')}
               </span>
-              <span className="font-mono text-base font-bold text-white">
+              <span className="font-mono text-base font-bold text-soft-cream">
                 {lifeScore.overall}
                 <span className="text-[10px] text-gray-light font-normal opacity-60">/100</span>
               </span>

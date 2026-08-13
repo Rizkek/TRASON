@@ -9,56 +9,42 @@ import { ModuleConfig, ModuleId, ModuleMetadata, ModuleStatus } from './types';
 export const MODULE_METADATA: Record<ModuleId, ModuleMetadata> = {
   finance: {
     id: 'finance',
-    name: 'Finance',
-    description: 'Track income and expenses, manage budgets',
     icon: 'Wallet',
     color: '#10b981', // emerald-500
     order: 1,
   },
   investments: {
     id: 'investments',
-    name: 'Investments',
-    description: 'Portfolio tracking and investment insights',
     icon: 'TrendingUp',
     color: '#3b82f6', // blue-500
     order: 2,
   },
   timeline: {
     id: 'timeline',
-    name: 'Schedule',
-    description: 'Daily activities and schedule management',
     icon: 'Clock',
     color: '#8b5cf6', // violet-500
     order: 3,
   },
   reminders: {
     id: 'reminders',
-    name: 'Reminders',
-    description: 'Task reminders and notifications',
     icon: 'Bell',
     color: '#f59e0b', // amber-500
     order: 4,
   },
   insights: {
     id: 'insights',
-    name: 'Insights',
-    description: 'AI-powered analytics and recommendations',
     icon: 'Lightbulb',
     color: '#ec4899',
     order: 5,
   },
   sport: {
     id: 'sport',
-    name: 'Sport',
-    description: 'Track workouts, activity streaks, and fitness habits',
     icon: 'Dumbbell',
     color: '#10b981',
     order: 6,
   },
   career: {
     id: 'career',
-    name: 'Career',
-    description: 'Track job applications, interviews, and opportunities',
     icon: 'Briefcase',
     color: '#f59e0b',
     order: 7,

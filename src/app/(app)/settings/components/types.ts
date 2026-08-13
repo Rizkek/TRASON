@@ -18,6 +18,7 @@ export interface PreferenceData {
   email_digest_enabled: boolean;
   digest_frequency: string;
   module_features?: Record<string, boolean>;
+  onboarding_done?: boolean;
 }
 
 export interface UserData {

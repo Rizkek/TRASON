@@ -135,8 +135,8 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
         display: false
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        titleColor: '#94A3B8',
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: '#CBD5E1',
         titleFont: { size: 12, weight: 'bold' as const },
         bodyFont: { size: 14, weight: 'bold' as const },
         padding: 12,
@@ -166,7 +166,7 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
           display: false,
         },
         ticks: {
-          color: 'rgba(255,255,255,0.3)',
+          color: 'gray',
           font: { size: 10 },
           maxTicksLimit: 10
         }
@@ -181,12 +181,12 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
   };
 
   return (
-    <Card className="p-md md:p-xl bg-gradient-to-br from-[#0F172A]/80 to-[#020617]/80 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
+    <Card className="p-md md:p-xl bg-black/[0.03] dark:bg-black/40 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
       <div className="absolute top-0 left-1/4 w-1/2 h-full bg-primary/5 blur-3xl rounded-full pointer-events-none" />
 
       <div className="flex items-center justify-between mb-md md:mb-xl relative z-10">
         <div>
-          <h3 className="font-sans font-medium text-gray-light text-md md:text-lg text-white">{t('dashboard.financial_analytics')}</h3>
+          <h3 className="font-sans font-medium text-md md:text-lg text-soft-cream">{t('dashboard.financial_analytics')}</h3>
           <p className="text-[10px] md:text-micro text-gray-light mt-1">{t('dashboard.monthly_overview')}</p>
         </div>
       </div>
