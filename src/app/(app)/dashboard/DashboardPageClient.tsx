@@ -23,6 +23,8 @@ import {
 } from '@phosphor-icons/react';
 import { TrasonIcon } from '@/components/ui/TrasonIcon';
 import dynamic from 'next/dynamic';
+import { useFinanceInsights } from '@/hooks/useFinanceInsights';
+import { InsightCard } from '@/components/insights/InsightCard';
 
 // Components
 import { UpNextCard } from './components/UpNextCard';
@@ -63,6 +65,13 @@ export function DashboardClient() {
   const { stats: careerStats, nextInterview, isLoading: careerLoading } = useCareer();
   const { subscriptions } = useSubscription();
   const { globalBudget } = useBudget();
+  const { insights: financeInsights } = useFinanceInsights();
+
+  const dashboardInsights = useMemo(() => {
+    return financeInsights
+      .filter(i => i.priority === 'high' || i.priority === 'medium')
+      .slice(0, 2);
+  }, [financeInsights]);
 
   // Module enablement flags
   const isFinanceEnabled = module_features?.['finance'] !== false;
@@ -150,6 +159,18 @@ export function DashboardClient() {
             </div>
           </div>
         </div>
+
+        {/* 1.5 Intelligence Layer / Insights */}
+        {dashboardInsights.length > 0 && (
+          <div className="space-y-3">
+            <h2 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">Insights</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {dashboardInsights.map(insight => (
+                <InsightCard key={insight.id} insight={insight} />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* 2. Needs Attention (Conditional Alerts) */}
         {isFinanceEnabled && dueSubscriptions.length > 0 && (

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Layout, Card, Badge, Loading } from '@/components';
+import { Layout, Card, Badge, Loading, ConfirmModal } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/authStore';
 import { insightQueries } from '@/services/analytics/insightQueries';
@@ -29,6 +29,7 @@ export function InsightsClient() {
   const [isFetching, setIsFetching] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
   // Active module hooks to collect complete life context
@@ -237,10 +238,13 @@ User Context Profile (TRASON Unified Life OS):
     }
   };
 
-  const handleResetAll = async () => {
+  const handleResetAll = () => {
     if (dbInsights.length === 0) return;
-    if (!window.confirm(t('insights_page.reset_insights_confirm'))) return;
+    setIsResetModalOpen(true);
+  };
 
+  const confirmResetAll = async () => {
+    setIsResetModalOpen(false);
     setIsResetting(true);
     try {
       await insightQueries.clearAllInsights();
@@ -472,6 +476,15 @@ User Context Profile (TRASON Unified Life OS):
           {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkle size={18} /> <span className="text-sm">{t('insights_page.ask_ai')}</span></>}
         </button>
       </div>
+
+      <ConfirmModal
+        isOpen={isResetModalOpen}
+        onClose={() => setIsResetModalOpen(false)}
+        onConfirm={confirmResetAll}
+        title={t('insights_page.reset_insights')}
+        description={t('insights_page.reset_insights_confirm')}
+        isDangerous={false} // Use primary color as requested
+      />
     </Layout>
   );
 }

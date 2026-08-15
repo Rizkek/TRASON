@@ -52,9 +52,10 @@ export function LandingFooter() {
         <div className="space-y-md">
           <h4 className="text-xs font-bold uppercase tracking-widest text-soft-cream">Ecosystem</h4>
           <ul className="space-y-sm">
-            <li><Link href="/preview" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Live Preview</Link></li>
+            <li><Link href="/#preview" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Live Preview</Link></li>
+            <li><Link href="/vision" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Vision</Link></li>
+            <li><Link href="/roadmap" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Roadmap</Link></li>
             <li><Link href="/changelog" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Changelog</Link></li>
-            <li><Link href="/contact" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Contact Support</Link></li>
           </ul>
         </div>
 

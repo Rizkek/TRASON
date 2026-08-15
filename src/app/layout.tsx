@@ -6,6 +6,7 @@ import { SmartInput } from '@/components/SmartInput';
 import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import { ThemeSync } from '@/components/layout/ThemeSync';
 import NextTopLoader from 'nextjs-toploader';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const BASE_URL = 'https://www.trason.web.id';
 
@@ -228,6 +229,7 @@ export default function RootLayout({
             {children}
             <SmartInput />
             <PwaInstallPrompt />
+            <SpeedInsights />
           </AuthProvider>
         </ErrorBoundary>
       </body>
