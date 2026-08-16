@@ -41,6 +41,7 @@ export function NotificationsSection({
               setPrefs((p) => ({
                 ...p,
                 push_notifications_enabled: !p.push_notifications_enabled,
+                notifications_enabled: !p.push_notifications_enabled,
               }))
             }
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
