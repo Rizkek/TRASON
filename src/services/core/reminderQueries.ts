@@ -22,9 +22,9 @@ export const reminderQueries = {
             .from('reminders')
             .select('*')
             .eq('user_id', userId)
-            .eq('status', 'pending')
             .is('deleted_at', null)
-            .order('due_datetime', { ascending: true });
+            .order('due_datetime', { ascending: true })
+            .limit(1000);
     if (error) throw error;
     return data;
     });
