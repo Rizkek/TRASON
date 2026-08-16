@@ -1,7 +1,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { GithubLogo, LinkedinLogo, Envelope as Mail, MapPin, ChatCircle as MessageCircle, Phone } from '@phosphor-icons/react/dist/ssr';
+import { InstagramLogo, LinkedinLogo, Envelope as Mail, MapPin, ChatCircle as MessageCircle, Phone } from '@phosphor-icons/react/dist/ssr';
 import { Logo } from '@/components';
 
 export function LandingFooter() {
@@ -28,13 +28,13 @@ export function LandingFooter() {
               <MessageCircle size={18} className="group-hover:scale-110 transition-transform" />
             </a>
             <a
-              href="https://github.com/Rizkek/TRASON"
+              href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
               className="w-9 h-9 rounded-xl bg-white/5 border border-white/5 hover:border-warm-gold/40 hover:bg-warm-gold/10 hover:text-warm-gold text-gray-light flex items-center justify-center transition-all duration-300 group"
-              aria-label="GitHub"
+              aria-label="Instagram"
             >
-              <GithubLogo size={18} className="group-hover:scale-110 transition-transform" />
+              <InstagramLogo size={18} className="group-hover:scale-110 transition-transform" />
             </a>
             <a
               href="https://linkedin.com"

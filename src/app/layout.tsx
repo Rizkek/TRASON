@@ -134,7 +134,7 @@ const jsonLd = {
         width: 512,
         height: 512,
       },
-      sameAs: ['https://github.com/Rizkek/TRASON'],
+      sameAs: ['https://instagram.com/'],
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'customer support',

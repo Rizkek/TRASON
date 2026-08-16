@@ -10,7 +10,7 @@ import { useTranslation } from '@/libs/i18n/useTranslation';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { 
-  ArrowUpRight, Command, ShieldCheck, GithubLogo, 
+  ArrowUpRight, Command, ShieldCheck, 
   CurrencyCircleDollar, Briefcase, Heartbeat, Target, CalendarBlank, Lock
 } from '@phosphor-icons/react';
 
@@ -268,7 +268,6 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-light/50">
             <span className="flex items-center gap-2"><Lock size={16} className="text-warm-gold" /> Secure</span>
-            <span className="flex items-center gap-2"><GithubLogo size={16} /> Open Source</span>
           </div>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Compass } from '@phosphor-icons/react/dist/ssr';
+import { Logo } from '@/components';
 
 export default function PrivacyPolicyPage() {
   return (
@@ -17,10 +18,8 @@ export default function PrivacyPolicyPage() {
             <span className="text-sm font-bold uppercase tracking-widest text-warm-gold">Back</span>
           </Link>
           <div className="flex items-center gap-sm">
-            <div className="w-8 h-8 bg-warm-gold rounded-full flex items-center justify-center text-warm-black">
-              <Compass size={18} />
-            </div>
-            <span className="text-xl font-display tracking-tight font-bold tracking-tight">TRASON</span>
+            <Logo size={32} />
+            <span className="font-brand text-2xl font-extrabold tracking-tight text-soft-cream">TRASON</span>
           </div>
           <div className="w-20" /> {/* Spacer */}
         </div>
