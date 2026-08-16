@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button, Input, Alert, Loading, Logo } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -10,8 +10,10 @@ import { sanitizeError, validateEmail } from '@/libs/validation';
 import { supabase } from '@/services/supabase/supabaseClient';
 import { Compass, ArrowLeft, Quotes, Eye, EyeSlash as EyeOff } from '@phosphor-icons/react';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect_to') || '/dashboard';
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -25,9 +27,9 @@ export default function LoginPage() {
   useEffect(() => {
     // Redirect if already authenticated (skip if still loading)
     if (!authLoading && isAuthenticated) {
-      router.push('/dashboard');
+      router.push(redirectTo);
     }
-  }, [authLoading, isAuthenticated, router]);
+  }, [authLoading, isAuthenticated, router, redirectTo]);
 
   if (authLoading) {
     return (
@@ -83,7 +85,7 @@ export default function LoginPage() {
       if (signInError) throw new Error(signInError.message);
       if (!data.session) throw new Error('No session created');
 
-      router.push('/dashboard');
+      router.push(redirectTo);
     } catch (err) {
       setError(sanitizeError(err));
       setIsLoading(false);
@@ -194,5 +196,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-warm-black flex items-center justify-center">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
