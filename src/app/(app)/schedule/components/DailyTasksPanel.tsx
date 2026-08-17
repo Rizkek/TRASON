@@ -12,6 +12,8 @@ interface DailyTasksPanelProps {
   isTasksLoading: boolean;
   completedCount: number;
   totalCount: number;
+  pendingToggleIds: Set<string>;
+  pendingDeleteIds: Set<string>;
   createTask: (data: { title: string; description?: string; category?: string }) => Promise<any>;
   toggleTask: (id: string, completed: boolean) => Promise<any>;
   deleteTask: (id: string) => Promise<any>;
@@ -23,6 +25,8 @@ export function DailyTasksPanel({
   isTasksLoading,
   completedCount,
   totalCount,
+  pendingToggleIds,
+  pendingDeleteIds,
   createTask,
   toggleTask,
   deleteTask,
@@ -118,47 +122,55 @@ export function DailyTasksPanel({
             </p>
           </div>
         ) : (
-          tasks.map((task) => (
-            <div
-              key={task.id}
-              className={`flex items-center gap-lg px-xl py-lg group transition-all hover:bg-black/[0.01] dark:bg-white/[0.01] ${
-                task.completed_today ? 'opacity-60' : ''
-              }`}
-            >
-              {/* Checkbox */}
-              <button
-                onClick={() => toggleTask(task.id, !task.completed_today)}
-                className={`flex-shrink-0 transition-all ${
-                  task.completed_today ? 'text-income' : 'text-gray-light hover:text-primary'
-                }`}
-                aria-label={task.completed_today ? 'Mark as not done' : 'Mark as done'}
+          tasks.map((task) => {
+            const isToggling = pendingToggleIds.has(task.id);
+            const isDeleting = pendingDeleteIds.has(task.id);
+            return (
+              <div
+                key={task.id}
+                className={`flex items-center gap-lg px-xl py-lg group transition-all hover:bg-black/[0.01] dark:bg-white/[0.01] ${
+                  task.completed_today ? 'opacity-60' : ''
+                } ${isDeleting ? 'opacity-30 pointer-events-none' : ''}`}
               >
-                {task.completed_today ? (
-                  <CheckSquare size={20} className="drop-shadow-[0_0_6px_rgba(0,200,100,0.4)]" />
-                ) : (
-                  <Square size={20} />
-                )}
-              </button>
+                {/* Checkbox */}
+                <button
+                  onClick={() => toggleTask(task.id, !task.completed_today)}
+                  disabled={isToggling || isDeleting}
+                  className={`flex-shrink-0 transition-all ${
+                    task.completed_today ? 'text-income' : 'text-gray-light hover:text-primary'
+                  } ${isToggling ? 'opacity-50 cursor-wait' : ''}`}
+                  aria-label={task.completed_today ? 'Mark as not done' : 'Mark as done'}
+                >
+                  {task.completed_today ? (
+                    <CheckSquare size={20} className="drop-shadow-[0_0_6px_rgba(0,200,100,0.4)]" />
+                  ) : (
+                    <Square size={20} />
+                  )}
+                </button>
 
-              {/* Title */}
-              <span
-                className={`flex-1 text-sm transition-all ${
-                  task.completed_today ? 'line-through text-gray-light' : 'text-soft-cream'
-                }`}
-              >
-                {task.title}
-              </span>
+                {/* Title */}
+                <span
+                  className={`flex-1 text-sm transition-all ${
+                    task.completed_today ? 'line-through text-gray-light' : 'text-soft-cream'
+                  }`}
+                >
+                  {task.title}
+                </span>
 
-              {/* Delete (hover) */}
-              <button
-                onClick={() => deleteTask(task.id)}
-                className="opacity-0 group-hover:opacity-100 text-gray-light hover:text-expense transition-all p-sm"
-                aria-label={`Delete ${task.title}`}
-              >
-                <Trash2 size={14} />
-              </button>
-            </div>
-          ))
+                {/* Delete (hover) */}
+                <button
+                  onClick={() => deleteTask(task.id)}
+                  disabled={isDeleting || isToggling}
+                  className={`opacity-0 group-hover:opacity-100 text-gray-light hover:text-expense transition-all p-sm ${
+                    isDeleting ? 'opacity-50 cursor-wait' : ''
+                  }`}
+                  aria-label={`Delete ${task.title}`}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            );
+          })
         )}
       </div>
     </div>

@@ -58,6 +58,8 @@ export function TimelineClient() {
     isLoading: isTasksLoading,
     completedCount,
     totalCount,
+    pendingToggleIds,
+    pendingDeleteIds,
     createTask,
     toggleTask,
     deleteTask,
@@ -369,6 +371,8 @@ export function TimelineClient() {
               isTasksLoading={isTasksLoading}
               completedCount={completedCount}
               totalCount={totalCount}
+              pendingToggleIds={pendingToggleIds}
+              pendingDeleteIds={pendingDeleteIds}
               createTask={createTask}
               toggleTask={toggleTask}
               deleteTask={deleteTask}

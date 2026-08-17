@@ -11,7 +11,7 @@ const MAX_PREVIEW = 5;
 
 export const DailyTasksSummary = () => {
   const { t } = useTranslation();
-  const { tasks, isLoading, toggleTask } = useDailyTasks();
+  const { tasks, isLoading, toggleTask, pendingToggleIds } = useDailyTasks();
 
   const totalCount = tasks.length;
   const completedCount = tasks.filter(t => t.completed_today).length;
@@ -51,24 +51,29 @@ export const DailyTasksSummary = () => {
           </p>
         ) : (
           <div className="space-y-1.5">
-            {previewTasks.map(task => (
-              <div 
-                key={task.id} 
-                className="flex items-center gap-2.5 p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors cursor-pointer group" 
-                onClick={() => toggleTask(task.id, !task.completed_today)}
-              >
-                <div className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
-                  task.completed_today ? 'bg-primary border-primary' : 'border-gray-light/40 group-hover:border-primary'
-                }`}>
-                  {task.completed_today && <ListChecks size={10} className="text-white" />}
+            {previewTasks.map(task => {
+              const isToggling = pendingToggleIds.has(task.id);
+              return (
+                <div 
+                  key={task.id} 
+                  className={`flex items-center gap-2.5 p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors ${
+                    isToggling ? 'cursor-wait opacity-60 pointer-events-none' : 'cursor-pointer'
+                  } group`} 
+                  onClick={() => !isToggling && toggleTask(task.id, !task.completed_today)}
+                >
+                  <div className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                    task.completed_today ? 'bg-primary border-primary' : 'border-gray-light/40 group-hover:border-primary'
+                  }`}>
+                    {task.completed_today && <ListChecks size={10} className="text-white" />}
+                  </div>
+                  <span className={`text-xs truncate transition-opacity flex-1 ${
+                    task.completed_today ? 'opacity-40 line-through text-gray-light' : 'text-soft-cream font-medium'
+                  }`}>
+                    {task.title}
+                  </span>
                 </div>
-                <span className={`text-xs truncate transition-opacity flex-1 ${
-                  task.completed_today ? 'opacity-40 line-through text-gray-light' : 'text-soft-cream font-medium'
-                }`}>
-                  {task.title}
-                </span>
-              </div>
-            ))}
+              );
+            })}
 
             {hasMore && (
               <div className="pt-2 text-center">
