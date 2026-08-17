@@ -47,19 +47,70 @@ export const usePushNotification = () => {
     };
   });
 
-  // Check if push notifications are supported & configured, then check existing subscription
+  // On mount: check if there is an existing browser push subscription and
+  // sync it to Supabase. This handles the case where a new deploy updated the
+  // Service Worker, the browser generated a new push endpoint, but the DB
+  // still has the old (now-expired/410) endpoint — causing all cron pushes to fail.
   useEffect(() => {
-    // Auto-detect if already subscribed
-    if (state.isSupported) {
-      navigator.serviceWorker.getRegistration().then((reg) => {
-        if (reg) {
-          reg.pushManager.getSubscription().then((sub) => {
-            setState((prev) => ({ ...prev, isSubscribed: sub !== null }));
-          });
-        }
-      }).catch(() => {});
-    }
+    if (!state.isSupported) return;
+
+    navigator.serviceWorker.getRegistration().then(async (reg) => {
+      if (!reg) return;
+      const sub = await reg.pushManager.getSubscription().catch(() => null);
+
+      // Update UI state
+      setState((prev) => ({ ...prev, isSubscribed: sub !== null }));
+
+      if (!sub) return;
+
+      // Sync current subscription endpoint to DB silently.
+      // If the SW was updated and generated a new endpoint, this ensures the
+      // DB always has the latest valid endpoint even without user action.
+      try {
+        const { data } = await supabase.auth.getSession();
+        const user = data.session?.user;
+        if (!user) return;
+
+        const p256dh = sub.getKey('p256dh');
+        const auth = sub.getKey('auth');
+        if (!p256dh || !auth) return;
+
+        const bytes = (buf: ArrayBuffer) => {
+          const u = new Uint8Array(buf);
+          let s = '';
+          u.forEach((b) => { s += String.fromCharCode(b); });
+          return btoa(s);
+        };
+
+        // Deactivate all other subscriptions for this user (stale endpoints)
+        await supabase
+          .from('push_subscriptions')
+          .update({ is_active: false })
+          .eq('user_id', user.id)
+          .neq('endpoint', sub.endpoint);
+
+        // Upsert the current fresh endpoint
+        await supabase
+          .from('push_subscriptions')
+          .upsert(
+            [{
+              user_id: user.id,
+              endpoint: sub.endpoint,
+              p256dh: bytes(p256dh),
+              auth: bytes(auth),
+              user_agent: navigator.userAgent,
+              is_active: true,
+              last_used_at: new Date().toISOString(),
+            }],
+            { onConflict: 'endpoint' }
+          );
+      } catch {
+        // Non-fatal: DB sync failed, will retry on next load
+      }
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isSupported]);
+
 
   // Register service worker
   const registerServiceWorker = useCallback(async () => {
