@@ -133,7 +133,7 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400">
+                <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
                   <Barbell size={16} />
                 </div>
                 <span className="text-xs font-bold tracking-tight text-gray-light uppercase">
@@ -152,7 +152,7 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
                     {sportSummary.totalSessions} {t('dashboard.sessions')}
                   </span>
                   {sportSummary.streak >= 2 && (
-                    <span className="flex items-center gap-0.5 text-xs font-bold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded-full">
+                    <span className="flex items-center gap-0.5 text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
                       <Flame size={12} />
                       {sportSummary.streak}d
                     </span>
@@ -178,7 +178,7 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400">
+                <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
                   <Briefcase size={16} />
                 </div>
                 <span className="text-xs font-bold tracking-tight text-gray-light uppercase">
@@ -197,14 +197,14 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
                     {careerStats.active} {t('dashboard.active_now')}
                   </span>
                   {careerStats.interview > 0 && (
-                    <span className="text-xs font-bold text-purple-400 bg-purple-400/10 px-1.5 py-0.5 rounded-full">
+                    <span className="text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
                       {careerStats.interview} {t('dashboard.interview')}
                     </span>
                   )}
                 </div>
                 <div className="text-[11px] text-gray-light truncate">
                   {nextInterview ? (
-                    <span className="flex items-center gap-1 text-purple-300">
+                    <span className="flex items-center gap-1 text-primary">
                       <Clock size={11} className="shrink-0" />
                       <span className="truncate">{nextInterview.company_name}</span>
                     </span>
