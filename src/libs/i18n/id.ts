@@ -112,6 +112,12 @@ export const id = {
     overweight: 'Berat di atas normal',
     balanced: 'Seimbang',
     underweight: 'Berat di bawah normal',
+    delete: 'Hapus posisi',
+    journal: {
+      empty_journal: 'Belum ada entri jurnal. Catat pelajaran pertamamu.',
+      lessons_title: 'Pelajaran investasi',
+      six_months_passed: 'Tinjau (6b)',
+    },
   },
   career_page: {
     title: 'Karier',
@@ -178,6 +184,7 @@ export const id = {
     edit_app: 'Ubah',
     new_app: 'Tambah',
     save: 'Simpan',
+    save_btn: 'Simpan',
     form: {
       company: 'Nama perusahaan',
       company_placeholder: 'Google, Tokopedia...',
@@ -475,6 +482,7 @@ export const id = {
     notes_label: 'Catatan',
     subs_placeholder: 'Netflix, Spotify, AWS...',
     amount: 'Jumlah',
+    amount_label: 'Jumlah',
     markAsPaid: 'Tandai Lunas',
     noSubscriptions: 'Belum ada langganan',
     trackSubscriptions: 'Lacak pembayaran berulang Anda di sini.',
@@ -637,6 +645,10 @@ export const id = {
     narrative_default_msg: 'Siap untuk tindakan Anda selanjutnya.',
     
     income: 'Pemasukan',
+    spending_breakdown: 'Rincian pengeluaran',
+    percentage_based: 'Analisis berbasis persentase',
+    total_label: 'Total',
+    no_expenses: 'Belum ada pengeluaran bulan ini.',
     expenses: 'Pengeluaran',
     balance: 'Saldo',
     
@@ -703,11 +715,15 @@ export const id = {
   common: {
     loading: 'Memuat...',
     save: 'Simpan',
+    saving: 'Menyimpan...',
     cancel: 'Batal',
     delete: 'Hapus',
     edit: 'Edit',
     success: 'Sukses',
     error: 'Kesalahan'
+  },
+  dailyTasks: {
+    empty: 'Belum ada tugas. Tambahkan tugas harian pertamamu.'
   },
   moduleCommon: {
     emptyTitle: 'Belum Ada Data',

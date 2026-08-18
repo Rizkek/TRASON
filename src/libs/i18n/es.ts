@@ -112,6 +112,12 @@ export const es = {
     overweight: 'Sobrepeso',
     balanced: 'Equilibrado',
     underweight: 'Peso bajo',
+    delete: 'Eliminar posición',
+    journal: {
+      empty_journal: 'Aún no hay entradas en el diario. Registra tu primera lección.',
+      lessons_title: 'Lecciones de inversión',
+      six_months_passed: 'Revisión (6m)',
+    },
   },
   career_page: {
     title: 'Carrera',
@@ -178,6 +184,7 @@ export const es = {
     edit_app: 'Editar',
     new_app: 'Nueva',
     save: 'Guardar',
+    save_btn: 'Guardar',
     form: {
       company: 'Nombre de la empresa',
       company_placeholder: 'Google, Tokopedia...',
@@ -475,6 +482,7 @@ export const es = {
     notes_label: 'Notas',
     subs_placeholder: 'Netflix, Spotify, AWS...',
     amount: 'Monto',
+    amount_label: 'Monto',
     markAsPaid: 'Marcar como Pagado',
     noSubscriptions: 'No hay suscripciones aún',
     trackSubscriptions: 'Haz un seguimiento de tus pagos recurrentes aquí.',
@@ -637,6 +645,10 @@ export const es = {
     narrative_default_msg: 'Mantén la próxima acción pequeña, clara e intencional.',
     
     income: 'Ingresos',
+    spending_breakdown: 'Desglose de gastos',
+    percentage_based: 'Análisis basado en porcentaje',
+    total_label: 'Total',
+    no_expenses: 'No hay gastos registrados este mes.',
     expenses: 'Gastos',
     balance: 'Saldo',
     
@@ -703,11 +715,15 @@ export const es = {
   common: {
     loading: 'Cargando...',
     save: 'Guardar',
+    saving: 'Guardando...',
     cancel: 'Cancelar',
     delete: 'Eliminar',
     edit: 'Editar',
     success: 'Éxito',
     error: 'Error'
+  },
+  dailyTasks: {
+    empty: 'Aún no hay tareas. Agrega tu primera tarea diaria.'
   },
   moduleCommon: {
     emptyTitle: 'No hay datos',

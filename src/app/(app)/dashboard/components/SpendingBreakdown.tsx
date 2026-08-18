@@ -109,8 +109,8 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
     <Card className="p-md md:p-xl bg-black/[0.03] dark:bg-black/40 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group h-full">
       <div className="flex justify-between items-start mb-md">
         <div>
-          <h3 className="font-sans font-medium text-md md:text-lg text-soft-cream">{t('dashboard.spending_breakdown') || 'Spending Breakdown'}</h3>
-          <p className="text-[10px] md:text-micro text-gray-light mt-1">Percentage based analysis</p>
+          <h3 className="font-sans font-medium text-md md:text-lg text-soft-cream">{t('dashboard.spending_breakdown')}</h3>
+          <p className="text-[10px] md:text-micro text-gray-light mt-1">{t('dashboard.percentage_based')}</p>
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
           <div className="w-[45%] md:w-[40%] h-full relative shrink-0">
             <Doughnut data={doughnutData} options={options} />
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-[10px] text-gray-light uppercase tracking-widest">Total</span>
+              <span className="text-[10px] text-gray-light uppercase tracking-widest">{t('dashboard.total_label')}</span>
               <span className="text-sm font-bold text-soft-cream">
                 {formatCurrency(chartData.totalExpense, currency, locale)}
               </span>
@@ -145,7 +145,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
         </div>
       ) : (
         <div className="flex items-center justify-center h-48 text-gray-light text-sm opacity-50">
-          No expenses recorded this month.
+          {t('dashboard.no_expenses')}
         </div>
       )}
     </Card>

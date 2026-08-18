@@ -68,7 +68,7 @@ export const UpNextCard: React.FC<UpNextCardProps> = ({ reminders, isLoading }) 
               className="flex items-center gap-2.5 p-2.5 rounded-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03] hover:border-primary/20 transition-all min-w-0"
             >
               <div className="flex items-center justify-center shrink-0 px-2 py-1 rounded bg-primary/10 text-primary font-mono text-[11px] font-bold tracking-tight">
-                {reminder.due_time || 'Today'}
+                {reminder.due_time || t('dashboard.today')}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold text-soft-cream truncate" title={reminder.title}>

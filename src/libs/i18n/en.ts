@@ -112,6 +112,12 @@ export const en = {
     overweight: 'Overweight',
     balanced: 'Balanced',
     underweight: 'Underweight',
+    delete: 'Delete position',
+    journal: {
+      empty_journal: 'No journal entries yet. Record your first lesson.',
+      lessons_title: 'Investment lessons',
+      six_months_passed: 'Review (6m)',
+    },
   },
   career_page: {
     title: 'Career',
@@ -178,6 +184,7 @@ export const en = {
     edit_app: 'Edit',
     new_app: 'Add',
     save: 'Save',
+    save_btn: 'Save',
     form: {
       company: 'Company name',
       company_placeholder: 'Google, Tokopedia...',
@@ -475,6 +482,7 @@ export const en = {
     notes_label: 'Notes',
     subs_placeholder: 'Netflix, Spotify, AWS...',
     amount: 'Amount',
+    amount_label: 'Amount',
     markAsPaid: 'Mark as paid',
     noSubscriptions: 'No subscriptions yet',
     trackSubscriptions: 'Track your recurring payments here.',
@@ -637,6 +645,10 @@ export const en = {
     narrative_default_msg: 'Ready for your next action.',
     
     income: 'Income',
+    spending_breakdown: 'Spending breakdown',
+    percentage_based: 'Percentage based analysis',
+    total_label: 'Total',
+    no_expenses: 'No expenses recorded this month.',
     expenses: 'Expenses',
     balance: 'Balance',
     
@@ -703,11 +715,15 @@ export const en = {
   common: {
     loading: 'Loading...',
     save: 'Save',
+    saving: 'Saving...',
     cancel: 'Cancel',
     delete: 'Delete',
     edit: 'Edit',
     success: 'Success',
     error: 'Error'
+  },
+  dailyTasks: {
+    empty: 'No tasks yet. Add your first daily task.'
   },
   moduleCommon: {
     emptyTitle: 'Nothing here yet',

@@ -112,6 +112,12 @@ export const ja = {
     overweight: 'オーバーウェイト',
     balanced: 'バランス',
     underweight: 'アンダーウェイト',
+    delete: 'ポジションを削除',
+    journal: {
+      empty_journal: 'まだ日記エントリがありません。最初の教訓を記録してください。',
+      lessons_title: '投資の教訓',
+      six_months_passed: 'レビュー（6ヶ月）',
+    },
   },
   career_page: {
     title: 'キャリア',
@@ -178,6 +184,7 @@ export const ja = {
     edit_app: '編集',
     new_app: '新規',
     save: '保存',
+    save_btn: '保存',
     form: {
       company: '会社名',
       company_placeholder: 'Google, Tokopedia...',
@@ -475,6 +482,7 @@ export const ja = {
     notes_label: 'メモ',
     subs_placeholder: 'Netflix、Spotify、AWS...',
     amount: '金額',
+    amount_label: '金額',
     markAsPaid: '支払い済みとしてマーク',
     noSubscriptions: 'サブスクリプションはまだありません',
     trackSubscriptions: 'ここで定期支払いを追跡します。',
@@ -637,6 +645,10 @@ export const ja = {
     narrative_default_msg: '次の行動は小さく、明確で、意図的なものに保ちましょう。',
     
     income: '収入',
+    spending_breakdown: '支出内訳',
+    percentage_based: 'パーセンテージ分析',
+    total_label: '合計',
+    no_expenses: '今月の支出はまだありません。',
     expenses: '支出',
     balance: '残高',
     
@@ -703,11 +715,15 @@ export const ja = {
   common: {
     loading: '読み込み中...',
     save: '保存',
+    saving: '保存中...',
     cancel: 'キャンセル',
     delete: '削除',
     edit: '編集',
     success: '成功',
     error: 'エラー'
+  },
+  dailyTasks: {
+    empty: 'タスクはまだありません。最初の日課タスクを追加してください。'
   },
   moduleCommon: {
     emptyTitle: 'データはまだありません',
