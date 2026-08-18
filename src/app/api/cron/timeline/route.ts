@@ -28,13 +28,15 @@ export async function GET(request: Request) {
   const now = new Date();
   console.log(`[CRON-TIMELINE] [${now.toISOString()}] Route invoked.`);
 
-  // Security check for cron secret
+  // Security check for cron secret (supports both Authorization header and ?secret= query param)
   const authHeader = request.headers.get('Authorization');
+  const url = new URL(request.url);
+  const querySecret = url.searchParams.get('secret');
   const expectedSecret = process.env.CRON_SECRET;
 
   console.log(`[CRON-TIMELINE] Authorization header present: ${!!authHeader}, Expected secret present: ${!!expectedSecret}`);
 
-  if (expectedSecret && authHeader !== `Bearer ${expectedSecret}`) {
+  if (expectedSecret && authHeader !== `Bearer ${expectedSecret}` && querySecret !== expectedSecret) {
     console.warn('[CRON-TIMELINE] Unauthorized access attempt.');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -63,8 +65,8 @@ export async function GET(request: Request) {
 
   webpush.setVapidDetails(vapidEmail, vapidPublic, vapidPrivate);
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  console.log(`[CRON-TIMELINE] Querying daily tasks for date: ${todayStr}`);
+  // todayStr will be resolved per-user based on their timezone preference (see below)
+  console.log(`[CRON-TIMELINE] Will resolve todayStr per-user timezone from user_preferences`);
 
   // Fetch all tasks
   const { data: rawTasks, error: tasksError } = await supabase
@@ -97,15 +99,34 @@ export async function GET(request: Request) {
   console.log(`[CRON-TIMELINE] Valid tasks: ${tasks.length}, skipped: ${skippedTasks}`);
   // ──────────────────────────────────────────────────────────────────────────
 
-  // Group incomplete tasks by user_id
+  // Fetch timezone per user from user_preferences
+  const uniqueUserIds = [...new Set(tasks.map((t) => t.user_id))];
+  const { data: prefsRows } = await supabase
+    .from('user_preferences')
+    .select('user_id, timezone')
+    .in('user_id', uniqueUserIds);
+
+  const userTimezoneMap: Record<string, string> = {};
+  (prefsRows || []).forEach((p) => {
+    if (p.user_id && p.timezone) userTimezoneMap[p.user_id] = p.timezone;
+  });
+  console.log(`[CRON-TIMELINE] Resolved timezones for ${Object.keys(userTimezoneMap).length} users.`);
+
+  // Helper: get today's date string in a given timezone
+  const getTodayStrForTz = (tz: string): string =>
+    new Date().toLocaleDateString('en-CA', { timeZone: tz });
+
+  // Group incomplete tasks by user_id (using per-user timezone)
   const incompleteTasksByUser: Record<string, string[]> = {};
 
   tasks.forEach((task) => {
+    const userTz = userTimezoneMap[task.user_id] || 'UTC';
+    const todayStr = getTodayStrForTz(userTz);
     const isIncomplete =
       !task.completed_today ||
       (task.completed_today && task.last_reset_date !== todayStr);
 
-    console.log(`[CRON-TIMELINE] Task "${task.title}" (${task.user_id}) completed=${task.completed_today} resetDate=${task.last_reset_date} → incomplete=${isIncomplete}`);
+    console.log(`[CRON-TIMELINE] Task "${task.title}" (${task.user_id}) tz=${userTz} today=${todayStr} completed=${task.completed_today} resetDate=${task.last_reset_date} → incomplete=${isIncomplete}`);
 
     if (isIncomplete) {
       if (!incompleteTasksByUser[task.user_id]) {

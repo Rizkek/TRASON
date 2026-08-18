@@ -72,22 +72,24 @@ export async function GET(request: Request) {
   }
   // -----------------------------------------------------------
 
+  // Fetch pending reminders with a wide UTC window that covers "today" across all timezones
+  // (UTC-12 to UTC+14 = 38h window). Per-user timezone filtering happens in memory below.
+  const startOfWindowUTC = new Date();
+  startOfWindowUTC.setUTCHours(0, 0, 0, 0);
+  startOfWindowUTC.setUTCDate(startOfWindowUTC.getUTCDate() - 1); // cover UTC-12 (yesterday UTC)
+  const endOfWindowUTC = new Date();
+  endOfWindowUTC.setUTCHours(23, 59, 59, 999);
+  endOfWindowUTC.setUTCDate(endOfWindowUTC.getUTCDate() + 1); // cover UTC+14 (tomorrow UTC)
 
-  // Use DB-side timezone-aware date comparison (WIB = Asia/Jakarta = UTC+7)
-  // This avoids the UTC todayStr issue where midnight WIB = prev-day UTC.
-  // Only fetch reminders that:
-  //   1. Have an explicit due_datetime (no date = no daily cron notification)
-  //   2. Are due today in WIB timezone
-  //   3. Are not yet in the past by more than 1 hour (grace window)
-  console.log(`[CRON-REMINDERS] Fetching pending reminders due today (WIB)...`);
+  console.log(`[CRON-REMINDERS] Fetching pending reminders in window: ${startOfWindowUTC.toISOString()} → ${endOfWindowUTC.toISOString()}`);
   const { data: rawReminders, error: remindersError } = await supabase
     .from('reminders')
     .select('id, user_id, title, due_datetime, due_time, notify_times')
     .eq('status', 'pending')
     .is('deleted_at', null)
     .not('due_datetime', 'is', null)
-    .gte('due_datetime', new Date(new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }) + 'T00:00:00+07:00').toISOString())
-    .lte('due_datetime', new Date(new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }) + 'T23:59:59+07:00').toISOString());
+    .gte('due_datetime', startOfWindowUTC.toISOString())
+    .lte('due_datetime', endOfWindowUTC.toISOString());
 
   if (remindersError) {
     console.error('[CRON-REMINDERS] Failed to fetch reminders:', remindersError);
@@ -116,11 +118,42 @@ export async function GET(request: Request) {
   }
   // ─────────────────────────────────────────────────────────────────────────
 
-  console.log(`[CRON-REMINDERS] ${allReminders.length} reminders qualify for notification today.`);
+  console.log(`[CRON-REMINDERS] ${allReminders.length} reminders in window. Filtering by per-user timezone...`);
 
   if (allReminders.length === 0) {
-    console.log('[CRON-REMINDERS] No reminders match today. Exiting early.');
+    console.log('[CRON-REMINDERS] No valid reminders after Zod parse. Exiting early.');
     return NextResponse.json({ success: true, sent: 0, message: 'No reminders today', skippedReminders });
+  }
+
+  // Fetch per-user timezones from user_preferences
+  const allUserIds = [...new Set(allReminders.map((r) => r.user_id))];
+  const { data: prefRows } = await supabase
+    .from('user_preferences')
+    .select('user_id, timezone')
+    .in('user_id', allUserIds);
+
+  const userTimezoneMap: Record<string, string> = {};
+  (prefRows || []).forEach((p) => {
+    if (p.user_id && p.timezone) userTimezoneMap[p.user_id] = p.timezone;
+  });
+  console.log(`[CRON-REMINDERS] Resolved timezones for ${Object.keys(userTimezoneMap).length}/${allUserIds.length} users.`);
+
+  // Filter reminders to only those due today in the user's own timezone
+  const todayReminders = allReminders.filter((r) => {
+    if (!r.due_datetime) return false;
+    const userTz = userTimezoneMap[r.user_id] || 'UTC';
+    const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: userTz });
+    const dueDateStr = new Date(r.due_datetime).toLocaleDateString('en-CA', { timeZone: userTz });
+    const isToday = dueDateStr === todayStr;
+    console.log(`[CRON-REMINDERS] Reminder "${r.title}" (${r.user_id}) tz=${userTz} due=${dueDateStr} today=${todayStr} → include=${isToday}`);
+    return isToday;
+  });
+
+  console.log(`[CRON-REMINDERS] ${todayReminders.length}/${allReminders.length} reminders qualify for today across all timezones.`);
+
+  if (todayReminders.length === 0) {
+    console.log('[CRON-REMINDERS] No reminders due today (per user timezone). Exiting early.');
+    return NextResponse.json({ success: true, sent: 0, message: 'No reminders due today', skippedReminders });
   }
 
   // VAPID Setup
@@ -139,7 +172,7 @@ export async function GET(request: Request) {
 
   // Group qualifying reminders by user_id
   const remindersByUser: Record<string, ReminderRow[]> = {};
-  allReminders.forEach((r) => {
+  todayReminders.forEach((r) => {
     if (!remindersByUser[r.user_id]) remindersByUser[r.user_id] = [];
     remindersByUser[r.user_id].push(r);
   });
