@@ -105,6 +105,7 @@ export function InvestmentJournalClient() {
           <div className="py-24 text-center">
             <Notebook size={48} className="mx-auto text-white/20 mb-4" />
             <h3 className="text-lg font-bold text-white">{t('investment_page.journal.empty_journal')}</h3>
+            <p className="text-gray-light mt-2 max-w-sm mx-auto">
               {filter === 'needs_review' 
                 ? (t('investment_page.journal.empty_needs_review') || 'Belum ada investasi yang berusia > 6 bulan untuk direview saat ini.')
                 : (t('investment_page.journal.empty_journal') || 'Tidak ada catatan investasi.')}
