@@ -161,7 +161,7 @@ export function ActivityModal({
 
         <div>
           <label className="text-[10px] font-bold text-gray-light mb-2 block">
-            {t('timeline_page.form.rating')} <span className="font-normal opacity-70">(Opsional)</span>
+            {t('timeline_page.form.rating')} <span className="font-normal opacity-70">({t('common.optional')})</span>
           </label>
           <div className="flex gap-md" role="group" aria-label="Rating">
             {[1, 2, 3, 4, 5].map((s) => (
@@ -185,7 +185,7 @@ export function ActivityModal({
         <div className="relative">
           <MapPin size={14} className="absolute left-md top-1/2 -translate-y-1/2 text-primary" />
           <input
-            placeholder={`${t('timeline_page.form.location')} (Opsional)`}
+            placeholder={`${t('timeline_page.form.location')} (${t('common.optional')})`}
             value={form.location}
             onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
             aria-label="Location"
@@ -196,7 +196,7 @@ export function ActivityModal({
         <textarea
           value={form.description}
           onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-          placeholder={`${t('timeline_page.form.notes')} (Opsional)`}
+          placeholder={`${t('timeline_page.form.notes')} (${t('common.optional')})`}
           rows={3}
           aria-label="Notes"
           className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"

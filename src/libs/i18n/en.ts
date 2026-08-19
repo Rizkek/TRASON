@@ -117,6 +117,11 @@ export const en = {
       empty_journal: 'No journal entries yet. Record your first lesson.',
       lessons_title: 'Investment lessons',
       six_months_passed: 'Review (6m)',
+      all_notes: 'All Notes',
+      empty_needs_review: 'No investments older than 6 months to review at the moment.',
+      buy_notes: 'Buy Notes:',
+      start_review: 'Start Review',
+      review_opens_on: 'Review opens on',
     },
   },
   career_page: {
@@ -202,6 +207,10 @@ export const en = {
       salary_min_placeholder: 'Min (e.g. 10,000,000)',
       salary_max_placeholder: 'Max (e.g. 15,000,000)',
       salary_placeholder: 'Rp 8-12jt / $3-5k',
+      salary_up_to: 'Up to',
+      salary_presets: 'Quick presets:',
+      interview_date_placeholder: 'Optional interview date',
+      sync_reminder_label: 'Auto-add to Reminders / Calendar (notify 1 hour & 1 day before)',
       url: 'Job posting URL',
       url_placeholder: 'https://...',
       notes_label: 'Notes',
@@ -720,7 +729,8 @@ export const en = {
     delete: 'Delete',
     edit: 'Edit',
     success: 'Success',
-    error: 'Error'
+    error: 'Error',
+    optional: 'Optional',
   },
   dailyTasks: {
     empty: 'No tasks yet. Add your first daily task.'

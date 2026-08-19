@@ -837,10 +837,10 @@ export default function CareerClient({ initialApplications }: Props) {
                 />
                 <DatePicker
                   id="modal-interview"
-                  label={`${t('career_page.form.interview_date')} (Opsional)`}
+                  label={`${t('career_page.form.interview_date')} (${t('common.optional')})`}
                   value={form.interview_date}
                   onChange={(val) => setForm((f) => ({ ...f, interview_date: val }))}
-                  placeholder="Optional interview date"
+                  placeholder={t('career_page.form.interview_date_placeholder') as string || "Optional interview date"}
                   holidays={holidays}
                 />
               </div>
@@ -856,7 +856,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   />
                   <label htmlFor="sync-reminder-cb" className="text-xs text-soft-cream font-medium cursor-pointer flex items-center gap-1.5">
                     <Bell size={14} className="text-primary" />
-                    <span>Tambahkan otomatis ke Pengingat / Kalender (notifikasi 1 jam & 1 hari sebelum)</span>
+                    <span>{t('career_page.form.sync_reminder_label') as string || 'Auto-add to Reminders / Calendar (notify 1 hour & 1 day before)'}</span>
                   </label>
                 </div>
               )}
@@ -864,7 +864,7 @@ export default function CareerClient({ initialApplications }: Props) {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm">
               <Input
-                label={`${t('career_page.form.location')} (Opsional)`}
+                label={`${t('career_page.form.location')} (${t('common.optional')})`}
                 placeholder={t('career_page.form.location_placeholder')}
                 value={form.location}
                 onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
@@ -881,7 +881,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 ]}
               />
               <Input
-                label={`${t('career_page.form.url')} (Opsional)`}
+                label={`${t('career_page.form.url')} (${t('common.optional')})`}
                 placeholder={t('career_page.form.url_placeholder')}
                 value={form.url}
                 onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
@@ -892,7 +892,7 @@ export default function CareerClient({ initialApplications }: Props) {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">
-                  {t('career_page.form.salary')} <span className="font-normal opacity-70 normal-case">(Opsional)</span>
+                  {t('career_page.form.salary')} <span className="font-normal opacity-70 normal-case">({t('common.optional')})</span>
                 </label>
                 {(form.salary_min.trim() || form.salary_max.trim()) && (
                   <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
@@ -902,7 +902,7 @@ export default function CareerClient({ initialApplications }: Props) {
                       ? `${form.salary_min} – ${form.salary_max}`
                       : form.salary_min
                       ? `${form.salary_min}`
-                      : `Up to ${form.salary_max}`}
+                      : `${t('career_page.form.salary_up_to') || 'Up to'} ${form.salary_max}`}
                   </span>
                 )}
               </div>
@@ -939,7 +939,7 @@ export default function CareerClient({ initialApplications }: Props) {
 
               {/* Quick Salary Presets */}
               <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                <span className="text-[10px] text-gray-light/60 font-medium">Preset cepat:</span>
+                <span className="text-[10px] text-gray-light/60 font-medium">{t('career_page.form.salary_presets') as string || 'Quick presets:'}</span>
                 {form.salary_currency === 'IDR' ? (
                   [
                     { label: '5-10 Jt', min: '5.000.000', max: '10.000.000' },
@@ -978,7 +978,7 @@ export default function CareerClient({ initialApplications }: Props) {
 
             <div className="space-y-1">
               <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">
-                {t('career_page.form.notes_label') || 'Catatan / Keterangan'} <span className="font-normal opacity-70 normal-case">(Opsional)</span>
+                {t('career_page.form.notes_label') as string || 'Notes'} <span className="font-normal opacity-70 normal-case">({t('common.optional')})</span>
               </label>
               <textarea
                 value={form.notes}

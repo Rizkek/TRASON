@@ -114,9 +114,14 @@ export const id = {
     underweight: 'Berat di bawah normal',
     delete: 'Hapus posisi',
     journal: {
-      empty_journal: 'Belum ada entri jurnal. Catat pelajaran pertamamu.',
+      empty_journal: 'Belum ada catatan jurnal. Catat pelajaran pertamamu.',
       lessons_title: 'Pelajaran investasi',
-      six_months_passed: 'Tinjau (6b)',
+      six_months_passed: 'Ulasan (6bln)',
+      all_notes: 'Semua Catatan',
+      empty_needs_review: 'Belum ada investasi yang berusia > 6 bulan untuk direview saat ini.',
+      buy_notes: 'Catatan Pembelian:',
+      start_review: 'Mulai Review',
+      review_opens_on: 'Review terbuka pada',
     },
   },
   career_page: {
@@ -202,6 +207,10 @@ export const id = {
       salary_min_placeholder: 'Min (misal 10.000.000)',
       salary_max_placeholder: 'Max (misal 15.000.000)',
       salary_placeholder: 'Rp 8-12jt / $3-5k',
+      salary_up_to: 'Maks',
+      salary_presets: 'Preset cepat:',
+      interview_date_placeholder: 'Tanggal wawancara (opsional)',
+      sync_reminder_label: 'Tambahkan otomatis ke Pengingat / Kalender (notifikasi 1 jam & 1 hari sebelum)',
       url: 'URL lowongan',
       url_placeholder: 'https://...',
       notes_label: 'Catatan',
@@ -720,7 +729,8 @@ export const id = {
     delete: 'Hapus',
     edit: 'Edit',
     success: 'Sukses',
-    error: 'Kesalahan'
+    error: 'Kesalahan',
+    optional: 'Opsional',
   },
   dailyTasks: {
     empty: 'Belum ada tugas. Tambahkan tugas harian pertamamu.'

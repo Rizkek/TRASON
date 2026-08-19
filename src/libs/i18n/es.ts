@@ -114,9 +114,14 @@ export const es = {
     underweight: 'Peso bajo',
     delete: 'Eliminar posición',
     journal: {
-      empty_journal: 'Aún no hay entradas en el diario. Registra tu primera lección.',
+      empty_journal: 'Aún no hay entradas. Registra tu primera lección.',
       lessons_title: 'Lecciones de inversión',
       six_months_passed: 'Revisión (6m)',
+      all_notes: 'Todas las Notas',
+      empty_needs_review: 'No hay inversiones de más de 6 meses para revisar en este momento.',
+      buy_notes: 'Notas de compra:',
+      start_review: 'Comenzar revisión',
+      review_opens_on: 'La revisión se abre el',
     },
   },
   career_page: {
@@ -202,6 +207,10 @@ export const es = {
       salary_min_placeholder: 'Mín (ej. 10.000.000)',
       salary_max_placeholder: 'Máx (ej. 15.000.000)',
       salary_placeholder: 'Rp 8-12jt / $3-5k',
+      salary_up_to: 'Hasta',
+      salary_presets: 'Preajustes rápidos:',
+      interview_date_placeholder: 'Fecha de entrevista (opcional)',
+      sync_reminder_label: 'Añadir automáticamente a Recordatorios / Calendario (notificar 1 hora y 1 día antes)',
       url: 'URL de la vacante',
       url_placeholder: 'https://...',
       notes_label: 'Notas',
@@ -720,7 +729,8 @@ export const es = {
     delete: 'Eliminar',
     edit: 'Editar',
     success: 'Éxito',
-    error: 'Error'
+    error: 'Error',
+    optional: 'Opcional',
   },
   dailyTasks: {
     empty: 'Aún no hay tareas. Agrega tu primera tarea diaria.'

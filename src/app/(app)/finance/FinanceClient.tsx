@@ -864,7 +864,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
 
           <div className="space-y-sm">
             <label className="text-[10px] font-bold text-gray-light tracking-widest block">
-              {t('finance.modal.description')} <span className="font-normal opacity-70">(Opsional)</span>
+              {t('finance.modal.description')} <span className="font-normal opacity-70">({t('common.optional')})</span>
             </label>
             <textarea
               placeholder={t('finance.modal.descriptionPlaceholder')}
@@ -950,7 +950,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
 
               <div className="space-y-sm">
                 <label className="text-[10px] font-bold text-gray-light tracking-widest block">
-                  {t('finance.modal.reason')} <span className="font-normal opacity-70">(Opsional)</span>
+                  {t('finance.modal.reason')} <span className="font-normal opacity-70">({t('common.optional')})</span>
                 </label>
                 <textarea
                   placeholder={t('finance.modal.reasonPlaceholder')}

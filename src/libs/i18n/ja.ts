@@ -114,9 +114,14 @@ export const ja = {
     underweight: 'アンダーウェイト',
     delete: 'ポジションを削除',
     journal: {
-      empty_journal: 'まだ日記エントリがありません。最初の教訓を記録してください。',
+      empty_journal: '履歴はまだありません。最初の教訓を記録しましょう。',
       lessons_title: '投資の教訓',
-      six_months_passed: 'レビュー（6ヶ月）',
+      six_months_passed: 'レビュー (6ヶ月)',
+      all_notes: 'すべてのメモ',
+      empty_needs_review: '現在、レビュー対象となる6ヶ月以上前の投資はありません。',
+      buy_notes: '購入メモ:',
+      start_review: 'レビューを開始',
+      review_opens_on: 'レビュー開始日',
     },
   },
   career_page: {
@@ -202,6 +207,10 @@ export const ja = {
       salary_min_placeholder: '最小',
       salary_max_placeholder: '最大',
       salary_placeholder: 'Rp 8-12jt / $3-5k',
+      salary_up_to: '上限',
+      salary_presets: 'クイックプリセット:',
+      interview_date_placeholder: '面接日（任意）',
+      sync_reminder_label: 'リマインダー/カレンダーに自動追加（1時間前・1日前に通知）',
       url: '求人URL',
       url_placeholder: 'https://...',
       notes_label: 'メモ',
@@ -720,7 +729,8 @@ export const ja = {
     delete: '削除',
     edit: '編集',
     success: '成功',
-    error: 'エラー'
+    error: 'エラー',
+    optional: '任意',
   },
   dailyTasks: {
     empty: 'タスクはまだありません。最初の日課タスクを追加してください。'

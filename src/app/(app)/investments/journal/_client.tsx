@@ -90,7 +90,7 @@ export function InvestmentJournalClient() {
             onClick={() => setFilter('all')}
             className={filter !== 'all' ? 'text-gray-light hover:text-white' : ''}
           >
-            Semua Catatan
+            {t('investment_page.journal.all_notes') || 'Semua Catatan'}
           </Button>
         </div>
 
@@ -105,10 +105,9 @@ export function InvestmentJournalClient() {
           <div className="py-24 text-center">
             <Notebook size={48} className="mx-auto text-white/20 mb-4" />
             <h3 className="text-lg font-bold text-white">{t('investment_page.journal.empty_journal')}</h3>
-            <p className="text-gray-light mt-2 max-w-sm mx-auto">
               {filter === 'needs_review' 
-                ? 'Belum ada investasi yang berusia > 6 bulan untuk direview saat ini.' 
-                : 'Tidak ada catatan investasi.'}
+                ? (t('investment_page.journal.empty_needs_review') || 'Belum ada investasi yang berusia > 6 bulan untuk direview saat ini.')
+                : (t('investment_page.journal.empty_journal') || 'Tidak ada catatan investasi.')}
             </p>
           </div>
         ) : (
@@ -154,7 +153,7 @@ export function InvestmentJournalClient() {
                       <div className="flex gap-2 items-start text-sm">
                         <ChatText size={16} className="text-primary shrink-0 mt-1" />
                         <div>
-                          <p className="text-gray-light font-semibold mb-1 text-xs">Catatan Pembelian:</p>
+                          <p className="text-gray-light font-semibold mb-1 text-xs">{t('investment_page.journal.buy_notes') || 'Catatan Pembelian:'}</p>
                           <p className="text-soft-cream leading-relaxed">{journal.notes || '-'}</p>
                         </div>
                       </div>
@@ -170,7 +169,7 @@ export function InvestmentJournalClient() {
                           </div>
                           <div className="flex gap-2">
                             <Button variant="primary" size="sm" className="w-full">
-                              Mulai Review
+                              {t('investment_page.journal.start_review') || 'Mulai Review'}
                             </Button>
                           </div>
                         </div>
@@ -187,7 +186,7 @@ export function InvestmentJournalClient() {
                       ) : (
                         <div className="flex items-center gap-2 text-gray-light text-xs">
                           <ChartLineUp size={16} />
-                          <p>Review terbuka pada {new Date(journal.review_date!).toLocaleDateString(locale, { month: 'long', year: 'numeric' })}</p>
+                          <p>{t('investment_page.journal.review_opens_on') || 'Review terbuka pada'} {new Date(journal.review_date!).toLocaleDateString(locale, { month: 'long', year: 'numeric' })}</p>
                         </div>
                       )}
                     </div>
