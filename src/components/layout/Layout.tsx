@@ -110,7 +110,7 @@ function OfflineBanner() {
 
   return (
     <div
-      className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-sm px-lg py-sm animate-fade-in backdrop-blur-md border-b text-[10px] font-bold tracking-[0.15em] uppercase ${
+      className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-2 px-6 py-2 animate-fade-in backdrop-blur-md border-b text-[10px] font-bold tracking-[0.15em] uppercase ${
         justReconnected
           ? 'bg-success/10 border-success/20 text-soft-cream'
           : 'bg-warm-gold/[0.08] border-warm-gold/20 text-soft-cream'
@@ -255,8 +255,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* ── Desktop Sidebar (md+) — hidden on mobile ─────────────────── */}
       <aside className="hidden md:flex fixed inset-y-0 left-0 z-50 w-72 shrink-0 bg-gray-strong border-r border-soft-cream/10 flex-col glass h-screen overflow-y-auto">
-        <div className="px-lg py-xl flex flex-col items-center">
-          <div className="w-12 h-12 flex items-center justify-center mb-md">
+        <div className="px-6 py-8 flex flex-col items-center">
+          <div className="w-12 h-12 flex items-center justify-center mb-4">
             <Logo size={40} variant="gold" />
           </div>
           <h1 className="text-2xl font-serif font-bold tracking-tight text-gradient">
@@ -265,7 +265,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <p className="text-[10px] uppercase tracking-[0.2em] text-gray-light mt-1 font-medium">Personal Operating System</p>
         </div>
 
-        <nav className="flex-1 px-md py-xl space-y-2">
+        <nav className="flex-1 px-4 py-8 space-y-2">
           {visibleMenuItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -273,7 +273,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 key={item.href}
                 href={item.href}
                 prefetch={false}
-                className={`flex items-center gap-md px-lg py-md rounded-xl transition-all duration-300 relative group overflow-hidden ${
+                className={`flex items-center gap-4 px-6 py-4 rounded-xl transition-all duration-300 relative group overflow-hidden ${
                   isActive(item.href)
                     ? 'bg-white/5 border border-white/10 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)] text-soft-cream'
                     : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/5 border border-transparent'
@@ -297,9 +297,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           })}
         </nav>
 
-        <div className="p-md mt-auto mb-md space-y-2">
+        <div className="p-4 mt-auto mb-4 space-y-2">
           {/* User Profile */}
-          <div className="flex items-center gap-md px-lg py-md rounded-md bg-soft-cream/5 border border-soft-cream/10">
+          <div className="flex items-center gap-4 px-6 py-4 rounded-md bg-soft-cream/5 border border-soft-cream/10">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-bold text-white shadow-lg overflow-hidden shrink-0">
               {(user as any)?.avatar_url ? (
                 <Image src={(user as any).avatar_url} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
@@ -316,7 +316,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* Logout */}
           <button
             onClick={() => setIsLogoutModalOpen(true)}
-            className="w-full flex items-center gap-md px-lg py-md rounded-md text-gray-light hover:text-danger hover:bg-danger/10 transition-all duration-300 group"
+            className="w-full flex items-center gap-4 px-6 py-4 rounded-md text-gray-light hover:text-danger hover:bg-danger/10 transition-all duration-300 group"
           >
             <TrasonIcon icon={SYS_ICONS.logout} size={20} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-semibold tracking-wide">{t('nav.logout')}</span>
@@ -330,14 +330,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="absolute bottom-[-5%] left-[-5%] w-[400px] h-[400px] bg-secondary opacity-[0.02] blur-2xl md:blur-[100px] rounded-full pointer-events-none" />
 
         {/* Mobile top header */}
-        <header className="bg-warm-black/95 backdrop-blur-md border-b border-soft-cream/5 px-md py-sm pt-[max(env(safe-area-inset-top),16px)] flex items-center justify-between md:hidden relative z-40 transition-colors">
-          <div className="flex items-center gap-sm">
+        <header className="bg-warm-black/95 backdrop-blur-md border-b border-soft-cream/5 px-4 py-2 pt-[max(env(safe-area-inset-top),16px)] flex items-center justify-between md:hidden relative z-40 transition-colors">
+          <div className="flex items-center gap-2">
             <Logo size={20} variant="gold" />
             <h2 className="text-sm font-bold text-soft-cream tracking-wider uppercase">
               {currentMenuItem ? t(`nav.${currentMenuItem.href.replace('/', '')}`) : 'TRASON'}
             </h2>
           </div>
-          <div className="flex items-center gap-sm">
+          <div className="flex items-center gap-2">
             <NotificationToggle />
             <button onClick={() => setIsBottomSheetOpen(true)} className="relative w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-[10px] font-bold text-white shadow-lg overflow-hidden shrink-0">
               {(user as any)?.avatar_url ? (
@@ -350,7 +350,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         </header>
 
         <main className="flex-1 overflow-y-auto relative z-10 pb-24 md:pb-0">
-          <div className="container mx-auto px-sm py-sm md:px-2xl md:py-xl max-w-6xl">
+          <div className="container mx-auto px-4 py-4 md:px-8 md:py-8 lg:px-12 max-w-6xl">
             {children}
           </div>
         </main>
@@ -416,7 +416,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-lg py-md border-b border-soft-cream/5">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-soft-cream/5">
               <span className="font-semibold text-soft-cream text-sm tracking-wide">{t('modules.title') || 'All Modules'}</span>
               <button
                 onClick={() => setIsBottomSheetOpen(false)}
@@ -427,9 +427,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
 
             {/* Menu grid */}
-            <div className="px-lg pt-lg pb-md">
+            <div className="px-6 pt-6 pb-4">
               {sheetNavItems.length > 0 ? (
-                <div className="grid grid-cols-3 gap-md mb-lg">
+                <div className="grid grid-cols-3 gap-4 mb-6">
                   {sheetNavItems.map((item) => {
                     const Icon = item.icon;
                     const active = isActive(item.href);
@@ -439,7 +439,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         href={item.href}
                         prefetch={false}
                         onClick={() => setIsBottomSheetOpen(false)}
-                        className={`flex flex-col items-center gap-sm p-md rounded-2xl border transition-all duration-300 group ${
+                        className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all duration-300 group ${
                           active
                             ? 'bg-white/5 border-white/10 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)] text-soft-cream'
                             : 'bg-soft-cream/5 border-soft-cream/5 text-gray-light hover:bg-soft-cream/10 hover:text-soft-cream hover:border-soft-cream/10'
@@ -454,16 +454,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-gray-light text-center py-md opacity-60">All modules are in the nav bar.</p>
+                <p className="text-xs text-gray-light text-center py-4 opacity-60">All modules are in the nav bar.</p>
               )}
 
               {/* Settings & User section */}
-              <div className="border-t border-soft-cream/5 pt-md space-y-sm">
+              <div className="border-t border-soft-cream/5 pt-4 space-y-2">
                 <Link
                   href="/settings"
                   prefetch={false}
                   onClick={() => setIsBottomSheetOpen(false)}
-                  className={`flex items-center gap-md px-md py-sm rounded-xl transition-all duration-200 ${
+                  className={`flex items-center gap-4 px-4 py-2 rounded-xl transition-all duration-200 ${
                     isActive('/settings')
                       ? 'bg-primary/10 text-primary'
                       : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/5'
@@ -474,7 +474,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </Link>
 
                 {/* User profile row */}
-                <div className="flex items-center gap-md px-md py-sm rounded-xl bg-soft-cream/5 border border-soft-cream/5">
+                <div className="flex items-center gap-4 px-4 py-2 rounded-xl bg-soft-cream/5 border border-soft-cream/5">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-bold text-white shadow-lg flex-shrink-0 overflow-hidden">
                     {(user as any)?.avatar_url ? (
                       <Image src={(user as any).avatar_url} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
@@ -489,7 +489,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <NotificationToggle />
                   <button
                     onClick={() => { setIsBottomSheetOpen(false); setIsLogoutModalOpen(true); }}
-                    className="flex items-center gap-xs text-gray-light hover:text-danger transition-colors text-xs font-medium px-sm py-xs rounded-lg hover:bg-danger/10"
+                    className="flex items-center gap-1 text-gray-light hover:text-danger transition-colors text-xs font-medium px-2 py-1 rounded-lg hover:bg-danger/10"
                   >
                     <TrasonIcon icon={SYS_ICONS.logout} size={16} />
                     <span>{t('nav.logout')}</span>

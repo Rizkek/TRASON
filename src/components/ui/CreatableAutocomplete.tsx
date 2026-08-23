@@ -235,7 +235,7 @@ export function CreatableAutocomplete({
   };
 
   return (
-    <div ref={containerRef} className={`relative w-full space-y-sm ${className}`}>
+    <div ref={containerRef} className={`relative w-full space-y-2 ${className}`}>
       {label && (
         <label className="block text-xs font-semibold text-gray-very-light tracking-wide flex items-center justify-between">
           <span>
@@ -249,7 +249,7 @@ export function CreatableAutocomplete({
       )}
 
       <div className="relative group">
-        <div className="absolute left-md top-1/2 -translate-y-1/2 text-gray-light group-focus-within:text-primary transition-colors z-10 pointer-events-none">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-light group-focus-within:text-primary transition-colors z-10 pointer-events-none">
           {type === 'company' ? <Buildings size={18} /> : <Briefcase size={18} />}
         </div>
 
@@ -278,7 +278,7 @@ export function CreatableAutocomplete({
           }
           disabled={disabled}
           autoFocus={autoFocus}
-          className={`w-full h-12 pl-2xl pr-16 bg-gray-strong/70 border transition-all duration-300 rounded-md focus:ring-2 focus:ring-secondary/40 text-soft-cream placeholder:text-gray-light/60 disabled:opacity-50 disabled:cursor-not-allowed text-sm ${
+          className={`w-full h-12 pl-12 pr-16 bg-gray-strong/70 border transition-all duration-300 rounded-md focus:ring-2 focus:ring-secondary/40 text-soft-cream placeholder:text-gray-light/60 disabled:opacity-50 disabled:cursor-not-allowed text-sm ${
             error
               ? 'border-danger focus:border-danger'
               : 'border-gray-light/25 focus:border-secondary hover:border-white/20'

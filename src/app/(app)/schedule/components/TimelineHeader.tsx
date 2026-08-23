@@ -4,6 +4,7 @@ import React from 'react';
 import { Button } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Plus } from '@phosphor-icons/react';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface TimelineHeaderProps {
   activeTab: 'weekly-log' | 'daily-checklist';
@@ -31,44 +32,44 @@ export function TimelineHeader({
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-start justify-between flex-wrap gap-md">
-      <div className="space-y-xs">
-        <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">
+    <div className="flex items-start justify-between flex-wrap gap-4">
+      <div className="space-y-1">
+        <Heading as="h1" size="h1" className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">
           {t('timeline_page.title')}
-        </h1>
-        <p className="text-subtext flex items-center gap-sm">
+        </Heading>
+        <Paragraph className="text-subtext flex items-center gap-2">
           {t('timeline_page.desc')}
-        </p>
+        </Paragraph>
       </div>
-      <div className="flex items-center gap-md">
+      <div className="flex items-center gap-4">
         {activeTab === 'weekly-log' && hasWeeklyLogFeature && activitiesCount > 0 && (
-          <div className="flex items-center gap-xl text-center">
+          <div className="flex items-center gap-8 text-center">
             <div>
-              <p className="text-2xl font-bold text-gradient-static">{activitiesCount}</p>
-              <p className="text-[10px] text-gray-light uppercase tracking-widest">
+              <Paragraph className="text-2xl font-bold text-gradient-static">{activitiesCount}</Paragraph>
+              <Paragraph className="text-[10px] text-gray-light uppercase tracking-widest">
                 {t('timeline_page.logs_upper')}
-              </p>
+              </Paragraph>
             </div>
             <div>
-              <p className="text-2xl font-bold text-secondary">
+              <Paragraph className="text-2xl font-bold text-secondary">
                 {totalHours > 0 ? `${totalHours}h` : `${remMinutes}m`}
-              </p>
-              <p className="text-[10px] text-gray-light uppercase tracking-widest">
+              </Paragraph>
+              <Paragraph className="text-[10px] text-gray-light uppercase tracking-widest">
                 {t('timeline_page.logged_upper')}
-              </p>
+              </Paragraph>
             </div>
           </div>
         )}
         {activeTab === 'daily-checklist' && hasDailyChecklistFeature && totalCount > 0 && (
-          <div className="flex items-center gap-sm">
+          <div className="flex items-center gap-2">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gradient-static">
+              <Paragraph className="text-2xl font-bold text-gradient-static">
                 {completedCount}
                 <span className="text-gray-light opacity-50 text-lg">/{totalCount}</span>
-              </p>
-              <p className="text-[10px] text-gray-light uppercase tracking-widest">
+              </Paragraph>
+              <Paragraph className="text-[10px] text-gray-light uppercase tracking-widest">
                 {t('timeline_page.done_today')}
-              </p>
+              </Paragraph>
             </div>
           </div>
         )}

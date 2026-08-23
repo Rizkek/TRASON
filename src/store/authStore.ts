@@ -54,14 +54,14 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       error: null,
       activeLanguage: 'en',
-      activeTheme: 'dark',
+      activeTheme: 'light',
 
       setUser: (user) =>
         set((state) => {
           const extractedLang = extractLanguage(user);
           const newLang = extractedLang || state.activeLanguage || 'en';
           const extractedTheme = extractTheme(user);
-          const newTheme = extractedTheme || state.activeTheme || 'dark';
+          const newTheme = extractedTheme || state.activeTheme || 'light';
           return {
             user,
             isAuthenticated: true,
@@ -90,7 +90,7 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isLoading: false,
           activeLanguage: 'en',
-          activeTheme: 'dark',
+          activeTheme: 'light',
         }),
 
       // Full sign-out: tells Supabase to invalidate the token, then clears local state
@@ -110,7 +110,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             isLoading: false,
             activeLanguage: 'en',
-            activeTheme: 'dark',
+            activeTheme: 'light',
           });
         }
       },

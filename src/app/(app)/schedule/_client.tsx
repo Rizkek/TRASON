@@ -250,7 +250,7 @@ export function TimelineClient() {
   if (authLoading) {
     return (
       <Layout>
-        <div className="flex justify-center py-2xl">
+        <div className="flex justify-center py-12">
           <Loading text={t('dashboard.checking_session')} />
         </div>
       </Layout>
@@ -306,7 +306,7 @@ export function TimelineClient() {
     <>
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
       <Layout>
-        <div className="space-y-xl animate-fade-in">
+        <div className="space-y-8 animate-fade-in">
           {/* Header & Overview Stats */}
           <TimelineHeader
             activeTab={activeTab}
@@ -321,12 +321,12 @@ export function TimelineClient() {
           />
 
           {/* Tab Switcher */}
-          <div className="flex items-center gap-sm bg-black/[0.02] dark:bg-white/[0.02] p-md rounded-lg mb-xl w-max border border-black/[0.05] dark:border-white/[0.05]">
+          <div className="flex items-center gap-2 bg-black/[0.02] dark:bg-white/[0.02] p-4 rounded-lg mb-8 w-max border border-black/[0.05] dark:border-white/[0.05]">
             {module_features?.['timeline_weekly_log'] !== false && (
               <button
                 onClick={() => setActiveTab('weekly-log')}
                 title={t('timeline_page.weekly_log')}
-                className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+                className={`flex items-center gap-2 px-6 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
                   activeTab === 'weekly-log'
                     ? 'bg-primary text-white shadow-lg'
                     : 'text-gray-light hover:text-soft-cream'
@@ -340,7 +340,7 @@ export function TimelineClient() {
               <button
                 onClick={() => setActiveTab('daily-checklist')}
                 title={t('timeline_page.daily_checklist')}
-                className={`flex items-center gap-sm px-lg py-sm rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+                className={`flex items-center gap-2 px-6 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
                   activeTab === 'daily-checklist'
                     ? 'bg-primary text-white shadow-lg'
                     : 'text-gray-light hover:text-soft-cream'

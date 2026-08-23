@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card, Badge, Loading } from '@/components';
+import { Heading, Paragraph } from '@/components/ui/typography';
 import { useDailyTasks } from '@/hooks/useDailyTasks';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { ListChecks, ArrowRight } from '@phosphor-icons/react';
@@ -19,12 +20,12 @@ export const DailyTasksSummary = () => {
   const hasMore = totalCount > MAX_PREVIEW;
 
   return (
-    <Card className="p-md md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] flex flex-col">
-      <div className="flex items-center justify-between mb-md pb-xs border-b border-black/[0.05] dark:border-white/[0.05]">
+    <Card className="p-4 md:p-6 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] flex flex-col">
+      <div className="flex items-center justify-between mb-4 pb-1 border-b border-black/[0.05] dark:border-white/[0.05]">
         <div className="flex items-center gap-2">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-soft-cream">
+          <Heading as="h2" size="h6" className="uppercase tracking-widest text-soft-cream">
             {t('dashboard.dailyTasks.title')}
-          </h2>
+          </Heading>
         </div>
         <div className="flex items-center gap-2">
           {totalCount > 0 && (
@@ -46,9 +47,9 @@ export const DailyTasksSummary = () => {
         {isLoading ? (
           <div className="flex justify-center py-6"><Loading /></div>
         ) : tasks.length === 0 ? (
-          <p className="text-xs text-gray-light italic text-center py-6 opacity-60">
+          <Paragraph className="text-xs text-gray-light italic text-center py-6 opacity-60">
             {t('dashboard.dailyTasks.empty')}
-          </p>
+          </Paragraph>
         ) : (
           <div className="space-y-1.5">
             {previewTasks.map(task => {

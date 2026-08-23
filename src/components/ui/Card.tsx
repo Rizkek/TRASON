@@ -22,7 +22,7 @@ export const Card: React.FC<CardProps> = ({
       {...props}
     >
       {(title || description) && (
-        <div className="px-lg py-md border-b border-soft-cream/10">
+        <div className="px-6 py-4 border-b border-soft-cream/10">
           {title && (
             <h3 className="text-sm font-bold tracking-tight text-soft-cream uppercase opacity-90">
               {title}
@@ -35,7 +35,7 @@ export const Card: React.FC<CardProps> = ({
           )}
         </div>
       )}
-      <div className={title || description ? 'p-lg' : ''}>{children}</div>
+      <div className={title || description ? 'p-6' : ''}>{children}</div>
     </div>
   );
 };

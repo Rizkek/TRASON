@@ -99,7 +99,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Quick Log Workout">
-      <form onSubmit={handleSubmit} className="space-y-md">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {/* Sport Type */}
         <div>
           <label className="block text-xs font-semibold text-gray-very-light tracking-wide mb-2">
@@ -156,7 +156,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
                   ? 'Contoh: 5K Morning Run, Interval Sprint...'
                   : 'Contoh: Badminton, Futsal, Sepeda Santai...'
               }
-              className="w-full h-11 px-lg bg-gray-strong/70 border border-gray-light/25 rounded-md focus:ring-2 focus:ring-secondary/40 text-soft-cream text-sm outline-none transition-all placeholder:text-gray-light/50"
+              className="w-full h-11 px-6 bg-gray-strong/70 border border-gray-light/25 rounded-md focus:ring-2 focus:ring-secondary/40 text-soft-cream text-sm outline-none transition-all placeholder:text-gray-light/50"
             />
             {isSearchingExercises && (
               <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -195,7 +195,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
 
         {/* Dynamic Metrics */}
         {sportType === 'lift' ? (
-          <div className="grid grid-cols-3 gap-sm p-3 rounded-lg bg-white/[0.02] border border-white/5">
+          <div className="grid grid-cols-3 gap-2 p-3 rounded-lg bg-white/[0.02] border border-white/5">
             <Input
               label="Sets"
               type="number"
@@ -220,7 +220,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
             />
           </div>
         ) : ['run', 'cycle', 'swim'].includes(sportType) ? (
-          <div className="grid grid-cols-1 gap-sm p-3 rounded-lg bg-white/[0.02] border border-white/5">
+          <div className="grid grid-cols-1 gap-2 p-3 rounded-lg bg-white/[0.02] border border-white/5">
             <Input
               label="Jarak (Km)"
               type="number"
@@ -233,7 +233,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
         ) : null}
 
         {/* Duration & Rating */}
-        <div className="grid grid-cols-2 gap-md">
+        <div className="grid grid-cols-2 gap-4">
           <Input
             label="Durasi (Menit)"
             type="number"
@@ -266,7 +266,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-md border-t border-white/10">
+        <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
           <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading}>
             Batal
           </Button>

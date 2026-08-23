@@ -6,6 +6,7 @@ import { Card } from '@/components';
 import { CreditCard, CaretRight as ChevronRight } from '@phosphor-icons/react';
 import { formatCurrency } from '@/libs/format';
 import type { Subscription } from '@/types/database';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface Props {
   subscriptions: Subscription[];
@@ -39,19 +40,19 @@ export function UpcomingBills({ subscriptions, currency, locale }: Props) {
   if (upcoming.length === 0) return null;
 
   return (
-    <Card className="p-md md:p-lg">
-      <div className="flex items-center justify-between mb-md">
-        <h3 className="text-[10px] md:text-xs font-bold text-gray-light tracking-widest uppercase">
+    <Card className="p-4 md:p-6">
+      <div className="flex items-center justify-between mb-4">
+        <Heading as="h3" size="h3" className="text-[10px] md:text-xs font-bold text-gray-light tracking-widest uppercase">
           Tagihan Mendatang
-        </h3>
+        </Heading>
         <Link
           href="/finance/subscriptions"
-          className="flex items-center gap-xs text-[10px] text-primary font-bold uppercase tracking-widest hover:underline"
+          className="flex items-center gap-1 text-[10px] text-primary font-bold uppercase tracking-widest hover:underline"
         >
           Semua <ChevronRight size={10} />
         </Link>
       </div>
-      <div className="space-y-xs">
+      <div className="space-y-1">
         {upcoming.map((sub) => {
           const urgency =
             sub.daysLeft <= 3
@@ -69,22 +70,22 @@ export function UpcomingBills({ subscriptions, currency, locale }: Props) {
           return (
             <div
               key={sub.id}
-              className="flex items-center justify-between gap-md py-sm border-b border-white/[0.04] last:border-0"
+              className="flex items-center justify-between gap-4 py-2 border-b border-white/[0.04] last:border-0"
             >
-              <div className="flex items-center gap-sm min-w-0">
+              <div className="flex items-center gap-2 min-w-0">
                 <div className="w-8 h-8 flex items-center justify-center bg-white/[0.04] rounded-lg shrink-0">
                   <CreditCard size={14} className="text-gray-light" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-soft-cream truncate">{sub.name}</p>
-                  <p className={`text-[10px] ${urgency}`}>{daysText}</p>
+                  <Paragraph className="text-xs font-semibold text-soft-cream truncate">{sub.name}</Paragraph>
+                  <Paragraph className={`text-[10px] ${urgency}`}>{daysText}</Paragraph>
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-xs font-bold text-soft-cream">
+                <Paragraph className="text-xs font-bold text-soft-cream">
                   {formatCurrency(sub.amount, sub.currency || currency, locale)}
-                </p>
-                <p className="text-[9px] text-gray-light">{cycleLabel(sub.billing_cycle)}</p>
+                </Paragraph>
+                <Paragraph className="text-[9px] text-gray-light">{cycleLabel(sub.billing_cycle)}</Paragraph>
               </div>
             </div>
           );

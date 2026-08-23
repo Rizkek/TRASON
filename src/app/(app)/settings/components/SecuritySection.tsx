@@ -6,6 +6,7 @@ import { useTranslation } from '@/libs/i18n/useTranslation';
 import { supabase } from '@/services/supabase/supabaseClient';
 import { sanitizeError } from '@/libs/validation';
 import { Warning as AlertTriangle } from '@phosphor-icons/react';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface SecuritySectionProps {
   showMessage: (type: 'success' | 'error', text: string) => void;
@@ -62,12 +63,12 @@ export function SecuritySection({
 
   return (
     <>
-      <div className="space-y-xl">
+      <div className="space-y-8">
         <Card
           className="glass border-none border-t border-danger"
           title={t('settings.security.sectionTitle')}
         >
-          <div className="space-y-xl max-w-md">
+          <div className="space-y-8 max-w-md">
             <Input
               label={t('settings.security.currentPass')}
               type="password"
@@ -103,12 +104,12 @@ export function SecuritySection({
         </Card>
 
         <Card className="glass border-none bg-danger/5 border-danger/20">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div>
-              <h3 className="text-lg font-bold text-danger flex items-center gap-2">
+              <Heading as="h3" size="h3" className="text-lg font-bold text-danger flex items-center gap-2">
                 <AlertTriangle size={20} /> {t('settings.security.deleteAccount')}
-              </h3>
-              <p className="text-sm text-gray-light mt-1">{t('settings.security.deleteDesc')}</p>
+              </Heading>
+              <Paragraph className="text-sm text-gray-light mt-1">{t('settings.security.deleteDesc')}</Paragraph>
             </div>
             <Button variant="danger" size="md" onClick={() => setDeleteConfirmOpen(true)}>
               {t('settings.security.deleteBtn')}

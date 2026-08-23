@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Alert, Logo } from '@/components';
+import { Heading, Paragraph } from '@/components/ui/typography';
 import { supabase } from '@/services/supabase/supabaseClient';
 import { userQueries } from '@/services/core/userQueries';
 import { validateEmail, validatePassword, sanitizeError } from '@/libs/validation';
@@ -156,41 +157,41 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
       {/* Left Side: Aesthetic (Hidden on mobile) */}
-      <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-4xl overflow-hidden border-r border-black/[0.05] dark:border-white/[0.05]">
+      <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-24 overflow-hidden border-r border-black/[0.05] dark:border-white/[0.05]">
          <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-deep-sage/10 blur-[100px] rounded-full" />
          <div className="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-warm-gold/5 blur-[80px] rounded-full" />
          
-         <div className="relative z-10 max-w-md space-y-xl animate-fade-in">
-            <Stack size={48} className="text-warm-gold opacity-40 mb-lg" />
-            <h2 className="text-4xl lg:text-5xl font-serif italic leading-tight text-soft-cream/90">
+         <div className="relative z-10 max-w-md space-y-8 animate-fade-in">
+            <Stack size={48} className="text-warm-gold opacity-40 mb-6" />
+            <Heading as="h2" size="h2" className="italic text-soft-cream/90">
               "Build the system, then let the system carry you."
-            </h2>
-            <div className="space-y-sm">
-              <p className="text-lg font-medium text-warm-gold">TRASON</p>
-              <p className="text-sm text-gray-light font-light leading-relaxed">
+            </Heading>
+            <div className="space-y-2">
+              <Paragraph size="lg" className="font-medium text-warm-gold">TRASON</Paragraph>
+              <Paragraph size="sm">
                 Start with one private workspace for your money, habits, workouts, reminders, and long-term direction.
-              </p>
+              </Paragraph>
             </div>
          </div>
 
-         <div className="absolute bottom-12 left-12 flex items-center gap-sm opacity-40">
+         <div className="absolute bottom-12 left-12 flex items-center gap-2 opacity-40">
             <Logo size={32} variant="gold" />
             <span className="font-serif text-lg tracking-tight">TRASON</span>
          </div>
       </div>
 
       {/* Right Side: Signup Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-lg md:p-4xl relative overflow-y-auto">
+      <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-24 relative overflow-y-auto">
         {isLoading && <div className="absolute top-0 left-0 right-0 h-1 bg-warm-gold animate-pulse" />}
-        <Link href="/" className="absolute top-12 z-10 left-16 flex items-center gap-sm text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
+        <Link href="/" className="absolute top-12 z-10 left-16 flex items-center gap-2 text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           <span>Back to Home</span>
         </Link>
 
-        <div className="w-full max-w-sm space-y-xl animate-slide-up py-5xl">
-          <div className="space-y-sm text-center md:text-left">
-            <h1 className="text-3xl font-serif">Create Your Personal OS</h1>
-            <p className="text-sm text-gray-light font-light">Set up a calm place to capture the day and understand your momentum.</p>
+        <div className="w-full max-w-sm space-y-8 animate-slide-up py-32">
+          <div className="space-y-2 text-center md:text-left">
+            <Heading as="h1" size="h3">Create Your Personal OS</Heading>
+            <Paragraph size="sm">Set up a calm place to capture the day and understand your momentum.</Paragraph>
           </div>
 
           {error && (
@@ -203,7 +204,7 @@ export default function SignupPage() {
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-lg">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <Input
               label="Full Name"
               name="name"
@@ -307,19 +308,19 @@ export default function SignupPage() {
               fullWidth 
               isLoading={isLoading}
               loadingText="Initializing Workspace... (this might take up to a minute)"
-              className="py-lg rounded-full font-bold shadow-xl shadow-warm-gold/10 mt-xl"
+              className="py-6 rounded-full font-bold shadow-xl shadow-warm-gold/10 mt-8"
             >
               Create Account
             </Button>
           </form>
 
           <div className="text-center md:text-left">
-            <p className="text-sm text-gray-light font-light">
+            <Paragraph size="sm">
               Already have your workspace?{' '}
               <Link href="/login" className="text-warm-gold hover:underline font-medium underline-offset-4 decoration-warm-gold/30">
                 Sign in
               </Link>
-            </p>
+            </Paragraph>
           </div>
         </div>
       </div>

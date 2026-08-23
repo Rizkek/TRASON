@@ -87,7 +87,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           
           {/* Header */}
           {(title || closeButton) && (
-            <div className="flex-none flex items-center justify-between px-xl pb-md pt-sm md:py-xl border-b border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none flex items-center justify-between px-8 pb-4 pt-2 md:py-8 border-b border-black/[0.05] dark:border-white/[0.05]">
               {title && (
                 <h2 className="text-xl font-bold tracking-tight text-white uppercase italic">
                    {title}
@@ -98,7 +98,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
                   onClick={onClose}
                   title="Close"
                   aria-label="Close"
-                  className="text-gray-light hover:text-white hover:bg-black/5 dark:bg-white/5 p-sm rounded-md transition-all ml-2"
+                  className="text-gray-light hover:text-white hover:bg-black/5 dark:bg-white/5 p-2 rounded-md transition-all ml-2"
                 >
                   <X size={20} />
                 </button>
@@ -108,7 +108,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 
           {/* Description */}
           {description && (
-            <div className="px-xl pt-xl">
+            <div className="px-8 pt-8">
               <p className="text-sm text-gray-light italic opacity-80 leading-relaxed">
                 {description}
               </p>
@@ -116,11 +116,11 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           )}
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto min-h-0 px-xl py-xl">{children}</div>
+          <div className="flex-1 overflow-y-auto min-h-0 px-8 py-8">{children}</div>
 
           {/* Footer */}
           {footer && (
-            <div className="flex-none px-xl py-xl bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none px-8 py-8 bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
               {footer}
             </div>
           )}

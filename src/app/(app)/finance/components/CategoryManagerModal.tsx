@@ -7,6 +7,7 @@ import { Category } from '@/types/database';
 import { CategoryIcon, CATEGORY_ICONS, ICON_CATEGORIES } from '@/components';
 import { ICON_NAME_SUGGESTIONS } from '@/libs/defaultCategories';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface CategoryManagerModalProps {
   isOpen: boolean;
@@ -93,19 +94,19 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
       }}
       title={t('finance.categories.manageTitle').replace('{type}', typeFilter === 'income' ? t('finance.modal.type.income') : t('finance.modal.type.expense'))}
     >
-      <div className="space-y-md">
+      <div className="space-y-4">
         <ErrorAlert error={error} onDismiss={() => setError(null)} />
         
         {!isAdding ? (
           <>
-            <div className="grid grid-cols-2 gap-sm max-h-[300px] overflow-y-auto">
+            <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto">
               {filteredCategories.map(cat => (
-                <div key={cat.id} className="flex items-center justify-between p-sm bg-gray-strong/40 rounded-md border border-black/5 dark:border-white/5">
-                  <div className="flex items-center gap-sm overflow-hidden">
+                <div key={cat.id} className="flex items-center justify-between p-2 bg-gray-strong/40 rounded-md border border-black/5 dark:border-white/5">
+                  <div className="flex items-center gap-2 overflow-hidden">
                     <CategoryIcon name={cat.icon || 'ShoppingCart'} className="text-gray-light" />
                     <span className="text-sm font-bold truncate">{cat.name}</span>
                   </div>
-                  <div className="flex gap-xs">
+                  <div className="flex gap-1">
                     <button onClick={() => startEdit(cat)} className="p-1 text-gray-light hover:text-primary transition-colors">
                       <Edit2 size={14} />
                     </button>
@@ -128,16 +129,16 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
             </Button>
           </>
         ) : (
-          <div className="space-y-md bg-gray-strong/20 p-md rounded-lg border border-black/5 dark:border-white/5">
-            <div className="flex items-center justify-between mb-sm">
-              <h3 className="text-sm font-bold">{editingId ? t('finance.categories.edit') : t('finance.categories.new')}</h3>
+          <div className="space-y-4 bg-gray-strong/20 p-4 rounded-lg border border-black/5 dark:border-white/5">
+            <div className="flex items-center justify-between mb-2">
+              <Heading as="h3" size="h3" className="text-sm font-bold">{editingId ? t('finance.categories.edit') : t('finance.categories.new')}</Heading>
               <button onClick={resetForm} className="text-gray-light hover:text-soft-cream">
                 <X size={16} />
               </button>
             </div>
             
-            <div className="flex gap-md relative">
-              <div className="w-20 flex flex-col items-center gap-xs">
+            <div className="flex gap-4 relative">
+              <div className="w-20 flex flex-col items-center gap-1">
                 <label className="text-[10px] font-bold text-gray-light tracking-widest self-start">{t('finance.categories.iconLabel')}</label>
                 <button
                   type="button"
@@ -178,13 +179,13 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
             </div>
 
             {showIconPicker && (
-              <div className="bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md p-sm max-h-[250px] overflow-y-auto space-y-md relative">
+              <div className="bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md p-2 max-h-[250px] overflow-y-auto space-y-4 relative">
                 {ICON_CATEGORIES.map(category => (
                   <div key={category.name}>
                     <div className="text-[10px] font-bold text-gray-light mb-2 uppercase tracking-widest sticky top-0 bg-[#252525]/90 dark:bg-gray-strong/90 backdrop-blur py-1 z-10">
                       {category.name}
                     </div>
-                    <div className="grid grid-cols-5 sm:grid-cols-7 gap-xs">
+                    <div className="grid grid-cols-5 sm:grid-cols-7 gap-1">
                       {category.icons.map(iconName => {
                         const suggestion = ICON_NAME_SUGGESTIONS[iconName];
                         const iconTitle = suggestion?.[language as keyof typeof suggestion] || suggestion?.id || suggestion?.en || iconName;
@@ -224,7 +225,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
               </div>
             )}
             
-            <div className="flex justify-end gap-sm mt-md">
+            <div className="flex justify-end gap-2 mt-4">
               <Button variant="ghost" size="sm" onClick={resetForm} disabled={isSaving}>{t('common.cancel')}</Button>
               <Button variant="primary" size="sm" onClick={handleSave} disabled={isSaving}>
                 {isSaving ? t('finance.categories.saving') : t('finance.categories.save')}

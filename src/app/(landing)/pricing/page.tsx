@@ -6,6 +6,7 @@ import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { Check, X } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 export const metadata: Metadata = {
   title: 'Pricing – Free Forever, Pro When You Need It',
@@ -23,20 +24,20 @@ export const metadata: Metadata = {
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-warm-black text-soft-cream font-sans relative overflow-x-hidden">
+    <div className="min-h-screen font-sans relative overflow-x-hidden">
       <LandingNavbar />
       
-      <main className="pt-32 md:pt-48 pb-24 px-lg max-w-7xl mx-auto space-y-16">
-        <div className="text-center space-y-md max-w-3xl mx-auto">
-           <h1 className="text-5xl md:text-7xl font-display tracking-tight">Simple, transparent pricing</h1>
-           <p className="text-xl text-gray-light/60">Start for free, upgrade when you need more power. No hidden fees.</p>
+      <main className="pt-32 md:pt-48 pb-24 px-6 max-w-7xl mx-auto space-y-16">
+        <div className="text-center space-y-4 max-w-3xl mx-auto">
+           <Heading as="h1" size="h1" className="text-soft-cream">Simple, transparent pricing</Heading>
+           <Paragraph size="xl" className="text-gray-light/60">Start for free, upgrade when you need more power. No hidden fees.</Paragraph>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {/* Free Tier */}
           <div className="bg-black/20 border border-white/5 rounded-3xl p-8 flex flex-col">
-            <h2 className="text-2xl font-bold font-display tracking-tight mb-2">Basic</h2>
-            <p className="text-gray-light text-sm mb-6">Perfect for getting started and organizing your life.</p>
+            <Heading as="h2" size="h4" className="mb-2 text-white">Basic</Heading>
+            <Paragraph size="sm" className="mb-6 text-gray-light">Perfect for getting started and organizing your life.</Paragraph>
             <div className="text-5xl font-bold text-white mb-8">
               $0<span className="text-lg text-gray-light font-normal">/mo</span>
             </div>
@@ -76,8 +77,8 @@ export default function PricingPage() {
             <div className="absolute top-0 right-0 bg-warm-gold text-warm-black text-xs font-bold px-4 py-1 rounded-bl-xl">
               RECOMMENDED
             </div>
-            <h2 className="text-2xl font-bold font-display tracking-tight mb-2 text-warm-gold">Pro</h2>
-            <p className="text-gray-light text-sm mb-6">For power users who want deep analytics and automation.</p>
+            <Heading as="h2" size="h4" className="mb-2 text-warm-gold">Pro</Heading>
+            <Paragraph size="sm" className="mb-6 text-gray-light">For power users who want deep analytics and automation.</Paragraph>
             <div className="text-5xl font-bold text-white mb-8">
               $9<span className="text-lg text-gray-light font-normal">/mo</span>
             </div>

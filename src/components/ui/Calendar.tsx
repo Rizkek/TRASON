@@ -141,11 +141,11 @@ export const Calendar: React.FC<CalendarProps> = ({
   return (
     <div className="glass-card overflow-hidden border-black/[0.03] dark:border-white/[0.03]">
       {/* Calendar Header */}
-      <div className="flex items-center justify-between p-lg border-b border-black/[0.03] dark:border-white/[0.03]">
+      <div className="flex items-center justify-between p-6 border-b border-black/[0.03] dark:border-white/[0.03]">
         <h3 className="font-serif text-2xl flex items-center gap-2">
           <span className="text-warm-gold">{monthName}</span> <span className="text-soft-cream/40 font-light">{year}</span>
         </h3>
-        <div className="flex gap-sm">
+        <div className="flex gap-2">
           <button onClick={handlePrevMonth} aria-label="Previous month" className="p-2 hover:bg-black/5 dark:bg-white/5 rounded-full transition-colors text-soft-cream">
             <ChevronLeft size={20} />
           </button>
@@ -180,7 +180,7 @@ export const Calendar: React.FC<CalendarProps> = ({
 
       {/* Month Holiday Footer Summary */}
       {currentMonthHolidays.length > 0 && (
-        <div className="p-md md:px-lg border-t border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/30 flex items-start gap-md flex-wrap">
+        <div className="p-4 md:px-6 border-t border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/30 flex items-start gap-4 flex-wrap">
           <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-light uppercase tracking-wider shrink-0 pt-0.5">
             <CalendarCheck size={14} className="text-primary" />
             <span>Hari Libur Bulan Ini:</span>

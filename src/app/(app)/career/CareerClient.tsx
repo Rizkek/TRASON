@@ -16,6 +16,7 @@ import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calen
 import { useInterviewJournal } from '@/hooks/useInterviewJournal';
 import { useReminder } from '@/hooks/useReminder';
 import { useHolidays } from '@/hooks/useHolidays';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 const FILTER_TABS = [
   { id: 'all',       labelKey: 'all',       icon: FunnelSimple },
@@ -363,7 +364,7 @@ export default function CareerClient({ initialApplications }: Props) {
   if (authLoading) {
     return (
       <Layout>
-        <div className="flex justify-center py-2xl"><Loading text={t('dashboard.checking_session')} /></div>
+        <div className="flex justify-center py-12"><Loading text={t('dashboard.checking_session')} /></div>
       </Layout>
     );
   }
@@ -373,20 +374,20 @@ export default function CareerClient({ initialApplications }: Props) {
     <>
       <ErrorAlert error={pageError || error} onDismiss={() => setPageError(null)} />
       <Layout>
-        <div className="space-y-xl animate-fade-in pb-4xl">
+        <div className="space-y-8 animate-fade-in pb-24">
 
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-lg">
-            <div className="space-y-xs">
-              <h1 className="text-5xl font-sans font-bold tracking-tight">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-1">
+              <Heading as="h1" size="h1" className="text-5xl font-sans font-bold tracking-tight">
                 {t('career_page.title')} <span className="text-warm-gold italic">{t('career_page.title_highlight')}</span>
-              </h1>
-              <p className="text-gray-light font-light">{t('career_page.desc')}</p>
+              </Heading>
+              <Paragraph className="text-gray-light font-light">{t('career_page.desc')}</Paragraph>
             </div>
             <div className="hidden md:block">
               <Button 
                 variant="primary" 
                 onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal} 
-                className="rounded-full px-xl" 
+                className="rounded-full px-8" 
                 aria-label={mainTab === 'applications' ? "Add new application" : "Add new journal entry"}
               >
                 <Plus size={18} className="mr-2" />
@@ -398,48 +399,48 @@ export default function CareerClient({ initialApplications }: Props) {
           </div>
 
           {!isLoading && (
-            <div className="flex flex-row justify-between gap-sm md:gap-md overflow-x-auto snap-x no-scrollbar pb-2">
+            <div className="flex flex-row justify-between gap-2 md:gap-4 overflow-x-auto snap-x no-scrollbar pb-2">
               {[
                 { label: t('career_page.stats.applied'), value: stats.applied, color: 'text-primary' },
                 { label: t('career_page.stats.reviewing'), value: stats.reviewing, color: 'text-amber-400' },
                 { label: t('career_page.stats.interview'), value: stats.interview, color: 'text-purple-400' },
                 { label: t('career_page.stats.offer'), value: stats.offer, color: 'text-income' },
               ].map((s) => (
-                <Card key={s.label} className="glass border-none p-sm md:p-xl text-center flex-1 min-w-[70px] snap-center">
-                  <p className={`text-xl md:text-3xl font-bold ${s.color}`}>{s.value}</p>
-                  <p className="text-[8px] md:text-xs text-gray-light uppercase tracking-widest mt-1 md:mt-xs">{s.label}</p>
+                <Card key={s.label} className="glass border-none p-2 md:p-8 text-center flex-1 min-w-[70px] snap-center">
+                  <Paragraph className={`text-xl md:text-3xl font-bold ${s.color}`}>{s.value}</Paragraph>
+                  <Paragraph className="text-[8px] md:text-xs text-gray-light uppercase tracking-widest mt-1 md:mt-1">{s.label}</Paragraph>
                 </Card>
               ))}
             </div>
           )}
 
           {!isLoading && analytics && analytics.totalApplications > 0 && (
-            <Card className="p-sm md:p-lg border border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02]">
-              <div className="flex items-center gap-md sm:gap-xl overflow-x-auto snap-x no-scrollbar flex-nowrap pb-1">
+            <Card className="p-2 md:p-6 border border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02]">
+              <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto snap-x no-scrollbar flex-nowrap pb-1">
                 <div className="text-center shrink-0 snap-center">
-                  <p className="text-md md:text-lg font-bold text-white">{analytics.responseRate.toFixed(0)}%</p>
-                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.responseRate')}</p>
-                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.resp')}</p>
+                  <Paragraph className="text-md md:text-lg font-bold text-white">{analytics.responseRate.toFixed(0)}%</Paragraph>
+                  <Paragraph className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.responseRate')}</Paragraph>
+                  <Paragraph className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.resp')}</Paragraph>
                 </div>
                 <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
                 <div className="text-center shrink-0 snap-center">
-                  <p className="text-md md:text-lg font-bold text-white">{analytics.interviewRate.toFixed(0)}%</p>
-                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.interviewRate')}</p>
-                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.intv')}</p>
+                  <Paragraph className="text-md md:text-lg font-bold text-white">{analytics.interviewRate.toFixed(0)}%</Paragraph>
+                  <Paragraph className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.interviewRate')}</Paragraph>
+                  <Paragraph className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.intv')}</Paragraph>
                 </div>
                 <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
                 <div className="text-center shrink-0 snap-center">
-                  <p className="text-md md:text-lg font-bold text-white">{analytics.offerRate.toFixed(0)}%</p>
-                  <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.offerRate')}</p>
-                  <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.offer')}</p>
+                  <Paragraph className="text-md md:text-lg font-bold text-white">{analytics.offerRate.toFixed(0)}%</Paragraph>
+                  <Paragraph className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.offerRate')}</Paragraph>
+                  <Paragraph className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.offer')}</Paragraph>
                 </div>
                 {analytics.avgDaysToInterview !== null && (
                   <>
                     <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
                     <div className="text-center shrink-0 snap-center">
-                      <p className="text-md md:text-lg font-bold text-white">{analytics.avgDaysToInterview}d</p>
-                      <p className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.avgToInterview')}</p>
-                      <p className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.avg')}</p>
+                      <Paragraph className="text-md md:text-lg font-bold text-white">{analytics.avgDaysToInterview}d</Paragraph>
+                      <Paragraph className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.avgToInterview')}</Paragraph>
+                      <Paragraph className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.avg')}</Paragraph>
                     </div>
                   </>
                 )}
@@ -447,7 +448,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   <div className="flex-1 min-w-[200px] shrink-0 ml-auto snap-center">
                     <div className="space-y-1">
                       {analytics.insights.slice(0, 2).map((insight, i) => (
-                        <p key={i} className="text-xs text-amber-400 truncate">{insight}</p>
+                        <Paragraph key={i} className="text-xs text-amber-400 truncate">{insight}</Paragraph>
                       ))}
                     </div>
                   </div>
@@ -460,7 +461,7 @@ export default function CareerClient({ initialApplications }: Props) {
             <button
               onClick={() => setMainTab('applications')}
               title={t('career_page.tabs.all').replace('All', 'Applications').replace('Semua', 'Lamaran')}
-              className={`flex items-center gap-1.5 px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+              className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                 mainTab === 'applications'
                   ? 'bg-warm-gold text-warm-black shadow-md'
                   : 'text-gray-light hover:text-soft-cream'
@@ -472,7 +473,7 @@ export default function CareerClient({ initialApplications }: Props) {
             <button
               onClick={() => setMainTab('journal')}
               title={t('career_page.interview_journal.tab')}
-              className={`flex items-center gap-1.5 px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+              className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                 mainTab === 'journal'
                   ? 'bg-warm-gold text-warm-black shadow-md'
                   : 'text-gray-light hover:text-soft-cream'
@@ -484,7 +485,7 @@ export default function CareerClient({ initialApplications }: Props) {
             <button
               onClick={() => setMainTab('ats_matcher')}
               title={t('career_page.ats_matcher.title')}
-              className={`flex items-center gap-1.5 px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+              className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                 mainTab === 'ats_matcher'
                   ? 'bg-warm-gold text-warm-black shadow-md'
                   : 'text-gray-light hover:text-soft-cream'
@@ -507,7 +508,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   role="tab"
                   aria-selected={activeFilter === tab.id}
                   title={t(`career_page.tabs.${tab.labelKey}`)}
-                  className={`flex items-center gap-1.5 px-xl py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                  className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                     activeFilter === tab.id
                       ? 'bg-warm-gold text-warm-black shadow-md'
                       : 'text-gray-light hover:text-soft-cream'
@@ -521,16 +522,16 @@ export default function CareerClient({ initialApplications }: Props) {
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center py-2xl"><Loading /></div>
+            <div className="flex justify-center py-12"><Loading /></div>
           ) : filteredApps.length === 0 ? (
-            <div className="glass-card p-4xl text-center space-y-md">
+            <div className="glass-card p-24 text-center space-y-4">
               <Briefcase size={48} className="mx-auto text-deep-sage opacity-20" />
-              <p className="text-gray-light font-light italic">
+              <Paragraph className="text-gray-light font-light italic">
                 {activeFilter === 'all' ? t('career_page.empty_all') : t('career_page.empty_filter').replace('{filter}', t(`career_page.tabs.${activeFilter}`))}
-              </p>
+              </Paragraph>
             </div>
           ) : (
-            <div className="space-y-md">
+            <div className="space-y-4">
               {filteredApps.map((app) => {
                 const status = STATUS_CONFIG[app.status];
                 const type = TYPE_CONFIG[app.application_type];
@@ -539,12 +540,12 @@ export default function CareerClient({ initialApplications }: Props) {
                 return (
                   <div
                     key={app.id}
-                    className="glass-card p-xl flex flex-col sm:flex-row sm:items-center gap-lg group transition-all hover:border-black/10 dark:border-white/10"
+                    className="glass-card p-8 flex flex-col sm:flex-row sm:items-center gap-6 group transition-all hover:border-black/10 dark:border-white/10"
                     role="article"
                     aria-label={`${app.company_name} — ${app.role_title}`}
                   >
-                    <div className="flex-1 min-w-0 space-y-sm">
-                      <div className="flex flex-wrap items-center gap-sm">
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <Badge
                           variant={status.badgeVariant}
                           aria-label={`Status: ${status.label}`}
@@ -562,11 +563,11 @@ export default function CareerClient({ initialApplications }: Props) {
                       </div>
 
                       <div>
-                        <h3 className="text-lg font-bold text-soft-cream">{app.company_name}</h3>
-                        <p className="text-sm text-gray-light">{app.role_title}</p>
+                        <Heading as="h3" size="h3" className="text-lg font-bold text-soft-cream">{app.company_name}</Heading>
+                        <Paragraph className="text-sm text-gray-light">{app.role_title}</Paragraph>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-md text-[10px] text-gray-light opacity-80">
+                      <div className="flex flex-wrap items-center gap-4 text-[10px] text-gray-light opacity-80">
                         <span className="flex items-center gap-1">
                           <Calendar size={10} />
                           {t('career_page.applied_on')} {new Date(app.applied_date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
@@ -592,13 +593,13 @@ export default function CareerClient({ initialApplications }: Props) {
                       </div>
 
                       {app.notes && (
-                        <p className="text-xs text-gray-light italic line-clamp-1 opacity-80">
+                        <Paragraph className="text-xs text-gray-light italic line-clamp-1 opacity-80">
                           {app.notes}
-                        </p>
+                        </Paragraph>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
+                    <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
                       {app.url && (
                         <a
                           href={app.url}
@@ -612,7 +613,7 @@ export default function CareerClient({ initialApplications }: Props) {
                       )}
                       <button
                         onClick={() => openEditModal(app)}
-                        className="px-md py-3 min-h-[44px] flex items-center justify-center text-xs font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 rounded-md transition-all"
+                        className="px-4 py-3 min-h-[44px] flex items-center justify-center text-xs font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 rounded-md transition-all"
                         aria-label={`Edit ${app.company_name} application`}
                       >
                         {t('career_page.edit')}
@@ -634,16 +635,16 @@ export default function CareerClient({ initialApplications }: Props) {
           ) : mainTab === 'journal' ? (
           <>
             {journalLoading ? (
-              <div className="flex justify-center py-2xl"><Loading /></div>
+              <div className="flex justify-center py-12"><Loading /></div>
             ) : journals.length === 0 ? (
-              <div className="glass-card p-4xl text-center space-y-md">
+              <div className="glass-card p-24 text-center space-y-4">
                 <BookOpen size={48} className="mx-auto text-deep-sage opacity-20" />
-                <p className="text-gray-light font-light italic">
+                <Paragraph className="text-gray-light font-light italic">
                   {(t('career_page.interview_journal.empty') as string) || 'No interview notes yet.'}
-                </p>
+                </Paragraph>
               </div>
             ) : (
-              <div className="space-y-md">
+              <div className="space-y-4">
                 {journals.map((journal: any) => {
                   const difficultyColor = 
                     journal.difficulty === 'hard' ? 'text-expense' : 
@@ -652,13 +653,13 @@ export default function CareerClient({ initialApplications }: Props) {
                   return (
                     <div
                       key={journal.id}
-                      className="glass-card p-xl flex flex-col gap-md group transition-all hover:border-black/10 dark:border-white/10"
+                      className="glass-card p-8 flex flex-col gap-4 group transition-all hover:border-black/10 dark:border-white/10"
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="text-lg font-bold text-soft-cream">{journal.company_name}</h3>
-                          <p className="text-sm text-gray-light">{journal.role_title}</p>
-                          <div className="flex flex-wrap items-center gap-md text-[10px] text-gray-light opacity-80 mt-1">
+                          <Heading as="h3" size="h3" className="text-lg font-bold text-soft-cream">{journal.company_name}</Heading>
+                          <Paragraph className="text-sm text-gray-light">{journal.role_title}</Paragraph>
+                          <div className="flex flex-wrap items-center gap-4 text-[10px] text-gray-light opacity-80 mt-1">
                             <span className="flex items-center gap-1">
                               <Calendar size={10} />
                               {new Date(journal.interview_date).toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })}
@@ -676,10 +677,10 @@ export default function CareerClient({ initialApplications }: Props) {
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => openEditJournalModal(journal)}
-                            className="px-md py-2 flex items-center justify-center text-xs font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 rounded-md transition-all"
+                            className="px-4 py-2 flex items-center justify-center text-xs font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 rounded-md transition-all"
                             aria-label={`Edit journal entry`}
                           >
                             {t('career_page.edit')}
@@ -695,30 +696,30 @@ export default function CareerClient({ initialApplications }: Props) {
                       </div>
 
                       {journal.questions_asked && (
-                        <div className="bg-black/5 dark:bg-white/5 p-md rounded-md">
-                          <p className="text-[10px] font-bold text-gray-light mb-1 flex items-center gap-1">
+                        <div className="bg-black/5 dark:bg-white/5 p-4 rounded-md">
+                          <Paragraph className="text-[10px] font-bold text-gray-light mb-1 flex items-center gap-1">
                             <MessageSquare size={10} />
                             {(t('career_page.interview_journal.questions') as string) || 'Questions Asked'}
-                          </p>
-                          <p className="text-sm text-soft-cream whitespace-pre-wrap font-light">{journal.questions_asked}</p>
+                          </Paragraph>
+                          <Paragraph className="text-sm text-soft-cream whitespace-pre-wrap font-light">{journal.questions_asked}</Paragraph>
                         </div>
                       )}
 
                       {journal.lessons_learned && (
-                        <div className="bg-primary/5 p-md rounded-md border border-primary/10">
-                          <p className="text-[10px] font-bold text-primary mb-1 flex items-center gap-1">
+                        <div className="bg-primary/5 p-4 rounded-md border border-primary/10">
+                          <Paragraph className="text-[10px] font-bold text-primary mb-1 flex items-center gap-1">
                             <Star size={10} />
                             {(t('career_page.interview_journal.lessons') as string) || 'Lessons Learned'}
-                          </p>
-                          <p className="text-sm text-soft-cream whitespace-pre-wrap font-light">{journal.lessons_learned}</p>
+                          </Paragraph>
+                          <Paragraph className="text-sm text-soft-cream whitespace-pre-wrap font-light">{journal.lessons_learned}</Paragraph>
                         </div>
                       )}
                       
                       {journal.notes && (
                         <div>
-                          <p className="text-xs text-gray-light italic opacity-80 whitespace-pre-wrap">
+                          <Paragraph className="text-xs text-gray-light italic opacity-80 whitespace-pre-wrap">
                             {journal.notes}
-                          </p>
+                          </Paragraph>
                         </div>
                       )}
                     </div>
@@ -750,7 +751,7 @@ export default function CareerClient({ initialApplications }: Props) {
           title={editingApp ? (t('career_page.edit_app') as string) : (t('career_page.new_app') as string)}
           maxWidth="2xl"
           footer={
-            <div className="flex gap-md justify-end">
+            <div className="flex gap-4 justify-end">
               <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)}>{t('investment_page.cancel_upper')}</Button>
               <Button variant="primary" size="md" onClick={handleSave} disabled={isSaving}>
                 {isSaving ? t('investment_page.saving_upper') : (t('career_page.save_btn') as string)}
@@ -758,8 +759,8 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
           }
         >
-          <div className="space-y-md">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <CreatableAutocomplete
                 label={t('career_page.form.company')}
                 placeholder={t('career_page.form.company_placeholder')}
@@ -782,7 +783,7 @@ export default function CareerClient({ initialApplications }: Props) {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Select
                 id="modal-type"
                 label={t('career_page.form.type')}
@@ -825,8 +826,8 @@ export default function CareerClient({ initialApplications }: Props) {
               />
             </div>
 
-            <div className="space-y-sm">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+            <div className="space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <DatePicker
                   id="modal-applied"
                   label={t('career_page.form.applied_date')}
@@ -862,7 +863,7 @@ export default function CareerClient({ initialApplications }: Props) {
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <Input
                 label={`${t('career_page.form.location')} (${t('common.optional')})`}
                 placeholder={t('career_page.form.location_placeholder')}
@@ -986,7 +987,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 placeholder={t('career_page.form.notes_placeholder')}
                 rows={3}
                 aria-label="Notes"
-                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
               />
             </div>
           </div>
@@ -1011,7 +1012,7 @@ export default function CareerClient({ initialApplications }: Props) {
           title={(t('career_page.interview_journal.new_entry_modal') as string) || 'Interview Journal'}
           maxWidth="2xl"
           footer={
-            <div className="flex gap-md justify-end">
+            <div className="flex gap-4 justify-end">
               <Button variant="ghost" size="md" onClick={() => setIsJournalModalOpen(false)}>{t('investment_page.cancel_upper')}</Button>
               <Button variant="primary" size="md" onClick={handleSaveJournal} disabled={isSaving}>
                 {isSaving ? t('investment_page.saving_upper') : ((t('career_page.interview_journal.save') as string) || 'Save')}
@@ -1019,8 +1020,8 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
           }
         >
-          <div className="space-y-md">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <CreatableAutocomplete
                 label={(t('career_page.interview_journal.company') as string) || 'Company'}
                 value={journalForm.company_name}
@@ -1038,7 +1039,7 @@ export default function CareerClient({ initialApplications }: Props) {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <DatePicker
                 label={(t('career_page.interview_journal.date') as string) || 'Interview Date'}
                 value={journalForm.interview_date}
@@ -1077,7 +1078,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 onChange={(e) => setJournalForm((f: any) => ({ ...f, questions_asked: e.target.value }))}
                 placeholder={(t('career_page.interview_journal.questions_placeholder') as string) || 'What did they ask?'}
                 rows={4}
-                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
               />
             </div>
 
@@ -1090,7 +1091,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 onChange={(e) => setJournalForm((f: any) => ({ ...f, lessons_learned: e.target.value }))}
                 placeholder={(t('career_page.interview_journal.lessons_placeholder') as string) || 'What would you do differently?'}
                 rows={3}
-                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
               />
             </div>
 
@@ -1103,7 +1104,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 onChange={(e) => setJournalForm((f: any) => ({ ...f, notes: e.target.value }))}
                 placeholder={(t('career_page.interview_journal.notes_placeholder') as string) || 'Additional context...'}
                 rows={2}
-                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
               />
             </div>
           </div>

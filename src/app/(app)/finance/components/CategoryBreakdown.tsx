@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { Card } from '@/components';
 import { formatCurrency } from '@/libs/format';
 import type { Transaction, CategoryJoin } from '@/types/database';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 function resolveCategory(
   categories: CategoryJoin | CategoryJoin[] | null | undefined
@@ -46,16 +47,16 @@ export function CategoryBreakdown({ transactions, currency, locale }: Props) {
   if (breakdown.length === 0) return null;
 
   return (
-    <Card className="p-md md:p-lg">
-      <h3 className="text-[10px] md:text-xs font-bold text-gray-light tracking-widest uppercase mb-md">
+    <Card className="p-4 md:p-6">
+      <Heading as="h3" size="h3" className="text-[10px] md:text-xs font-bold text-gray-light tracking-widest uppercase mb-4">
         Pengeluaran per Kategori
-      </h3>
-      <div className="space-y-md">
+      </Heading>
+      <div className="space-y-4">
         {breakdown.map((item) => (
-          <div key={item.name} className="space-y-xs">
-            <div className="flex items-center justify-between text-xs gap-sm">
+          <div key={item.name} className="space-y-1">
+            <div className="flex items-center justify-between text-xs gap-2">
               <span className="text-soft-cream font-medium truncate">{item.name}</span>
-              <div className="flex items-center gap-sm shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
                 <span className="text-gray-light hidden sm:block">
                   {formatCurrency(item.amount, currency, locale)}
                 </span>

@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { Card } from '@/components';
+import { Heading, Paragraph } from '@/components/ui/typography';
 import { Transaction } from '@/services/supabase/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -106,18 +107,18 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
   };
 
   return (
-    <Card className="p-md md:p-xl bg-black/[0.03] dark:bg-black/40 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group h-full">
-      <div className="flex justify-between items-start mb-md">
+    <Card className="p-4 md:p-8 bg-black/[0.03] dark:bg-black/40 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group h-full">
+      <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="font-sans font-medium text-md md:text-lg text-soft-cream">{t('dashboard.spending_breakdown')}</h3>
-          <p className="text-[10px] md:text-micro text-gray-light mt-1">{t('dashboard.percentage_based')}</p>
+          <Heading as="h3" size="h6" className="text-soft-cream">{t('dashboard.spending_breakdown')}</Heading>
+          <Paragraph className="text-[10px] md:text-micro text-gray-light mt-1">{t('dashboard.percentage_based')}</Paragraph>
         </div>
       </div>
 
       {!isMounted ? (
         <div className="w-full h-48 bg-white/[0.02] rounded-lg animate-pulse" />
       ) : chartData.data.length > 0 ? (
-        <div className="flex flex-col md:flex-row items-center gap-xl h-[200px] md:h-[240px]">
+        <div className="flex flex-col md:flex-row items-center gap-8 h-[200px] md:h-[240px]">
           <div className="w-[45%] md:w-[40%] h-full relative shrink-0">
             <Doughnut data={doughnutData} options={options} />
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
@@ -128,10 +129,10 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
             </div>
           </div>
           <div className="flex-1 h-full overflow-y-auto pr-2 custom-scrollbar">
-            <div className="space-y-sm">
+            <div className="space-y-2">
               {chartData.data.map((item, i) => (
                 <div key={i} className="flex justify-between items-center text-sm">
-                  <div className="flex items-center gap-xs truncate pr-2">
+                  <div className="flex items-center gap-1 truncate pr-2">
                     <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
                     <span className="text-gray-light truncate">{item.name}</span>
                   </div>

@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components';
+import { Heading, Paragraph } from '@/components/ui/typography';
 import { ArrowRight, CalendarBlank, Clock, CheckCircle } from '@phosphor-icons/react';
 import { Reminder } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -33,12 +34,12 @@ export const UpNextCard: React.FC<UpNextCardProps> = ({ reminders, isLoading }) 
   }, [reminders]);
 
   return (
-    <Card className="p-md md:p-lg bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
-      <div className="flex items-center justify-between mb-md pb-xs border-b border-black/[0.05] dark:border-white/[0.05]">
+    <Card className="p-4 md:p-6 bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
+      <div className="flex items-center justify-between mb-4 pb-1 border-b border-black/[0.05] dark:border-white/[0.05]">
         <div className="flex items-center gap-2">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-soft-cream">
+          <Heading as="h2" size="h6" className="uppercase tracking-widest text-soft-cream">
             {t('dashboard.up_next')}
-          </h2>
+          </Heading>
         </div>
         <Link
           href="/reminders"
@@ -56,9 +57,9 @@ export const UpNextCard: React.FC<UpNextCardProps> = ({ reminders, isLoading }) 
         </div>
       ) : activeReminders.length === 0 ? (
         <div className="py-4 text-center">
-          <p className="text-xs text-gray-light italic opacity-75">
+          <Paragraph className="text-xs text-gray-light italic opacity-75">
             {t('dashboard.up_next_empty')}
-          </p>
+          </Paragraph>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
@@ -71,13 +72,13 @@ export const UpNextCard: React.FC<UpNextCardProps> = ({ reminders, isLoading }) 
                 {reminder.due_time || t('dashboard.today')}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-soft-cream truncate" title={reminder.title}>
+                <Paragraph className="text-xs font-semibold text-soft-cream truncate" title={reminder.title}>
                   {reminder.title}
-                </p>
+                </Paragraph>
                 {reminder.description && (
-                  <p className="text-[10px] text-gray-light truncate opacity-70">
+                  <Paragraph className="text-[10px] text-gray-light truncate opacity-70">
                     {reminder.description}
-                  </p>
+                  </Paragraph>
                 )}
               </div>
               {reminder.priority === 'high' && (

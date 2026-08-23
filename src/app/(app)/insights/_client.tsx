@@ -16,6 +16,7 @@ import { Sparkle } from '@phosphor-icons/react';
 import { formatDate } from '@/libs/format';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 export function InsightsClient() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -313,20 +314,20 @@ User Context Profile (TRASON Unified Life OS):
 
   return (
     <Layout>
-      <div className="space-y-xl animate-fade-in">
+      <div className="space-y-8 animate-fade-in">
         <div className="flex items-start justify-between">
-          <div className="space-y-sm">
-            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('insights_page.title')}</h1>
-            <p className="text-subtext flex items-center gap-sm">
+          <div className="space-y-2">
+            <Heading as="h1" size="h1" className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('insights_page.title')}</Heading>
+            <Paragraph className="text-subtext flex items-center gap-2">
               {t('insights_page.desc')}
-            </p>
+            </Paragraph>
           </div>
-          <div className="hidden md:flex items-center gap-sm">
+          <div className="hidden md:flex items-center gap-2">
             {dbInsights.length > 0 && (
               <button 
                 onClick={handleResetAll}
                 disabled={isResetting || isGenerating}
-                className="px-md py-md bg-white/5 hover:bg-danger/10 text-gray-light hover:text-danger border border-white/10 hover:border-danger/30 font-bold rounded-lg flex items-center gap-sm disabled:opacity-50 transition-all text-xs"
+                className="px-4 py-4 bg-white/5 hover:bg-danger/10 text-gray-light hover:text-danger border border-white/10 hover:border-danger/30 font-bold rounded-lg flex items-center gap-2 disabled:opacity-50 transition-all text-xs"
               >
                 <ArrowCounterClockwise size={16} />
                 <span>{isResetting ? t('insights_page.resetting') : t('insights_page.reset_insights')}</span>
@@ -335,7 +336,7 @@ User Context Profile (TRASON Unified Life OS):
             <button 
               onClick={handleGenerateAI}
               disabled={isGenerating || isResetting}
-              className="px-lg py-md bg-primary text-black font-bold rounded-lg flex items-center gap-sm hover:opacity-90 disabled:opacity-50 transition-all"
+              className="px-6 py-4 bg-primary text-black font-bold rounded-lg flex items-center gap-2 hover:opacity-90 disabled:opacity-50 transition-all"
             >
               {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkle size={16} /> {t('insights_page.ask_ai')}</>}
             </button>
@@ -344,26 +345,26 @@ User Context Profile (TRASON Unified Life OS):
 
         {/* Error banner jika AI gagal */}
         {aiError && (
-          <div className="flex items-center gap-md p-md rounded-md bg-danger/10 border border-danger/20">
+          <div className="flex items-center gap-4 p-4 rounded-md bg-danger/10 border border-danger/20">
             <Zap size={16} className="text-danger shrink-0" />
-            <p className="text-xs text-danger">{aiError}</p>
+            <Paragraph className="text-xs text-danger">{aiError}</Paragraph>
             <button onClick={() => setAiError(null)} className="ml-auto text-danger/60 hover:text-danger text-lg leading-none">&times;</button>
           </div>
         )}
 
         {isFetching ? (
-          <div className="flex justify-center py-2xl"><Loading /></div>
+          <div className="flex justify-center py-12"><Loading /></div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-lg" style={{ minHeight: '200px' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ minHeight: '200px' }}>
             {insights.length > 0 ? (
               insights.map((insight) => (
                 <Card 
                   key={insight.id} 
-                  className="p-xl relative overflow-hidden group hover:scale-[1.01] transition-transform"
+                  className="p-8 relative overflow-hidden group hover:scale-[1.01] transition-transform"
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full" />
                   
-                  <div className="flex items-start gap-xl relative z-10">
+                  <div className="flex items-start gap-8 relative z-10">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
                       insight.type === 'finance' || insight.type === 'investment' ? 'bg-success/10 text-success' : 
                       insight.type === 'productivity' || insight.type === 'career' ? 'bg-secondary/10 text-secondary' : 
@@ -374,20 +375,20 @@ User Context Profile (TRASON Unified Life OS):
                        <Lightbulb size={24} />}
                     </div>
                     
-                    <div className="space-y-md flex-1 min-w-0">
+                    <div className="space-y-4 flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-md">
+                        <div className="flex items-center gap-4">
                           <Badge variant={insight.type === 'finance' || insight.type === 'investment' ? 'success' : insight.type === 'productivity' || insight.type === 'career' ? 'insight' : 'activity'} size="sm">
                             {insight.type.toUpperCase()}
                           </Badge>
-                          <span className="text-[10px] font-bold text-gray-light uppercase tracking-widest flex items-center gap-sm">
+                          <span className="text-[10px] font-bold text-gray-light uppercase tracking-widest flex items-center gap-2">
                             <Calendar size={10} /> {formatDate(insight.date)}
                           </span>
                         </div>
                         {insight.id && !insight.id.startsWith('live-') && (
                           <button
                             onClick={(e) => handleDeleteInsight(insight.id, e)}
-                            className="p-sm text-gray-light hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
+                            className="p-2 text-gray-light hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
                             title={t('insights_page.delete_insight')}
                           >
                             <Trash2 size={16} />
@@ -395,19 +396,19 @@ User Context Profile (TRASON Unified Life OS):
                         )}
                       </div>
                       
-                      <h3 className="text-xl font-bold text-soft-cream leading-tight truncate">
+                      <Heading as="h3" size="h3" className="text-xl font-bold text-soft-cream leading-tight truncate">
                         {insight.title}
-                      </h3>
+                      </Heading>
                       
-                      <p className="text-sm text-gray-light leading-relaxed whitespace-pre-wrap break-words">
+                      <Paragraph className="text-sm text-gray-light leading-relaxed whitespace-pre-wrap break-words">
                         {insight.description}
-                      </p>
+                      </Paragraph>
                       
                       {insight.content && (
-                         <div className="p-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-md mt-md">
-                            <p className="text-xs text-soft-cream opacity-90 group-hover:opacity-100 transition-opacity whitespace-pre-wrap break-words">
+                         <div className="p-6 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-md mt-4">
+                            <Paragraph className="text-xs text-soft-cream opacity-90 group-hover:opacity-100 transition-opacity whitespace-pre-wrap break-words">
                                {insight.content}
-                            </p>
+                            </Paragraph>
                          </div>
                       )}
                     </div>
@@ -417,39 +418,39 @@ User Context Profile (TRASON Unified Life OS):
             ) : (
               // Empty state with some placeholder premium cards
               <>
-                <Card className="p-xl flex flex-col justify-center items-center text-center space-y-md opacity-60">
+                <Card className="p-8 flex flex-col justify-center items-center text-center space-y-4 opacity-60">
                   <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center text-gray-light">
                     <Stack size={32} />
                   </div>
-                  <h3 className="text-lg font-bold">{t('insights_page.no_insights_title')}</h3>
-                  <p className="text-xs text-gray-light max-w-xs">
+                  <Heading as="h3" size="h3" className="text-lg font-bold">{t('insights_page.no_insights_title')}</Heading>
+                  <Paragraph className="text-xs text-gray-light max-w-xs">
                     {t('insights_page.no_insights_desc')}
-                  </p>
+                  </Paragraph>
                 </Card>
                 
-                <Card className="p-xl border-dashed border-black/10 dark:border-white/10 bg-transparent flex flex-col justify-center items-center text-center space-y-md opacity-40">
+                <Card className="p-8 border-dashed border-black/10 dark:border-white/10 bg-transparent flex flex-col justify-center items-center text-center space-y-4 opacity-40">
                   <div className="w-12 h-12 border border-black/10 dark:border-white/10 rounded-full flex items-center justify-center">
                     <Target size={20} />
                   </div>
-                  <p className="text-[10px] font-bold tracking-[0.2em] uppercase">{t('insights_page.system_idle')}</p>
+                  <Paragraph className="text-[10px] font-bold tracking-[0.2em] uppercase">{t('insights_page.system_idle')}</Paragraph>
                 </Card>
               </>
             )}
           </div>
         )}
 
-        <div className="pt-xl">
-           <Card className="p-xl glass overflow-hidden relative">
+        <div className="pt-8">
+           <Card className="p-8 glass overflow-hidden relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent pointer-events-none" />
-              <div className="flex items-center gap-xl relative z-10">
-                 <div className="p-md bg-primary/20 rounded-full animate-pulse">
+              <div className="flex items-center gap-8 relative z-10">
+                 <div className="p-4 bg-primary/20 rounded-full animate-pulse">
                     <Lightbulb size={24} className="text-primary" />
                  </div>
                  <div>
-                    <h4 className="text-md font-bold text-white uppercase tracking-wider mb-1">{t('insights_page.architect_perspective_title')}</h4>
-                    <p className="text-sm text-gray-light">
+                    <Heading as="h4" size="h4" className="text-md font-bold text-white uppercase tracking-wider mb-1">{t('insights_page.architect_perspective_title')}</Heading>
+                    <Paragraph className="text-sm text-gray-light">
                       {t('insights_page.architect_perspective_desc')}
-                    </p>
+                    </Paragraph>
                  </div>
               </div>
            </Card>
@@ -471,7 +472,7 @@ User Context Profile (TRASON Unified Life OS):
         <button 
           onClick={handleGenerateAI}
           disabled={isGenerating || isResetting}
-          className="flex-1 py-sm bg-primary text-black font-bold rounded-xl flex items-center justify-center gap-sm shadow-[0_4px_20px_rgba(244,201,93,0.4)] disabled:opacity-50 transition-all"
+          className="flex-1 py-2 bg-primary text-black font-bold rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(244,201,93,0.4)] disabled:opacity-50 transition-all"
         >
           {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><Sparkle size={18} /> <span className="text-sm">{t('insights_page.ask_ai')}</span></>}
         </button>

@@ -18,6 +18,7 @@ import {
   GridNine,
   type Icon,
 } from '@phosphor-icons/react';
+import { Heading, Paragraph } from '@/components/ui/typography';
 import {
   Tab,
   UserData,
@@ -315,13 +316,13 @@ export function SettingsClient() {
     <>
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
       <Layout>
-        <div className="space-y-xl animate-fade-in max-w-4xl">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-md mb-xl">
+        <div className="space-y-8 animate-fade-in max-w-4xl">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-soft-cream">
+              <Heading as="h1" size="h1" className="text-3xl font-bold tracking-tight text-soft-cream">
                 {t('settings.title')}
-              </h1>
-              <p className="text-gray-light mt-1 text-sm">{t('settings.subtitle')}</p>
+              </Heading>
+              <Paragraph className="text-gray-light mt-1 text-sm">{t('settings.subtitle')}</Paragraph>
             </div>
           </div>
 
@@ -334,7 +335,7 @@ export function SettingsClient() {
             />
           )}
 
-          <div className="flex gap-sm overflow-x-auto pb-md no-scrollbar">
+          <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -344,7 +345,7 @@ export function SettingsClient() {
                   onClick={() => setActiveTab(tab.id)}
                   title={tab.label}
                   aria-label={tab.label}
-                  className={`flex items-center justify-center p-md md:px-xl md:py-md gap-md text-[10px] font-bold whitespace-nowrap rounded-md border transition-all shrink-0 ${
+                  className={`flex items-center justify-center p-4 md:px-8 md:py-4 gap-4 text-[10px] font-bold whitespace-nowrap rounded-md border transition-all shrink-0 ${
                     activeTab === tab.id
                       ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20'
                       : 'bg-black/[0.02] dark:bg-white/[0.02] text-gray-light border-black/[0.05] dark:border-white/[0.05] hover:border-black/[0.1] dark:hover:border-white/[0.1] hover:text-soft-cream'

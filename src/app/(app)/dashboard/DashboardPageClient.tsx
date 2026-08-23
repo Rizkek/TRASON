@@ -25,6 +25,7 @@ import { TrasonIcon } from '@/components/ui/TrasonIcon';
 import dynamic from 'next/dynamic';
 import { useFinanceInsights } from '@/hooks/useFinanceInsights';
 import { InsightCard } from '@/components/insights/InsightCard';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 // Components
 import { UpNextCard } from './components/UpNextCard';
@@ -144,14 +145,14 @@ export function DashboardClient() {
 
   return (
     <Layout>
-      <div className="space-y-4 md:space-y-6 animate-fade-in max-w-7xl mx-auto pb-12">
+      <div className="space-y-6 animate-fade-in max-w-6xl mx-auto pb-12">
         {/* 1. Contextual Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pt-1 pb-2">
           <div>
-            <h1 className="text-2xl md:text-3xl font-display font-extrabold tracking-tight text-soft-cream flex flex-wrap items-baseline gap-x-2">
+            <Heading as="h1" size="h2" className="flex flex-wrap items-baseline gap-x-2 text-gray-900 dark:text-soft-cream">
               <span className="opacity-80">{greeting},</span>
               <span>{user?.first_name || user?.name?.split(' ')[0] || 'User'}</span>
-            </h1>
+            </Heading>
             <div className="flex items-center gap-2 text-gray-light/70 text-xs mt-1">
               <span className="uppercase tracking-wider font-medium">{todayDate}</span>
               <span className="w-1 h-1 rounded-full bg-gray-light/40" />
@@ -163,7 +164,7 @@ export function DashboardClient() {
         {/* 1.5 Intelligence Layer / Insights */}
         {dashboardInsights.length > 0 && (
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">Insights</h2>
+            <Heading as="h2" size="h6" className="tracking-wider text-muted-foreground uppercase">Insights</Heading>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {dashboardInsights.map(insight => (
                 <InsightCard key={insight.id} insight={insight} />
@@ -174,20 +175,20 @@ export function DashboardClient() {
 
         {/* 2. Needs Attention (Conditional Alerts) */}
         {isFinanceEnabled && dueSubscriptions.length > 0 && (
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3.5 flex items-start sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-5 flex items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
               <div className="bg-amber-500/20 p-2 rounded-lg text-amber-400 shrink-0">
                 <TrasonIcon icon={Warning} size={18} />
               </div>
               <div>
-                <p className="text-amber-300 text-xs font-bold">
+                <Paragraph className="text-amber-600 dark:text-amber-300 text-xs font-bold">
                   {dueSubscriptions.length === 1
                     ? t('dashboard.subscriptions_due_single')
                     : t('dashboard.subscriptions_due_multiple').replace('{count}', dueSubscriptions.length.toString())}
-                </p>
-                <p className="text-[11px] text-amber-300/80 mt-0.5 truncate max-w-md">
+                </Paragraph>
+                <Paragraph className="text-[11px] text-amber-600/80 dark:text-amber-300/80 mt-0.5 truncate max-w-md">
                   {dueSubscriptions.map(s => s.name).join(', ')}
-                </p>
+                </Paragraph>
               </div>
             </div>
             <Button 

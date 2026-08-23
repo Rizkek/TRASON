@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card } from '@/components';
+import { Heading, Paragraph } from '@/components/ui/typography';
 import { 
   ArrowRight, 
   Wallet, 
@@ -59,9 +60,9 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-xs font-bold uppercase tracking-widest text-gray-light">
+        <Heading as="h2" size="h6" className="uppercase tracking-widest text-gray-light">
           {t('dashboard.current_state')}
-        </h2>
+        </Heading>
       </div>
 
       <div className={`grid ${gridColsClass} gap-3`}>

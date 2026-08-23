@@ -12,6 +12,7 @@ import { formatCurrency, formatNumber, getLocalISODate } from '@/libs/format';
 import { formatSignedCurrency, formatSignedPercent } from '@/services/finance/investmentService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 type AssetType = 'stock' | 'crypto' | 'gold' | 'property' | 'debt' | 'vehicle' | 'other';
 
@@ -221,15 +222,15 @@ export function InvestmentsClient() {
     <>
       {formError && <ErrorAlert error={formError} onDismiss={() => setFormError(null)} />}
       <Layout>
-        <div className="space-y-xl animate-fade-in">
-          <div className="flex items-start justify-between gap-md flex-wrap">
-          <div className="space-y-sm max-w-2xl">
-            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('investment_page.investment_analyst_title')}</h1>
-            <p className="text-subtext flex items-center gap-sm">
+        <div className="space-y-8 animate-fade-in">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="space-y-2 max-w-2xl">
+            <Heading as="h1" size="h1" className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('investment_page.investment_analyst_title')}</Heading>
+            <Paragraph className="text-subtext flex items-center gap-2">
               {t('investment_page.investment_analyst_desc')}
-            </p>
+            </Paragraph>
           </div>
-          <div className="hidden md:flex gap-md">
+          <div className="hidden md:flex gap-4">
             <Button variant="ghost" size="md" onClick={() => refreshPortfolio()} disabled={isRefreshing}>
               <ArrowsClockwise size={16} className={`mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
               {t('investment_page.refresh_prices')}
@@ -247,28 +248,28 @@ export function InvestmentsClient() {
           </Alert>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-md md:gap-lg">
-          <Card className="p-xl bg-gradient-to-br from-black/20 to-black/5 border-primary/20 backdrop-blur-md">
-            <p className="text-micro text-primary/80 uppercase tracking-widest font-semibold mb-sm">{t('dashboard.netWorth.title')}</p>
-            <p className="text-3xl font-sans font-bold tracking-tight tabular-nums text-white">{formatCurrency(summary?.netWorth || 0, currency, locale)}</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          <Card className="p-8 bg-gradient-to-br from-black/20 to-black/5 border-primary/20 backdrop-blur-md">
+            <Paragraph className="text-micro text-primary/80 uppercase tracking-widest font-semibold mb-2">{t('dashboard.netWorth.title')}</Paragraph>
+            <Paragraph className="text-3xl font-sans font-bold tracking-tight tabular-nums text-white">{formatCurrency(summary?.netWorth || 0, currency, locale)}</Paragraph>
           </Card>
-          <Card className="p-xl bg-black/20 border-white/5">
-            <p className="text-micro text-gray-light mb-sm uppercase tracking-widest">{t('dashboard.netWorth.totalAssets')}</p>
-            <p className="text-2xl font-bold tabular-nums text-white">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</p>
-            <p className="text-xs text-gray-light mt-1">{t('investment_page.liquid_property_vehicle')}</p>
+          <Card className="p-8 bg-black/20 border-white/5">
+            <Paragraph className="text-micro text-gray-light mb-2 uppercase tracking-widest">{t('dashboard.netWorth.totalAssets')}</Paragraph>
+            <Paragraph className="text-2xl font-bold tabular-nums text-white">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</Paragraph>
+            <Paragraph className="text-xs text-gray-light mt-1">{t('investment_page.liquid_property_vehicle')}</Paragraph>
           </Card>
-          <Card className="p-xl bg-black/20 border-white/5">
-            <p className="text-micro text-gray-light mb-sm uppercase tracking-widest">{t('dashboard.netWorth.totalLiabilities')}</p>
-            <p className="text-2xl font-bold tabular-nums text-white">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</p>
-            <p className="text-xs text-gray-light mt-1">{t('investment_page.debt_mortgages')}</p>
+          <Card className="p-8 bg-black/20 border-white/5">
+            <Paragraph className="text-micro text-gray-light mb-2 uppercase tracking-widest">{t('dashboard.netWorth.totalLiabilities')}</Paragraph>
+            <Paragraph className="text-2xl font-bold tabular-nums text-white">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</Paragraph>
+            <Paragraph className="text-xs text-gray-light mt-1">{t('investment_page.debt_mortgages')}</Paragraph>
           </Card>
         </div>
 
         <Card className="overflow-hidden">
-          <div className="px-lg py-md border-b border-black/5 dark:border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-md">
+          <div className="px-6 py-4 border-b border-black/5 dark:border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h3 className="text-sm font-bold tracking-tight">{t('investment_page.portfolio_tracker')}</h3>
-              <p className="text-xs text-gray-light mt-1">{t('investment_page.portfolio_tracker_desc')}</p>
+              <Heading as="h3" size="h3" className="text-sm font-bold tracking-tight">{t('investment_page.portfolio_tracker')}</Heading>
+              <Paragraph className="text-xs text-gray-light mt-1">{t('investment_page.portfolio_tracker_desc')}</Paragraph>
             </div>
             
             {/* Tabs */}
@@ -276,7 +277,7 @@ export function InvestmentsClient() {
               <button
                 onClick={() => setActiveTab('financial')}
                 title={t('investment_page.financial_assets')}
-                className={`flex items-center gap-1.5 px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
                   activeTab === 'financial'
                     ? 'bg-primary text-white shadow-md'
                     : 'text-gray-light hover:text-soft-cream'
@@ -288,7 +289,7 @@ export function InvestmentsClient() {
               <button
                 onClick={() => setActiveTab('physical')}
                 title={t('investment_page.physical_assets')}
-                className={`flex items-center gap-1.5 px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
                   activeTab === 'physical'
                     ? 'bg-primary text-white shadow-md'
                     : 'text-gray-light hover:text-soft-cream'
@@ -300,7 +301,7 @@ export function InvestmentsClient() {
               <button
                 onClick={() => setActiveTab('liabilities')}
                 title={t('investment_page.liabilities')}
-                className={`flex items-center gap-1.5 px-xl py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
                   activeTab === 'liabilities'
                     ? 'bg-expense text-white shadow-md'
                     : 'text-gray-light hover:text-soft-cream'
@@ -313,17 +314,17 @@ export function InvestmentsClient() {
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center py-2xl"><Loading /></div>
+            <div className="flex justify-center py-12"><Loading /></div>
           ) : filteredPositions.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-black/5 dark:border-white/5 text-[10px] uppercase tracking-widest text-gray-light">
-                    <th className="px-sm py-sm">{t('investment_page.asset')}</th>
-                    <th className="px-sm py-sm">{t('investment_page.amount')}</th>
-                    <th className="px-sm py-sm">{t('investment_page.avg_cost')}</th>
-                    <th className="px-sm py-sm">{t('investment_page.value')}</th>
-                    <th className="px-sm py-sm text-right">{t('investment_page.actions')}</th>
+                    <th className="px-2 py-2">{t('investment_page.asset')}</th>
+                    <th className="px-2 py-2">{t('investment_page.amount')}</th>
+                    <th className="px-2 py-2">{t('investment_page.avg_cost')}</th>
+                    <th className="px-2 py-2">{t('investment_page.value')}</th>
+                    <th className="px-2 py-2 text-right">{t('investment_page.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -334,10 +335,10 @@ export function InvestmentsClient() {
                       : null;
                     return (
                     <tr key={position.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:bg-white/5 transition-colors">
-                      <td className="px-sm py-md">
+                      <td className="px-2 py-4">
                         <div className="space-y-1">
-                          <div className="flex items-center gap-xs">
-                            <p className="font-bold text-white text-xs">{position.symbol}</p>
+                          <div className="flex items-center gap-1">
+                            <Paragraph className="font-bold text-white text-xs">{position.symbol}</Paragraph>
                             <Badge variant={getAssetBadgeVariant(position.asset_type)} size="sm" className="text-[9px] px-1 py-0">
                               {position.asset_type}
                             </Badge>
@@ -351,22 +352,22 @@ export function InvestmentsClient() {
                               </span>
                             )}
                           </div>
-                          <p className="text-[10px] text-gray-light truncate max-w-[120px]">{position.display_name || t('investment_page.tracked_position')}</p>
+                          <Paragraph className="text-[10px] text-gray-light truncate max-w-[120px]">{position.display_name || t('investment_page.tracked_position')}</Paragraph>
                         </div>
                       </td>
-                      <td className="px-sm py-md text-xs text-soft-cream">{formatNumber(position.amount, 4)}</td>
-                      <td className="px-sm py-md text-xs text-soft-cream">{formatCurrency(position.buy_price, currency, locale)}</td>
-                      <td className="px-sm py-md text-xs font-bold text-white">
+                      <td className="px-2 py-4 text-xs text-soft-cream">{formatNumber(position.amount, 4)}</td>
+                      <td className="px-2 py-4 text-xs text-soft-cream">{formatCurrency(position.buy_price, currency, locale)}</td>
+                      <td className="px-2 py-4 text-xs font-bold text-white">
                         {formatCurrency(position.current_value, currency, locale)}
                       </td>
-                      <td className="px-sm py-md text-right">
+                      <td className="px-2 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Button variant="ghost" size="sm" onClick={() => openEditModal(position)}>
                             {t('investment_page.edit')}
                           </Button>
                           <button
                             onClick={() => setDeleteConfirmId(position.id)}
-                            className="p-xs text-gray-light hover:text-danger hover:bg-danger/10 rounded transition-colors"
+                            className="p-1 text-gray-light hover:text-danger hover:bg-danger/10 rounded transition-colors"
                             aria-label={t('investment_page.delete')}
                           >
                             <Trash2 size={16} />
@@ -380,48 +381,48 @@ export function InvestmentsClient() {
               </table>
             </div>
           ) : (
-            <div className="py-2xl text-center">
-              <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-lg text-primary">
+            <div className="py-12 text-center">
+              <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
                 <Shield size={28} />
               </div>
-              <h3 className="text-lg font-bold text-white">{t('dashboard.start_with_one_position')}</h3>
-              <p className="text-sm text-gray-light max-w-lg mx-auto mt-sm">
+              <Heading as="h3" size="h3" className="text-lg font-bold text-white">{t('dashboard.start_with_one_position')}</Heading>
+              <Paragraph className="text-sm text-gray-light max-w-lg mx-auto mt-2">
                 {t('investment_page.investment_empty_state_desc')}
-              </p>
-              <Button variant="primary" size="md" className="mt-lg" onClick={openNewModal}>{t('investment_page.add_first_position')}</Button>
+              </Paragraph>
+              <Button variant="primary" size="md" className="mt-6" onClick={openNewModal}>{t('investment_page.add_first_position')}</Button>
             </div>
           )}
         </Card>
 
         {calculatedPositions.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
-            <Card className="p-xl">
-              <div className="flex items-center gap-sm mb-md text-secondary">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="p-8">
+              <div className="flex items-center gap-2 mb-4 text-secondary">
                 <Landmark size={16} />
-                <p className="text-micro">{t('investment_page.stocks_upper')}</p>
+                <Paragraph className="text-micro">{t('investment_page.stocks_upper')}</Paragraph>
               </div>
-              <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.stock || 0, currency, locale)}</p>
+              <Paragraph className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.stock || 0, currency, locale)}</Paragraph>
             </Card>
-            <Card className="p-xl">
-              <div className="flex items-center gap-sm mb-md text-primary">
+            <Card className="p-8">
+              <div className="flex items-center gap-2 mb-4 text-primary">
                 <Coins size={16} />
-                <p className="text-micro">{t('investment_page.crypto_upper')}</p>
+                <Paragraph className="text-micro">{t('investment_page.crypto_upper')}</Paragraph>
               </div>
-              <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.crypto || 0, currency, locale)}</p>
+              <Paragraph className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.crypto || 0, currency, locale)}</Paragraph>
             </Card>
-            <Card className="p-xl">
-              <div className="flex items-center gap-sm mb-md text-warning">
+            <Card className="p-8">
+              <div className="flex items-center gap-2 mb-4 text-warning">
                 <Shield size={16} />
-                <p className="text-micro">{t('investment_page.gold_upper')}</p>
+                <Paragraph className="text-micro">{t('investment_page.gold_upper')}</Paragraph>
               </div>
-              <p className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.gold || 0, currency, locale)}</p>
+              <Paragraph className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.gold || 0, currency, locale)}</Paragraph>
             </Card>
           </div>
         )}
       </div>
 
       {/* Mobile-only FAB for Add Position */}
-      <div className="md:hidden fixed bottom-24 right-4 z-40 flex flex-col gap-sm">
+      <div className="md:hidden fixed bottom-24 right-4 z-40 flex flex-col gap-2">
         <Button 
           variant="ghost" 
           onClick={() => refreshPortfolio()} 
@@ -447,7 +448,7 @@ export function InvestmentsClient() {
         onClose={() => setIsModalOpen(false)}
         title={editingPosition ? t('investment_page.edit_position') : t('investment_page.add_position_title')}
         footer={
-          <div className="flex justify-end gap-md">
+          <div className="flex justify-end gap-4">
             <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)} disabled={isSaving}>{t('investment_page.cancel_upper')}</Button>
             <Button variant="primary" size="md" onClick={handleSave} isLoading={isSaving} disabled={isSaving}>
               {isSaving ? t('investment_page.saving_upper') : editingPosition ? t('investment_page.update_position_upper') : t('investment_page.save_position_upper')}
@@ -456,8 +457,8 @@ export function InvestmentsClient() {
         }
 
       >
-        <div className="space-y-lg">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select
               label={t('investment_page.asset_type')}
               value={form.asset_type}
@@ -497,7 +498,7 @@ export function InvestmentsClient() {
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label={t('investment_page.display_name')}
               placeholder="Apple Inc. / Bitcoin / Gold"
@@ -511,7 +512,7 @@ export function InvestmentsClient() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {!['property', 'vehicle', 'debt'].includes(form.asset_type) && (
               <Input
                 label={t('investment_page.amount_upper')}
@@ -556,12 +557,12 @@ export function InvestmentsClient() {
           />
 
           {/* Investment Journal Section */}
-          <div className="pt-sm border-t border-white/5 space-y-md">
+          <div className="pt-2 border-t border-white/5 space-y-4">
             <div>
-              <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase mb-sm block">
+              <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase mb-2 block">
                 {t('investment_page.buy_rationale')}
               </label>
-              <div className="flex flex-wrap gap-xs">
+              <div className="flex flex-wrap gap-1">
                 {[
                   { value: 'long_term', label: 'Long Term' },
                   { value: 'dividend', label: 'Dividend' },
@@ -574,7 +575,7 @@ export function InvestmentsClient() {
                     key={option.value}
                     type="button"
                     onClick={() => setForm((prev) => ({ ...prev, rationale_type: prev.rationale_type === option.value ? '' : option.value as any }))}
-                    className={`px-sm py-xs rounded-full border text-xs transition-colors ${
+                    className={`px-2 py-1 rounded-full border text-xs transition-colors ${
                       form.rationale_type === option.value
                         ? 'bg-primary/20 border-primary text-primary'
                         : 'border-white/10 text-gray-light hover:border-white/30'
@@ -587,14 +588,14 @@ export function InvestmentsClient() {
             </div>
           </div>
 
-          <div className="space-y-sm">
+          <div className="space-y-2">
             <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('investment_page.notes_upper')}</label>
             <textarea
               rows={4}
               value={form.notes}
               onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))}
               placeholder={t('investment_page.notes_placeholder')}
-              className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
           </div>
         </div>

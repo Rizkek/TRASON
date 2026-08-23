@@ -17,6 +17,7 @@ const SportHistoryChart = dynamic(() => import('@/components/modules/Sport/Sport
   loading: () => <div className="h-64 w-full bg-slate-800 animate-pulse rounded-xl" />
 });
 import { useTranslation } from '@/libs/i18n/useTranslation';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 export const SportPageClient: React.FC = () => {
   const { user } = useAuthStore();
@@ -78,14 +79,14 @@ export const SportPageClient: React.FC = () => {
     <>
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
       <Layout>
-        <div className="space-y-xl animate-fade-in pb-2xl">
+        <div className="space-y-8 animate-fade-in pb-12">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-md">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
-              <h1 className="text-4xl font-sans font-bold tracking-tight text-soft-cream mb-2">{t('sport_page.sport_fitness_title')}</h1>
-              <p className="text-gray-light text-sm tracking-wide">
+              <Heading as="h1" size="h1" className="text-4xl font-sans font-bold tracking-tight text-soft-cream mb-2">{t('sport_page.sport_fitness_title')}</Heading>
+              <Paragraph className="text-gray-light text-sm tracking-wide">
                 {t('sport_page.sport_fitness_desc')}
-              </p>
+              </Paragraph>
             </div>
             <div className="hidden md:block">
               <Button
@@ -105,23 +106,23 @@ export const SportPageClient: React.FC = () => {
           ) : (
             <>
               {/* Workout Plans */}
-              <div className="space-y-md">
+              <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-sans font-bold tracking-tight font-bold text-white">{t('sport_page.workout_plans')}</h2>
+                  <Heading as="h2" size="h2" className="text-xl font-sans font-bold tracking-tight font-bold text-white">{t('sport_page.workout_plans')}</Heading>
                   <Button variant="ghost" size="sm" className="text-xs" onClick={() => setIsCreatePlanModalOpen(true)}>
                     <Plus size={14} className="mr-1" /> {t('sport_page.new_plan')}
                   </Button>
                 </div>
 
                 {plans.length === 0 ? (
-                  <div className="text-center p-xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl">
-                    <Dumbbell size={32} className="mx-auto text-gray-light mb-md opacity-50" />
-                    <h4 className="text-white font-bold mb-1">{t('sport_page.no_active_plans')}</h4>
-                    <p className="text-sm text-gray-light mb-md">{t('sport_page.create_workout_desc')}</p>
+                  <div className="text-center p-8 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl">
+                    <Dumbbell size={32} className="mx-auto text-gray-light mb-4 opacity-50" />
+                    <Heading as="h4" size="h4" className="text-white font-bold mb-1">{t('sport_page.no_active_plans')}</Heading>
+                    <Paragraph className="text-sm text-gray-light mb-4">{t('sport_page.create_workout_desc')}</Paragraph>
                     <Button variant="outline" size="sm" onClick={() => setIsCreatePlanModalOpen(true)}>{t('sport_page.create_plan_btn')}</Button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {plans.map((plan) => (
                       <WorkoutPlanCard
                         key={plan.id}
@@ -134,37 +135,37 @@ export const SportPageClient: React.FC = () => {
               </div>
 
               {/* Top Stats Row */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-md">
-                <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-md">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-4">
                   <div className="flex items-center gap-2 text-gray-light mb-2">
                     <Flame size={16} className="text-accent-purple" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">{t('sport_page.this_week')}</span>
                   </div>
-                  <p className="text-2xl font-bold text-white">{stats.thisWeekSessions} <span className="text-sm font-normal text-gray-light">{t('sport_page.sessions_label')}</span></p>
+                  <Paragraph className="text-2xl font-bold text-white">{stats.thisWeekSessions} <span className="text-sm font-normal text-gray-light">{t('sport_page.sessions_label')}</span></Paragraph>
                 </div>
 
-                <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-md">
+                <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-4">
                   <div className="flex items-center gap-2 text-gray-light mb-2">
                     <Timer size={16} className="text-accent-gold" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">{t('sport_page.avg_session')}</span>
                   </div>
-                  <p className="text-2xl font-bold text-white">{stats.avgSessionMinutes} <span className="text-sm font-normal text-gray-light">{t('sport_page.min_label')}</span></p>
+                  <Paragraph className="text-2xl font-bold text-white">{stats.avgSessionMinutes} <span className="text-sm font-normal text-gray-light">{t('sport_page.min_label')}</span></Paragraph>
                 </div>
 
-                <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-md">
+                <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-4">
                   <div className="flex items-center gap-2 text-gray-light mb-2">
                     <Activity size={16} className="text-primary" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">{t('sport_page.total_time')}</span>
                   </div>
-                  <p className="text-2xl font-bold text-white">{Math.floor(stats.totalMinutes / 60)}<span className="text-sm font-normal text-gray-light">{t('sport_page.h_label')}</span> {stats.totalMinutes % 60}<span className="text-sm font-normal text-gray-light">{t('sport_page.m_label')}</span></p>
+                  <Paragraph className="text-2xl font-bold text-white">{Math.floor(stats.totalMinutes / 60)}<span className="text-sm font-normal text-gray-light">{t('sport_page.h_label')}</span> {stats.totalMinutes % 60}<span className="text-sm font-normal text-gray-light">{t('sport_page.m_label')}</span></Paragraph>
                 </div>
 
-                <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-md">
+                <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-4">
                   <div className="flex items-center gap-2 text-gray-light mb-2">
                     <Dumbbell size={16} className="text-secondary" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">{t('sport_page.total_sessions')}</span>
                   </div>
-                  <p className="text-2xl font-bold text-white">{stats.totalSessions}</p>
+                  <Paragraph className="text-2xl font-bold text-white">{stats.totalSessions}</Paragraph>
                 </div>
               </div>
 
@@ -172,24 +173,24 @@ export const SportPageClient: React.FC = () => {
               <SportHistoryChart sessions={sessions} />
 
               {/* PR Board */}
-              <div className="space-y-md">
-                <h2 className="text-xl font-sans font-bold tracking-tight font-bold text-white flex items-center gap-2">
+              <div className="space-y-4">
+                <Heading as="h2" size="h2" className="text-xl font-sans font-bold tracking-tight font-bold text-white flex items-center gap-2">
                   <Flame className="text-accent-gold" size={20} /> {t('sport_page.personal_records')}
-                </h2>
+                </Heading>
                 <PRBoard records={prBoard} />
               </div>
 
               {/* Sessions ClockCounterClockwise List */}
               {sessions.length > 0 && (
-                <div className="space-y-md">
-                  <h2 className="text-xl font-sans font-bold tracking-tight font-bold text-white">{t('sport_page.recent_workouts')}</h2>
-                  <div className="grid grid-cols-1 gap-md">
+                <div className="space-y-4">
+                  <Heading as="h2" size="h2" className="text-xl font-sans font-bold tracking-tight font-bold text-white">{t('sport_page.recent_workouts')}</Heading>
+                  <div className="grid grid-cols-1 gap-4">
                     {sessions.slice((page - 1) * limit, page * limit).map((session) => (
-                      <div key={session.id} className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-lg p-md flex justify-between items-center hover:bg-black/[0.05] dark:bg-white/[0.05] transition-colors">
+                      <div key={session.id} className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-lg p-4 flex justify-between items-center hover:bg-black/[0.05] dark:bg-white/[0.05] transition-colors">
                         <div>
-                          <p className="text-white font-bold">{new Date(session.session_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
-                          <p className="text-xs text-gray-light">{session.duration_minutes} {t('sport_page.minutes_count')} â€¢ {t('sport_page.intensity')}: {session.rating}/5</p>
-                          {session.notes && <p className="text-sm text-gray-very-light mt-1 italic line-clamp-1">{session.notes}</p>}
+                          <Paragraph className="text-white font-bold">{new Date(session.session_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</Paragraph>
+                          <Paragraph className="text-xs text-gray-light">{session.duration_minutes} {t('sport_page.minutes_count')} â€¢ {t('sport_page.intensity')}: {session.rating}/5</Paragraph>
+                          {session.notes && <Paragraph className="text-sm text-gray-very-light mt-1 italic line-clamp-1">{session.notes}</Paragraph>}
                         </div>
                         <div className="text-right">
                           <span className="text-xs font-bold px-2 py-1 bg-black/5 dark:bg-white/5 rounded-md text-gray-light">
@@ -201,10 +202,10 @@ export const SportPageClient: React.FC = () => {
                   </div>
                   {Math.ceil(sessions.length / limit) > 1 && (
                     <div className="flex items-center justify-between mt-4">
-                      <p className="text-xs text-gray-light">
+                      <Paragraph className="text-xs text-gray-light">
                         Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, sessions.length)} of {sessions.length}
-                      </p>
-                      <div className="flex items-center gap-xs">
+                      </Paragraph>
+                      <div className="flex items-center gap-1">
                         <Button 
                           variant="outline" 
                           size="sm" 
@@ -213,7 +214,7 @@ export const SportPageClient: React.FC = () => {
                         >
                           Prev
                         </Button>
-                        <div className="px-sm text-xs font-bold text-soft-cream min-w-[60px] text-center">
+                        <div className="px-2 text-xs font-bold text-soft-cream min-w-[60px] text-center">
                           {page} / {Math.ceil(sessions.length / limit)}
                         </div>
                         <Button 

@@ -57,7 +57,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       title={title}
       baseZIndex={100}
       footer={
-        <div className="flex justify-end gap-md">
+        <div className="flex justify-end gap-4">
           <Button variant="ghost" size="md" onClick={onClose} disabled={isLoading}>
             {cancelText}
           </Button>
@@ -73,11 +73,11 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         </div>
       }
     >
-      <div className="space-y-md">
+      <div className="space-y-4">
         <p className="text-sm text-soft-cream whitespace-pre-wrap break-words">{description}</p>
         
         {requireInput && (
-          <div className="space-y-sm pt-sm">
+          <div className="space-y-2 pt-2">
             <p className="text-xs text-gray-light italic">
               Type <span className="font-bold text-white select-all">{requireInput}</span> below to confirm:
             </p>

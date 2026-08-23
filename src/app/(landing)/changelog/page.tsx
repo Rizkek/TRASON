@@ -3,6 +3,7 @@
 import React from 'react';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 const CHANGES = [
   {
@@ -40,13 +41,13 @@ const CHANGES = [
 
 export default function ChangelogPage() {
   return (
-    <div className="min-h-screen bg-warm-black text-soft-cream font-sans relative overflow-x-hidden">
+    <div className="min-h-screen font-sans relative overflow-x-hidden">
       <LandingNavbar />
       
-      <main className="pt-32 md:pt-48 pb-24 px-lg max-w-3xl mx-auto space-y-16">
-        <div className="space-y-md mb-16">
-           <h1 className="text-5xl md:text-7xl font-display tracking-tight">Changelog</h1>
-           <p className="text-xl text-gray-light/60">New updates and improvements to TRASON.</p>
+      <main className="pt-32 md:pt-48 pb-24 px-6 max-w-3xl mx-auto space-y-16">
+        <div className="space-y-4 mb-16">
+           <Heading as="h1" size="h1" className="text-soft-cream">Changelog</Heading>
+           <Paragraph size="xl" className="text-gray-light/60">New updates and improvements to TRASON.</Paragraph>
         </div>
 
         <div className="space-y-16">
@@ -63,7 +64,7 @@ export default function ChangelogPage() {
                 </div>
                 
                 <div className="flex-1 space-y-4">
-                  <h2 className="text-2xl font-bold text-white">{release.title}</h2>
+                  <Heading as="h2" size="h4" className="text-white">{release.title}</Heading>
                   <ul className="space-y-3">
                     {release.items.map((item, j) => (
                       <li key={j} className="flex gap-3 text-gray-light text-sm">

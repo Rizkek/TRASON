@@ -67,10 +67,10 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     return (
       <div
         ref={ref}
-        className={`border rounded-md p-lg ${style.bg} ${style.border} ${className}`}
+        className={`border rounded-md p-6 ${style.bg} ${style.border} ${className}`}
         {...props}
       >
-        <div className="flex gap-lg">
+        <div className="flex gap-6">
           <div className={`flex-shrink-0 text-lg font-bold ${style.text}`} aria-hidden="true">{style.icon}</div>
           <div className="flex-1">
             {title && <h3 className={`${style.title} text-sm`}>{title}</h3>}

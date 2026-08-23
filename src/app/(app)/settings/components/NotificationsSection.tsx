@@ -5,6 +5,7 @@ import { Card, Button, Select } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { PreferenceData } from './types';
 import { BellRinging, Globe, FloppyDisk as Save } from '@phosphor-icons/react';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface NotificationsSectionProps {
   prefs: PreferenceData;
@@ -23,15 +24,15 @@ export function NotificationsSection({
 
   return (
     <Card className="glass border-none" title={t('settings.alerts.sectionTitle')}>
-      <div className="space-y-xl">
-        <div className="flex items-center justify-between p-lg rounded-md border bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
-          <div className="flex items-center gap-md">
+      <div className="space-y-8">
+        <div className="flex items-center justify-between p-6 rounded-md border bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+          <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
               <BellRinging size={20} className="text-secondary" />
             </div>
             <div>
-              <h4 className="text-sm font-medium text-soft-cream">{t('settings.alerts.push')}</h4>
-              <p className="text-[10px] text-gray-light">{t('settings.alerts.pushDesc')}</p>
+              <Heading as="h4" size="h4" className="text-sm font-medium text-soft-cream">{t('settings.alerts.push')}</Heading>
+              <Paragraph className="text-[10px] text-gray-light">{t('settings.alerts.pushDesc')}</Paragraph>
             </div>
           </div>
           {/* Toggle Switch */}
@@ -58,14 +59,14 @@ export function NotificationsSection({
           </button>
         </div>
 
-        <div className="flex items-center justify-between p-lg rounded-md border bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
-          <div className="flex items-center gap-md">
+        <div className="flex items-center justify-between p-6 rounded-md border bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+          <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
               <Globe size={20} className="text-primary" />
             </div>
             <div>
-              <h4 className="text-sm font-medium text-soft-cream">{t('settings.alerts.email')}</h4>
-              <p className="text-[10px] text-gray-light">{t('settings.alerts.emailDesc')}</p>
+              <Heading as="h4" size="h4" className="text-sm font-medium text-soft-cream">{t('settings.alerts.email')}</Heading>
+              <Paragraph className="text-[10px] text-gray-light">{t('settings.alerts.emailDesc')}</Paragraph>
             </div>
           </div>
           <button
@@ -106,7 +107,7 @@ export function NotificationsSection({
         )}
       </div>
 
-      <div className="flex justify-end mt-xl">
+      <div className="flex justify-end mt-8">
         <Button
           variant="primary"
           size="md"

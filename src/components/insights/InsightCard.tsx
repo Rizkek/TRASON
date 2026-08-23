@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { InsightCandidate } from '@/types/insight';
 import { Card } from '@/components/ui/Card';
 import { Info, ArrowRight, TrendUp, WarningCircle, Sparkle } from '@phosphor-icons/react';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface InsightCardProps {
   insight: InsightCandidate;
@@ -27,13 +28,13 @@ export function InsightCard({ insight, className = '' }: InsightCardProps) {
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
           {renderIcon()}
-          <h3 className="font-semibold text-foreground text-sm tracking-tight">{insight.title}</h3>
+          <Heading as="h3" size="h6" className="text-foreground">{insight.title}</Heading>
         </div>
       </div>
 
-      <p className="text-sm text-muted-foreground leading-relaxed">
+      <Paragraph size="sm" className="text-muted-foreground leading-relaxed">
         {insight.description}
-      </p>
+      </Paragraph>
 
       {insight.evidence && (
         <div className="mt-1">

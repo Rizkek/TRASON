@@ -9,6 +9,7 @@ import { ModuleId } from '@/modules/types';
 import { DEFAULT_MODULE_STATUS, MODULE_METADATA } from '@/modules/registry';
 import { MODULE_ICONS } from './types';
 import { GridNine } from '@phosphor-icons/react';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface ModuleItemProps {
   id: ModuleId;
@@ -69,9 +70,9 @@ export const ModuleItem = React.memo(function ModuleItem({
     })();
 
   return (
-    <div className="space-y-sm">
+    <div className="space-y-2">
       <div
-        className={`flex items-center justify-between p-lg rounded-md border transition-all ${
+        className={`flex items-center justify-between p-6 rounded-md border transition-all ${
           isEnabled && !allSubFeaturesOff
             ? 'bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]'
             : allSubFeaturesOff
@@ -79,7 +80,7 @@ export const ModuleItem = React.memo(function ModuleItem({
             : 'bg-transparent border-black/[0.02] dark:border-white/[0.02] opacity-60'
         }`}
       >
-        <div className="flex items-center gap-md flex-1 min-w-0">
+        <div className="flex items-center gap-4 flex-1 min-w-0">
           <div
             className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
             style={{ backgroundColor: `${metadata.color}15` }}
@@ -87,14 +88,14 @@ export const ModuleItem = React.memo(function ModuleItem({
             <Icon size={20} style={{ color: allSubFeaturesOff ? '#f97316' : metadata.color }} />
           </div>
           <div className="min-w-0">
-            <h4 className="text-sm font-medium text-soft-cream truncate">{t(`nav.${id}`)}</h4>
-            <p className="text-[10px] text-gray-light">
+            <Heading as="h4" size="h4" className="text-sm font-medium text-soft-cream truncate">{t(`nav.${id}`)}</Heading>
+            <Paragraph className="text-[10px] text-gray-light">
               {allSubFeaturesOff ? (
                 <span className="text-orange-400">{t('modules.all_sub_off_warning')}</span>
               ) : (
                 t(`modules.${id}_desc`)
               )}
-            </p>
+            </Paragraph>
           </div>
         </div>
 
@@ -119,10 +120,10 @@ export const ModuleItem = React.memo(function ModuleItem({
 
       {/* Sub-toggles for Timeline and Reminders */}
       {isEnabled && (id === 'timeline' || id === 'reminders') && (
-        <div className="ml-4 pl-3 border-l border-black/10 dark:border-white/10 space-y-sm mt-sm">
+        <div className="ml-4 pl-3 border-l border-black/10 dark:border-white/10 space-y-2 mt-2">
           {id === 'timeline' && (
             <>
-              <div className="flex items-center justify-between gap-md py-sm">
+              <div className="flex items-center justify-between gap-4 py-2">
                 <span className="text-xs text-gray-light flex-1 min-w-0">
                   {t('modules.timeline_weekly_log')}
                 </span>
@@ -143,7 +144,7 @@ export const ModuleItem = React.memo(function ModuleItem({
                   />
                 </button>
               </div>
-              <div className="flex items-center justify-between gap-md py-sm">
+              <div className="flex items-center justify-between gap-4 py-2">
                 <span className="text-xs text-gray-light flex-1 min-w-0">
                   {t('modules.timeline_daily_checklist')}
                 </span>
@@ -167,7 +168,7 @@ export const ModuleItem = React.memo(function ModuleItem({
             </>
           )}
           {id === 'reminders' && (
-            <div className="flex items-center justify-between gap-md py-sm">
+            <div className="flex items-center justify-between gap-4 py-2">
               <span className="text-xs text-gray-light flex-1 min-w-0">
                 {t('modules.reminders_history')}
               </span>
@@ -252,11 +253,11 @@ export function ModulesSection() {
   );
 
   return (
-    <div className="space-y-lg">
+    <div className="space-y-6">
       <Card className="glass border-none" title={t('settings.modules.sectionTitle')}>
-        <p className="text-sm text-gray-light mb-xl">{t('settings.modules.description')}</p>
-        <div className="space-y-xl">
-          <div className="grid gap-md">
+        <Paragraph className="text-sm text-gray-light mb-8">{t('settings.modules.description')}</Paragraph>
+        <div className="space-y-8">
+          <div className="grid gap-4">
             {statuses.map((status) => (
               <ModuleItem
                 key={status.id}
@@ -274,14 +275,14 @@ export function ModulesSection() {
       </Card>
 
       <Card className="glass border-none bg-black/[0.01] dark:bg-white/[0.01]" title="MODULE STATUS">
-        <div className="grid grid-cols-2 gap-md">
-          <div className="p-lg rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05]">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-6 rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05]">
             <div className="text-2xl font-bold text-primary">{enabledCount}</div>
             <div className="text-[10px] text-gray-light tracking-widest">
               {t('modules.enabled_count').toUpperCase()}
             </div>
           </div>
-          <div className="p-lg rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05]">
+          <div className="p-6 rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05]">
             <div className="text-2xl font-bold text-secondary">{disabledCount}</div>
             <div className="text-[10px] text-gray-light tracking-widest">
               {t('modules.disabled_count').toUpperCase()}

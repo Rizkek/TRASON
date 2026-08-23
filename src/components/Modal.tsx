@@ -85,7 +85,7 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Modal Container */}
       <div 
         ref={modalRef}
-        className={`fixed inset-0 flex items-center justify-center p-md pointer-events-none trason-modal z-[${baseZIndex + 10}]`}
+        className={`fixed inset-0 flex items-center justify-center p-4 pointer-events-none trason-modal z-[${baseZIndex + 10}]`}
         style={{ zIndex: baseZIndex + 10 }}
       >
         <div
@@ -97,7 +97,7 @@ export const Modal: React.FC<ModalProps> = ({
           
           {/* Header */}
           {(title || closeButton) && (
-            <div className="flex-none flex items-center justify-between px-xl py-xl border-b border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none flex items-center justify-between px-8 py-8 border-b border-black/[0.05] dark:border-white/[0.05]">
               {title && (
                 <h2 className="text-xl font-bold tracking-tight text-white uppercase italic">
                    {title}
@@ -108,7 +108,7 @@ export const Modal: React.FC<ModalProps> = ({
                   onClick={onClose}
                   title="Close modal"
                   aria-label="Close modal"
-                  className="text-gray-light hover:text-white hover:bg-black/5 dark:bg-white/5 p-sm rounded-md transition-all ml-2"
+                  className="text-gray-light hover:text-white hover:bg-black/5 dark:bg-white/5 p-2 rounded-md transition-all ml-2"
                 >
                   <X size={20} />
                 </button>
@@ -118,7 +118,7 @@ export const Modal: React.FC<ModalProps> = ({
 
           {/* Description */}
           {description && (
-            <div className="px-xl pt-xl">
+            <div className="px-8 pt-8">
               <p className="text-sm text-gray-light italic opacity-80 leading-relaxed">
                 {description}
               </p>
@@ -126,11 +126,11 @@ export const Modal: React.FC<ModalProps> = ({
           )}
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto px-xl py-xl">{children}</div>
+          <div className="flex-1 overflow-y-auto px-8 py-8">{children}</div>
 
           {/* Footer */}
           {footer && (
-            <div className="flex-none px-xl py-xl bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none px-8 py-8 bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
               {footer}
             </div>
           )}

@@ -21,8 +21,8 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
   const { locale } = useUserPreferences();
   if (records.length === 0) {
     return (
-      <Card className="p-xl bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] text-center">
-        <Trophy size={32} className="mx-auto text-gray-light mb-md opacity-50" />
+      <Card className="p-8 bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] text-center">
+        <Trophy size={32} className="mx-auto text-gray-light mb-4 opacity-50" />
         <h4 className="text-white font-bold mb-1">No Personal Records Yet</h4>
         <p className="text-sm text-gray-light">Log your first workout to start tracking your bests.</p>
       </Card>
@@ -30,16 +30,16 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-md">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       {records.map((pr) => (
         <Card 
           key={pr.id} 
-          className="p-lg bg-gradient-to-br from-white/[0.05] to-transparent border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group hover:border-accent-gold/30 transition-colors"
+          className="p-6 bg-gradient-to-br from-white/[0.05] to-transparent border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group hover:border-accent-gold/30 transition-colors"
         >
           {/* Subtle gold glow for PRs */}
           <div className="absolute -right-8 -top-8 w-24 h-24 bg-accent-gold opacity-10 blur-2xl rounded-full pointer-events-none group-hover:opacity-20 transition-opacity" />
           
-          <div className="flex items-center gap-3 mb-md">
+          <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded-full bg-accent-gold/10 text-accent-gold flex items-center justify-center">
               {getSportIcon(pr.sport_type)}
             </div>
@@ -62,7 +62,7 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
             </span>
           </div>
           
-          <div className="mt-sm text-[10px] text-gray-very-light flex items-center justify-between border-t border-black/[0.05] dark:border-white/[0.05] pt-sm">
+          <div className="mt-2 text-[10px] text-gray-very-light flex items-center justify-between border-t border-black/[0.05] dark:border-white/[0.05] pt-2">
             <span>{pr.metric_type}</span>
             <span>{new Date(pr.record_date).toLocaleDateString(locale)}</span>
           </div>

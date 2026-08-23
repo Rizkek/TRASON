@@ -6,6 +6,7 @@ import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Activity } from '@/services/supabase/supabaseClient';
 import { ActivityFormData, CATEGORY_OPTIONS, MOOD_OPTIONS, HOURS, formatHour } from './types';
 import { Repeat, Star, MapPin } from '@phosphor-icons/react';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface ActivityModalProps {
   isOpen: boolean;
@@ -42,7 +43,7 @@ export function ActivityModal({
       onClose={onClose}
       title={editingActivity ? t('timeline_page.edit_log') : t('timeline_page.log_activity_modal')}
       footer={
-        <div className="flex gap-md justify-end">
+        <div className="flex gap-4 justify-end">
           <Button variant="ghost" size="md" onClick={onClose}>
             {t('investment_page.cancel_upper')}
           </Button>
@@ -52,7 +53,7 @@ export function ActivityModal({
         </div>
       }
     >
-      <div className="space-y-xl">
+      <div className="space-y-8">
         {/* Weekly Routine Template selector */}
         <div className="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
@@ -61,9 +62,9 @@ export function ActivityModal({
               <label htmlFor="routine-checkbox" className="text-xs font-bold text-soft-cream cursor-pointer block">
                 Jadwal Rutin Mingguan (Template)
               </label>
-              <p className="text-[10px] text-gray-light">
+              <Paragraph className="text-[10px] text-gray-light">
                 Aktivitas berulang tiap minggu (misal: jam kerja, kuliah, olahraga, standup).
-              </p>
+              </Paragraph>
             </div>
           </div>
           <input
@@ -84,7 +85,7 @@ export function ActivityModal({
           autoFocus
         />
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-md">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="space-y-1.5">
             <Select
               id="form-day"
@@ -130,7 +131,7 @@ export function ActivityModal({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-md">
+        <div className="grid grid-cols-2 gap-4">
           <Select
             id="form-cat"
             label={t('timeline_page.form.category')}
@@ -163,7 +164,7 @@ export function ActivityModal({
           <label className="text-[10px] font-bold text-gray-light mb-2 block">
             {t('timeline_page.form.rating')} <span className="font-normal opacity-70">({t('common.optional')})</span>
           </label>
-          <div className="flex gap-md" role="group" aria-label="Rating">
+          <div className="flex gap-4" role="group" aria-label="Rating">
             {[1, 2, 3, 4, 5].map((s) => (
               <button
                 key={s}
@@ -183,13 +184,13 @@ export function ActivityModal({
         </div>
 
         <div className="relative">
-          <MapPin size={14} className="absolute left-md top-1/2 -translate-y-1/2 text-primary" />
+          <MapPin size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" />
           <input
             placeholder={`${t('timeline_page.form.location')} (${t('common.optional')})`}
             value={form.location}
             onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
             aria-label="Location"
-            className="w-full pl-xl pr-md py-md bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md text-sm focus:border-primary focus:outline-none transition-all"
+            className="w-full pl-8 pr-4 py-4 bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md text-sm focus:border-primary focus:outline-none transition-all"
           />
         </div>
 
@@ -199,7 +200,7 @@ export function ActivityModal({
           placeholder={`${t('timeline_page.form.notes')} (${t('common.optional')})`}
           rows={3}
           aria-label="Notes"
-          className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+          className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
         />
       </div>
     </Modal>

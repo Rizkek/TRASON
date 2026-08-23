@@ -6,6 +6,7 @@ import { useCategory } from '@/hooks/useCategory';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { sanitizeError } from '@/libs/validation';
 import { Wallet, Target } from '@phosphor-icons/react/dist/ssr';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface Props {
   isOpen: boolean;
@@ -98,7 +99,7 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
       onClose={onClose}
       title={t('finance.budget.title')}
       footer={
-        <div className="flex gap-md justify-end w-full">
+        <div className="flex gap-4 justify-end w-full">
           <Button variant="ghost" onClick={onClose} disabled={isSaving}>
             {t('common.cancel')}
           </Button>
@@ -108,20 +109,20 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
         </div>
       }
     >
-      <div className="space-y-xl">
+      <div className="space-y-8">
         <ErrorAlert error={error} onDismiss={() => setError(null)} />
         
         {/* Global Budget */}
-        <div className="space-y-md">
-          <div className="bg-primary/5 p-md rounded-xl border border-primary/10 flex items-start gap-sm">
-            <div className="p-sm bg-primary/10 rounded-lg text-primary shrink-0">
+        <div className="space-y-4">
+          <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 flex items-start gap-2">
+            <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
               <Wallet size={20} />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-soft-cream">{t('finance.budget.globalMonthly')}</h4>
-              <p className="text-xs text-gray-light mt-1">
+              <Heading as="h4" size="h4" className="text-sm font-bold text-soft-cream">{t('finance.budget.globalMonthly')}</Heading>
+              <Paragraph className="text-xs text-gray-light mt-1">
                 {t('finance.budget.global_desc')}
-              </p>
+              </Paragraph>
             </div>
           </div>
           <Input
@@ -136,22 +137,22 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
         <div className="w-full h-px bg-white/10"></div>
 
         {/* Category Budgets */}
-        <div className="space-y-md">
-          <div className="flex items-center gap-sm mb-sm">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-2">
             <Target size={18} className="text-secondary" />
-            <h4 className="text-sm font-bold text-soft-cream">{t('finance.budget.predictiveBlueprint')}</h4>
+            <Heading as="h4" size="h4" className="text-sm font-bold text-soft-cream">{t('finance.budget.predictiveBlueprint')}</Heading>
           </div>
-          <p className="text-xs text-gray-light">
+          <Paragraph className="text-xs text-gray-light">
             {t('finance.budget.category_desc')}
-          </p>
+          </Paragraph>
           
-          <div className="space-y-sm mt-md max-h-[40vh] overflow-y-auto pr-sm custom-scrollbar">
+          <div className="space-y-2 mt-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
             {categories.length === 0 ? (
-              <p className="text-xs text-center text-gray-light py-md">{t('finance.budget.noCategories')}</p>
+              <Paragraph className="text-xs text-center text-gray-light py-4">{t('finance.budget.noCategories')}</Paragraph>
             ) : (
               categories.map(cat => (
-                <div key={cat.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-sm bg-black/[0.02] dark:bg-white/[0.02] p-sm rounded-lg border border-black/5 dark:border-white/5">
-                  <div className="flex items-center gap-sm">
+                <div key={cat.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-black/[0.02] dark:bg-white/[0.02] p-2 rounded-lg border border-black/5 dark:border-white/5">
+                  <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-md bg-gray-strong/40 flex items-center justify-center text-xs text-soft-cream">
                       <CategoryIcon name={cat.icon || 'Box'} />
                     </div>

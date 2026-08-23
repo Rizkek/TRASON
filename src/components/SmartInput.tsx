@@ -122,48 +122,48 @@ export function SmartInput() {
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center pt-[20vh]">
       <div className="bg-gray-strong border border-black/10 dark:border-white/10 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col">
         
-        <form onSubmit={handleSubmit} className="relative flex items-center p-md border-b border-black/10 dark:border-white/10">
-          <Search className="absolute left-lg text-gray-light" size={20} />
+        <form onSubmit={handleSubmit} className="relative flex items-center p-4 border-b border-black/10 dark:border-white/10">
+          <Search className="absolute left-6 text-gray-light" size={20} />
           <input
             ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type 'Spent $15 on lunch' or 'Remind me to run tomorrow'..."
-            className="w-full bg-transparent text-white text-lg pl-3xl pr-xl py-md focus:outline-none placeholder-gray-light/50"
+            className="w-full bg-transparent text-white text-lg pl-16 pr-8 py-4 focus:outline-none placeholder-gray-light/50"
             disabled={isLoading}
           />
           <button 
             type="submit" 
             disabled={isLoading || !input.trim()}
-            className="absolute right-lg text-primary hover:text-white disabled:opacity-50"
+            className="absolute right-6 text-primary hover:text-white disabled:opacity-50"
           >
             {isLoading ? <Loader2 className="animate-spin" size={20} /> : <PaperPlaneRight size={20} />}
           </button>
         </form>
 
         {result && !result.error && (
-          <div className="p-xl bg-black/20">
-            <p className="text-sm text-gray-light mb-md">{result.message}</p>
+          <div className="p-8 bg-black/20">
+            <p className="text-sm text-gray-light mb-4">{result.message}</p>
             
             {result.data && (
-              <div className="bg-black/5 dark:bg-white/5 rounded-lg p-md mb-md font-mono text-xs text-white/80">
+              <div className="bg-black/5 dark:bg-white/5 rounded-lg p-4 mb-4 font-mono text-xs text-white/80">
                 {JSON.stringify(result.data, null, 2)}
               </div>
             )}
 
             {result.confidence > 0.7 && result.action === 'create' && (
-              <div className="flex justify-end gap-md mt-lg">
+              <div className="flex justify-end gap-4 mt-6">
                 <button 
                   onClick={() => setResult(null)} 
-                  className="px-md py-sm text-sm text-gray-light hover:text-white"
+                  className="px-4 py-2 text-sm text-gray-light hover:text-white"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={handleConfirm}
                   disabled={isLoading}
-                  className="px-md py-sm text-sm bg-primary text-black font-bold rounded hover:opacity-90 disabled:opacity-50"
+                  className="px-4 py-2 text-sm bg-primary text-black font-bold rounded hover:opacity-90 disabled:opacity-50"
                 >
                   Confirm & Save
                 </button>
@@ -173,12 +173,12 @@ export function SmartInput() {
         )}
         
         {result?.error && (
-          <div className="p-xl bg-red-500/10 text-red-500 text-sm">
+          <div className="p-8 bg-red-500/10 text-red-500 text-sm">
             {result.error}
           </div>
         )}
         
-        <div className="p-md text-xs text-gray-light/40 flex justify-between bg-black/40">
+        <div className="p-4 text-xs text-gray-light/40 flex justify-between bg-black/40">
           <span>Smart Input Engine (Powered by AI)</span>
           <span>Press ESC to close</span>
         </div>

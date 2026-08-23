@@ -19,7 +19,7 @@ export function FaqItem({ q, a }: FaqItemProps) {
     >
       <button
         type="button"
-        className="w-full text-left px-lg py-md flex justify-between items-center font-bold text-soft-cream/90 hover:text-white transition-colors gap-4"
+        className="w-full text-left px-6 py-4 flex justify-between items-center font-bold text-soft-cream/90 hover:text-white transition-colors gap-4"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >
@@ -38,7 +38,7 @@ export function FaqItem({ q, a }: FaqItemProps) {
         }`}
       >
         <div className="overflow-hidden">
-          <div className="px-lg pb-md text-gray-light leading-relaxed text-sm pt-1 border-t border-white/5">
+          <div className="px-6 pb-4 text-gray-light leading-relaxed text-sm pt-1 border-t border-white/5">
             {a}
           </div>
         </div>

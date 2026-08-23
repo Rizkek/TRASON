@@ -26,7 +26,7 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary opacity-20 blur-[50px] rounded-full pointer-events-none" />
       )}
 
-      <div className="p-xl space-y-lg relative z-10">
+      <div className="p-8 space-y-6 relative z-10">
         <div className="flex justify-between items-start gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -51,15 +51,15 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-md">
-          <div className="bg-black/5 dark:bg-white/5 rounded-md p-md">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-black/5 dark:bg-white/5 rounded-md p-4">
             <div className="flex items-center gap-2 text-gray-light mb-1">
               <Calendar size={14} />
               <span className="text-[10px] uppercase tracking-widest font-bold">Duration</span>
             </div>
             <p className="text-lg font-bold text-white">{plan.duration_weeks} Weeks</p>
           </div>
-          <div className="bg-black/5 dark:bg-white/5 rounded-md p-md">
+          <div className="bg-black/5 dark:bg-white/5 rounded-md p-4">
             <div className="flex items-center gap-2 text-gray-light mb-1">
               <CheckCircle size={14} />
               <span className="text-[10px] uppercase tracking-widest font-bold">Training Days</span>
@@ -68,7 +68,7 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
           </div>
         </div>
 
-        <div className="pt-sm flex items-center justify-between border-t border-black/[0.05] dark:border-white/[0.05]">
+        <div className="pt-2 flex items-center justify-between border-t border-black/[0.05] dark:border-white/[0.05]">
           <div className="flex items-center gap-2">
             {!plan.is_active && onActivate && (
               <Button 

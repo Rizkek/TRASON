@@ -11,6 +11,7 @@ import { ModuleSelectionCard } from './components/ModuleSelectionCard';
 import { Globe, Clock, Wallet, TrendUp as TrendingUp, BellRinging, Briefcase, Heartbeat, Sparkle, CaretRight as ChevronRight, Check, PaintBrush, User as UserIcon } from '@phosphor-icons/react';
 import { supabase } from '@/services/supabase/supabaseClient';
 import { DEFAULT_MODULE_STATUS, getAllModules } from '@/modules/registry';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 const LANGUAGE_OPTIONS = [
   { value: 'en', label: 'English' },
@@ -135,28 +136,28 @@ export function OnboardingClient() {
   }
 
   return (
-    <div className="min-h-screen bg-warm-black flex flex-col items-center justify-center p-md md:p-xl relative overflow-hidden">
+    <div className="min-h-screen bg-warm-black flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden">
       {/* Background Ornaments */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary opacity-5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary opacity-5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="w-full max-w-2xl relative z-10 space-y-lg animate-fade-in">
+      <div className="w-full max-w-2xl relative z-10 space-y-6 animate-fade-in">
         <ErrorAlert error={error} onDismiss={() => setError(null)} />
 
-        <div className="text-center space-y-sm mb-xl">
-          <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-white">
+        <div className="text-center space-y-2 mb-8">
+          <Heading as="h1" size="h1" className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-white">
             {t('onboarding.welcome')}
-          </h1>
-          <p className="text-gray-light text-sm md:text-base max-w-md mx-auto">
+          </Heading>
+          <Paragraph className="text-gray-light text-sm md:text-base max-w-md mx-auto">
             {step === 1 
               ? "Let's set up your persona so TRASON knows what to call you." 
               : step === 2
               ? "Let's personalize your digital space. Start by setting your region and language."
               : "Select the modules you want to activate. You can always change this later in settings."}
-          </p>
+          </Paragraph>
         </div>
 
-        <Card className="glass border-white/5 p-xl md:p-2xl shadow-2xl relative overflow-hidden transition-all duration-500">
+        <Card className="glass border-white/5 p-8 md:p-12 shadow-2xl relative overflow-hidden transition-all duration-500">
           {/* Progress Bar */}
           <div className="absolute top-0 left-0 w-full h-1 bg-black/20">
             <div 
@@ -166,32 +167,32 @@ export function OnboardingClient() {
           </div>
 
           {step === 1 && (
-            <div className="space-y-xl animate-fade-in">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-                <div className="space-y-md">
-                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-sm">
+            <div className="space-y-8 animate-fade-in">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-2">
                     <UserIcon size={14} className="text-primary" /> {t("onboarding.first_name")}
                   </label>
                   <input
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder={t("onboarding.first_name_ph")}
-                    className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-lg text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
+                    className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-6 text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
                   />
                 </div>
-                <div className="space-y-md">
-                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-sm">
+                <div className="space-y-4">
+                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-2">
                     {t("onboarding.last_name")}
                   </label>
                   <input
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder={t("onboarding.last_name_ph")}
-                    className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-lg text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
+                    className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-6 text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
                   />
                 </div>
               </div>
-              <div className="flex justify-end pt-lg border-t border-white/5">
+              <div className="flex justify-end pt-6 border-t border-white/5">
                 <Button 
                   variant="primary" 
                   size="lg" 
@@ -204,8 +205,8 @@ export function OnboardingClient() {
           )}
 
           {step === 2 && (
-            <div className="space-y-xl animate-fade-in">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+            <div className="space-y-8 animate-fade-in">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Select
                   label={t("onboarding.language")}
                   value={language}
@@ -227,17 +228,17 @@ export function OnboardingClient() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-lg pt-4 border-t border-white/5">
-                <div className="space-y-md">
-                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-white/5">
+                <div className="space-y-4">
+                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-2">
                     <Wallet size={14} className="text-warm-gold" /> {t("onboarding.currency")}
                   </label>
-                  <div className="flex flex-wrap gap-sm">
+                  <div className="flex flex-wrap gap-2">
                     {CURRENCY_OPTIONS.map((c) => (
                       <button
                         key={c}
                         onClick={() => setCurrency(c)}
-                        className={`px-lg py-sm rounded-lg border text-sm font-bold transition-all ${
+                        className={`px-6 py-2 rounded-lg border text-sm font-bold transition-all ${
                           currency === c 
                             ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105' 
                             : 'bg-black/10 border-white/5 text-gray-light hover:bg-black/20 hover:border-white/10'
@@ -249,16 +250,16 @@ export function OnboardingClient() {
                   </div>
                 </div>
 
-                <div className="space-y-md">
-                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-sm">
+                <div className="space-y-4">
+                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-2">
                     <PaintBrush size={14} className="text-primary" /> {t("onboarding.theme")}
                   </label>
-                  <div className="flex gap-sm">
+                  <div className="flex gap-2">
                     {['dark', 'light'].map((th) => (
                       <button
                         key={th}
                         onClick={() => setTheme(th as 'dark' | 'light')}
-                        className={`px-lg py-sm rounded-lg border text-sm font-bold uppercase transition-all ${
+                        className={`px-6 py-2 rounded-lg border text-sm font-bold uppercase transition-all ${
                           theme === th 
                             ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105' 
                             : 'bg-black/10 border-white/5 text-gray-light hover:bg-black/20 hover:border-white/10'
@@ -271,7 +272,7 @@ export function OnboardingClient() {
                 </div>
               </div>
 
-              <div className="flex justify-between pt-lg border-t border-white/5">
+              <div className="flex justify-between pt-6 border-t border-white/5">
                 <Button 
                   variant="ghost" 
                   size="lg" 
@@ -289,8 +290,8 @@ export function OnboardingClient() {
           )}
 
           {step === 3 && (
-            <div className="space-y-xl animate-fade-in">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-md max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-8 animate-fade-in">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
                 {getAllModules().map((module) => {
                   const Icon = { Wallet, TrendingUp, Heartbeat, Briefcase, Clock, BellRinging, Sparkle, Dumbbell: Heartbeat, Bell: BellRinging, Lightbulb: Sparkle }[module.icon] || Globe;
                   return (
@@ -308,7 +309,7 @@ export function OnboardingClient() {
                 })}
               </div>
 
-              <div className="flex justify-between items-center pt-lg border-t border-white/5">
+              <div className="flex justify-between items-center pt-6 border-t border-white/5">
                 <Button 
                   variant="ghost" 
                   size="md" 

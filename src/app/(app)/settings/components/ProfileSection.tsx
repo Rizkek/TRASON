@@ -6,6 +6,7 @@ import { Card, Button, Input, Loading } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { ProfileData, UserData } from './types';
 import { Camera, FloppyDisk as Save } from '@phosphor-icons/react';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface ProfileSectionProps {
   user: UserData | null;
@@ -35,8 +36,8 @@ export function ProfileSection({
     <Card className="glass border-none shadow-2xl relative overflow-hidden">
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary opacity-[0.02] blur-3xl pointer-events-none" />
 
-      <div className="p-xl space-y-xl relative z-10">
-        <div className="flex flex-col md:flex-row items-center gap-xl pb-xl border-b border-black/[0.05] dark:border-white/[0.05]">
+      <div className="p-8 space-y-8 relative z-10">
+        <div className="flex flex-col md:flex-row items-center gap-8 pb-8 border-b border-black/[0.05] dark:border-white/[0.05]">
           <div className="relative group">
             <input
               type="file"
@@ -73,22 +74,22 @@ export function ProfileSection({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploadingAvatar}
-              className="absolute -bottom-2 -right-2 p-sm bg-secondary text-white rounded-md shadow-lg border border-black/20 dark:border-white/20 hover:scale-110 transition-transform disabled:opacity-50"
+              className="absolute -bottom-2 -right-2 p-2 bg-secondary text-white rounded-md shadow-lg border border-black/20 dark:border-white/20 hover:scale-110 transition-transform disabled:opacity-50"
             >
               <Camera size={14} />
             </button>
           </div>
           <div className="text-center md:text-left">
-            <h2 className="text-xl font-bold text-soft-cream tracking-tight">
+            <Heading as="h2" size="h2" className="text-xl font-bold text-soft-cream tracking-tight">
               {profile.first_name || profile.last_name
                 ? `${profile.first_name} ${profile.last_name}`.trim()
                 : 'Syncing Identity...'}
-            </h2>
-            <p className="text-sm text-gray-light italic">{user?.email}</p>
+            </Heading>
+            <Paragraph className="text-sm text-gray-light italic">{user?.email}</Paragraph>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <Input
             label={t('settings.profile.firstName')}
             value={profile.first_name}
@@ -109,7 +110,7 @@ export function ProfileSection({
           onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
         />
 
-        <div className="flex justify-end pt-md">
+        <div className="flex justify-end pt-4">
           <Button
             variant="primary"
             size="md"

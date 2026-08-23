@@ -9,6 +9,7 @@ import { formatCurrency, formatNumber } from '@/libs/format';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Target, Plus, CheckCircle, Clock } from '@phosphor-icons/react';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 export function InvestmentGoalsClient() {
   const router = useRouter();
@@ -39,16 +40,16 @@ export function InvestmentGoalsClient() {
 
   return (
     <Layout>
-      <div className="space-y-xl animate-fade-in">
+      <div className="space-y-8 animate-fade-in">
         {/* Header Section */}
-        <div className="flex items-start justify-between gap-md flex-wrap">
-          <div className="space-y-sm max-w-2xl">
-            <h1 className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">Goal-based Investment</h1>
-            <p className="text-subtext flex items-center gap-sm">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="space-y-2 max-w-2xl">
+            <Heading as="h1" size="h1" className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">Goal-based Investment</Heading>
+            <Paragraph className="text-subtext flex items-center gap-2">
               Berhenti berinvestasi tanpa arah. Setiap rupiah yang Anda alokasikan memiliki tujuan hidupnya sendiri.
-            </p>
+            </Paragraph>
           </div>
-          <div className="hidden md:flex gap-md">
+          <div className="hidden md:flex gap-4">
             <Button variant="primary" size="md">
               <Plus size={16} className="mr-2" />
               Buat Goal Baru
@@ -58,20 +59,20 @@ export function InvestmentGoalsClient() {
 
         {/* Goals List */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-md md:gap-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {[...Array(4)].map((_, i) => (
-              <Card key={i} className="p-xl animate-pulse h-48 bg-white/5" />
+              <Card key={i} className="p-8 animate-pulse h-48 bg-white/5" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-md md:gap-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
             {goals.map((goal) => {
               const progressPct = Math.min(100, Math.round((goal.current_amount / goal.target_amount) * 100));
               
               return (
                 <Card 
                   key={goal.id} 
-                  className="p-xl relative overflow-hidden group hover:border-white/20 transition-all duration-300"
+                  className="p-8 relative overflow-hidden group hover:border-white/20 transition-all duration-300"
                 >
                   {/* Glassmorphic Background Blur specific to goal color */}
                   <div 
@@ -79,17 +80,17 @@ export function InvestmentGoalsClient() {
                     style={{ backgroundColor: goal.color || '#4F46E5' }}
                   />
                   
-                  <div className="relative z-10 flex flex-col h-full justify-between gap-lg">
+                  <div className="relative z-10 flex flex-col h-full justify-between gap-6">
                     {/* Goal Header */}
                     <div className="flex justify-between items-start">
                       <div>
-                        <div className="flex items-center gap-xs mb-1">
+                        <div className="flex items-center gap-1 mb-1">
                           <Target size={16} weight="duotone" style={{ color: goal.color || '#4F46E5' }} />
-                          <p className="text-[10px] tracking-widest uppercase font-semibold text-gray-light">
+                          <Paragraph className="text-[10px] tracking-widest uppercase font-semibold text-gray-light">
                             {goal.status === 'completed' ? 'Tercapai' : 'Progres'}
-                          </p>
+                          </Paragraph>
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-xs">{goal.title}</h3>
+                        <Heading as="h3" size="h3" className="text-xl font-bold text-white mb-1">{goal.title}</Heading>
                         {goal.target_date && (
                           <div className="flex items-center gap-1 text-xs text-gray-light">
                             <Clock size={12} />
@@ -99,14 +100,14 @@ export function InvestmentGoalsClient() {
                       </div>
                       
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-white">
+                        <Paragraph className="text-2xl font-bold text-white">
                           {progressPct}%
-                        </p>
+                        </Paragraph>
                       </div>
                     </div>
 
                     {/* Progress Bar & Amount */}
-                    <div className="space-y-sm">
+                    <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-light font-medium">
                           {formatCurrency(goal.current_amount, goal.currency, locale)}
@@ -130,13 +131,13 @@ export function InvestmentGoalsClient() {
                     </div>
                     
                     {/* Insights/Action area */}
-                    <div className="pt-sm mt-auto border-t border-white/5 flex justify-between items-center">
-                      <p className="text-xs text-gray-light">
+                    <div className="pt-2 mt-auto border-t border-white/5 flex justify-between items-center">
+                      <Paragraph className="text-xs text-gray-light">
                         {progressPct >= 100 
                           ? 'Selamat! Tujuan Anda tercapai.' 
                           : `Sisa ${formatCurrency(goal.target_amount - goal.current_amount, goal.currency, locale)}`
                         }
-                      </p>
+                      </Paragraph>
                       <Button variant="ghost" size="sm" className="text-xs">
                         Alokasikan
                       </Button>

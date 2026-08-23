@@ -4,6 +4,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 export const metadata: Metadata = {
   title: 'Our Vision – Why We Built TRASON',
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function VisionPage() {
   return (
-    <div className="min-h-screen bg-[#050505] text-soft-cream font-sans relative overflow-x-hidden selection:bg-warm-gold/30 selection:text-white">
+    <div className="min-h-screen bg-[#050505] font-sans relative overflow-x-hidden selection:bg-warm-gold/30 selection:text-white">
       {/* Subtle Grain Overlay (simulated with CSS) */}
       <div className="fixed inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Dissolve_Noise_Texture.png")' }} />
 
@@ -34,13 +35,13 @@ export default function VisionPage() {
           
           {/* Manifesto Header */}
           <header className="space-y-12">
-            <h1 className="text-5xl md:text-8xl font-display tracking-tight leading-[1.1] tracking-tight text-white">
+            <Heading as="h1" size="h1" className="leading-[1.1] text-white">
               App fatigue <br />
               <span className="text-gray-500 italic">is killing our focus.</span>
-            </h1>
-            <p className="text-xl md:text-3xl text-gray-400 font-light leading-relaxed max-w-2xl">
+            </Heading>
+            <Paragraph size="xl" className="text-gray-400 max-w-2xl">
               We live in the most technologically advanced era in human history, yet we've never been more scattered.
-            </p>
+            </Paragraph>
           </header>
 
           {/* Core Problem */}
@@ -63,9 +64,9 @@ export default function VisionPage() {
               <p>
                 We believe your personal data should live in one place. It should compound. It should correlate. 
               </p>
-              <p>
-                <strong className="text-white font-display tracking-tight text-2xl">TRASON is not another app. It's a personal operating system.</strong>
-              </p>
+              <Paragraph size="xl" className="text-white font-bold">
+                TRASON is not another app. It's a personal operating system.
+              </Paragraph>
               <p>
                 Imagine a system that knows you spent $200 on an online course, automatically tags it to your Career Pipeline, and reminds you to study during your deep work block, all while ensuring it doesn't disrupt your sleep schedule. 
               </p>

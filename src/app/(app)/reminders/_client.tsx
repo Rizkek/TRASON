@@ -14,6 +14,7 @@ import { Bell, BellSlash as BellOff, CheckCircle, Clock, Plus, Trash as Trash2, 
 import { getLocalISODate } from '@/libs/format';
 import { formatDateOnly } from '@/libs/date';
 import { useHolidays } from '@/hooks/useHolidays';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 
 export function RemindersClient() {
@@ -206,7 +207,7 @@ export function RemindersClient() {
 
   if (authLoading || isRemindersLoading) return (
     <Layout>
-      <div className="flex justify-center py-2xl"><Loading text={t('dashboard.checking_session')} /></div>
+      <div className="flex justify-center py-12"><Loading text={t('dashboard.checking_session')} /></div>
     </Layout>
   );
 
@@ -220,14 +221,14 @@ export function RemindersClient() {
 
   return (
     <Layout>
-      <div className="space-y-2xl animate-fade-in pb-4xl">
+      <div className="space-y-12 animate-fade-in pb-24">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-lg">
-          <div className="space-y-xs">
-            <h1 className="text-5xl font-sans font-bold tracking-tight">{t('reminders_page.title')}</h1>
-            <p className="text-gray-light font-light">{t('reminders_page.desc')}</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <Heading as="h1" size="h1" className="text-5xl font-sans font-bold tracking-tight">{t('reminders_page.title')}</Heading>
+            <Paragraph className="text-gray-light font-light">{t('reminders_page.desc')}</Paragraph>
           </div>
-          <div className="flex items-center gap-md">
+          <div className="flex items-center gap-4">
             {/* Only show calendar/list toggle when active reminders is enabled */}
             {remindersActiveEnabled && (
               <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05]">
@@ -246,7 +247,7 @@ export function RemindersClient() {
               </div>
             )}
             <div className="hidden md:block">
-              <Button variant="primary" onClick={openAddModal} className="rounded-full px-xl">
+              <Button variant="primary" onClick={openAddModal} className="rounded-full px-8">
                 <Plus size={18} className="mr-2" />
                 {t('reminders_page.new_reminder')}
               </Button>
@@ -256,7 +257,7 @@ export function RemindersClient() {
 
 
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Main View */}
           <div className="lg:col-span-8">
             {/* Calendar view only available when reminders_active is on */}
@@ -269,9 +270,9 @@ export function RemindersClient() {
                 holidays={holidays}
               />
             ) : (
-              <div className="space-y-md">
+              <div className="space-y-4">
                 {/* Tabs */}
-                <div className="flex items-center gap-md mb-xl pb-md border-b border-black/[0.05] dark:border-white/[0.05]">
+                <div className="flex items-center gap-4 mb-8 pb-4 border-b border-black/[0.05] dark:border-white/[0.05]">
                   {remindersActiveEnabled && (
                     <button
                       onClick={() => setFilter('active')}
@@ -291,24 +292,24 @@ export function RemindersClient() {
                 </div>
 
                 {!remindersActiveEnabled && !remindersHistoryEnabled ? (
-                  <div className="glass-card p-4xl text-center space-y-md">
+                  <div className="glass-card p-24 text-center space-y-4">
                     <BellOff size={48} className="mx-auto text-gray-light opacity-20" />
-                    <p className="text-gray-light font-light italic">{t('reminders_page.disabled_in_settings')}</p>
+                    <Paragraph className="text-gray-light font-light italic">{t('reminders_page.disabled_in_settings')}</Paragraph>
                   </div>
                 ) : ((filter === 'active' && remindersActiveEnabled) || (filter === 'history' && remindersHistoryEnabled)) && (
                   reminders.filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed').length === 0 ? (
-                    <div className="glass-card p-4xl text-center space-y-md">
+                    <div className="glass-card p-24 text-center space-y-4">
                       <Bell size={48} className="mx-auto text-deep-sage opacity-20" />
-                      <p className="text-gray-light font-light italic">
+                      <Paragraph className="text-gray-light font-light italic">
                         {filter === 'active' ? t('reminders_page.empty_reminders') : t('reminders_page.empty_history')}
-                      </p>
+                      </Paragraph>
                     </div>
                   ) : (
                     reminders
                       .filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed')
                       .map(reminder => (
-                      <div key={reminder.id} className="glass-card p-xl flex items-center justify-between group">
-                        <div className="flex items-center gap-xl">
+                      <div key={reminder.id} className="glass-card p-8 flex items-center justify-between group">
+                        <div className="flex items-center gap-8">
                           <button 
                             onClick={() => toggleStatus(reminder)}
                             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
@@ -318,8 +319,8 @@ export function RemindersClient() {
                             {reminder.status === 'completed' && <CheckCircle size={14} />}
                           </button>
                           <div>
-                            <h4 className={`text-lg font-medium ${reminder.status === 'completed' ? 'line-through opacity-40' : ''}`}>{reminder.title}</h4>
-                            <div className="flex items-center gap-md text-micro text-gray-light uppercase tracking-widest mt-1">
+                            <Heading as="h4" size="h4" className={`text-lg font-medium ${reminder.status === 'completed' ? 'line-through opacity-40' : ''}`}>{reminder.title}</Heading>
+                            <div className="flex items-center gap-4 text-micro text-gray-light uppercase tracking-widest mt-1">
                               <Clock size={12} />
                               <span>{(() => { const raw = reminder.due_datetime || reminder.due_date; if (!raw) return '—'; const d = new Date(raw); return isNaN(d.getTime()) ? '—' : d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone || 'UTC' }); })()}</span>
                               <span>•</span>
@@ -327,7 +328,7 @@ export function RemindersClient() {
                             </div>
                           </div>
                         </div>
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-sm">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">
                            <button onClick={() => openEditModal(reminder)} className="text-gray-light hover:text-warm-gold p-2">
                              <Edit2 size={16} />
                            </button>
@@ -344,18 +345,18 @@ export function RemindersClient() {
           </div>
 
           {/* Side Panel: Selected Date Details */}
-          <div className="lg:col-span-4 space-y-xl">
-             <div className="glass-card p-xl border-warm-gold/10">
-                <h3 className="font-sans font-bold tracking-tight text-xl mb-xl">
+          <div className="lg:col-span-4 space-y-8">
+             <div className="glass-card p-8 border-warm-gold/10">
+                <Heading as="h3" size="h3" className="font-sans font-bold tracking-tight text-xl mb-8">
                   {selectedDate.toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' })}
-                </h3>
+                </Heading>
                 
-                <div className="space-y-md">
+                <div className="space-y-4">
                   {selectedDateReminders.length === 0 ? (
-                    <p className="text-sm text-gray-light font-light italic opacity-60">{t('reminders_page.empty_date')}</p>
+                    <Paragraph className="text-sm text-gray-light font-light italic opacity-60">{t('reminders_page.empty_date')}</Paragraph>
                   ) : (
                     selectedDateReminders.map(r => (
-                      <div key={r.id} className="p-md rounded-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03] space-y-sm">
+                      <div key={r.id} className="p-4 rounded-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03] space-y-2">
                         <div className="flex justify-between items-start">
                           <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-tighter font-bold ${
                             r.priority === 'high' ? 'bg-expense/20 text-expense' : 'bg-deep-sage/20 text-deep-sage'
@@ -364,14 +365,14 @@ export function RemindersClient() {
                           </span>
                           <span className="text-micro text-gray-light">{r.due_time}</span>
                         </div>
-                        <p className="text-sm font-medium">{r.title}</p>
+                        <Paragraph className="text-sm font-medium">{r.title}</Paragraph>
                       </div>
                     ))
                   )}
                   
                   <button 
                     onClick={openAddModal}
-                    className="w-full py-md mt-md border border-dashed border-black/10 dark:border-white/10 rounded-lg text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold hover:border-warm-gold/40 transition-all"
+                    className="w-full py-4 mt-4 border border-dashed border-black/10 dark:border-white/10 rounded-lg text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold hover:border-warm-gold/40 transition-all"
                   >
                     {t('reminders_page.add_to_day')}
                   </button>
@@ -379,13 +380,13 @@ export function RemindersClient() {
              </div>
              
              {/* Weekly Context - Small Summary */}
-             <div className="glass-card p-xl bg-gradient-to-br from-gray-strong to-warm-black">
-                <h4 className="text-micro uppercase tracking-[0.3em] text-deep-sage font-bold mb-md">{t('reminders_page.weekly_focus')}</h4>
-                <p className="text-sm font-light text-gray-very-light leading-relaxed">
+             <div className="glass-card p-8 bg-gradient-to-br from-gray-strong to-warm-black">
+                <Heading as="h4" size="h4" className="text-micro uppercase tracking-[0.3em] text-deep-sage font-bold mb-4">{t('reminders_page.weekly_focus')}</Heading>
+                <Paragraph className="text-sm font-light text-gray-very-light leading-relaxed">
                   {t('reminders_page.weekly_focus_desc').split('{count}').map((part, i, arr) => 
                     i === arr.length - 1 ? part : <React.Fragment key={i}>{part}<span className="text-warm-gold font-bold">{reminders.filter(r => r.status === 'pending').length}</span></React.Fragment>
                   )}
-                </p>
+                </Paragraph>
              </div>
           </div>
         </div>
@@ -398,13 +399,13 @@ export function RemindersClient() {
         onClose={() => setIsModalOpen(false)} 
         title={editingReminder ? t('reminders_page.edit_reminder') : t('reminders_page.new_reminder_modal')}
         footer={
-          <div className="pt-xl border-t border-black/5 dark:border-white/5 flex gap-md">
+          <div className="pt-8 border-t border-black/5 dark:border-white/5 flex gap-4">
             <Button variant="ghost" fullWidth onClick={() => setIsModalOpen(false)} disabled={isSaving}>{t('investment_page.cancel_upper')}</Button>
             <Button variant="primary" fullWidth onClick={handleSave} isLoading={isSaving} disabled={isSaving}>{t('reminders_page.save_reminder')}</Button>
           </div>
         }
       >
-        <div className="space-y-xl py-md">
+        <div className="space-y-8 py-4">
           {error && <ErrorAlert error={error} onDismiss={() => setError(null)} />}
           <Input 
             label={t('reminders_page.form.title_label')} 
@@ -415,7 +416,7 @@ export function RemindersClient() {
             required
             className="bg-black/[0.03] dark:bg-white/[0.03]"
           />
-          <div className="grid grid-cols-2 gap-md">
+          <div className="grid grid-cols-2 gap-4">
             <DatePicker 
               label={t('reminders_page.form.date')} 
               value={form.dueDate} 
@@ -433,8 +434,8 @@ export function RemindersClient() {
             />
           </div>
           <div>
-            <label className="text-micro uppercase tracking-widest text-gray-light mb-sm block">{t('reminders_page.form.priority')}</label>
-            <div className="flex gap-md">
+            <label className="text-micro uppercase tracking-widest text-gray-light mb-2 block">{t('reminders_page.form.priority')}</label>
+            <div className="flex gap-4">
               {['low', 'medium', 'high'].map(p => (
                 <button
                   key={p}
@@ -451,14 +452,14 @@ export function RemindersClient() {
 
           {/* Pilihan waktu notifikasi */}
           <div>
-            <label className="text-micro uppercase tracking-widest text-gray-light mb-sm block">{t('reminders_page.form.notify_label')}</label>
-            <div className="flex flex-wrap gap-sm">
+            <label className="text-micro uppercase tracking-widest text-gray-light mb-2 block">{t('reminders_page.form.notify_label')}</label>
+            <div className="flex flex-wrap gap-2">
               {NOTIFY_OPTIONS.map(opt => (
                 <button
                   key={opt.value}
                   type="button"
                   onClick={() => toggleNotifyTime(opt.value)}
-                  className={`px-md py-sm rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${
+                  className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${
                     form.notifyTimes.includes(opt.value)
                       ? 'bg-warm-gold/20 text-warm-gold border-warm-gold/50'
                       : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/10 dark:border-white/10 text-gray-light hover:border-black/30 dark:border-white/30'
@@ -468,16 +469,16 @@ export function RemindersClient() {
                 </button>
               ))}
             </div>
-            <p className="text-[9px] text-gray-light mt-sm opacity-60">{t('reminders_page.form.notify_help')}</p>
+            <Paragraph className="text-[9px] text-gray-light mt-2 opacity-60">{t('reminders_page.form.notify_help')}</Paragraph>
           </div>
-          <div className="space-y-sm">
+          <div className="space-y-2">
             <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('reminders_page.form.notes_label')}</label>
             <textarea
               placeholder={t('reminders_page.form.notes_placeholder')}
               rows={4}
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-              className="w-full bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md p-lg text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
             />
           </div>
         </div>

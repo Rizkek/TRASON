@@ -32,7 +32,7 @@ export const CreatePlanModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, is
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Create Workout Plan">
-      <form onSubmit={handleSubmit} className="space-y-md">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           label="Plan Name"
           value={name}
@@ -62,7 +62,7 @@ export const CreatePlanModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, is
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-md border-t border-black/10 dark:border-white/10">
+        <div className="flex justify-end gap-3 pt-4 border-t border-black/10 dark:border-white/10">
           <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>

@@ -41,9 +41,9 @@ export const Button = memo(
       };
 
       const sizes = {
-        sm: 'px-md py-sm text-xs rounded-sm uppercase tracking-wide',
-        md: 'px-lg py-md text-sm rounded-sm',
-        lg: 'px-xl py-lg text-base rounded-md',
+        sm: 'h-9 px-4 text-xs rounded-sm uppercase tracking-wide',
+        md: 'h-11 px-6 text-sm rounded-sm',
+        lg: 'h-14 px-8 text-base rounded-md',
       };
 
       const widthStyle = fullWidth ? 'w-full' : '';
@@ -57,14 +57,14 @@ export const Button = memo(
           {...props}
         >
           {isLoading ? (
-            <div className="mr-md animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+            <div className="mr-4 animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
           ) : leftIcon ? (
-            <span className="mr-md">{leftIcon}</span>
+            <span className="mr-4">{leftIcon}</span>
           ) : null}
           
           <span className="relative z-10">{isLoading && loadingText ? loadingText : children}</span>
           
-          {!isLoading && rightIcon && <span className="ml-md">{rightIcon}</span>}
+          {!isLoading && rightIcon && <span className="ml-4">{rightIcon}</span>}
           
           {/* Subtle reflection effect for primary */}
           {variant === 'primary' && (

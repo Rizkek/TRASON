@@ -10,7 +10,7 @@ export const LogoLoading: React.FC = () => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/20 blur-[80px] rounded-full animate-pulse" />
       
       {/* TRASON Logo Pulse */}
-      <div className="relative z-10 flex flex-col items-center justify-center space-y-xl">
+      <div className="relative z-10 flex flex-col items-center justify-center space-y-8">
         <div className="relative flex items-center justify-center">
           {/* Outer ring spin */}
           <div className="absolute -inset-4 rounded-full border-t border-r border-primary/50 animate-spin" style={{ animationDuration: '3s' }} />

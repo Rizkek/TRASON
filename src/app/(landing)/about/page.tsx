@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { FaqItem } from '@/components/landing/FaqItem';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 export const metadata: Metadata = {
   title: 'About TRASON – Philosophy & FAQ',
@@ -52,18 +53,18 @@ export default function AboutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-warm-black text-soft-cream font-sans relative overflow-x-hidden">
+    <div className="min-h-screen font-sans relative overflow-x-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <LandingNavbar />
       
-      <main className="pt-32 md:pt-48 pb-24 px-lg max-w-4xl mx-auto space-y-32">
+      <main className="pt-32 md:pt-48 pb-24 px-6 max-w-4xl mx-auto space-y-32">
         
         {/* The Philosophy */}
-        <section className="space-y-lg">
-           <h1 className="text-5xl md:text-7xl font-display tracking-tight mb-xl">The Philosophy of TRASON</h1>
+        <section className="space-y-6">
+           <Heading as="h1" size="h1" className="mb-8 text-soft-cream">The Philosophy of TRASON</Heading>
            <div className="prose prose-invert prose-lg max-w-none text-gray-light/90 space-y-6">
              {/* AEO / GEO Optimized TL;DR Summary */}
              <div className="bg-warm-gold/5 border border-warm-gold/20 p-6 rounded-xl space-y-2 mb-8">
@@ -96,11 +97,11 @@ export default function AboutPage() {
         </section>
 
         {/* Current Status / Roadmap */}
-        <section className="space-y-xl">
-           <h2 className="text-3xl md:text-4xl font-display tracking-tight">Current Status & Roadmap</h2>
+        <section className="space-y-8">
+           <Heading as="h2" size="h3" className="text-soft-cream">Current Status & Roadmap</Heading>
            
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
-              <div className="bg-black/20 border border-white/5 p-lg rounded-2xl space-y-md">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-black/20 border border-white/5 p-6 rounded-2xl space-y-4">
                  <h3 className="font-bold text-emerald-400 flex items-center gap-2">
                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                    Live Now (MVP)
@@ -113,7 +114,7 @@ export default function AboutPage() {
                  </ul>
               </div>
 
-              <div className="bg-black/20 border border-white/5 p-lg rounded-2xl space-y-md">
+              <div className="bg-black/20 border border-white/5 p-6 rounded-2xl space-y-4">
                  <h3 className="font-bold text-warm-gold flex items-center gap-2">
                    <div className="w-2 h-2 rounded-full border-2 border-warm-gold" />
                    In Development
@@ -131,13 +132,13 @@ export default function AboutPage() {
         {/* Removed Tech Stack */}
 
         {/* FAQ */}
-        <section className="space-y-xl">
-           <div className="space-y-sm">
-             <h2 className="text-3xl md:text-4xl font-display tracking-tight">Frequently Asked Questions</h2>
-             <p className="text-gray-light">Everything you need to know about the platform.</p>
+        <section className="space-y-8">
+           <div className="space-y-2">
+             <Heading as="h2" size="h3" className="text-soft-cream">Frequently Asked Questions</Heading>
+             <Paragraph className="text-gray-light">Everything you need to know about the platform.</Paragraph>
            </div>
            
-           <div className="space-y-sm">
+           <div className="space-y-2">
              {FAQS.map((faq, i) => (
                <FaqItem key={i} q={faq.q} a={faq.a} />
              ))}

@@ -3,16 +3,17 @@ import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { Envelope as Mail, MapPin, Phone } from '@phosphor-icons/react/dist/ssr';
 import { ContactForm } from './ContactForm';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-warm-black text-soft-cream font-sans relative overflow-x-hidden">
+    <div className="min-h-screen font-sans relative overflow-x-hidden">
       <LandingNavbar />
       
-      <main className="pt-32 md:pt-48 pb-24 px-lg max-w-7xl mx-auto space-y-12">
-        <div className="text-center space-y-md max-w-3xl mx-auto mb-16">
-           <h1 className="text-5xl md:text-7xl font-display tracking-tight">Contact Us</h1>
-           <p className="text-xl text-gray-light/60">Have questions, feedback, or need support? We're here to help.</p>
+      <main className="pt-32 md:pt-48 pb-24 px-6 max-w-7xl mx-auto space-y-12">
+        <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
+           <Heading as="h1" size="h1" className="text-soft-cream">Contact Us</Heading>
+           <Paragraph size="xl" className="text-gray-light/60">Have questions, feedback, or need support? We're here to help.</Paragraph>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
@@ -21,15 +22,15 @@ export default function ContactPage() {
           {/* Contact Info & MapTrifold */}
           <div className="space-y-12">
             <div className="space-y-8">
-              <h2 className="text-2xl font-bold font-display tracking-tight">Contact Information</h2>
+              <Heading as="h2" size="h4" className="text-soft-cream">Contact Information</Heading>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center shrink-0">
                     <Mail className="text-warm-gold" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white mb-1">Email</h3>
-                    <p className="text-gray-light">riskiinferno@gmail.com</p>
+                    <Heading as="h3" size="h6" className="text-white mb-1">Email</Heading>
+                    <Paragraph className="text-gray-light">riskiinferno@gmail.com</Paragraph>
                     <p className="text-sm text-gray-light/60 mt-1">We aim to reply within 24 hours.</p>
                   </div>
                 </div>
@@ -38,8 +39,8 @@ export default function ContactPage() {
                     <Phone className="text-warm-gold" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white mb-1">Phone</h3>
-                    <p className="text-gray-light">+62 812 3456 7890</p>
+                    <Heading as="h3" size="h6" className="text-white mb-1">Phone</Heading>
+                    <Paragraph className="text-gray-light">+62 812 3456 7890</Paragraph>
                     <p className="text-sm text-gray-light/60 mt-1">Mon-Fri from 9am to 5pm (WIB).</p>
                   </div>
                 </div>
@@ -48,8 +49,8 @@ export default function ContactPage() {
                     <MapPin className="text-warm-gold" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white mb-1">Office</h3>
-                    <p className="text-gray-light">Klaten<br />Jawa Tengah, Indonesia</p>
+                    <Heading as="h3" size="h6" className="text-white mb-1">Office</Heading>
+                    <Paragraph className="text-gray-light">Klaten<br />Jawa Tengah, Indonesia</Paragraph>
                   </div>
                 </div>
               </div>

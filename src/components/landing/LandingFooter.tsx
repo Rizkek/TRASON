@@ -1,100 +1,165 @@
-
 import React from 'react';
 import Link from 'next/link';
-import { InstagramLogo, LinkedinLogo, Envelope as Mail, MapPin, ChatCircle as MessageCircle, Phone } from '@phosphor-icons/react/dist/ssr';
+import {
+  InstagramLogo,
+  LinkedinLogo,
+  Envelope as Mail,
+  MapPin,
+  ChatCircle as MessageCircle,
+} from '@phosphor-icons/react/dist/ssr';
 import { Logo } from '@/components';
 
 export function LandingFooter() {
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="py-20 px-lg border-t border-black/[0.05] dark:border-white/[0.05] bg-black/20">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-xl">
-        {/* Brand & Description */}
-        <div className="space-y-md col-span-1 md:col-span-1">
-          <div className="flex items-center gap-sm">
-            <Logo size={32} />
-            <span className="font-brand text-2xl font-extrabold tracking-tight text-soft-cream">TRASON</span>
-          </div>
-          <p className="text-sm text-gray-light font-light leading-relaxed">
-            The unified personal operating system designed to eliminate app fatigue and centralize your financial, career, and vitality data.
+    <footer
+      className="border-t border-black/[0.06] dark:border-white/[0.06] bg-black/[0.015] dark:bg-white/[0.015]"
+      aria-label="Site footer"
+    >
+      <div className="max-w-6xl mx-auto px-6 md:px-12 py-16 grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-8">
+
+        {/* Brand */}
+        <div className="space-y-4 col-span-1 md:col-span-1">
+          <Link href="/" className="flex items-center gap-2 w-fit" aria-label="TRASON home">
+            <Logo size={26} />
+            <span className="font-brand text-xl font-extrabold tracking-tight text-warm-black dark:text-soft-cream">
+              TRASON
+            </span>
+          </Link>
+          <p className="text-sm text-gray-medium dark:text-gray-light leading-relaxed max-w-[220px]">
+            A personal operating system for your money, time, career, and wellbeing.
           </p>
-          <div className="flex items-center gap-2 pt-sm">
-            <a
+          {/* Social */}
+          <div className="flex items-center gap-2 pt-1">
+            <SocialLink
               href="https://wa.me/62895417240107"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-9 h-9 rounded-xl bg-white/5 border border-white/5 hover:border-warm-gold/40 hover:bg-warm-gold/10 hover:text-warm-gold text-gray-light flex items-center justify-center transition-all duration-300 group"
-              aria-label="WhatsApp"
-            >
-              <MessageCircle size={18} className="group-hover:scale-110 transition-transform" />
-            </a>
-            <a
+              label="WhatsApp"
+              icon={<MessageCircle size={16} />}
+            />
+            <SocialLink
               href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-9 h-9 rounded-xl bg-white/5 border border-white/5 hover:border-warm-gold/40 hover:bg-warm-gold/10 hover:text-warm-gold text-gray-light flex items-center justify-center transition-all duration-300 group"
-              aria-label="Instagram"
-            >
-              <InstagramLogo size={18} className="group-hover:scale-110 transition-transform" />
-            </a>
-            <a
+              label="Instagram"
+              icon={<InstagramLogo size={16} />}
+            />
+            <SocialLink
               href="https://linkedin.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-9 h-9 rounded-xl bg-white/5 border border-white/5 hover:border-warm-gold/40 hover:bg-warm-gold/10 hover:text-warm-gold text-gray-light flex items-center justify-center transition-all duration-300 group"
-              aria-label="LinkedIn"
-            >
-              <LinkedinLogo size={18} className="group-hover:scale-110 transition-transform" />
-            </a>
+              label="LinkedIn"
+              icon={<LinkedinLogo size={16} />}
+            />
           </div>
         </div>
 
-        {/* Product Links */}
-        <div className="space-y-md">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-soft-cream">Ecosystem</h4>
-          <ul className="space-y-sm">
-            <li><Link href="/#preview" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Live Preview</Link></li>
-            <li><Link href="/vision" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Vision</Link></li>
-            <li><Link href="/roadmap" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Roadmap</Link></li>
-            <li><Link href="/changelog" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Changelog</Link></li>
+        {/* Product */}
+        <div className="space-y-4">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-warm-black dark:text-soft-cream">
+            Product
+          </div>
+          <ul className="space-y-2.5">
+            {[
+              { label: 'Overview', href: '/' },
+              { label: 'Pricing', href: '/pricing' },
+              { label: 'Changelog', href: '/changelog' },
+            ].map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="text-sm text-gray-medium dark:text-gray-light hover:text-warm-black dark:hover:text-soft-cream transition-colors"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
-        {/* Connect Info */}
-        <div className="space-y-md">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-soft-cream">Connect</h4>
-          <ul className="space-y-sm">
-            <li className="flex items-center gap-2 text-sm text-gray-light">
-              <Mail size={14} className="text-warm-gold" /> hello@trason.app
-            </li>
-            <li className="flex items-center gap-2 text-sm text-gray-light">
-              <Phone size={14} className="text-warm-gold" /> 0895417240107
-            </li>
-            <li className="flex items-start gap-2 text-sm text-gray-light">
-              <MapPin size={14} className="mt-0.5 flex-shrink-0 text-warm-gold" />
-              <span>Klaten<br />Jawa Tengah, Indonesia</span>
-            </li>
+        {/* Company */}
+        <div className="space-y-4">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-warm-black dark:text-soft-cream">
+            Company
+          </div>
+          <ul className="space-y-2.5">
+            {[
+              { label: 'About', href: '/about' },
+              { label: 'Contact', href: '/contact' },
+              { label: 'Support', href: '/support' },
+            ].map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="text-sm text-gray-medium dark:text-gray-light hover:text-warm-black dark:hover:text-soft-cream transition-colors"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
-        {/* Legal Links */}
-        <div className="space-y-md">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-soft-cream">Legal</h4>
-          <ul className="space-y-sm">
-            <li><Link href="/privacy" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Privacy Policy</Link></li>
-            <li><Link href="/terms" className="text-sm text-gray-light hover:text-warm-gold transition-colors">Terms of Service</Link></li>
+        {/* Contact */}
+        <div className="space-y-4">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-warm-black dark:text-soft-cream">
+            Contact
+          </div>
+          <ul className="space-y-3">
+            <li className="flex items-center gap-2 text-sm text-gray-medium dark:text-gray-light">
+              <Mail size={13} className="shrink-0" aria-hidden="true" />
+              <a href="mailto:hello@trason.app" className="hover:text-warm-black dark:hover:text-soft-cream transition-colors">
+                hello@trason.app
+              </a>
+            </li>
+            <li className="flex items-start gap-2 text-sm text-gray-medium dark:text-gray-light">
+              <MapPin size={13} className="shrink-0 mt-0.5" aria-hidden="true" />
+              <span>Klaten, Jawa Tengah</span>
+            </li>
           </ul>
+
+          {/* Privacy trust signals */}
+          <div className="pt-2 space-y-1.5">
+            <Link href="/privacy" className="text-xs text-gray-medium dark:text-gray-light hover:text-warm-black dark:hover:text-soft-cream transition-colors block">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="text-xs text-gray-medium dark:text-gray-light hover:text-warm-black dark:hover:text-soft-cream transition-colors block">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto mt-2xl pt-lg border-t border-black/10 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-md">
-        <p className="text-xs text-gray-light/60">
-          © {new Date().getFullYear()} TRASON OS. All rights reserved.
-        </p>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="text-xs text-gray-light">All systems operational</span>
+      {/* Bottom bar */}
+      <div className="border-t border-black/5 dark:border-white/5">
+        <div className="max-w-6xl mx-auto px-6 md:px-12 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-gray-medium dark:text-gray-light">
+            © {year} TRASON. All rights reserved.
+          </p>
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+            <span className="text-xs text-gray-medium dark:text-gray-light">All systems operational</span>
+          </div>
         </div>
       </div>
     </footer>
+  );
+}
+
+function SocialLink({
+  href,
+  label,
+  icon,
+}: {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="w-8 h-8 rounded-lg bg-black/5 dark:bg-white/5 border border-black/6 dark:border-white/6 hover:bg-black/8 dark:hover:bg-white/8 text-gray-medium dark:text-gray-light flex items-center justify-center transition-colors"
+      aria-label={label}
+    >
+      {icon}
+    </a>
   );
 }

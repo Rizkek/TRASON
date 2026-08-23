@@ -6,6 +6,7 @@ import { Button, Select } from '@/components';
 import { Target, WarningCircle, CheckCircle, Lightbulb, UploadSimple, FileText, X, Copy, Check, Sparkle } from '@phosphor-icons/react';
 import { extractTextFromFile } from '@/libs/fileExtractor';
 import { CareerApplication } from '@/types/database';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 // Comprehensive Bilingual (Indonesian & English) Stopwords
 const STOP_WORDS = new Set([
@@ -165,24 +166,24 @@ export function ATSMatcher({ applications = [] }: Props) {
   };
 
   return (
-    <div className="space-y-lg animate-fade-in pb-xl">
-      <div className="glass-card p-xl border-t-4 border-t-primary">
+    <div className="space-y-6 animate-fade-in pb-8">
+      <div className="glass-card p-8 border-t-4 border-t-primary">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start justify-between gap-md mb-md">
-          <div className="flex items-start gap-md">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-4">
+          <div className="flex items-start gap-4">
             <div className="p-3 bg-primary/10 text-primary rounded-xl shrink-0">
               <Target size={24} weight="duotone" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-soft-cream flex items-center gap-2">
+              <Heading as="h2" size="h2" className="text-xl font-bold text-soft-cream flex items-center gap-2">
                 {t('career_page.ats_matcher.title')}
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary font-bold tracking-wider uppercase">
                   {t('career_page.ats_matcher.tag')}
                 </span>
-              </h2>
-              <p className="text-xs md:text-sm text-gray-light mt-1 max-w-2xl font-light">
+              </Heading>
+              <Paragraph className="text-xs md:text-sm text-gray-light mt-1 max-w-2xl font-light">
                 {t('career_page.ats_matcher.desc')}
-              </p>
+              </Paragraph>
             </div>
           </div>
 
@@ -208,16 +209,16 @@ export function ATSMatcher({ applications = [] }: Props) {
         </div>
 
         {extractError && (
-          <div className="p-md rounded-lg bg-expense/10 border border-expense/20 text-expense text-xs flex items-center gap-2 mb-md">
+          <div className="p-4 rounded-lg bg-expense/10 border border-expense/20 text-expense text-xs flex items-center gap-2 mb-4">
             <WarningCircle size={16} />
             <span>{extractError}</span>
           </div>
         )}
 
         {/* Input Areas */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg mt-md">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
           {/* JD Input */}
-          <div className="space-y-sm">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-[11px] font-bold text-gray-light uppercase tracking-wider block">
                 {t('career_page.ats_matcher.jd_label')}
@@ -260,22 +261,22 @@ export function ATSMatcher({ applications = [] }: Props) {
                 onChange={(e) => setJdText(e.target.value)}
                 placeholder={t('career_page.ats_matcher.jd_placeholder') as string}
                 rows={10}
-                className="w-full bg-black/20 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-md text-sm text-soft-cream focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all resize-none font-sans"
+                className="w-full bg-black/20 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-4 text-sm text-soft-cream focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all resize-none font-sans"
               />
               {!jdText && (
                 <div 
                   onClick={() => jdFileInputRef.current?.click()}
-                  className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-lg text-center opacity-40 hover:opacity-70 transition-opacity"
+                  className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-6 text-center opacity-40 hover:opacity-70 transition-opacity"
                 >
                   <FileText size={28} className="text-gray-light mb-1" />
-                  <p className="text-xs text-gray-light">{t('career_page.ats_matcher.drag_jd_hint')}</p>
+                  <Paragraph className="text-xs text-gray-light">{t('career_page.ats_matcher.drag_jd_hint')}</Paragraph>
                 </div>
               )}
             </div>
           </div>
 
           {/* CV Input */}
-          <div className="space-y-sm">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-[11px] font-bold text-gray-light uppercase tracking-wider block">
                 {t('career_page.ats_matcher.cv_label')}
@@ -318,15 +319,15 @@ export function ATSMatcher({ applications = [] }: Props) {
                 onChange={(e) => setCvText(e.target.value)}
                 placeholder={t('career_page.ats_matcher.cv_placeholder') as string}
                 rows={10}
-                className="w-full bg-black/20 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-md text-sm text-soft-cream focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all resize-none font-sans"
+                className="w-full bg-black/20 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-4 text-sm text-soft-cream focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all resize-none font-sans"
               />
               {!cvText && (
                 <div 
                   onClick={() => cvFileInputRef.current?.click()}
-                  className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-lg text-center opacity-40 hover:opacity-70 transition-opacity"
+                  className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-6 text-center opacity-40 hover:opacity-70 transition-opacity"
                 >
                   <FileText size={28} className="text-gray-light mb-1" />
-                  <p className="text-xs text-gray-light">{t('career_page.ats_matcher.drag_cv_hint')}</p>
+                  <Paragraph className="text-xs text-gray-light">{t('career_page.ats_matcher.drag_cv_hint')}</Paragraph>
                 </div>
               )}
             </div>
@@ -334,13 +335,13 @@ export function ATSMatcher({ applications = [] }: Props) {
         </div>
 
         {/* Action Button */}
-        <div className="flex justify-center mt-lg">
+        <div className="flex justify-center mt-6">
           <Button
             variant="primary"
             size="lg"
             onClick={analyze}
             disabled={!jdText.trim() || !cvText.trim() || isExtractingJd || isExtractingCv}
-            className="w-full md:w-auto px-2xl py-4 rounded-xl shadow-[0_4px_20px_rgba(244,201,93,0.2)] hover:shadow-[0_8px_30px_rgba(244,201,93,0.3)] transition-all flex items-center justify-center gap-2 font-bold"
+            className="w-full md:w-auto px-12 py-4 rounded-xl shadow-[0_4px_20px_rgba(244,201,93,0.2)] hover:shadow-[0_8px_30px_rgba(244,201,93,0.3)] transition-all flex items-center justify-center gap-2 font-bold"
           >
             <Target size={20} />
             {t('career_page.ats_matcher.analyze_btn')}
@@ -350,12 +351,12 @@ export function ATSMatcher({ applications = [] }: Props) {
 
       {/* Results Presentation */}
       {result && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg animate-slide-up">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up">
           {/* Score Card */}
-          <div className="glass-card p-xl flex flex-col items-center justify-center text-center">
-            <h3 className="text-[11px] font-bold text-gray-light uppercase tracking-wider mb-md">
+          <div className="glass-card p-8 flex flex-col items-center justify-center text-center">
+            <Heading as="h3" size="h3" className="text-[11px] font-bold text-gray-light uppercase tracking-wider mb-4">
               {t('career_page.ats_matcher.score_title')}
-            </h3>
+            </Heading>
             <div className="relative w-36 h-36 flex items-center justify-center">
               <svg className="absolute w-full h-full transform -rotate-90">
                 <circle cx="72" cy="72" r="62" fill="none" stroke="currentColor" strokeWidth="10" className="text-black/5 dark:text-white/5" />
@@ -378,7 +379,7 @@ export function ATSMatcher({ applications = [] }: Props) {
               </div>
             </div>
 
-            <div className="mt-md text-xs text-gray-light flex items-center gap-1.5 font-medium">
+            <div className="mt-4 text-xs text-gray-light flex items-center gap-1.5 font-medium">
               <Lightbulb size={16} className="text-primary shrink-0" />
               <span>
                 {result.score >= 75
@@ -391,17 +392,17 @@ export function ATSMatcher({ applications = [] }: Props) {
           </div>
 
           {/* Keywords Breakdown */}
-          <div className="glass-card p-xl md:col-span-2 space-y-lg">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-xl h-full">
+          <div className="glass-card p-8 md:col-span-2 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 h-full">
               {/* Matched Keywords */}
-              <div className="space-y-sm">
-                <h3 className="text-sm font-bold flex items-center gap-2 text-success">
+              <div className="space-y-2">
+                <Heading as="h3" size="h3" className="text-sm font-bold flex items-center gap-2 text-success">
                   <CheckCircle size={18} weight="fill" />
                   {t('career_page.ats_matcher.matched_keywords')} ({result.matched.length})
-                </h3>
+                </Heading>
                 <div className="flex flex-wrap gap-1.5 max-h-[220px] overflow-y-auto no-scrollbar p-1">
                   {result.matched.length === 0 ? (
-                    <p className="text-xs text-gray-light italic">{t('career_page.ats_matcher.no_matched_found')}</p>
+                    <Paragraph className="text-xs text-gray-light italic">{t('career_page.ats_matcher.no_matched_found')}</Paragraph>
                   ) : (
                     result.matched.map(kw => (
                       <span
@@ -416,12 +417,12 @@ export function ATSMatcher({ applications = [] }: Props) {
               </div>
 
               {/* Missing Keywords */}
-              <div className="space-y-sm">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold flex items-center gap-2 text-expense">
+                  <Heading as="h3" size="h3" className="text-sm font-bold flex items-center gap-2 text-expense">
                     <WarningCircle size={18} weight="fill" />
                     {t('career_page.ats_matcher.missing_keywords')} ({result.missing.length})
-                  </h3>
+                  </Heading>
                   {result.missing.length > 0 && (
                     <button
                       onClick={handleCopyMissing}
@@ -436,9 +437,9 @@ export function ATSMatcher({ applications = [] }: Props) {
 
                 <div className="flex flex-wrap gap-1.5 max-h-[220px] overflow-y-auto no-scrollbar p-1">
                   {result.missing.length === 0 ? (
-                    <p className="text-xs text-success italic flex items-center gap-1">
+                    <Paragraph className="text-xs text-success italic flex items-center gap-1">
                       <Sparkle size={14} weight="fill" /> {t('career_page.ats_matcher.all_matched')}
-                    </p>
+                    </Paragraph>
                   ) : (
                     result.missing.map(kw => (
                       <span

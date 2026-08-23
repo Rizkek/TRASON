@@ -6,6 +6,7 @@ import { Coins } from '@phosphor-icons/react';
 import { SYS_ICONS } from '@/config/icons';
 import { TrasonIcon } from '@/components/ui/TrasonIcon';
 import { formatCurrency } from '@/libs/format';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface Props {
   totalIncome: number;
@@ -65,9 +66,9 @@ export function FinancialSummaryCards({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-sm">
+      <div className="grid grid-cols-2 gap-2">
         {[...Array(4)].map((_, i) => (
-          <Card key={i} className="p-sm md:p-lg animate-pulse">
+          <Card key={i} className="p-2 md:p-6 animate-pulse">
             <div className="h-3 w-16 bg-white/10 rounded mb-2" />
             <div className="h-5 w-24 bg-white/10 rounded" />
           </Card>
@@ -77,20 +78,20 @@ export function FinancialSummaryCards({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-sm">
+    <div className="grid grid-cols-2 gap-2">
       {cards.map(({ label, value, Icon, valueColor, iconClass, border }) => (
-        <Card key={label} className={`p-sm md:p-lg ${border}`}>
-          <div className="flex items-center gap-xs mb-1">
+        <Card key={label} className={`p-2 md:p-6 ${border}`}>
+          <div className="flex items-center gap-1 mb-1">
             <span className={`p-1 rounded-md shrink-0 ${iconClass}`}>
               <TrasonIcon icon={Icon} size={12} variant="default" />
             </span>
-            <p className="text-[9px] md:text-[11px] tracking-widest uppercase font-semibold text-gray-light truncate">
+            <Paragraph className="text-[9px] md:text-[11px] tracking-widest uppercase font-semibold text-gray-light truncate">
               {label}
-            </p>
+            </Paragraph>
           </div>
-          <p className={`text-sm md:text-xl font-bold truncate ${valueColor}`}>
+          <Paragraph className={`text-sm md:text-xl font-bold truncate ${valueColor}`}>
             {formatCurrency(value, currency, locale)}
-          </p>
+          </Paragraph>
         </Card>
       ))}
     </div>

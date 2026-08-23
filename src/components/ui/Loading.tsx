@@ -23,10 +23,10 @@ export const Loading: React.FC<LoadingProps> = ({
   };
 
   const spinner = (
-    <div className="flex flex-col items-center justify-center gap-md" role="status" aria-live="polite">
+    <div className="flex flex-col items-center justify-center gap-4" role="status" aria-live="polite">
       <div className="relative">
         <div className="absolute inset-0 rounded-full bg-primary/20 blur-md" />
-        <div className="relative flex items-center justify-center rounded-full border border-primary/30 bg-gray-strong/80 p-md">
+        <div className="relative flex items-center justify-center rounded-full border border-primary/30 bg-gray-strong/80 p-4">
           <Loader2 className={`${sizeClasses[size]} animate-spin text-primary`} />
         </div>
       </div>

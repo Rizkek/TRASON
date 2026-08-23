@@ -14,6 +14,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { Card } from '@/components';
+import { Heading, Paragraph } from '@/components/ui/typography';
 import { Transaction } from '@/services/supabase/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -181,13 +182,13 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
   };
 
   return (
-    <Card className="p-md md:p-xl bg-black/[0.03] dark:bg-black/40 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
+    <Card className="p-4 md:p-8 bg-black/[0.03] dark:bg-black/40 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
       <div className="absolute top-0 left-1/4 w-1/2 h-full bg-primary/5 blur-3xl rounded-full pointer-events-none" />
 
-      <div className="flex items-center justify-between mb-md md:mb-xl relative z-10">
+      <div className="flex items-center justify-between mb-4 md:mb-8 relative z-10">
         <div>
-          <h3 className="font-sans font-medium text-md md:text-lg text-soft-cream">{t('dashboard.financial_analytics')}</h3>
-          <p className="text-[10px] md:text-micro text-gray-light mt-1">{t('dashboard.monthly_overview')}</p>
+          <Heading as="h3" size="h6" className="text-soft-cream">{t('dashboard.financial_analytics')}</Heading>
+          <Paragraph className="text-[10px] md:text-micro text-gray-light mt-1">{t('dashboard.monthly_overview')}</Paragraph>
         </div>
       </div>
 

@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLifeScore } from '@/hooks/useLifeScore';
 import { Card, Loading } from '@/components';
+import { Heading, Paragraph } from '@/components/ui/typography';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { TrendUp as TrendingUp, CaretDown as ChevronDown, CaretUp as ChevronUp } from '@phosphor-icons/react';
@@ -105,9 +106,9 @@ export function LifeScoreCard() {
       {showInsights && lifeScore.insights.length > 0 && (
         <div className="mt-3 pt-3 border-t border-black/[0.05] dark:border-white/[0.05] space-y-2">
           {lifeScore.insights.map((insight: string, i: number) => (
-            <p key={i} className="text-xs text-gray-light leading-relaxed pl-2 border-l-2 border-primary/40">
+            <Paragraph key={i} className="text-xs text-gray-light leading-relaxed pl-2 border-l-2 border-primary/40">
               {t(insight)}
-            </p>
+            </Paragraph>
           ))}
         </div>
       )}

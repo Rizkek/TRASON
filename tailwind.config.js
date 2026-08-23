@@ -63,21 +63,14 @@ module.exports = {
         'token-micro': ['10px', { lineHeight: '1.4', fontWeight: '600', letterSpacing: '0.05em' }],
       },
       spacing: {
-        'xs': '4px',
-        'sm': '8px',
-        'md': '16px',
-        'lg': '24px',
-        'xl': '32px',
-        '2xl': '48px',
-        '3xl': '64px',
-        '4xl': '96px',
-        '5xl': '128px',
+        // Enforce standard numerical scale, arbitrary spacing has been swept.
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in',
         'slide-up': 'slideUp 0.3s ease-out',
         'subtle-pulse': 'subtlePulse 2s ease-in-out infinite',
         'shimmer': 'shimmer 4s infinite linear',
+        'marquee': 'marquee 30s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -95,6 +88,10 @@ module.exports = {
         shimmer: {
           '0%': { backgroundPosition: '200% center' },
           '100%': { backgroundPosition: '-200% center' },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
       },
       maxWidth: {

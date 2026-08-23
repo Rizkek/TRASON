@@ -4,6 +4,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button, Input, Alert, Loading, Logo } from '@/components';
+import { Heading, Paragraph } from '@/components/ui/typography';
 import { useAuthStore } from '@/store/authStore';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { sanitizeError, validateEmail } from '@/libs/validation';
@@ -95,43 +96,43 @@ function LoginForm() {
   return (
     <div className="min-h-screen bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
       {/* Left Side: Aesthetic/Quotes (Hidden on mobile) */}
-      <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-4xl overflow-hidden border-r border-black/[0.05] dark:border-white/[0.05]">
+      <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-24 overflow-hidden border-r border-black/[0.05] dark:border-white/[0.05]">
          {/* Decorative elements */}
          <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-deep-sage/10 blur-[100px] rounded-full" />
          <div className="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-warm-gold/5 blur-[80px] rounded-full" />
          
-         <div className="relative z-10 max-w-md space-y-xl animate-fade-in">
-            <Quotes size={48} className="text-warm-gold opacity-40 mb-lg" />
-            <h2 className="text-4xl lg:text-5xl font-serif italic leading-tight text-soft-cream/90">
+         <div className="relative z-10 max-w-md space-y-8 animate-fade-in">
+            <Quotes size={48} className="text-warm-gold opacity-40 mb-6" />
+            <Heading as="h2" size="h2" className="italic text-soft-cream/90">
               "Return to the signal. Leave the noise outside."
-            </h2>
-            <div className="space-y-sm">
-              <p className="text-lg font-medium text-warm-gold">TRASON</p>
-              <p className="text-sm text-gray-light font-light leading-relaxed">
+            </Heading>
+            <div className="space-y-2">
+              <Paragraph size="lg" className="font-medium text-warm-gold">TRASON</Paragraph>
+              <Paragraph size="sm">
                 Your dashboard is ready to show what matters next: money, movement, reminders, and momentum.
-              </p>
+              </Paragraph>
             </div>
          </div>
 
          {/* Bottom Brand Label */}
-         <div className="absolute bottom-12 left-12 flex items-center gap-sm opacity-40">
+         <div className="absolute bottom-12 left-12 flex items-center gap-2 opacity-40">
             <Logo size={32} variant="gold" />
             <span className="font-serif text-lg tracking-tight">TRASON</span>
          </div>
       </div>
 
       {/* Right Side: Login Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-lg md:p-4xl relative">
+      <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-24 relative">
         {isLoading && <div className="absolute top-0 left-0 right-0 h-1 bg-warm-gold animate-pulse" />}
-        <Link href="/" className="absolute top-12 left-16 flex items-center gap-sm text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
+        <Link href="/" className="absolute top-12 left-16 flex items-center gap-2 text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           <span>Back to Home</span>
         </Link>
 
-        <div className="w-full max-w-sm space-y-xl animate-slide-up">
-          <div className="space-y-sm text-center md:text-left">
-            <h1 className="text-3xl font-serif">Welcome Back</h1>
-            <p className="text-sm text-gray-light font-light">Sign in to continue where your last signal left off.</p>
+        <div className="w-full max-w-sm space-y-8 animate-slide-up">
+          <div className="space-y-2 text-center md:text-left">
+            <Heading as="h1" size="h3">Welcome Back</Heading>
+            <Paragraph size="sm">Sign in to continue where your last signal left off.</Paragraph>
           </div>
 
           {error && (
@@ -140,8 +141,8 @@ function LoginForm() {
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-xl">
-            <div className="space-y-lg">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="space-y-6">
               <Input
                 label="Email Address"
                 name="email"
@@ -179,19 +180,19 @@ function LoginForm() {
               variant="primary" 
               fullWidth 
               isLoading={isLoading}
-              className="py-lg rounded-full font-bold shadow-xl shadow-warm-gold/10"
+              className="py-6 rounded-full font-bold shadow-xl shadow-warm-gold/10"
             >
               Open Dashboard
             </Button>
           </form>
 
           <div className="text-center md:text-left">
-            <p className="text-sm text-gray-light font-light">
+            <Paragraph size="sm">
               New to TRASON?{' '}
               <Link href="/signup" className="text-warm-gold hover:underline font-medium underline-offset-4 decoration-warm-gold/30">
                 Begin here
               </Link>
-            </p>
+            </Paragraph>
           </div>
         </div>
       </div>

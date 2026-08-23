@@ -5,6 +5,7 @@ import { Loading } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { sanitizeError } from '@/libs/validation';
 import { Plus, Trash as Trash2, CheckSquare, Square, ListChecks, ArrowCounterClockwise } from '@phosphor-icons/react';
+import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface DailyTasksPanelProps {
   locale: string;
@@ -55,14 +56,14 @@ export function DailyTasksPanel({
   return (
     <div className="glass rounded-xl border border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
       {/* Checklist Header */}
-      <div className="flex items-center justify-between px-xl py-lg border-b border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/40">
-        <div className="space-y-xs">
-          <h2 className="text-sm font-bold text-soft-cream uppercase tracking-widest flex items-center gap-sm">
+      <div className="flex items-center justify-between px-8 py-6 border-b border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/40">
+        <div className="space-y-1">
+          <Heading as="h2" size="h2" className="text-sm font-bold text-soft-cream uppercase tracking-widest flex items-center gap-2">
             <ListChecks size={15} className="text-primary" />
             {new Date().toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' })}
-          </h2>
+          </Heading>
           {totalCount > 0 && (
-            <div className="flex items-center gap-sm">
+            <div className="flex items-center gap-2">
               <div className="flex-1 h-1.5 bg-black/[0.05] dark:bg-white/[0.05] rounded-full overflow-hidden" style={{ width: '120px' }}>
                 <div
                   className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500"
@@ -77,49 +78,49 @@ export function DailyTasksPanel({
             </div>
           )}
         </div>
-        <div className="flex items-center gap-sm text-[9px] text-gray-light opacity-50">
+        <div className="flex items-center gap-2 text-[9px] text-gray-light opacity-50">
           <ArrowCounterClockwise size={11} />
           {t('timeline_page.resets_midnight')}
         </div>
       </div>
 
       {/* Add Task Input */}
-      <div className="px-xl py-lg border-b border-black/[0.05] dark:border-white/[0.05]">
-        <form onSubmit={handleAddTask} className="flex gap-sm">
+      <div className="px-8 py-6 border-b border-black/[0.05] dark:border-white/[0.05]">
+        <form onSubmit={handleAddTask} className="flex gap-2">
           <input
             value={newTaskInput}
             onChange={(e) => setNewTaskInput(e.target.value)}
             placeholder={t('timeline_page.add_task_placeholder')}
             disabled={isAddingTask}
-            className="flex-1 bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md px-lg py-sm text-sm text-soft-cream placeholder-gray-light/40 focus:border-primary focus:outline-none transition-all disabled:opacity-50"
+            className="flex-1 bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md px-6 py-2 text-sm text-soft-cream placeholder-gray-light/40 focus:border-primary focus:outline-none transition-all disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={!newTaskInput.trim() || isAddingTask}
-            className="flex items-center gap-sm px-lg py-sm bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary rounded-md text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary rounded-md text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <Plus size={14} />
             {t('timeline_page.add')}
           </button>
         </form>
-        {taskError && <p className="text-[11px] text-expense mt-sm">{taskError}</p>}
+        {taskError && <Paragraph className="text-[11px] text-expense mt-2">{taskError}</Paragraph>}
       </div>
 
       {/* Task List */}
       <div className="divide-y divide-white/[0.03]">
         {isTasksLoading ? (
-          <div className="flex justify-center py-2xl">
+          <div className="flex justify-center py-12">
             <Loading />
           </div>
         ) : tasks.length === 0 ? (
-          <div className="flex flex-col items-center py-3xl gap-md text-center px-xl">
+          <div className="flex flex-col items-center py-16 gap-4 text-center px-8">
             <ListChecks size={40} className="text-gray-light opacity-20" />
-            <p className="text-sm text-gray-light opacity-60 font-light italic">
+            <Paragraph className="text-sm text-gray-light opacity-60 font-light italic">
               {t('dailyTasks.empty')}
-            </p>
-            <p className="text-[10px] text-gray-light opacity-40">
+            </Paragraph>
+            <Paragraph className="text-[10px] text-gray-light opacity-40">
               {t('timeline_page.resets_midnight')}
-            </p>
+            </Paragraph>
           </div>
         ) : (
           tasks.map((task) => {
@@ -128,7 +129,7 @@ export function DailyTasksPanel({
             return (
               <div
                 key={task.id}
-                className={`flex items-center gap-lg px-xl py-lg group transition-all hover:bg-black/[0.01] dark:bg-white/[0.01] ${
+                className={`flex items-center gap-6 px-8 py-6 group transition-all hover:bg-black/[0.01] dark:bg-white/[0.01] ${
                   task.completed_today ? 'opacity-60' : ''
                 } ${isDeleting ? 'opacity-30 pointer-events-none' : ''}`}
               >
@@ -161,7 +162,7 @@ export function DailyTasksPanel({
                 <button
                   onClick={() => deleteTask(task.id)}
                   disabled={isDeleting || isToggling}
-                  className={`opacity-0 group-hover:opacity-100 text-gray-light hover:text-expense transition-all p-sm ${
+                  className={`opacity-0 group-hover:opacity-100 text-gray-light hover:text-expense transition-all p-2 ${
                     isDeleting ? 'opacity-50 cursor-wait' : ''
                   }`}
                   aria-label={`Delete ${task.title}`}

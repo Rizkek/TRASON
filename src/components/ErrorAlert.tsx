@@ -31,7 +31,7 @@ export function ErrorAlert({
     <div
       className={`fixed ${positionClass} right-4 left-4 md:left-auto md:w-96 z-50 animate-slide-in`}
     >
-      <div className="bg-danger text-white px-lg py-md rounded-md shadow-lg flex items-start gap-md">
+      <div className="bg-danger text-white px-6 py-4 rounded-md shadow-lg flex items-start gap-4">
         <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
         <div className="flex-1">
           <p className="text-sm font-medium">{error}</p>
