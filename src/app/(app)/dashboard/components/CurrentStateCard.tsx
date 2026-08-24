@@ -77,7 +77,7 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
                 <div className="p-1.5 rounded-lg bg-primary/20 text-primary">
                   <Wallet size={16} />
                 </div>
-                <span className="text-xs font-bold tracking-tight text-gray-light uppercase">
+                <span className="text-xs font-medium tracking-tight text-gray-light uppercase">
                   {t('nav.finance')}
                 </span>
               </div>
@@ -88,13 +88,13 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
               <div className="flex justify-between items-end">
                 <div>
                   <div className="text-[10px] text-gray-light uppercase tracking-wider">{t('dashboard.income')}</div>
-                  <div className="text-sm md:text-md font-bold font-mono text-emerald-400">
+                  <div className="text-sm md:text-md font-semibold font-mono text-emerald-400">
                     {formatCurrency(totalIncome, currency, locale)}
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] text-gray-light uppercase tracking-wider">{t('dashboard.expenses')}</div>
-                  <div className="text-sm md:text-md font-bold font-mono text-rose-400">
+                  <div className="text-sm md:text-md font-semibold font-mono text-rose-400">
                     {formatCurrency(totalExpense, currency, locale)}
                   </div>
                 </div>
@@ -137,7 +137,7 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
                 <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
                   <Barbell size={16} />
                 </div>
-                <span className="text-xs font-bold tracking-tight text-gray-light uppercase">
+                <span className="text-xs font-medium tracking-tight text-gray-light uppercase">
                   {t('nav.sport')}
                 </span>
               </div>
@@ -149,11 +149,11 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
             ) : (
               <div className="space-y-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-lg md:text-xl font-bold text-soft-cream">
+                  <span className="text-lg md:text-xl font-semibold text-soft-cream">
                     {sportSummary.totalSessions} {t('dashboard.sessions')}
                   </span>
                   {sportSummary.streak >= 2 && (
-                    <span className="flex items-center gap-0.5 text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
+                    <span className="flex items-center gap-0.5 text-xs font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
                       <Flame size={12} />
                       {sportSummary.streak}d
                     </span>
@@ -182,7 +182,7 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
                 <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
                   <Briefcase size={16} />
                 </div>
-                <span className="text-xs font-bold tracking-tight text-gray-light uppercase">
+                <span className="text-xs font-medium tracking-tight text-gray-light uppercase">
                   {t('nav.career')}
                 </span>
               </div>
@@ -194,11 +194,11 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
             ) : (
               <div className="space-y-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-lg md:text-xl font-bold text-soft-cream">
+                  <span className="text-lg md:text-xl font-semibold text-soft-cream">
                     {careerStats.active} {t('dashboard.active_now')}
                   </span>
                   {careerStats.interview > 0 && (
-                    <span className="text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
+                    <span className="text-xs font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
                       {careerStats.interview} {t('dashboard.interview')}
                     </span>
                   )}

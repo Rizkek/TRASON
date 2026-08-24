@@ -225,7 +225,7 @@ export function InvestmentsClient() {
         <div className="space-y-8 animate-fade-in">
           <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="space-y-2 max-w-2xl">
-            <Heading as="h1" size="h1" className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('investment_page.investment_analyst_title')}</Heading>
+            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-soft-cream">{t('investment_page.investment_analyst_title')}</Heading>
             <Paragraph className="text-subtext flex items-center gap-2">
               {t('investment_page.investment_analyst_desc')}
             </Paragraph>
@@ -251,16 +251,16 @@ export function InvestmentsClient() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           <Card className="p-8 bg-gradient-to-br from-black/20 to-black/5 border-primary/20 backdrop-blur-md">
             <Paragraph className="text-micro text-primary/80 uppercase tracking-widest font-semibold mb-2">{t('dashboard.netWorth.title')}</Paragraph>
-            <Paragraph className="text-3xl font-sans font-bold tracking-tight tabular-nums text-white">{formatCurrency(summary?.netWorth || 0, currency, locale)}</Paragraph>
+            <Paragraph className="text-3xl font-sans font-semibold tracking-tight tabular-nums text-white">{formatCurrency(summary?.netWorth || 0, currency, locale)}</Paragraph>
           </Card>
           <Card className="p-8 bg-black/20 border-white/5">
             <Paragraph className="text-micro text-gray-light mb-2 uppercase tracking-widest">{t('dashboard.netWorth.totalAssets')}</Paragraph>
-            <Paragraph className="text-2xl font-bold tabular-nums text-white">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</Paragraph>
+            <Paragraph className="text-2xl font-semibold tabular-nums text-white">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</Paragraph>
             <Paragraph className="text-xs text-gray-light mt-1">{t('investment_page.liquid_property_vehicle')}</Paragraph>
           </Card>
           <Card className="p-8 bg-black/20 border-white/5">
             <Paragraph className="text-micro text-gray-light mb-2 uppercase tracking-widest">{t('dashboard.netWorth.totalLiabilities')}</Paragraph>
-            <Paragraph className="text-2xl font-bold tabular-nums text-white">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</Paragraph>
+            <Paragraph className="text-2xl font-semibold tabular-nums text-white">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</Paragraph>
             <Paragraph className="text-xs text-gray-light mt-1">{t('investment_page.debt_mortgages')}</Paragraph>
           </Card>
         </div>
@@ -268,7 +268,7 @@ export function InvestmentsClient() {
         <Card className="overflow-hidden">
           <div className="px-6 py-4 border-b border-black/5 dark:border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <Heading as="h3" size="h3" className="text-sm font-bold tracking-tight">{t('investment_page.portfolio_tracker')}</Heading>
+              <Heading as="h3" size="h3" className="text-sm font-semibold tracking-tight">{t('investment_page.portfolio_tracker')}</Heading>
               <Paragraph className="text-xs text-gray-light mt-1">{t('investment_page.portfolio_tracker_desc')}</Paragraph>
             </div>
             
@@ -401,21 +401,21 @@ export function InvestmentsClient() {
                 <Landmark size={16} />
                 <Paragraph className="text-micro">{t('investment_page.stocks_upper')}</Paragraph>
               </div>
-              <Paragraph className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.stock || 0, currency, locale)}</Paragraph>
+              <Paragraph className="text-lg font-semibold text-white">{formatCurrency(summary?.allocationByType.stock || 0, currency, locale)}</Paragraph>
             </Card>
             <Card className="p-8">
               <div className="flex items-center gap-2 mb-4 text-primary">
                 <Coins size={16} />
                 <Paragraph className="text-micro">{t('investment_page.crypto_upper')}</Paragraph>
               </div>
-              <Paragraph className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.crypto || 0, currency, locale)}</Paragraph>
+              <Paragraph className="text-lg font-semibold text-white">{formatCurrency(summary?.allocationByType.crypto || 0, currency, locale)}</Paragraph>
             </Card>
             <Card className="p-8">
               <div className="flex items-center gap-2 mb-4 text-warning">
                 <Shield size={16} />
                 <Paragraph className="text-micro">{t('investment_page.gold_upper')}</Paragraph>
               </div>
-              <Paragraph className="text-lg font-bold text-white">{formatCurrency(summary?.allocationByType.gold || 0, currency, locale)}</Paragraph>
+              <Paragraph className="text-lg font-semibold text-white">{formatCurrency(summary?.allocationByType.gold || 0, currency, locale)}</Paragraph>
             </Card>
           </div>
         )}

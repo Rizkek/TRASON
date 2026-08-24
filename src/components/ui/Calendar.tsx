@@ -82,13 +82,13 @@ export const Calendar: React.FC<CalendarProps> = ({
         <div className="flex justify-between items-start">
           <span className={`text-xs font-sans transition-colors ${
             isToday 
-              ? 'bg-warm-gold text-warm-black w-6 h-6 flex items-center justify-center rounded-full font-bold shadow-[0_0_10px_rgba(244,201,93,0.4)]' 
+              ? 'bg-warm-gold text-warm-black w-6 h-6 flex items-center justify-center rounded-full font-semibold shadow-[0_0_10px_rgba(244,201,93,0.4)]' 
               : isSelected 
-              ? 'text-warm-gold font-bold' 
+              ? 'text-warm-gold font-semibold' 
               : isHolidayRed || isSunday 
               ? 'text-rose-400 font-extrabold' 
               : isCutiAmber 
-              ? 'text-amber-300 font-bold' 
+              ? 'text-amber-300 font-semibold' 
               : 'text-gray-light'
           }`}>
             {d}
@@ -164,7 +164,7 @@ export const Calendar: React.FC<CalendarProps> = ({
         }).map((day, i) => (
           <div 
             key={day} 
-            className={`py-2 text-center text-[10px] uppercase tracking-[0.2em] font-bold ${
+            className={`py-2 text-center text-[10px] uppercase tracking-[0.2em] font-medium ${
               i === 0 ? 'text-rose-400 font-extrabold' : 'text-gray-light/60'
             }`}
           >
@@ -181,7 +181,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       {/* Month Holiday Footer Summary */}
       {currentMonthHolidays.length > 0 && (
         <div className="p-4 md:px-6 border-t border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/30 flex items-start gap-4 flex-wrap">
-          <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-light uppercase tracking-wider shrink-0 pt-0.5">
+          <div className="flex items-center gap-1.5 text-[11px] font-medium text-gray-light uppercase tracking-wider shrink-0 pt-0.5">
             <CalendarCheck size={14} className="text-primary" />
             <span>Hari Libur Bulan Ini:</span>
           </div>
@@ -197,7 +197,7 @@ export const Calendar: React.FC<CalendarProps> = ({
                       : 'bg-rose-500/10 text-rose-200 border-rose-500/20'
                   }`}
                 >
-                  <span className="font-bold font-mono">{d}</span>
+                  <span className="font-semibold font-mono">{d}</span>
                   <span>{h.name}</span>
                 </div>
               );

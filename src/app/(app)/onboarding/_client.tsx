@@ -145,7 +145,7 @@ export function OnboardingClient() {
         <ErrorAlert error={error} onDismiss={() => setError(null)} />
 
         <div className="text-center space-y-2 mb-8">
-          <Heading as="h1" size="h1" className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-white">
+          <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-white">
             {t('onboarding.welcome')}
           </Heading>
           <Paragraph className="text-gray-light text-sm md:text-base max-w-md mx-auto">
@@ -170,7 +170,7 @@ export function OnboardingClient() {
             <div className="space-y-8 animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-2">
+                  <label className="text-xs font-medium text-gray-light tracking-widest uppercase flex items-center gap-2">
                     <UserIcon size={14} className="text-primary" /> {t("onboarding.first_name")}
                   </label>
                   <input
@@ -181,7 +181,7 @@ export function OnboardingClient() {
                   />
                 </div>
                 <div className="space-y-4">
-                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-2">
+                  <label className="text-xs font-medium text-gray-light tracking-widest uppercase flex items-center gap-2">
                     {t("onboarding.last_name")}
                   </label>
                   <input
@@ -230,7 +230,7 @@ export function OnboardingClient() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-white/5">
                 <div className="space-y-4">
-                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-2">
+                  <label className="text-xs font-medium text-gray-light tracking-widest uppercase flex items-center gap-2">
                     <Wallet size={14} className="text-warm-gold" /> {t("onboarding.currency")}
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -251,7 +251,7 @@ export function OnboardingClient() {
                 </div>
 
                 <div className="space-y-4">
-                  <label className="text-xs font-bold text-gray-light tracking-widest uppercase flex items-center gap-2">
+                  <label className="text-xs font-medium text-gray-light tracking-widest uppercase flex items-center gap-2">
                     <PaintBrush size={14} className="text-primary" /> {t("onboarding.theme")}
                   </label>
                   <div className="flex gap-2">

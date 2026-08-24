@@ -106,7 +106,7 @@ export function SecuritySection({
         <Card className="glass border-none bg-danger/5 border-danger/20">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div>
-              <Heading as="h3" size="h3" className="text-lg font-bold text-danger flex items-center gap-2">
+              <Heading as="h3" size="h3" className="text-lg font-semibold text-danger flex items-center gap-2">
                 <AlertTriangle size={20} /> {t('settings.security.deleteAccount')}
               </Heading>
               <Paragraph className="text-sm text-gray-light mt-1">{t('settings.security.deleteDesc')}</Paragraph>

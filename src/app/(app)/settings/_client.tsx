@@ -319,7 +319,7 @@ export function SettingsClient() {
         <div className="space-y-8 animate-fade-in max-w-4xl">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
             <div>
-              <Heading as="h1" size="h1" className="text-3xl font-bold tracking-tight text-soft-cream">
+              <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-soft-cream">
                 {t('settings.title')}
               </Heading>
               <Paragraph className="text-gray-light mt-1 text-sm">{t('settings.subtitle')}</Paragraph>

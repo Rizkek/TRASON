@@ -80,7 +80,7 @@ export function ProfileSection({
             </button>
           </div>
           <div className="text-center md:text-left">
-            <Heading as="h2" size="h2" className="text-xl font-bold text-soft-cream tracking-tight">
+            <Heading as="h2" size="h2" className="text-xl font-semibold text-soft-cream tracking-tight">
               {profile.first_name || profile.last_name
                 ? `${profile.first_name} ${profile.last_name}`.trim()
                 : 'Syncing Identity...'}

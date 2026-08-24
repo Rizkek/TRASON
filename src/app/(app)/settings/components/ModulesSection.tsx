@@ -277,13 +277,13 @@ export function ModulesSection() {
       <Card className="glass border-none bg-black/[0.01] dark:bg-white/[0.01]" title="MODULE STATUS">
         <div className="grid grid-cols-2 gap-4">
           <div className="p-6 rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05]">
-            <div className="text-2xl font-bold text-primary">{enabledCount}</div>
+            <div className="text-2xl font-semibold text-primary">{enabledCount}</div>
             <div className="text-[10px] text-gray-light tracking-widest">
               {t('modules.enabled_count').toUpperCase()}
             </div>
           </div>
           <div className="p-6 rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05]">
-            <div className="text-2xl font-bold text-secondary">{disabledCount}</div>
+            <div className="text-2xl font-semibold text-secondary">{disabledCount}</div>
             <div className="text-[10px] text-gray-light tracking-widest">
               {t('modules.disabled_count').toUpperCase()}
             </div>

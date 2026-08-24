@@ -17,7 +17,7 @@
   --color-primary: 244 201 93;     /* #F4C95D */
   --color-secondary: 227 184 77;   /* #E3B84D */
   --color-warm-black: 11 15 20;    /* #0B0F14 */
-  --color-soft-cream: 248 250 252; /* #F8FAFC */
+  --color-soft-cream: 252 252 253; /* #FCFCFD — near white, no yellowish cast */
   --color-gray-strong: 17 24 39;   /* #111827 */
   --color-gray-medium: 55 65 81;   /* #374151 */
   --color-gray-light: 148 163 184; /* #94A3B8 */
@@ -49,7 +49,7 @@
 
 html {
   scroll-behavior: smooth;
-  font-family: var(--font-inter);
+  font-family: var(--font-sans);
   @apply bg-soft-cream dark:bg-warm-black;
 }
 

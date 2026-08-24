@@ -174,7 +174,7 @@ export function SubscriptionsClient() {
 
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="space-y-2">
-            <Heading as="h1" size="h1" className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('finance.subscriptions') || 'Subscriptions'}</Heading>
+            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-soft-cream">{t('finance.subscriptions') || 'Subscriptions'}</Heading>
             <Paragraph className="text-subtext flex items-center gap-2">
               {t('finance.manageSubscriptions') || 'Manage your recurring payments.'}
             </Paragraph>

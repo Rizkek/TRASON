@@ -83,7 +83,7 @@ export const SportPageClient: React.FC = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
-              <Heading as="h1" size="h1" className="text-4xl font-sans font-bold tracking-tight text-soft-cream mb-2">{t('sport_page.sport_fitness_title')}</Heading>
+              <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-soft-cream mb-2">{t('sport_page.sport_fitness_title')}</Heading>
               <Paragraph className="text-gray-light text-sm tracking-wide">
                 {t('sport_page.sport_fitness_desc')}
               </Paragraph>
@@ -108,7 +108,7 @@ export const SportPageClient: React.FC = () => {
               {/* Workout Plans */}
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <Heading as="h2" size="h2" className="text-xl font-sans font-bold tracking-tight font-bold text-white">{t('sport_page.workout_plans')}</Heading>
+                  <Heading as="h2" size="h2" className="text-xl font-sans font-semibold tracking-tight text-white">{t('sport_page.workout_plans')}</Heading>
                   <Button variant="ghost" size="sm" className="text-xs" onClick={() => setIsCreatePlanModalOpen(true)}>
                     <Plus size={14} className="mr-1" /> {t('sport_page.new_plan')}
                   </Button>
@@ -141,7 +141,7 @@ export const SportPageClient: React.FC = () => {
                     <Flame size={16} className="text-accent-purple" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">{t('sport_page.this_week')}</span>
                   </div>
-                  <Paragraph className="text-2xl font-bold text-white">{stats.thisWeekSessions} <span className="text-sm font-normal text-gray-light">{t('sport_page.sessions_label')}</span></Paragraph>
+                  <Paragraph className="text-2xl font-semibold text-white">{stats.thisWeekSessions} <span className="text-sm font-normal text-gray-light">{t('sport_page.sessions_label')}</span></Paragraph>
                 </div>
 
                 <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-4">
@@ -149,7 +149,7 @@ export const SportPageClient: React.FC = () => {
                     <Timer size={16} className="text-accent-gold" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">{t('sport_page.avg_session')}</span>
                   </div>
-                  <Paragraph className="text-2xl font-bold text-white">{stats.avgSessionMinutes} <span className="text-sm font-normal text-gray-light">{t('sport_page.min_label')}</span></Paragraph>
+                  <Paragraph className="text-2xl font-semibold text-white">{stats.avgSessionMinutes} <span className="text-sm font-normal text-gray-light">{t('sport_page.min_label')}</span></Paragraph>
                 </div>
 
                 <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-4">
@@ -157,7 +157,7 @@ export const SportPageClient: React.FC = () => {
                     <Activity size={16} className="text-primary" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">{t('sport_page.total_time')}</span>
                   </div>
-                  <Paragraph className="text-2xl font-bold text-white">{Math.floor(stats.totalMinutes / 60)}<span className="text-sm font-normal text-gray-light">{t('sport_page.h_label')}</span> {stats.totalMinutes % 60}<span className="text-sm font-normal text-gray-light">{t('sport_page.m_label')}</span></Paragraph>
+                  <Paragraph className="text-2xl font-semibold text-white">{Math.floor(stats.totalMinutes / 60)}<span className="text-sm font-normal text-gray-light">{t('sport_page.h_label')}</span> {stats.totalMinutes % 60}<span className="text-sm font-normal text-gray-light">{t('sport_page.m_label')}</span></Paragraph>
                 </div>
 
                 <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-4">
@@ -165,7 +165,7 @@ export const SportPageClient: React.FC = () => {
                     <Dumbbell size={16} className="text-secondary" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">{t('sport_page.total_sessions')}</span>
                   </div>
-                  <Paragraph className="text-2xl font-bold text-white">{stats.totalSessions}</Paragraph>
+                  <Paragraph className="text-2xl font-semibold text-white">{stats.totalSessions}</Paragraph>
                 </div>
               </div>
 
@@ -174,7 +174,7 @@ export const SportPageClient: React.FC = () => {
 
               {/* PR Board */}
               <div className="space-y-4">
-                <Heading as="h2" size="h2" className="text-xl font-sans font-bold tracking-tight font-bold text-white flex items-center gap-2">
+                <Heading as="h2" size="h2" className="text-xl font-sans font-semibold tracking-tight text-white flex items-center gap-2">
                   <Flame className="text-accent-gold" size={20} /> {t('sport_page.personal_records')}
                 </Heading>
                 <PRBoard records={prBoard} />
@@ -183,12 +183,12 @@ export const SportPageClient: React.FC = () => {
               {/* Sessions ClockCounterClockwise List */}
               {sessions.length > 0 && (
                 <div className="space-y-4">
-                  <Heading as="h2" size="h2" className="text-xl font-sans font-bold tracking-tight font-bold text-white">{t('sport_page.recent_workouts')}</Heading>
+                  <Heading as="h2" size="h2" className="text-xl font-sans font-semibold tracking-tight text-white">{t('sport_page.recent_workouts')}</Heading>
                   <div className="grid grid-cols-1 gap-4">
                     {sessions.slice((page - 1) * limit, page * limit).map((session) => (
                       <div key={session.id} className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-lg p-4 flex justify-between items-center hover:bg-black/[0.05] dark:bg-white/[0.05] transition-colors">
                         <div>
-                          <Paragraph className="text-white font-bold">{new Date(session.session_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</Paragraph>
+                          <Paragraph className="text-white font-semibold">{new Date(session.session_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</Paragraph>
                           <Paragraph className="text-xs text-gray-light">{session.duration_minutes} {t('sport_page.minutes_count')} â€¢ {t('sport_page.intensity')}: {session.rating}/5</Paragraph>
                           {session.notes && <Paragraph className="text-sm text-gray-very-light mt-1 italic line-clamp-1">{session.notes}</Paragraph>}
                         </div>

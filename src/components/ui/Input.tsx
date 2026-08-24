@@ -36,6 +36,9 @@ export const Input = memo(
       const effectiveLeft = leftIcon || prefix;
       const effectiveRight = rightIcon || suffix;
       const effectiveHelp = helperText || helpText;
+      const errorId = error && inputId ? `${inputId}-error` : undefined;
+      const helpId = effectiveHelp && inputId ? `${inputId}-help` : undefined;
+      const ariaDescribedBy = [errorId, helpId].filter(Boolean).join(' ') || undefined;
 
       return (
         <div className="w-full">
@@ -59,6 +62,8 @@ export const Input = memo(
               ref={ref}
               id={inputId}
               disabled={disabled}
+              aria-invalid={!!error}
+              aria-describedby={ariaDescribedBy}
               className={`w-full bg-black/30 border text-soft-cream placeholder:text-gray-light/50 text-sm rounded-lg px-3.5 py-2.5 transition-all duration-200 outline-none ${
                 effectiveLeft ? 'pl-10' : ''
               } ${effectiveRight ? 'pr-10' : ''} ${
@@ -77,11 +82,11 @@ export const Input = memo(
           </div>
 
           {error && (
-            <p className="mt-1 text-xs text-danger font-medium">{error}</p>
+            <p id={errorId} className="mt-1 text-xs text-danger font-medium">{error}</p>
           )}
 
           {!error && effectiveHelp && (
-            <p className="mt-1 text-xs text-gray-light">{effectiveHelp}</p>
+            <p id={helpId} className="mt-1 text-xs text-gray-light">{effectiveHelp}</p>
           )}
         </div>
       );

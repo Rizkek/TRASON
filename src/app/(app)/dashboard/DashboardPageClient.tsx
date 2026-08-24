@@ -149,11 +149,11 @@ export function DashboardClient() {
         {/* 1. Contextual Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pt-1 pb-2">
           <div>
-            <Heading as="h1" size="h2" className="flex flex-wrap items-baseline gap-x-2 text-gray-900 dark:text-soft-cream">
+            <Heading as="h1" size="h2" weight="semibold" className="flex flex-wrap items-baseline gap-x-2 text-gray-900 dark:text-soft-cream">
               <span className="opacity-80">{greeting},</span>
               <span>{user?.first_name || user?.name?.split(' ')[0] || 'User'}</span>
             </Heading>
-            <div className="flex items-center gap-2 text-gray-light/70 text-xs mt-1">
+            <div className="flex items-center gap-2 text-gray-light/70 text-label-sm mt-1">
               <span className="uppercase tracking-wider font-medium">{todayDate}</span>
               <span className="w-1 h-1 rounded-full bg-gray-light/40" />
               <span className="font-mono tabular-nums">{todayTime}</span>
@@ -181,12 +181,12 @@ export function DashboardClient() {
                 <TrasonIcon icon={Warning} size={18} />
               </div>
               <div>
-                <Paragraph className="text-amber-600 dark:text-amber-300 text-xs font-bold">
+                <Paragraph className="text-amber-600 dark:text-amber-300 text-label-sm font-bold">
                   {dueSubscriptions.length === 1
                     ? t('dashboard.subscriptions_due_single')
                     : t('dashboard.subscriptions_due_multiple').replace('{count}', dueSubscriptions.length.toString())}
                 </Paragraph>
-                <Paragraph className="text-[11px] text-amber-600/80 dark:text-amber-300/80 mt-0.5 truncate max-w-md">
+                <Paragraph className="text-token-micro text-amber-600/80 dark:text-amber-300/80 mt-0.5 truncate max-w-md">
                   {dueSubscriptions.map(s => s.name).join(', ')}
                 </Paragraph>
               </div>
@@ -195,7 +195,7 @@ export function DashboardClient() {
               variant="outline" 
               size="sm" 
               onClick={() => router.push('/finance/subscriptions')}
-              className="shrink-0 border-amber-500/40 text-amber-300 hover:bg-amber-500/20 text-xs px-3 py-1"
+              className="shrink-0 border-amber-500/40 text-amber-300 hover:bg-amber-500/20 text-label-sm px-3 py-1"
             >
               {t('dashboard.review')}
             </Button>
@@ -236,7 +236,9 @@ export function DashboardClient() {
             <div className="flex items-center justify-between border-t border-black/[0.05] dark:border-white/[0.05] pt-4">
               <button
                 onClick={() => setShowFinancialChart(!showFinancialChart)}
-                className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream transition-colors py-1 px-2 rounded-lg hover:bg-white/5"
+                aria-expanded={showFinancialChart}
+                aria-controls="financial-chart-panel"
+                className="flex items-center gap-2 text-label-sm uppercase tracking-widest text-gray-light hover:text-soft-cream transition-colors py-1 px-2 rounded-lg hover:bg-white/5"
               >
                 <ChartLineUp size={16} className="text-primary" />
                 <span>
@@ -257,7 +259,7 @@ export function DashboardClient() {
                   >
                     <TrasonIcon icon={CaretLeft} size={16} />
                   </button>
-                  <span className="text-xs font-bold text-soft-cream px-2 tracking-wide font-mono">
+                  <span className="text-label-sm text-soft-cream px-2 tracking-wide font-mono">
                     {new Date(financeYear, financeMonth).toLocaleString(locale || 'en-US', { month: 'short', year: 'numeric' })}
                   </span>
                   <button 
@@ -275,7 +277,7 @@ export function DashboardClient() {
             </div>
 
             {showFinancialChart && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-3 animate-fade-in">
+              <div id="financial-chart-panel" className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-3 animate-fade-in">
                 <div className="lg:col-span-2">
                   <FinancialChart transactions={transactions} month={financeMonth} year={financeYear} />
                 </div>

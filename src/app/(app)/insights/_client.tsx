@@ -317,7 +317,7 @@ User Context Profile (TRASON Unified Life OS):
       <div className="space-y-8 animate-fade-in">
         <div className="flex items-start justify-between">
           <div className="space-y-2">
-            <Heading as="h1" size="h1" className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('insights_page.title')}</Heading>
+            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-soft-cream">{t('insights_page.title')}</Heading>
             <Paragraph className="text-subtext flex items-center gap-2">
               {t('insights_page.desc')}
             </Paragraph>
@@ -381,7 +381,7 @@ User Context Profile (TRASON Unified Life OS):
                           <Badge variant={insight.type === 'finance' || insight.type === 'investment' ? 'success' : insight.type === 'productivity' || insight.type === 'career' ? 'insight' : 'activity'} size="sm">
                             {insight.type.toUpperCase()}
                           </Badge>
-                          <span className="text-[10px] font-bold text-gray-light uppercase tracking-widest flex items-center gap-2">
+                          <span className="text-[10px] font-medium text-gray-light uppercase tracking-widest flex items-center gap-2">
                             <Calendar size={10} /> {formatDate(insight.date)}
                           </span>
                         </div>
@@ -396,7 +396,7 @@ User Context Profile (TRASON Unified Life OS):
                         )}
                       </div>
                       
-                      <Heading as="h3" size="h3" className="text-xl font-bold text-soft-cream leading-tight truncate">
+                      <Heading as="h3" size="h3" className="text-xl font-semibold text-soft-cream leading-tight truncate">
                         {insight.title}
                       </Heading>
                       
@@ -422,7 +422,7 @@ User Context Profile (TRASON Unified Life OS):
                   <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center text-gray-light">
                     <Stack size={32} />
                   </div>
-                  <Heading as="h3" size="h3" className="text-lg font-bold">{t('insights_page.no_insights_title')}</Heading>
+                  <Heading as="h3" size="h3" className="text-lg font-semibold">{t('insights_page.no_insights_title')}</Heading>
                   <Paragraph className="text-xs text-gray-light max-w-xs">
                     {t('insights_page.no_insights_desc')}
                   </Paragraph>
@@ -432,7 +432,7 @@ User Context Profile (TRASON Unified Life OS):
                   <div className="w-12 h-12 border border-black/10 dark:border-white/10 rounded-full flex items-center justify-center">
                     <Target size={20} />
                   </div>
-                  <Paragraph className="text-[10px] font-bold tracking-[0.2em] uppercase">{t('insights_page.system_idle')}</Paragraph>
+                  <Paragraph className="text-[10px] font-medium tracking-[0.2em] uppercase">{t('insights_page.system_idle')}</Paragraph>
                 </Card>
               </>
             )}
@@ -447,7 +447,7 @@ User Context Profile (TRASON Unified Life OS):
                     <Lightbulb size={24} className="text-primary" />
                  </div>
                  <div>
-                    <Heading as="h4" size="h4" className="text-md font-bold text-white uppercase tracking-wider mb-1">{t('insights_page.architect_perspective_title')}</Heading>
+                    <Heading as="h4" size="h4" className="text-md font-semibold text-white uppercase tracking-wider mb-1">{t('insights_page.architect_perspective_title')}</Heading>
                     <Paragraph className="text-sm text-gray-light">
                       {t('insights_page.architect_perspective_desc')}
                     </Paragraph>

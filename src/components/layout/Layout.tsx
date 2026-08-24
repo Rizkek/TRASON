@@ -110,7 +110,7 @@ function OfflineBanner() {
 
   return (
     <div
-      className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-2 px-6 py-2 animate-fade-in backdrop-blur-md border-b text-[10px] font-bold tracking-[0.15em] uppercase ${
+      className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-2 px-6 py-2 animate-fade-in backdrop-blur-md border-b text-token-micro uppercase ${
         justReconnected
           ? 'bg-success/10 border-success/20 text-soft-cream'
           : 'bg-warm-gold/[0.08] border-warm-gold/20 text-soft-cream'
@@ -168,6 +168,8 @@ const NotificationToggle = () => {
           : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/10'
       }`}
       title={notifications_enabled ? 'Notifications ON' : 'Notifications OFF'}
+      aria-label={notifications_enabled ? 'Disable notifications' : 'Enable notifications'}
+      aria-pressed={notifications_enabled}
     >
       {notifications_enabled ? <TrasonIcon icon={SYS_ICONS.notifications} size={18} /> : <TrasonIcon icon={SYS_ICONS.notificationsOff} size={18} />}
     </button>
@@ -187,6 +189,29 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = React.useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
   const [isLoggingOut, setIsLoggingOut] = React.useState(false);
+  const [sheetOffset, setSheetOffset] = React.useState(0);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const dragStartY = React.useRef(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    dragStartY.current = e.touches[0].clientY;
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const currentY = e.touches[0].clientY;
+    const offset = Math.max(0, currentY - dragStartY.current); // Only allow swiping down
+    setSheetOffset(offset);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    if (sheetOffset > 100) {
+      setIsBottomSheetOpen(false);
+    }
+    setSheetOffset(0); // Reset for next open
+  };
 
   const { module_features } = useUserPreferences();
 
@@ -259,10 +284,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="w-12 h-12 flex items-center justify-center mb-4">
             <Logo size={40} variant="gold" />
           </div>
-          <h1 className="text-2xl font-serif font-bold tracking-tight text-gradient">
+          <h1 className="text-heading-lg font-serif text-gradient">
             TRASON
           </h1>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-gray-light mt-1 font-medium">Personal Operating System</p>
+          <p className="text-token-micro uppercase text-gray-light mt-1">Personal Operating System</p>
         </div>
 
         <nav className="flex-1 px-4 py-8 space-y-2">
@@ -285,7 +310,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 <NavIcon icon={Icon} isActive={isActive(item.href)} size={20} />
                 
-                <span className={`text-sm font-semibold tracking-wide transition-colors duration-300 ${isActive(item.href) ? 'text-soft-cream drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]' : ''}`}>
+                <span className={`text-label-md tracking-wide transition-colors duration-300 ${isActive(item.href) ? 'text-soft-cream drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]' : ''}`}>
                   {t(`nav.${item.href.replace('/', '')}`)}
                 </span>
 
@@ -300,7 +325,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="p-4 mt-auto mb-4 space-y-2">
           {/* User Profile */}
           <div className="flex items-center gap-4 px-6 py-4 rounded-md bg-soft-cream/5 border border-soft-cream/10">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-bold text-white shadow-lg overflow-hidden shrink-0">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-medium text-white shadow-lg overflow-hidden shrink-0">
               {(user as any)?.avatar_url ? (
                 <Image src={(user as any).avatar_url} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
               ) : (
@@ -308,8 +333,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-sm text-soft-cream truncate">{user?.first_name || user?.name || 'User'}</p>
-              <p className="text-[10px] text-gray-light truncate opacity-80">{user?.email}</p>
+              <p className="text-label-md text-soft-cream truncate">{user?.first_name || user?.name || 'User'}</p>
+              <p className="text-token-micro text-gray-light truncate opacity-80">{user?.email}</p>
             </div>
             <NotificationToggle />
           </div>
@@ -319,27 +344,32 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             className="w-full flex items-center gap-4 px-6 py-4 rounded-md text-gray-light hover:text-danger hover:bg-danger/10 transition-all duration-300 group"
           >
             <TrasonIcon icon={SYS_ICONS.logout} size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-semibold tracking-wide">{t('nav.logout')}</span>
+            <span className="text-label-md tracking-wide">{t('nav.logout')}</span>
           </button>
         </div>
       </aside>
 
       {/* ── Main content area ─────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative md:ml-72">
-        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary opacity-[0.03] blur-2xl md:blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-[-5%] left-[-5%] w-[400px] h-[400px] bg-secondary opacity-[0.02] blur-2xl md:blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[70%] max-w-[500px] h-[500px] bg-[radial-gradient(circle_at_top_right,rgba(var(--color-primary),0.15),transparent_60%)] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[70%] max-w-[400px] h-[400px] bg-[radial-gradient(circle_at_bottom_left,rgba(var(--color-secondary),0.1),transparent_60%)] pointer-events-none" />
 
         {/* Mobile top header */}
         <header className="bg-warm-black/95 backdrop-blur-md border-b border-soft-cream/5 px-4 py-2 pt-[max(env(safe-area-inset-top),16px)] flex items-center justify-between md:hidden relative z-40 transition-colors">
           <div className="flex items-center gap-2">
             <Logo size={20} variant="gold" />
-            <h2 className="text-sm font-bold text-soft-cream tracking-wider uppercase">
+            <h2 className="text-label-md text-soft-cream uppercase">
               {currentMenuItem ? t(`nav.${currentMenuItem.href.replace('/', '')}`) : 'TRASON'}
             </h2>
           </div>
           <div className="flex items-center gap-2">
             <NotificationToggle />
-            <button onClick={() => setIsBottomSheetOpen(true)} className="relative w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-[10px] font-bold text-white shadow-lg overflow-hidden shrink-0">
+            <button 
+              onClick={() => setIsBottomSheetOpen(true)} 
+              aria-label="Open mobile menu"
+              aria-expanded={isBottomSheetOpen}
+              className="relative w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-token-micro text-white shadow-lg overflow-hidden shrink-0"
+            >
               {(user as any)?.avatar_url ? (
                 <Image src={(user as any).avatar_url} alt="Avatar" fill sizes="28px" className="object-cover" />
               ) : (
@@ -365,7 +395,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 key={item.href}
                 href={item.href}
                 prefetch={false}
-                className={`flex flex-col items-center p-2 rounded-xl min-w-[60px] transition-all duration-300 group ${
+                className={`flex flex-col items-center p-2 rounded-xl min-w-[60px] min-h-[44px] transition-all duration-300 group ${
                   active
                     ? 'text-primary'
                     : 'text-gray-light hover:text-soft-cream'
@@ -377,7 +407,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-1 rounded-full bg-primary shadow-[0_0_8px_rgba(244,201,93,0.9)] opacity-80" />
                   )}
                 </div>
-                <span className={`text-[10px] mt-1 font-medium tracking-wide transition-colors ${active ? 'text-soft-cream drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]' : ''}`}>
+                <span className={`text-label-sm mt-1 tracking-wide transition-colors ${active ? 'text-soft-cream drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]' : ''}`}>
                   {t(`nav.${item.href.replace('/', '')}`)}
                 </span>
               </Link>
@@ -387,6 +417,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* "More" button — opens bottom sheet */}
           <button
             onClick={() => setIsBottomSheetOpen(true)}
+            aria-label="More options"
+            aria-expanded={isBottomSheetOpen}
             className={`flex flex-col items-center p-2 rounded-xl min-w-[60px] transition-all duration-200 ${
               isBottomSheetOpen ? 'text-primary' : 'text-gray-light hover:text-soft-cream'
             }`}
@@ -394,7 +426,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className={`p-1.5 rounded-lg transition-all duration-200 ${isBottomSheetOpen ? 'bg-primary/15' : ''}`}>
               <TrasonIcon icon={SYS_ICONS.menu} size={22} />
             </div>
-            <span className="text-[10px] mt-0.5 font-medium tracking-wide">{t('nav.more') || 'More'}</span>
+            <span className="text-label-sm mt-1 tracking-wide">{t('nav.more') || 'More'}</span>
           </button>
         </nav>
       </div>
@@ -409,7 +441,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           />
 
           {/* Sheet panel */}
-          <div className="relative bg-gray-strong rounded-t-3xl border-t border-soft-cream/10 shadow-2xl animate-slide-up">
+          <div 
+            className="relative bg-gray-strong rounded-t-3xl border-t border-soft-cream/10 shadow-2xl animate-slide-up"
+            style={{ 
+              transform: `translateY(${sheetOffset}px)`,
+              transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-10 h-1 rounded-full bg-soft-cream/20" />
@@ -417,9 +458,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-soft-cream/5">
-              <span className="font-semibold text-soft-cream text-sm tracking-wide">{t('modules.title') || 'All Modules'}</span>
+              <span className="text-label-md text-soft-cream tracking-wide">{t('modules.title') || 'All Modules'}</span>
               <button
                 onClick={() => setIsBottomSheetOpen(false)}
+                aria-label="Close menu"
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-soft-cream/5 hover:bg-soft-cream/10 transition-colors text-gray-light hover:text-soft-cream"
               >
                 <TrasonIcon icon={SYS_ICONS.close} size={20} />
@@ -446,7 +488,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         }`}
                       >
                         <NavIcon icon={Icon} isActive={active} size={24} />
-                        <span className={`text-[11px] font-medium text-center leading-tight transition-colors ${active ? 'text-soft-cream drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]' : ''}`}>
+                        <span className={`text-label-sm text-center leading-tight transition-colors ${active ? 'text-soft-cream drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]' : ''}`}>
                           {t(`nav.${item.href.replace('/', '')}`)}
                         </span>
                       </Link>
@@ -454,7 +496,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-gray-light text-center py-4 opacity-60">All modules are in the nav bar.</p>
+                <p className="text-label-sm text-gray-light text-center py-4 opacity-60">All modules are in the nav bar.</p>
               )}
 
               {/* Settings & User section */}
@@ -470,12 +512,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   }`}
                 >
                   <TrasonIcon icon={SYS_ICONS.settings} size={20} />
-                  <span className="text-sm font-semibold">{t('nav.settings')}</span>
+                  <span className="text-label-md">{t('nav.settings')}</span>
                 </Link>
 
                 {/* User profile row */}
                 <div className="flex items-center gap-4 px-4 py-2 rounded-xl bg-soft-cream/5 border border-soft-cream/5">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-bold text-white shadow-lg flex-shrink-0 overflow-hidden">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-medium text-white shadow-lg flex-shrink-0 overflow-hidden">
                     {(user as any)?.avatar_url ? (
                       <Image src={(user as any).avatar_url} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
                     ) : (
@@ -483,13 +525,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-soft-cream truncate">{user?.first_name || user?.name || 'User'}</p>
-                    <p className="text-[10px] text-gray-light truncate opacity-80">{user?.email}</p>
+                    <p className="text-label-md text-soft-cream truncate">{user?.first_name || user?.name || 'User'}</p>
+                    <p className="text-label-sm text-gray-light truncate opacity-80">{user?.email}</p>
                   </div>
                   <NotificationToggle />
                   <button
                     onClick={() => { setIsBottomSheetOpen(false); setIsLogoutModalOpen(true); }}
-                    className="flex items-center gap-1 text-gray-light hover:text-danger transition-colors text-xs font-medium px-2 py-1 rounded-lg hover:bg-danger/10"
+                    className="flex items-center gap-1 text-gray-light hover:text-danger transition-colors text-label-sm px-2 py-1 rounded-lg hover:bg-danger/10"
                   >
                     <TrasonIcon icon={SYS_ICONS.logout} size={16} />
                     <span>{t('nav.logout')}</span>

@@ -58,14 +58,14 @@ export function LifeScoreCard() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-soft-cream">
+              <span className="text-xs font-medium uppercase tracking-widest text-soft-cream">
                 {t('life_score.ui.title')}
               </span>
-              <span className="font-mono text-base font-bold text-soft-cream">
+              <span className="font-mono text-base font-semibold text-soft-cream">
                 {lifeScore.overall}
                 <span className="text-[10px] text-gray-light font-normal opacity-60">/100</span>
               </span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${scoreColor}`}>
+              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${scoreColor}`}>
                 {scoreLabel}
               </span>
             </div>
@@ -85,7 +85,7 @@ export function LifeScoreCard() {
             return (
               <div key={key} className="flex items-center gap-1.5 font-medium">
                 <span className="opacity-75">{t(`life_score.dimensions.${key}`)}</span>
-                <span className={`font-mono font-bold ${valColor}`}>{val}</span>
+                <span className={`font-mono font-semibold ${valColor}`}>{val}</span>
               </div>
             );
           })}
@@ -93,7 +93,7 @@ export function LifeScoreCard() {
           {lifeScore.insights.length > 0 && (
             <button
               onClick={() => setShowInsights(!showInsights)}
-              className="ml-auto text-[11px] font-bold text-gray-light hover:text-soft-cream transition-colors flex items-center gap-1 py-1 px-2 rounded-md hover:bg-white/5"
+              className="ml-auto text-[11px] font-medium text-gray-light hover:text-soft-cream transition-colors flex items-center gap-1 py-1 px-2 rounded-md hover:bg-white/5"
             >
               <span>{lifeScore.insights.length} {t('life_score.ui.insights_today')}</span>
               {showInsights ? <ChevronUp size={12} /> : <ChevronDown size={12} />}

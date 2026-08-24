@@ -378,7 +378,7 @@ export default function CareerClient({ initialApplications }: Props) {
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-1">
-              <Heading as="h1" size="h1" className="text-5xl font-sans font-bold tracking-tight">
+              <Heading as="h1" size="h2" weight="semibold" className="tracking-tight">
                 {t('career_page.title')} <span className="text-warm-gold italic">{t('career_page.title_highlight')}</span>
               </Heading>
               <Paragraph className="text-gray-light font-light">{t('career_page.desc')}</Paragraph>
@@ -407,7 +407,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 { label: t('career_page.stats.offer'), value: stats.offer, color: 'text-income' },
               ].map((s) => (
                 <Card key={s.label} className="glass border-none p-2 md:p-8 text-center flex-1 min-w-[70px] snap-center">
-                  <Paragraph className={`text-xl md:text-3xl font-bold ${s.color}`}>{s.value}</Paragraph>
+                  <Paragraph className={`text-xl md:text-3xl font-semibold ${s.color}`}>{s.value}</Paragraph>
                   <Paragraph className="text-[8px] md:text-xs text-gray-light uppercase tracking-widest mt-1 md:mt-1">{s.label}</Paragraph>
                 </Card>
               ))}
@@ -418,7 +418,7 @@ export default function CareerClient({ initialApplications }: Props) {
             <Card className="p-2 md:p-6 border border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02]">
               <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto snap-x no-scrollbar flex-nowrap pb-1">
                 <div className="text-center shrink-0 snap-center">
-                  <Paragraph className="text-md md:text-lg font-bold text-white">{analytics.responseRate.toFixed(0)}%</Paragraph>
+                  <Paragraph className="text-md md:text-lg font-medium text-white">{analytics.responseRate.toFixed(0)}%</Paragraph>
                   <Paragraph className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.responseRate')}</Paragraph>
                   <Paragraph className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.resp')}</Paragraph>
                 </div>
@@ -438,7 +438,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   <>
                     <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
                     <div className="text-center shrink-0 snap-center">
-                      <Paragraph className="text-md md:text-lg font-bold text-white">{analytics.avgDaysToInterview}d</Paragraph>
+                      <Paragraph className="text-md md:text-lg font-semibold text-white">{analytics.avgDaysToInterview}d</Paragraph>
                       <Paragraph className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.avgToInterview')}</Paragraph>
                       <Paragraph className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.avg')}</Paragraph>
                     </div>
@@ -563,7 +563,7 @@ export default function CareerClient({ initialApplications }: Props) {
                       </div>
 
                       <div>
-                        <Heading as="h3" size="h3" className="text-lg font-bold text-soft-cream">{app.company_name}</Heading>
+                        <Heading as="h3" size="h3" className="text-lg font-semibold text-soft-cream">{app.company_name}</Heading>
                         <Paragraph className="text-sm text-gray-light">{app.role_title}</Paragraph>
                       </div>
 
@@ -657,7 +657,7 @@ export default function CareerClient({ initialApplications }: Props) {
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <Heading as="h3" size="h3" className="text-lg font-bold text-soft-cream">{journal.company_name}</Heading>
+                          <Heading as="h3" size="h3" className="text-lg font-semibold text-soft-cream">{journal.company_name}</Heading>
                           <Paragraph className="text-sm text-gray-light">{journal.role_title}</Paragraph>
                           <div className="flex flex-wrap items-center gap-4 text-[10px] text-gray-light opacity-80 mt-1">
                             <span className="flex items-center gap-1">

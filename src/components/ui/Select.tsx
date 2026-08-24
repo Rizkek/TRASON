@@ -69,7 +69,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
         {label && (
           <label
             htmlFor={id}
-            className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none"
+            className="block text-xs font-medium text-gray-light uppercase tracking-wider select-none"
           >
             {label}
           </label>
@@ -120,7 +120,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                       return (
                         <SelectPrimitive.Group key={opt.label || idx}>
                           {opt.label && (
-                            <SelectPrimitive.Label className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-light/50">
+                            <SelectPrimitive.Label className="px-2.5 py-1.5 text-xs font-medium uppercase tracking-wider text-gray-light/50">
                               {opt.label}
                             </SelectPrimitive.Label>
                           )}
@@ -130,7 +130,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                                 {subOpt.icon}
                                 <span>{subOpt.label}</span>
                                 {subOpt.badge && (
-                                  <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-light font-mono">
+                                  <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-white/10 text-gray-light font-mono">
                                     {subOpt.badge}
                                   </span>
                                 )}
@@ -147,7 +147,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                           {opt.icon}
                           <span>{opt.label}</span>
                           {opt.badge && (
-                            <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-light font-mono">
+                            <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-white/10 text-gray-light font-mono">
                               {opt.badge}
                             </span>
                           )}
@@ -200,7 +200,7 @@ export const SelectLabel = React.forwardRef<
 >(({ className = '', ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={`px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-light/50 ${className}`}
+    className={`px-2.5 py-1.5 text-xs font-medium uppercase tracking-wider text-gray-light/50 ${className}`}
     {...props}
   />
 ));

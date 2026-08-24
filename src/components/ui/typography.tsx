@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 // Heading Component
-const headingVariants = cva("font-serif leading-tight tracking-tight", {
+const headingVariants = cva("font-sans leading-tight tracking-tight", {
     variants: {
         variant: {
             default: "text-warm-black dark:text-soft-cream",
@@ -14,12 +14,13 @@ const headingVariants = cva("font-serif leading-tight tracking-tight", {
             inverse: "text-white dark:text-warm-black",
         },
         size: {
-            h1: "text-5xl md:text-7xl lg:text-[7rem] leading-[1.05]",
-            h2: "text-4xl md:text-5xl lg:text-6xl",
-            h3: "text-3xl md:text-4xl",
-            h4: "text-2xl md:text-3xl",
-            h5: "text-xl md:text-2xl",
-            h6: "text-lg md:text-xl",
+            // Calibrated for app/dashboard context (not marketing pages)
+            h1: "text-3xl md:text-4xl",
+            h2: "text-2xl md:text-3xl",
+            h3: "text-xl md:text-2xl",
+            h4: "text-lg md:text-xl",
+            h5: "text-base md:text-lg",
+            h6: "text-sm md:text-base",
         },
         alignment: {
             left: "text-left",
@@ -50,7 +51,7 @@ const headingVariants = cva("font-serif leading-tight tracking-tight", {
         variant: "default",
         size: "h3",
         alignment: "left",
-        weight: "normal", // DM Serif Display looks best normal
+        weight: "semibold",
     },
 });
 
@@ -60,7 +61,6 @@ interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement>, Variant
 
 const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(
     ({ className, variant, size, alignment, weight, as, children, ...props }, ref) => {
-        // Fallback to the size prop if 'as' is not provided, or 'h1' if both are missing
         const Component = as || (typeof size === 'string' && size.startsWith('h') ? size as any : "h1");
 
         return (

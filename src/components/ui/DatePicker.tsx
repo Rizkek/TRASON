@@ -121,7 +121,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       {label && (
         <label
           htmlFor={id}
-          className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none"
+          className="block text-[11px] font-medium text-gray-light uppercase tracking-wider select-none"
         >
           {label}
         </label>
@@ -341,7 +341,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               <button
                 type="button"
                 onClick={handleQuickToday}
-                className="px-3 py-1 text-xs font-bold bg-warm-gold/15 text-warm-gold hover:bg-warm-gold hover:text-warm-black rounded-lg transition-all"
+                className="px-3 py-1 text-xs font-medium bg-warm-gold/15 text-warm-gold hover:bg-warm-gold hover:text-warm-black rounded-lg transition-all"
               >
                 Today
               </button>

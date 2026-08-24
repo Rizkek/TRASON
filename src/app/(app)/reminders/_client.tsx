@@ -225,7 +225,7 @@ export function RemindersClient() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
-            <Heading as="h1" size="h1" className="text-5xl font-sans font-bold tracking-tight">{t('reminders_page.title')}</Heading>
+            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight">{t('reminders_page.title')}</Heading>
             <Paragraph className="text-gray-light font-light">{t('reminders_page.desc')}</Paragraph>
           </div>
           <div className="flex items-center gap-4">

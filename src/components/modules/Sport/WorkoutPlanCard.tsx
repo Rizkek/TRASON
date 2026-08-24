@@ -30,7 +30,7 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
         <div className="flex justify-between items-start gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <h3 className={`text-xl font-serif font-bold tracking-tight ${plan.is_active ? 'text-primary' : 'text-soft-cream'}`}>
+              <h3 className={`text-xl font-serif font-semibold tracking-tight ${plan.is_active ? 'text-primary' : 'text-soft-cream'}`}>
                 {plan.name}
               </h3>
               {plan.is_active && (
@@ -55,16 +55,16 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
           <div className="bg-black/5 dark:bg-white/5 rounded-md p-4">
             <div className="flex items-center gap-2 text-gray-light mb-1">
               <Calendar size={14} />
-              <span className="text-[10px] uppercase tracking-widest font-bold">Duration</span>
+              <span className="text-[10px] uppercase tracking-widest font-medium">Duration</span>
             </div>
-            <p className="text-lg font-bold text-white">{plan.duration_weeks} Weeks</p>
+            <p className="text-lg font-semibold text-white">{plan.duration_weeks} Weeks</p>
           </div>
           <div className="bg-black/5 dark:bg-white/5 rounded-md p-4">
             <div className="flex items-center gap-2 text-gray-light mb-1">
               <CheckCircle size={14} />
-              <span className="text-[10px] uppercase tracking-widest font-bold">Training Days</span>
+              <span className="text-[10px] uppercase tracking-widest font-medium">Training Days</span>
             </div>
-            <p className="text-lg font-bold text-white">{daysCount} Days/Week</p>
+            <p className="text-lg font-semibold text-white">{daysCount} Days/Week</p>
           </div>
         </div>
 
@@ -84,7 +84,7 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
               </Button>
             )}
           </div>
-          <div className="text-xs font-bold text-gray-light group-hover:text-primary transition-colors flex items-center gap-1">
+          <div className="text-xs font-medium text-gray-light group-hover:text-primary transition-colors flex items-center gap-1">
             View Details <ChevronRight size={14} />
           </div>
         </div>

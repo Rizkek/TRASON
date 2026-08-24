@@ -23,7 +23,7 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
     return (
       <Card className="p-8 bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] text-center">
         <Trophy size={32} className="mx-auto text-gray-light mb-4 opacity-50" />
-        <h4 className="text-white font-bold mb-1">No Personal Records Yet</h4>
+        <h4 className="text-white font-semibold mb-1">No Personal Records Yet</h4>
         <p className="text-sm text-gray-light">Log your first workout to start tracking your bests.</p>
       </Card>
     );
@@ -44,17 +44,17 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
               {getSportIcon(pr.sport_type)}
             </div>
             <div>
-              <p className="text-xs uppercase tracking-widest text-gray-light font-bold">
+              <p className="text-xs uppercase tracking-widest text-gray-light font-medium">
                 {pr.sport_type}
               </p>
-              <h4 className="text-sm font-bold text-white leading-tight">
+              <h4 className="text-sm font-semibold text-white leading-tight">
                 {pr.exercise_name}
               </h4>
             </div>
           </div>
           
           <div className="flex items-end gap-2">
-            <span className="text-3xl font-serif font-bold text-accent-gold tracking-tight">
+            <span className="text-3xl font-serif font-semibold text-accent-gold tracking-tight">
               {pr.metric_value}
             </span>
             <span className="text-sm text-gray-light mb-1 font-medium">

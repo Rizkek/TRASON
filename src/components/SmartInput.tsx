@@ -163,7 +163,7 @@ export function SmartInput() {
                 <button 
                   onClick={handleConfirm}
                   disabled={isLoading}
-                  className="px-4 py-2 text-sm bg-primary text-black font-bold rounded hover:opacity-90 disabled:opacity-50"
+                  className="px-4 py-2 text-sm bg-primary text-black font-semibold rounded hover:opacity-90 disabled:opacity-50"
                 >
                   Confirm & Save
                 </button>

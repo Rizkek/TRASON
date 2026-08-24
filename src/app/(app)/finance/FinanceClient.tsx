@@ -64,7 +64,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
   const { transactions: prevTransactions, isLoading: isPrevLoading } = useTransaction(carryStart, carryEnd);
   
   // Carry-forward: net balance of all past months
-  const carryForwardBalance = prevTransactions.reduce((sum, t) => {
+  const carryForwardBalance = prevTransactions.reduce((sum: number, t: Transaction) => {
     return t.type === 'income' ? sum + t.amount : sum - t.amount;
   }, 0);
   const { categories, mutate: mutateCategories } = useCategory();
@@ -73,7 +73,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
   
   const categorySpending = React.useMemo(() => {
     const spending: Record<string, number> = {};
-    transactions.forEach(t => {
+    transactions.forEach((t: Transaction) => {
       if (t.type === 'expense' && t.category_id) {
         spending[t.category_id] = (spending[t.category_id] || 0) + t.amount;
       }
@@ -282,18 +282,18 @@ export default function FinanceClient({ initialTransactions }: Props) {
   };
 
   const totalIncome = transactions
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
+    .filter((t: Transaction) => t.type === 'income')
+    .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
     
   const totalExpense = transactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0);
+    .filter((t: Transaction) => t.type === 'expense')
+    .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
   
   // Closing balance = carry-forward + this month's net
   const closingBalance = carryForwardBalance + (totalIncome - totalExpense);
   const isFirstMonth = prevTransactions.length === 0;
 
-  const filteredTransactions = transactions.filter(t => {
+  const filteredTransactions = transactions.filter((t: Transaction) => {
     const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = filterType === 'all' || t.type === filterType;
     return matchesSearch && matchesType;
@@ -344,7 +344,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
       <div className="space-y-8 animate-fade-in">
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="space-y-2 w-full md:w-auto flex-1">
-            <Heading as="h1" size="h1" className="text-heading-xl md:text-display-lg font-display font-extrabold tracking-tight text-soft-cream">{t('finance.title')}</Heading>
+            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-soft-cream">{t('finance.title')}</Heading>
             <div className="flex items-center gap-4">
               <Paragraph className="text-subtext flex items-center gap-2">
                 {t('finance.subtitle')}
@@ -354,7 +354,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                 <button onClick={handlePrevMonth} className="text-gray-light hover:text-soft-cream p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                   <ChevronLeft size={16} />
                 </button>
-                <span className="text-xs font-bold text-soft-cream w-[140px] text-center">
+                <span className="text-xs font-medium text-soft-cream w-[140px] text-center">
                   {monthName} {selectedYear}
                 </span>
                 <button onClick={handleNextMonth} className="text-gray-light hover:text-soft-cream p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
@@ -390,7 +390,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
               <div>
                 <div className="flex items-center gap-2">
                   <Wallet size={16} className="text-primary" />
-                  <Heading as="h3" size="h3" className="text-sm font-bold text-soft-cream">{t('finance.budget.globalMonthly')}</Heading>
+                  <Heading as="h3" size="h3" className="text-sm font-semibold text-soft-cream">{t('finance.budget.globalMonthly')}</Heading>
                 </div>
                 <Paragraph className="text-xs text-gray-light mt-1">
                   {formatCurrency(totalExpense, currency || 'USD', locale)} / {formatCurrency(globalBudget.amount, currency || 'USD', locale)}
@@ -442,7 +442,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                       <div className="w-6 h-6 rounded-md bg-gray-strong/40 flex items-center justify-center text-[10px] text-soft-cream">
                         <CategoryIcon name={cat?.icon || 'Box'} />
                       </div>
-                      <Heading as="h3" size="h3" className="text-xs font-bold text-soft-cream">{cat?.name || 'Kategori'}</Heading>
+                      <Heading as="h3" size="h3" className="text-xs font-medium text-soft-cream">{cat?.name || 'Kategori'}</Heading>
                     </div>
                     <Paragraph className="text-[10px] font-mono text-gray-light">
                       {Math.round(percentage)}%
@@ -483,7 +483,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
               <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.totalIncome')}</Paragraph>
             </div>
             <div className="flex items-end justify-between mt-2">
-              <Paragraph className="text-sm md:text-2xl font-bold text-success truncate">
+              <Paragraph className="text-sm md:text-2xl font-semibold text-success truncate">
                 {isTransactionsLoading ? (
                   <span className="animate-pulse text-gray-light">...</span>
                 ) : (
@@ -503,7 +503,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
               <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.totalExpense')}</Paragraph>
             </div>
             <div className="flex items-end justify-between mt-2">
-              <Paragraph className="text-sm md:text-2xl font-bold text-danger truncate">
+              <Paragraph className="text-sm md:text-2xl font-semibold text-danger truncate">
                 {isTransactionsLoading ? (
                   <span className="animate-pulse text-gray-light">...</span>
                 ) : (
@@ -523,7 +523,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
               <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.netBalance')}</Paragraph>
             </div>
             <div className="flex items-end justify-between mt-2">
-              <Paragraph className="text-sm md:text-2xl font-bold text-white truncate">
+              <Paragraph className="text-sm md:text-2xl font-semibold text-white truncate">
                 {isTransactionsLoading ? (
                   <span className="animate-pulse text-gray-light">...</span>
                 ) : (
@@ -544,7 +544,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
             </div>
             <div className="flex items-end justify-between mt-2">
               <div className="min-w-0">
-                <Paragraph className={`text-sm md:text-2xl font-bold truncate ${(isTransactionsLoading || isPrevLoading) ? 'text-gray-light' : (closingBalance >= 0 ? 'text-accent-gold' : 'text-danger')}`}>
+                <Paragraph className={`text-sm md:text-2xl font-semibold truncate ${(isTransactionsLoading || isPrevLoading) ? 'text-gray-light' : (closingBalance >= 0 ? 'text-accent-gold' : 'text-danger')}`}>
                   {(isTransactionsLoading || isPrevLoading) ? (
                     <span className="animate-pulse">...</span>
                   ) : (
@@ -592,11 +592,11 @@ export default function FinanceClient({ initialTransactions }: Props) {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-black/[0.02] dark:bg-white/[0.02] border-b border-black/[0.05] dark:border-white/[0.05]">
-                  <th className="px-8 py-6 text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.transaction')}</th>
-                  <th className="px-8 py-6 text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.date')}</th>
-                  <th className="px-8 py-6 text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.category')}</th>
-                  <th className="px-8 py-6 text-right text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.amount')}</th>
-                  <th className="px-8 py-6 text-right text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.table.actions')}</th>
+                  <th className="px-8 py-6 text-[10px] font-medium text-gray-light tracking-widest uppercase">{t('finance.table.transaction')}</th>
+                  <th className="px-8 py-6 text-[10px] font-medium text-gray-light tracking-widest uppercase">{t('finance.table.date')}</th>
+                  <th className="px-8 py-6 text-[10px] font-medium text-gray-light tracking-widest uppercase">{t('finance.table.category')}</th>
+                  <th className="px-8 py-6 text-right text-[10px] font-medium text-gray-light tracking-widest uppercase">{t('finance.table.amount')}</th>
+                  <th className="px-8 py-6 text-right text-[10px] font-medium text-gray-light tracking-widest uppercase">{t('finance.table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white divide-opacity-[0.03]">
@@ -605,7 +605,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                     <td colSpan={5} className="py-12 text-center"><Loading /></td>
                   </tr>
                 ) : paginatedTransactions.length > 0 ? (
-                  paginatedTransactions.map((t) => (
+                  paginatedTransactions.map((t: Transaction) => (
                     <tr 
                       key={t.id} 
                       className="group hover:bg-black/[0.02] dark:bg-white/[0.02] transition-colors cursor-pointer"
@@ -619,7 +619,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                             {t.type === 'income' ? <Coins size={18} /> : <Receipt size={18} />}
                           </div>
                           <div>
-                            <Paragraph className="text-sm font-bold text-soft-cream group-hover:text-primary transition-colors underline-offset-4 decoration-primary">{t.title}</Paragraph>
+                            <Paragraph className="text-sm font-semibold text-soft-cream group-hover:text-primary transition-colors underline-offset-4 decoration-primary">{t.title}</Paragraph>
                             {t.description && <Paragraph className="text-[10px] text-gray-light truncate max-w-[200px] mt-1">{t.description}</Paragraph>}
                           </div>
                         </div>
@@ -636,7 +636,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                         </Badge>
                       </td>
                       <td className="px-8 py-8 text-right">
-                        <Paragraph className={`text-sm font-bold ${t.type === 'income' ? 'text-success' : 'text-soft-cream'}`}>
+                        <Paragraph className={`text-sm font-semibold ${t.type === 'income' ? 'text-success' : 'text-soft-cream'}`}>
                           {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount, t.original_currency || currency, locale)}
                         </Paragraph>
                       </td>
@@ -675,7 +675,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                 >
                   Prev
                 </Button>
-                <div className="px-2 text-xs font-bold text-soft-cream min-w-[60px] text-center">
+                <div className="px-2 text-xs font-medium text-soft-cream min-w-[60px] text-center">
                   {page} / {totalPages}
                 </div>
                 <Button 

@@ -314,7 +314,7 @@ export function CreatableAutocomplete({
       {isOpen && (
         <div className="absolute left-0 right-0 top-full mt-1 z-[300] max-h-72 overflow-y-auto rounded-xl border border-white/10 bg-warm-black/95 backdrop-blur-2xl p-1.5 text-soft-cream shadow-[0_20px_50px_rgba(0,0,0,0.8)] animate-in fade-in-0 zoom-in-95">
           {/* Header indicator */}
-          <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-light/50 flex items-center justify-between border-b border-white/5 mb-1 pb-1">
+          <div className="px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-gray-light/50 flex items-center justify-between border-b border-white/5 mb-1 pb-1">
             <span>
               {type === 'company' ? 'Rekomendasi Perusahaan Indonesia & Global' : 'Rekomendasi Posisi & Peran'}
             </span>
@@ -338,10 +338,10 @@ export function CreatableAutocomplete({
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold truncate">
+                  <span className="text-xs font-medium truncate">
                     + Tambah &ldquo;{inputValue.trim()}&rdquo;
                   </span>
-                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-primary/25 text-primary uppercase font-bold tracking-wider">
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-primary/25 text-primary uppercase font-medium tracking-wider">
                     Baru
                   </span>
                 </div>
