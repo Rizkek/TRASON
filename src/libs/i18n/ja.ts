@@ -478,6 +478,8 @@ export const ja = {
     filterAll: 'すべて',
     filterIncome: '収入',
     filterExpense: '支出',
+    capturePlaceholder: "クイック追加 (例: '昼食 25k', 'ガソリン 50k')",
+    captureError: "理解できませんでした。'昼食 25k' のような形式にするか、Smart Input (Ctrl+K) を使用してください。",
     subscriptions: 'サブスクリプション',
     manageSubscriptions: '定期支払いを管理します。',
     addSubscription: 'サブスクリプションを追加',
@@ -507,7 +509,8 @@ export const ja = {
       date: '日付',
       category: 'カテゴリー',
       amount: '金額',
-      actions: 'アクション'
+      actions: 'アクション',
+      viewReceipt: 'レシートを見る'
     },
     modal: {
       addTitle: '取引を追加',
@@ -548,6 +551,7 @@ export const ja = {
       empty: '取引はまだありません',
       category: 'カテゴリー',
       notes: 'メモ',
+      viewReceipt: 'レシートを見る',
       searchPlaceholder: '取引を検索...',
       today: '今日',
       yesterday: '昨日',
@@ -590,7 +594,12 @@ export const ja = {
     },
     activeSubscriptions: 'アクティブなサブスクリプション',
     servicesCount: 'サービス',
-    allShown: '· すべて表示済み ·'
+    allShown: '· すべて表示 ·',
+    tabs: {
+      transactions: 'トランザクション',
+      installments: '分割払い',
+      subscriptions: 'サブスクリプション'
+    }
   },
   dashboard: {
     splash: {
@@ -737,7 +746,10 @@ export const ja = {
   },
   moduleCommon: {
     emptyTitle: 'データはまだありません',
-    emptyDesc: '最初の記録を追加して始めましょう。'
+    emptyDesc: '最初の記録を追加して始めましょう。',
+    showing: '表示中',
+    to: '〜',
+    of: '/'
   },
   life_score: {
     dimensions: {

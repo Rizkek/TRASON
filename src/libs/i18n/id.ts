@@ -478,6 +478,8 @@ export const id = {
     filterAll: 'Semua',
     filterIncome: 'Pemasukan',
     filterExpense: 'Pengeluaran',
+    capturePlaceholder: "Tambah cepat (contoh: 'Makan siang 25k', 'Beli bensin 50ribu')",
+    captureError: "Format tidak dipahami. Coba format seperti 'Makan siang 25k' atau gunakan Smart Input (Ctrl+K) untuk AI.",
     subscriptions: 'Langganan',
     manageSubscriptions: 'Lacak pengeluaran rutin.',
     addSubscription: 'Tambah Langganan',
@@ -507,7 +509,8 @@ export const id = {
       date: 'Tanggal',
       category: 'Kategori',
       amount: 'Jumlah',
-      actions: 'Aksi'
+      actions: 'Aksi',
+      viewReceipt: 'Lihat Struk'
     },
     modal: {
       addTitle: 'Tambah Transaksi',
@@ -548,6 +551,7 @@ export const id = {
       empty: 'Belum ada transaksi',
       category: 'Kategori',
       notes: 'Catatan',
+      viewReceipt: 'Lihat Struk',
       searchPlaceholder: 'Cari transaksi...',
       today: 'Hari Ini',
       yesterday: 'Kemarin',
@@ -590,7 +594,12 @@ export const id = {
     },
     activeSubscriptions: 'Langganan Aktif',
     servicesCount: 'layanan',
-    allShown: '· semua ditampilkan ·'
+    allShown: '· semua ditampilkan ·',
+    tabs: {
+      transactions: 'Transaksi',
+      installments: 'Cicilan',
+      subscriptions: 'Langganan'
+    }
   },
   dashboard: {
     splash: {
@@ -737,7 +746,10 @@ export const id = {
   },
   moduleCommon: {
     emptyTitle: 'Belum Ada Data',
-    emptyDesc: 'Mulai dengan membuat catatan pertama Anda.'
+    emptyDesc: 'Mulai dengan membuat catatan pertama Anda.',
+    showing: 'Menampilkan',
+    to: 'sampai',
+    of: 'dari'
   },
   life_score: {
     dimensions: {

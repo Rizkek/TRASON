@@ -76,7 +76,6 @@ export function SmartInput() {
           date: result.data.date || getLocalISODate(),
           category_id: null as any,
           time: '00:00:00',
-          description: '',
           payment_method: 'cash',
           tags: []
         });

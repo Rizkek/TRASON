@@ -478,6 +478,8 @@ export const es = {
     filterAll: 'Todo',
     filterIncome: 'Ingresos',
     filterExpense: 'Gastos',
+    capturePlaceholder: "Adición rápida (ej. 'Makan siang 25k')",
+    captureError: "No se pudo entender. Intenta el formato 'Makan siang 25k' o usa el Smart Input global (Ctrl+K).",
     subscriptions: 'Suscripciones',
     manageSubscriptions: 'Administra tus pagos recurrentes.',
     addSubscription: 'Añadir Suscripción',
@@ -507,7 +509,8 @@ export const es = {
       date: 'Fecha',
       category: 'Categoría',
       amount: 'Monto',
-      actions: 'Acciones'
+      actions: 'Acciones',
+      viewReceipt: 'Ver Recibo'
     },
     modal: {
       addTitle: 'Agregar Transacción',
@@ -548,6 +551,7 @@ export const es = {
       empty: 'No hay transacciones aún',
       category: 'Categoría',
       notes: 'Notas',
+      viewReceipt: 'Ver Recibo',
       searchPlaceholder: 'Buscar transacciones...',
       today: 'Hoy',
       yesterday: 'Ayer',
@@ -590,7 +594,12 @@ export const es = {
     },
     activeSubscriptions: 'Suscripciones Activas',
     servicesCount: 'servicios',
-    allShown: '· todo mostrado ·'
+    allShown: '· mostrados todos ·',
+    tabs: {
+      transactions: 'Transacciones',
+      installments: 'Cuotas',
+      subscriptions: 'Suscripciones'
+    }
   },
   dashboard: {
     splash: {
@@ -737,7 +746,10 @@ export const es = {
   },
   moduleCommon: {
     emptyTitle: 'No hay datos',
-    emptyDesc: 'Comienza creando tu primer registro.'
+    emptyDesc: 'Comienza creando tu primer registro.',
+    showing: 'Mostrando',
+    to: 'a',
+    of: 'de'
   },
   life_score: {
     dimensions: {

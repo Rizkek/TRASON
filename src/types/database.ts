@@ -59,13 +59,13 @@ export interface Transaction {
   category_id: string | null;
   goal_id?: string | null;
   title: string;
-  description?: string | null;
   amount: number;
   type: 'income' | 'expense';
   date: string;
   time?: string;
   payment_method?: string;
   receipt_image_url?: string;
+  source?: 'manual' | 'text' | 'receipt' | 'import' | 'api';
   tags?: string[];
   metadata?: Record<string, unknown>; // Will store decision_notes, expected_impact, timeline_event_id, etc.
   original_amount?: number;
@@ -76,6 +76,37 @@ export interface Transaction {
   deleted_at?: string;
   /** Populated by Supabase join when selecting categories:category_id(...) */
   categories?: CategoryJoin | CategoryJoin[] | null;
+}
+
+export interface Installment {
+  id: string;
+  user_id: string;
+  title: string;
+  total_amount: number;
+  down_payment: number;
+  monthly_amount: number;
+  total_months: number;
+  paid_months: number;
+  start_date: string;
+  creditor?: string | null;
+  category_id?: string | null;
+  currency: string;
+  status: 'active' | 'completed' | 'cancelled';
+  created_at: string;
+  updated_at: string;
+  categories?: CategoryJoin | null;
+}
+
+export interface InstallmentPayment {
+  id: string;
+  installment_id: string;
+  user_id: string;
+  transaction_id?: string | null;
+  due_date: string;
+  paid_date?: string | null;
+  amount: number;
+  status: 'pending' | 'paid' | 'missed';
+  created_at: string;
 }
 
 export interface Subscription {

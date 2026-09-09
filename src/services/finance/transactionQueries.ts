@@ -18,7 +18,7 @@ export const transactionQueries = {
             .from('transactions')
             .select(
               `
-          id, user_id, category_id, title, description, amount, type, date, time,
+          id, user_id, category_id, title, amount, type, date, time,
           payment_method, tags, created_at, updated_at,
           categories:category_id(id, name, color, icon)
         `
@@ -58,7 +58,7 @@ export const transactionQueries = {
           .from('transactions')
           .insert([{ ...transaction, user_id: userId }])
           .select(
-            `id, user_id, category_id, title, description, amount, type, date, time,
+            `id, user_id, category_id, title, amount, type, date, time,
             payment_method, tags, created_at, updated_at,
             categories:category_id(id, name, color, icon)`
           )
@@ -87,7 +87,7 @@ export const transactionQueries = {
           .eq('id', id)
           .eq('user_id', userId)
           .select(
-            `id, user_id, category_id, title, description, amount, type, date, time,
+            `id, user_id, category_id, title, amount, type, date, time,
             payment_method, tags, created_at, updated_at,
             categories:category_id(id, name, color, icon)`
           )

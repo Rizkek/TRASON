@@ -3,17 +3,27 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon, BottomSheet, DatePicker } from '@/components';
 import { CategoryManagerModal } from './components/CategoryManagerModal';
 import { BudgetManagerModal } from './components/BudgetManagerModal';
 import { TransactionFeed } from './components/TransactionFeed';
+import { TextCaptureForm } from './components/TextCaptureForm';
+import { InstallmentList } from './components/InstallmentList';
+import { InstallmentSheet } from './components/InstallmentSheet';
+const ReceiptUpload = dynamic(() => import('./components/ReceiptUpload').then(m => m.ReceiptUpload), { ssr: false });
+const ReceiptReviewSheet = dynamic(() => import('./components/ReceiptReviewSheet').then(m => m.ReceiptReviewSheet), { ssr: false });
+import { DuplicateAlert } from './components/DuplicateAlert';
+import { FinanceTabBar, FinanceTab } from './components/FinanceTabBar';
+import { detectDuplicates } from '@/services/finance/capture/duplicateDetector';
 import { useAuthStore } from '@/store/authStore';
 import { useTransaction } from '@/hooks/useTransaction';
 import { useCategory } from '@/hooks/useCategory';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useBudget } from '@/hooks/useBudget';
+import { useInstallment } from '@/hooks/useInstallment';
 import { validateTransaction, sanitizeError } from '@/libs/validation';
-import { Transaction } from '@/types/database';
+import { Transaction, InstallmentPayment, Installment } from '@/types/database';
 import { Plus, Wallet, Funnel, MagnifyingGlass as Search, Info, Target, Swap, X, Bell, TrendUp as TrendingUp, TrendDown as TrendingDown, DotsThreeVertical as MoreVertical, ArrowUpRight, ArrowDownLeft, Calendar, ArrowsClockwise, CaretLeft as ChevronLeft, CaretRight as ChevronRight, Coins, Receipt, Bank as Landmark } from '@phosphor-icons/react';
 import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
 import { fetchExchangeRates } from '@/libs/exchange';
@@ -24,13 +34,8 @@ import type { CategoryJoin } from '@/types/database';
 import { DEFAULT_FINANCE_CATEGORIES } from '@/libs/defaultCategories';
 import { categoryQueries } from '@/services/activity/categoryQueries';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { resolveCategory } from '@/libs/finance/categoryHelpers';
 
-/** Safely get the category object regardless of whether Supabase returns an array or single object */
-function resolveCategory(categories: CategoryJoin | CategoryJoin[] | null | undefined): CategoryJoin | null {
-  if (!categories) return null;
-  if (Array.isArray(categories)) return categories[0] ?? null;
-  return categories;
-}
 
 interface Props {
   initialTransactions?: Transaction[];
@@ -70,6 +75,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
   const { categories, mutate: mutateCategories } = useCategory();
   const { createSubscription } = useSubscription();
   const { globalBudget, budgets } = useBudget();
+  const { payInstallment } = useInstallment();
   
   const categorySpending = React.useMemo(() => {
     const spending: Record<string, number> = {};
@@ -89,11 +95,16 @@ export default function FinanceClient({ initialTransactions }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [isInstallmentSheetOpen, setIsInstallmentSheetOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [reviewTransactionId, setReviewTransactionId] = useState<string | null>(null);
+  const [duplicateMatches, setDuplicateMatches] = useState<any[]>([]);
+  const [ignoreDuplicates, setIgnoreDuplicates] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<FinanceTab>('transactions');
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   
@@ -103,12 +114,12 @@ export default function FinanceClient({ initialTransactions }: Props) {
     type: 'expense' as 'income' | 'expense',
     category_id: '',
     date: getLocalISODate(new Date(), timezone),
-    description: '',
     original_currency: currency || 'USD',
     decision_notes: '',
     expected_impact: '',
     is_recurring: false,
     billing_cycle: 'monthly' as 'monthly' | 'yearly' | 'weekly',
+    source: 'manual' as 'manual' | 'text' | 'receipt' | 'import' | 'api'
   });
 
   useEffect(() => {
@@ -169,7 +180,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
       type: form.type,
       date: form.date,
       category_id: form.category_id || null,
-      description: form.description || null,
+      source: form.source as 'manual' | 'text' | 'receipt' | 'import' | 'api',
       original_amount: safeAmount,
       original_currency: form.original_currency,
       exchange_rate_to_base: exchangeRate,
@@ -189,6 +200,25 @@ export default function FinanceClient({ initialTransactions }: Props) {
       original_currency: form.original_currency,
       isEdit: !!editingTransaction,
     });
+
+    if (!editingTransaction && !ignoreDuplicates) {
+      const matches = detectDuplicates(
+        {
+          amount: safeAmount,
+          title: form.title,
+          date: form.date,
+          type: form.type as 'income' | 'expense',
+          source: 'manual',
+        } as any,
+        transactions
+      );
+
+      if (matches.length > 0) {
+        setDuplicateMatches(matches);
+        setIsSaving(false);
+        return;
+      }
+    }
 
     try {
       if (editingTransaction) {
@@ -211,11 +241,12 @@ export default function FinanceClient({ initialTransactions }: Props) {
             next_billing_date: nextDate.toISOString().split('T')[0],
             category_id: form.category_id || null,
             is_active: true,
-            notes: form.description || undefined,
           });
         }
       }
       setIsModalOpen(false);
+      setDuplicateMatches([]);
+      setIgnoreDuplicates(false);
     } catch (err) {
       const errorMessage = sanitizeError(err);
       setError(errorMessage);
@@ -243,6 +274,27 @@ export default function FinanceClient({ initialTransactions }: Props) {
     setEditingTransaction(null);
     setFormErrors({});
     setError(null);
+    setDuplicateMatches([]);
+    setIgnoreDuplicates(false);
+  };
+
+  const handlePayInstallment = async (payment: InstallmentPayment, installment: Installment) => {
+    try {
+      const tx = await createTransaction({
+        title: `Cicilan: ${installment.title}`,
+        amount: payment.amount,
+        type: 'expense' as const,
+        date: getLocalISODate(new Date(), timezone),
+        category_id: installment.category_id || null,
+        source: 'manual',
+        original_currency: installment.currency || currency || 'IDR'
+      });
+      if (tx && tx.id) {
+        await payInstallment(payment.id, tx.id);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Gagal membayar cicilan');
+    }
   };
 
   const openAddModal = () => {
@@ -253,13 +305,44 @@ export default function FinanceClient({ initialTransactions }: Props) {
       type: 'expense' as const,
       category_id: '',
       date: getLocalISODate(new Date(), timezone),
-      description: '',
+      source: 'manual',
       original_currency: currency || 'USD',
       decision_notes: '',
       expected_impact: '',
       is_recurring: false,
       billing_cycle: 'monthly',
     });
+    setDuplicateMatches([]);
+    setIgnoreDuplicates(false);
+    setIsModalOpen(true);
+  };
+
+  const openCaptureModal = (parsed: any) => {
+    setEditingTransaction(null);
+    
+    let matchedCatId = '';
+    if (parsed.category_name) {
+      const matchedCat = categories.find((c: any) => c.name.toLowerCase() === parsed.category_name?.toLowerCase());
+      if (matchedCat) {
+        matchedCatId = matchedCat.id;
+      }
+    }
+
+    setForm({
+      title: parsed.title,
+      amount: parsed.amount.toString(),
+      type: parsed.type,
+      category_id: matchedCatId,
+      date: parsed.date,
+      source: 'text',
+      original_currency: currency || 'USD',
+      decision_notes: '',
+      expected_impact: '',
+      is_recurring: false,
+      billing_cycle: 'monthly',
+    });
+    setDuplicateMatches([]);
+    setIgnoreDuplicates(false);
     setIsModalOpen(true);
   };
 
@@ -271,12 +354,12 @@ export default function FinanceClient({ initialTransactions }: Props) {
       type: t.type,
       category_id: t.category_id || '',
       date: formatDateOnly(t.date),
-      description: t.description || '',
       original_currency: t.original_currency || currency || 'USD',
       decision_notes: (t.metadata?.decision_notes as string) || '',
       expected_impact: (t.metadata?.expected_impact as string) || '',
       is_recurring: false, // Editing doesn't re-create subscription
-      billing_cycle: 'monthly',
+      billing_cycle: 'monthly' as 'monthly' | 'yearly' | 'weekly',
+      source: (t.source as 'manual' | 'text' | 'receipt' | 'import' | 'api') || 'manual',
     });
     setIsModalOpen(true);
   };
@@ -382,6 +465,112 @@ export default function FinanceClient({ initialTransactions }: Props) {
           </div>
         </div>
 
+        {/* --- GLOBAL OVERVIEW CARDS --- */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 w-full">
+          {/* Income */}
+          <Card className="p-2 md:p-8 relative overflow-hidden group">
+            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-all" />
+            <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
+              <div className="p-1 bg-success/10 rounded-md shrink-0 text-success">
+                <Coins size={12} />
+              </div>
+              <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.totalIncome')}</Paragraph>
+            </div>
+            <div className="flex items-end justify-between mt-2">
+              <Paragraph className="text-sm md:text-2xl font-semibold text-success truncate">
+                {isTransactionsLoading ? (
+                  <span className="animate-pulse text-gray-light">...</span>
+                ) : (
+                  formatCurrency(totalIncome, currency, locale)
+                )}
+              </Paragraph>
+            </div>
+          </Card>
+          
+          {/* Expense */}
+          <Card className="p-2 md:p-8 relative overflow-hidden group">
+            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-danger/5 rounded-full blur-2xl group-hover:bg-danger/10 transition-all" />
+            <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
+              <div className="p-1 bg-danger/10 rounded-md shrink-0 text-danger">
+                <Receipt size={12} />
+              </div>
+              <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.totalExpense')}</Paragraph>
+            </div>
+            <div className="flex items-end justify-between mt-2">
+              <Paragraph className="text-sm md:text-2xl font-semibold text-danger truncate">
+                {isTransactionsLoading ? (
+                  <span className="animate-pulse text-gray-light">...</span>
+                ) : (
+                  formatCurrency(totalExpense, currency, locale)
+                )}
+              </Paragraph>
+            </div>
+          </Card>
+
+          {/* Net Balance */}
+          <Card className="p-2 md:p-8 relative overflow-hidden group border-b-2 border-primary/20">
+            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
+            <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
+              <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary">
+                <Landmark size={12} />
+              </div>
+              <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.netBalance')}</Paragraph>
+            </div>
+            <div className="flex items-end justify-between mt-2">
+              <Paragraph className="text-sm md:text-2xl font-semibold text-white truncate">
+                {isTransactionsLoading ? (
+                  <span className="animate-pulse text-gray-light">...</span>
+                ) : (
+                  formatCurrency(totalIncome - totalExpense, currency, locale)
+                )}
+              </Paragraph>
+            </div>
+          </Card>
+
+          {/* Wallet / Closing Balance card — always visible */}
+          <Card className="p-2 md:p-8 relative overflow-hidden group border-b-2 border-accent-gold/30">
+            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-accent-gold/5 rounded-full blur-2xl group-hover:bg-accent-gold/10 transition-all" />
+            <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
+              <div className="p-1 bg-accent-gold/10 rounded-md shrink-0 text-accent-gold">
+                <Wallet size={12} />
+              </div>
+              <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.wallet')}</Paragraph>
+            </div>
+            <div className="flex items-end justify-between mt-2">
+              <div className="min-w-0">
+                <Paragraph className={`text-sm md:text-2xl font-semibold truncate ${(isTransactionsLoading || isPrevLoading) ? 'text-gray-light' : (closingBalance >= 0 ? 'text-accent-gold' : 'text-danger')}`}>
+                  {(isTransactionsLoading || isPrevLoading) ? (
+                    <span className="animate-pulse">...</span>
+                  ) : (
+                    formatCurrency(closingBalance, currency, locale)
+                  )}
+                </Paragraph>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* --- TABS --- */}
+        <FinanceTabBar activeTab={activeTab} onChange={(tab) => {
+          if (tab === 'subscriptions') {
+            router.push('/finance/subscriptions');
+          } else {
+            setActiveTab(tab);
+          }
+        }} />
+
+        {activeTab === 'transactions' && (
+          <>
+            <div className="flex gap-2 items-start w-full">
+              <div className="flex-1 min-w-0">
+                <TextCaptureForm onCaptureSuccess={openCaptureModal} />
+              </div>
+              <ReceiptUpload 
+                onUploadSuccess={(txId) => setReviewTransactionId(txId)} 
+                onError={(err) => setError(err)} 
+              />
+            </div>
+
         {/* Budget Progress Bar */}
         {globalBudget && (
           <div className="bg-[#141414] border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
@@ -472,89 +661,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
           </div>
         )}
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6">
-          {/* Income */}
-          <Card className="p-2 md:p-8 relative overflow-hidden group">
-            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-all" />
-            <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
-              <div className="p-1 bg-success/10 rounded-md shrink-0 text-success">
-                <Coins size={12} />
-              </div>
-              <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.totalIncome')}</Paragraph>
-            </div>
-            <div className="flex items-end justify-between mt-2">
-              <Paragraph className="text-sm md:text-2xl font-semibold text-success truncate">
-                {isTransactionsLoading ? (
-                  <span className="animate-pulse text-gray-light">...</span>
-                ) : (
-                  formatCurrency(totalIncome, currency, locale)
-                )}
-              </Paragraph>
-            </div>
-          </Card>
-          
-          {/* Expense */}
-          <Card className="p-2 md:p-8 relative overflow-hidden group">
-            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-danger/5 rounded-full blur-2xl group-hover:bg-danger/10 transition-all" />
-            <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
-              <div className="p-1 bg-danger/10 rounded-md shrink-0 text-danger">
-                <Receipt size={12} />
-              </div>
-              <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.totalExpense')}</Paragraph>
-            </div>
-            <div className="flex items-end justify-between mt-2">
-              <Paragraph className="text-sm md:text-2xl font-semibold text-danger truncate">
-                {isTransactionsLoading ? (
-                  <span className="animate-pulse text-gray-light">...</span>
-                ) : (
-                  formatCurrency(totalExpense, currency, locale)
-                )}
-              </Paragraph>
-            </div>
-          </Card>
-
-          {/* Net Balance */}
-          <Card className="p-2 md:p-8 relative overflow-hidden group border-b-2 border-primary/20">
-            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
-            <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
-              <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary">
-                <Landmark size={12} />
-              </div>
-              <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.netBalance')}</Paragraph>
-            </div>
-            <div className="flex items-end justify-between mt-2">
-              <Paragraph className="text-sm md:text-2xl font-semibold text-white truncate">
-                {isTransactionsLoading ? (
-                  <span className="animate-pulse text-gray-light">...</span>
-                ) : (
-                  formatCurrency(totalIncome - totalExpense, currency, locale)
-                )}
-              </Paragraph>
-            </div>
-          </Card>
-
-          {/* Wallet / Closing Balance card — always visible */}
-          <Card className="p-2 md:p-8 relative overflow-hidden group border-b-2 border-accent-gold/30">
-            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-accent-gold/5 rounded-full blur-2xl group-hover:bg-accent-gold/10 transition-all" />
-            <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
-              <div className="p-1 bg-accent-gold/10 rounded-md shrink-0 text-accent-gold">
-                <Wallet size={12} />
-              </div>
-              <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.wallet')}</Paragraph>
-            </div>
-            <div className="flex items-end justify-between mt-2">
-              <div className="min-w-0">
-                <Paragraph className={`text-sm md:text-2xl font-semibold truncate ${(isTransactionsLoading || isPrevLoading) ? 'text-gray-light' : (closingBalance >= 0 ? 'text-accent-gold' : 'text-danger')}`}>
-                  {(isTransactionsLoading || isPrevLoading) ? (
-                    <span className="animate-pulse">...</span>
-                  ) : (
-                    formatCurrency(closingBalance, currency, locale)
-                  )}
-                </Paragraph>
-              </div>
-            </div>
-          </Card>
-        </div>
 
         <div className="hidden md:flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative w-full md:w-96 group">
@@ -620,7 +726,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
                           </div>
                           <div>
                             <Paragraph className="text-sm font-semibold text-soft-cream group-hover:text-primary transition-colors underline-offset-4 decoration-primary">{t.title}</Paragraph>
-                            {t.description && <Paragraph className="text-[10px] text-gray-light truncate max-w-[200px] mt-1">{t.description}</Paragraph>}
                           </div>
                         </div>
                       </td>
@@ -641,9 +746,26 @@ export default function FinanceClient({ initialTransactions }: Props) {
                         </Paragraph>
                       </td>
                       <td className="px-8 py-8 text-right">
-                        <button type="button" title="More options" aria-label="More options" className="p-2 text-gray-light hover:text-soft-cream rounded-md hover:bg-black/5 dark:bg-white/5 transition-all">
-                          <MoreVertical size={16} />
-                        </button>
+                        <div className="flex justify-end gap-2">
+                          {(t.source === 'receipt' || t.source === 'text') && (
+                            <button 
+                              type="button" 
+                              title="View Receipt" 
+                              onClick={(e) => { e.stopPropagation(); setReviewTransactionId(t.id); }}
+                              className="p-2 text-primary hover:bg-primary/10 rounded-md transition-all"
+                            >
+                              <Receipt size={16} />
+                            </button>
+                          )}
+                          <button 
+                            type="button" 
+                            title="More options" 
+                            onClick={(e) => { e.stopPropagation(); openEditModal(t); }}
+                            className="p-2 text-gray-light hover:text-soft-cream rounded-md hover:bg-black/5 dark:bg-white/5 transition-all"
+                          >
+                            <MoreVertical size={16} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -664,7 +786,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
           {totalPages > 1 && (
             <div className="px-8 py-6 border-t border-black/[0.05] dark:border-white/[0.05] flex items-center justify-between bg-black/[0.01] dark:bg-white/[0.01]">
               <Paragraph className="text-xs text-gray-light">
-                Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, filteredTransactions.length)} of {filteredTransactions.length}
+                {t('moduleCommon.showing')} {((page - 1) * limit) + 1} {t('moduleCommon.to')} {Math.min(page * limit, filteredTransactions.length)} {t('moduleCommon.of')} {filteredTransactions.length}
               </Paragraph>
               <div className="flex items-center gap-1">
                 <Button 
@@ -703,23 +825,35 @@ export default function FinanceClient({ initialTransactions }: Props) {
             onFilterChange={setFilterType}
             onEdit={openEditModal}
             onDeleteRequest={setDeleteConfirmId}
+            onViewReceipt={setReviewTransactionId}
             currency={currency}
             locale={locale}
           />
         </div>
+        </>
+        )}
+
+        {activeTab === 'installments' && (
+          <InstallmentList 
+            onAddClick={() => setIsInstallmentSheetOpen(true)}
+            onPayClick={handlePayInstallment}
+          />
+        )}
       </div>
 
       {/* Mobile-only FAB for New Entry */}
-      <div className="md:hidden fixed bottom-24 right-4 z-40">
-        <Button 
-          variant="primary" 
-          onClick={openAddModal} 
-          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(244,201,93,0.4)]"
-          aria-label={t('finance.newEntry')}
-        >
-          <Plus size={24} />
-        </Button>
-      </div>
+      {activeTab === 'transactions' && (
+        <div className="md:hidden fixed bottom-24 right-4 z-40">
+          <Button 
+            variant="primary" 
+            onClick={openAddModal} 
+            className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(244,201,93,0.4)]"
+            aria-label={t('finance.newEntry')}
+          >
+            <Plus size={24} />
+          </Button>
+        </div>
+      )}
 
       {isModalOpen && (
         <BottomSheet
@@ -729,13 +863,30 @@ export default function FinanceClient({ initialTransactions }: Props) {
           footer={
             <div className="flex gap-4 justify-end">
               <Button variant="ghost" size="md" onClick={handleCloseModal} disabled={isSaving}>{t('common.cancel')}</Button>
-              <Button variant="primary" onClick={handleSave} disabled={isSaving} className="w-full">
+              <Button variant="primary" onClick={handleSave} disabled={isSaving || (duplicateMatches.length > 0 && !ignoreDuplicates)} className="w-full">
                 {isSaving ? t('finance.modal.savingBtn') : t('finance.modal.saveBtn')}
               </Button>
             </div>
           }
         >
-        <div className="space-y-8">
+        <div className="space-y-8 pb-24 md:pb-6">
+          <DuplicateAlert 
+            matches={duplicateMatches}
+            currency={currency}
+            locale={locale}
+            onIgnore={() => {
+              setIgnoreDuplicates(true);
+              setTimeout(() => {
+                handleSave();
+              }, 0);
+            }}
+            onViewDuplicate={(id) => {
+              setIsModalOpen(false);
+              const t = transactions.find((tx: any) => tx.id === id);
+              if (t) openEditModal(t);
+            }}
+          />
+
           <div className="flex bg-gray-strong p-1 rounded-md border border-black/[0.05] dark:border-white/[0.05]">
             {(['income', 'expense'] as const).map((type) => (
               <button
@@ -863,19 +1014,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
             )}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-light tracking-widest block">
-              {t('finance.modal.description')} <span className="font-normal opacity-70">({t('common.optional')})</span>
-            </label>
-            <textarea
-              placeholder={t('finance.modal.descriptionPlaceholder')}
-              rows={2}
-              value={form.description}
-              onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-              className="w-full bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
-            />
-          </div>
-
           {!editingTransaction && (
             <div className="flex flex-col gap-2 p-4 bg-gray-strong/40 rounded-lg border border-white/[0.05]">
               <div className="flex items-center gap-2">
@@ -977,6 +1115,13 @@ export default function FinanceClient({ initialTransactions }: Props) {
       </BottomSheet>
       )}
 
+      {isInstallmentSheetOpen && (
+        <InstallmentSheet 
+          isOpen={isInstallmentSheetOpen} 
+          onClose={() => setIsInstallmentSheetOpen(false)} 
+        />
+      )}
+
       <ConfirmModal
         isOpen={!!deleteConfirmId}
         onClose={() => setDeleteConfirmId(null)}
@@ -997,6 +1142,11 @@ export default function FinanceClient({ initialTransactions }: Props) {
       <BudgetManagerModal
         isOpen={isBudgetModalOpen}
         onClose={() => setIsBudgetModalOpen(false)}
+      />
+      <ReceiptReviewSheet
+        transactionId={reviewTransactionId}
+        isOpen={!!reviewTransactionId}
+        onClose={() => setReviewTransactionId(null)}
       />
       </Layout>
     </>

@@ -5,7 +5,7 @@ import { Logo } from './Logo';
 
 export const LogoLoading: React.FC = () => {
   return (
-    <div className="w-full h-full min-h-[70vh] flex flex-col items-center justify-center relative">
+    <div className="fixed inset-0 w-full h-[100dvh] flex flex-col items-center justify-center bg-warm-black z-[9999] overflow-hidden">
       {/* Dynamic Background Glows */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/20 blur-[80px] rounded-full animate-pulse" />
       

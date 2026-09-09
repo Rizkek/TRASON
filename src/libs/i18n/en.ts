@@ -478,6 +478,8 @@ export const en = {
     filterAll: 'All',
     filterIncome: 'Income',
     filterExpense: 'Expenses',
+    capturePlaceholder: "Quick add (e.g. 'Makan siang 25k', 'Beli bensin 50ribu')",
+    captureError: "Couldn't understand that. Try formatting like 'Makan siang 25k' or use the global Smart Input (Ctrl+K) for AI parsing.",
     subscriptions: 'Subscriptions',
     manageSubscriptions: 'Track recurring expenses.',
     addSubscription: 'Add subscription',
@@ -507,7 +509,8 @@ export const en = {
       date: 'Date',
       category: 'Category',
       amount: 'Amount',
-      actions: 'Actions'
+      actions: 'Actions',
+      viewReceipt: 'View Receipt'
     },
     modal: {
       addTitle: 'Add transaction',
@@ -548,6 +551,7 @@ export const en = {
       empty: 'No transactions yet',
       category: 'Category',
       notes: 'Notes',
+      viewReceipt: 'View Receipt',
       searchPlaceholder: 'Search transactions...',
       today: 'Today',
       yesterday: 'Yesterday',
@@ -590,7 +594,12 @@ export const en = {
     },
     activeSubscriptions: 'Active subscriptions',
     servicesCount: 'services',
-    allShown: '· all shown ·'
+    allShown: '· all shown ·',
+    tabs: {
+      transactions: 'Transactions',
+      installments: 'Installments',
+      subscriptions: 'Subscriptions'
+    }
   },
   dashboard: {
     splash: {
@@ -737,7 +746,10 @@ export const en = {
   },
   moduleCommon: {
     emptyTitle: 'Nothing here yet',
-    emptyDesc: 'Begin by creating your first record.'
+    emptyDesc: 'Begin by creating your first record.',
+    showing: 'Showing',
+    to: 'to',
+    of: 'of'
   },
   life_score: {
     dimensions: {

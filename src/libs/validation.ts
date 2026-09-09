@@ -19,6 +19,7 @@ export interface TransactionForm {
   category_id?: string;
   date: string;
   description?: string;
+  source?: 'manual' | 'text' | 'receipt' | 'import' | 'api';
 }
 
 export const validateTransaction = (data: TransactionForm): ValidationResult => {
@@ -62,6 +63,11 @@ export const validateTransaction = (data: TransactionForm): ValidationResult => 
   // Description validation (optional)
   if (data.description && data.description.length > 1000) {
     errors.description = 'Description must be less than 1000 characters';
+  }
+
+  // Source validation (optional)
+  if (data.source && !['manual', 'text', 'receipt', 'import', 'api'].includes(data.source)) {
+    errors.source = 'Invalid source';
   }
 
   return {

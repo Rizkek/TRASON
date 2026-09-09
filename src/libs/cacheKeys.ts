@@ -22,6 +22,16 @@ export const CACHE_KEYS = {
     all: () => ['transactions', '*'],
   },
 
+  // Transaction Items
+  transactionItems: {
+    byTransactionId: (transactionId: string) => ['transaction_items', transactionId],
+  },
+
+  // Receipt Metadata
+  receiptMetadata: {
+    byTransactionId: (transactionId: string) => ['receipt_metadata', transactionId],
+  },
+
   // Activities (Daily Schedule)
   activities: {
     list: (start: string, end: string) => ['activities', start, end],

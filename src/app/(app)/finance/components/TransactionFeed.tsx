@@ -2,19 +2,13 @@
 
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Card, Badge, Loading } from '@/components';
-import { MagnifyingGlass as Search, ArrowUpRight, ArrowDownLeft, Calendar, X, PencilSimple as Edit2, Trash as Trash2} from '@phosphor-icons/react';
+import { Receipt, Calendar, ArrowUpRight, ArrowDownLeft, X, Check, MagnifyingGlass as Search, PencilSimple as Edit2, Trash as Trash2 } from '@phosphor-icons/react';
 import { formatCurrency, formatDate } from '@/libs/format';
 import type { Transaction, CategoryJoin } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { resolveCategory } from '@/libs/finance/categoryHelpers';
 
-function resolveCategory(
-  categories: CategoryJoin | CategoryJoin[] | null | undefined
-): CategoryJoin | null {
-  if (!categories) return null;
-  if (Array.isArray(categories)) return categories[0] ?? null;
-  return categories;
-}
 
 // Date label is computed once per render based on locale strings passed from parent,
 // but for simplicity we keep a module-level helper and pass t() at call site.
@@ -51,6 +45,7 @@ interface Props {
   onFilterChange: (type: 'all' | 'income' | 'expense') => void;
   onEdit: (t: Transaction) => void;
   onDeleteRequest: (id: string) => void;
+  onViewReceipt?: (id: string) => void;
   currency: string;
   locale: string;
 }
@@ -64,6 +59,7 @@ export function TransactionFeed({
   onFilterChange,
   onEdit,
   onDeleteRequest,
+  onViewReceipt,
   currency,
   locale,
 }: Props) {
@@ -220,10 +216,14 @@ export function TransactionFeed({
                       </div>
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <Paragraph className="text-sm font-semibold text-soft-cream truncate">{tx.title}</Paragraph>
+                        <div className="flex items-center gap-2">
+                          <Paragraph className="text-sm font-semibold text-soft-cream truncate">{tx.title}</Paragraph>
+                          {(tx.source === 'receipt' || tx.source === 'text') && onViewReceipt && (
+                            <Receipt size={14} className="text-primary shrink-0" weight="fill" />
+                          )}
+                        </div>
                         <Paragraph className="text-[10px] text-gray-light truncate">
                           {cat?.name || 'Lainnya'}
-                          {tx.description ? ` · ${tx.description}` : ''}
                         </Paragraph>
                       </div>
                       {/* Amount */}
@@ -337,12 +337,6 @@ export function TransactionFeed({
                       >
                         {selectedCat.name}
                       </Badge>
-                    </div>
-                  )}
-                  {selected.description && (
-                    <div className="flex items-start justify-between text-xs gap-4">
-                      <span className="text-gray-light shrink-0">{t('finance.feed.notes')}</span>
-                      <span className="text-soft-cream text-right">{selected.description}</span>
                     </div>
                   )}
                   {(selected.metadata?.decision_notes as string) && (

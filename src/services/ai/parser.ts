@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai';
+import { google } from '@ai-sdk/google';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 
@@ -31,7 +31,7 @@ const transactionSchema = z.object({
 export async function parseNaturalLanguageInput(userInput: string) {
   try {
     const { object } = await generateObject({
-      model: openai('gpt-4o-mini'),
+      model: google('gemini-2.5-flash'),
       schema: transactionSchema,
       prompt: `
         You are a helpful personal assistant for TRASON, a personal life OS dashboard (finance, habits, reminders, sports/vitality).
