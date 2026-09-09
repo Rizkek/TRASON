@@ -12,7 +12,7 @@ const nextConfig = {
   compress: true,
   eslint: {
     ignoreDuringBuilds: true,
-  },goit a
+  },
   typescript: {
     ignoreBuildErrors: false,
   },
