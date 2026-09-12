@@ -121,14 +121,20 @@ export async function GET(request: Request) {
 
   tasks.forEach((task) => {
     const userTz = userTimezoneMap[task.user_id] || 'UTC';
-    const todayStr = getTodayStrForTz(userTz);
+    const userNow = new Date(now.toLocaleString('en-US', { timeZone: userTz }));
+    const todayStr = userNow.toLocaleDateString('en-CA');
+    const currentHour = userNow.getHours();
+    
+    // Only send reminders during the 9 AM or 7 PM window in the user's timezone
+    const isReminderWindow = currentHour === 9 || currentHour === 19;
+    
     const isIncomplete =
       !task.completed_today ||
       (task.completed_today && task.last_reset_date !== todayStr);
 
-    console.log(`[CRON-TIMELINE] Task "${task.title}" (${task.user_id}) tz=${userTz} today=${todayStr} completed=${task.completed_today} resetDate=${task.last_reset_date} → incomplete=${isIncomplete}`);
+    console.log(`[CRON-TIMELINE] Task "${task.title}" (${task.user_id}) tz=${userTz} today=${todayStr} window=${isReminderWindow} incomplete=${isIncomplete}`);
 
-    if (isIncomplete) {
+    if (isIncomplete && isReminderWindow) {
       if (!incompleteTasksByUser[task.user_id]) {
         incompleteTasksByUser[task.user_id] = [];
       }
@@ -206,6 +212,7 @@ export async function GET(request: Request) {
       title: 'Daily Task Reminder',
       body: bodyText,
       url: '/schedule',
+      tag: 'daily-timeline',
     });
 
     let safeEndpoint = 'unknown';

@@ -138,22 +138,41 @@ export async function GET(request: Request) {
   });
   console.log(`[CRON-REMINDERS] Resolved timezones for ${Object.keys(userTimezoneMap).length}/${allUserIds.length} users.`);
 
-  // Filter reminders to only those due today in the user's own timezone
+  // Filter reminders to only those due around NOW in the user's own timezone.
+  // This narrow time window prevents spamming the Push Service every time the cron runs.
   const todayReminders = allReminders.filter((r) => {
     if (!r.due_datetime) return false;
+    
     const userTz = userTimezoneMap[r.user_id] || 'UTC';
-    const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: userTz });
+    const userNow = new Date(now.toLocaleString('en-US', { timeZone: userTz }));
+    const todayStr = userNow.toLocaleDateString('en-CA');
     const dueDateStr = new Date(r.due_datetime).toLocaleDateString('en-CA', { timeZone: userTz });
     const isToday = dueDateStr === todayStr;
-    console.log(`[CRON-REMINDERS] Reminder "${r.title}" (${r.user_id}) tz=${userTz} due=${dueDateStr} today=${todayStr} → include=${isToday}`);
-    return isToday;
+    
+    if (!isToday) return false;
+
+    if (!r.due_time) {
+      // All-day reminder: Notify only between 08:00 and 08:59 in the user's timezone
+      const isMorningWindow = userNow.getHours() === 8;
+      console.log(`[CRON-REMINDERS] All-day reminder "${r.title}" (${r.user_id}) tz=${userTz} today=${todayStr} window=${isMorningWindow} → include=${isMorningWindow}`);
+      return isMorningWindow;
+    } else {
+      // Specific time reminder: Notify if due_datetime is within [-30m, +30m] of NOW.
+      const dueTimeMs = new Date(r.due_datetime).getTime();
+      const nowTimeMs = now.getTime();
+      const diffMins = (nowTimeMs - dueTimeMs) / 1000 / 60;
+      const isWithinWindow = diffMins >= -30 && diffMins <= 30;
+      
+      console.log(`[CRON-REMINDERS] Reminder "${r.title}" (${r.user_id}) tz=${userTz} diffMins=${diffMins.toFixed(1)} window=${isWithinWindow} → include=${isWithinWindow}`);
+      return isWithinWindow;
+    }
   });
 
-  console.log(`[CRON-REMINDERS] ${todayReminders.length}/${allReminders.length} reminders qualify for today across all timezones.`);
+  console.log(`[CRON-REMINDERS] ${todayReminders.length}/${allReminders.length} reminders qualify for the current time window.`);
 
   if (todayReminders.length === 0) {
-    console.log('[CRON-REMINDERS] No reminders due today (per user timezone). Exiting early.');
-    return NextResponse.json({ success: true, sent: 0, message: 'No reminders due today', skippedReminders });
+    console.log('[CRON-REMINDERS] No reminders due in the current time window. Exiting early.');
+    return NextResponse.json({ success: true, sent: 0, message: 'No reminders in current window', skippedReminders });
   }
 
   // VAPID Setup
