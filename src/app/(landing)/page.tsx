@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { AuthRedirect } from '@/components/landing/AuthRedirect';
@@ -11,20 +10,6 @@ import { WhyTrason } from '@/components/landing/sections/WhyTrason';
 import { Intelligence } from '@/components/landing/sections/Intelligence';
 import { Mobile } from '@/components/landing/sections/Mobile';
 import { FinalCta } from '@/components/landing/sections/FinalCta';
-
-export const metadata: Metadata = {
-  title: 'TRASON — Your life, in one clear system',
-  description:
-    'TRASON is a personal operating system. Money, career, workouts, schedule and reminders live in one connected place, so you always know where things stand.',
-  alternates: { canonical: '/' },
-  openGraph: {
-    title: 'TRASON — Your life, in one clear system',
-    description:
-      'Money, career, workouts, schedule and reminders in one connected place. Free to start, installs like an app.',
-    url: '/',
-    type: 'website',
-  },
-};
 
 export default function Home() {
   return (
