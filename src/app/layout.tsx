@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Geist, Geist_Mono, DM_Serif_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -10,24 +11,51 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const BASE_URL = 'https://www.trason.web.id';
 
+const fontSans = Geist({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const fontMono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+});
+
+const fontBrand = DM_Serif_Display({
+  weight: '400',
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  variable: '--font-brand',
+  display: 'swap',
+});
+
+const fontDisplay = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+});
+
+const SITE_DESCRIPTION =
+  'TRASON is a personal operating system. Money, career, workouts, schedule and reminders live in one connected place, so you always know where things stand.';
+
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'TRASON',
+    default: 'TRASON — Your life, in one clear system',
     template: '%s | TRASON',
   },
-  description:
-    'Stop switching apps. TRASON unifies your finance, daily habits, and career tracking into one calm dashboard. Start for free.',
+  description: SITE_DESCRIPTION,
   keywords: [
-    'Personal OS',
-    'habit tracker',
-    'financial planner',
-    'career growth',
-    'personal dashboard',
-    'life management app',
-    'productivity',
-    'TRASON',
     'personal operating system',
+    'personal finance tracker',
+    'job application tracker',
+    'workout log',
+    'weekly schedule',
+    'reminders',
+    'life dashboard',
+    'TRASON',
   ],
   authors: [{ name: 'TRASON', url: BASE_URL }],
   creator: 'TRASON',
@@ -41,9 +69,8 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
-    title: 'TRASON | Personal OS',
-    description:
-      'Stop switching apps. TRASON unifies your finance, daily habits, and career tracking into one calm dashboard.',
+    title: 'TRASON — Your life, in one clear system',
+    description: SITE_DESCRIPTION,
     url: BASE_URL,
     siteName: 'TRASON',
     images: [
@@ -51,7 +78,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'TRASON – Personal Operating System dashboard preview',
+        alt: 'TRASON dashboard showing Life Score, reminders, finance and vitality at a glance',
         type: 'image/png',
       },
     ],
@@ -60,12 +87,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TRASON | Personal OS',
-    description:
-      'Stop switching apps. TRASON unifies your finance, daily habits, and career tracking into one calm dashboard.',
+    title: 'TRASON — Your life, in one clear system',
+    description: SITE_DESCRIPTION,
     images: ['/og-image.png'],
-    site: '@trasonapp',
-    creator: '@trasonapp',
   },
   manifest: '/manifest.json',
   appleWebApp: {
@@ -112,16 +136,8 @@ const jsonLd = {
       '@id': `${BASE_URL}/#website`,
       url: BASE_URL,
       name: 'TRASON',
-      description:
-        'Personal Operating System for finances, habits, reminders, and career growth.',
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: {
-          '@type': 'EntryPoint',
-          urlTemplate: `${BASE_URL}/search?q={search_term_string}`,
-        },
-        'query-input': 'required name=search_term_string',
-      },
+      description: SITE_DESCRIPTION,
+      inLanguage: ['en', 'id'],
     },
     {
       '@type': 'Organization',
@@ -134,7 +150,6 @@ const jsonLd = {
         width: 512,
         height: 512,
       },
-      sameAs: ['https://instagram.com/'],
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'customer support',
@@ -148,23 +163,24 @@ const jsonLd = {
       '@id': `${BASE_URL}/#app`,
       name: 'TRASON',
       url: BASE_URL,
-      description:
-        'TRASON is a free Personal Operating System that unifies your finances, daily habits, career pipeline, and smart reminders into one calm dashboard.',
+      description: SITE_DESCRIPTION,
       applicationCategory: 'ProductivityApplication',
       operatingSystem: 'Web, iOS (PWA), Android (PWA)',
       offers: {
         '@type': 'Offer',
         price: '0',
         priceCurrency: 'USD',
-        description: 'Free core features, forever.',
+        description: 'Free to start.',
       },
       featureList: [
-        'Financial tracking and net worth dashboard',
-        'Habit heatmaps and streak tracking',
-        'Career pipeline and job application tracking',
-        'Smart context-aware reminders',
-        'AI-powered life insights',
-        'Offline support via PWA',
+        'Income, expenses, subscriptions, budgets and receipt capture',
+        'Investment positions for stocks, crypto and gold',
+        'Job application pipeline with resume match',
+        'Workout sessions and personal records',
+        'Weekly schedule and daily tasks',
+        'Reminders delivered as push notifications',
+        'Life Score and on-demand insights summary',
+        'Installable web app (PWA)',
       ],
       screenshot: `${BASE_URL}/og-image.png`,
       author: {
@@ -180,11 +196,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${fontSans.variable} ${fontMono.variable} ${fontBrand.variable} ${fontDisplay.variable}`}
+    >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@200..800&display=swap" rel="stylesheet" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <link rel="icon" href="/favicon.png" type="image/png" />
