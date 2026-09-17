@@ -165,7 +165,7 @@ const jsonLd = {
       url: BASE_URL,
       description: SITE_DESCRIPTION,
       applicationCategory: 'ProductivityApplication',
-      operatingSystem: 'Web, iOS (PWA), Android (PWA)',
+      operatingSystem: 'Web (installable PWA)',
       offers: {
         '@type': 'Offer',
         price: '0',
