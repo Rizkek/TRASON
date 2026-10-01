@@ -30,6 +30,32 @@ module.exports = {
         'gray-light': 'rgb(var(--color-gray-light) / <alpha-value>)',
         'gray-very-light': 'rgb(var(--color-gray-very-light) / <alpha-value>)',
         'accent-purple': '#8B5CF6',  // Static — for avatar gradient
+
+        // Landing page semantic tokens (light editorial canvas), see globals.css.
+        // Namespaced as `lp-*` so they never collide with app-level class names.
+        lp: {
+          background: 'rgb(var(--lp-background) / <alpha-value>)',
+          surface: 'rgb(var(--lp-surface) / <alpha-value>)',
+          foreground: 'rgb(var(--lp-foreground) / <alpha-value>)',
+          muted: 'rgb(var(--lp-muted) / <alpha-value>)',
+          border: 'rgb(var(--lp-border) / <alpha-value>)',
+          accent: 'rgb(var(--lp-accent) / <alpha-value>)',
+          'accent-foreground': 'rgb(var(--lp-accent-foreground) / <alpha-value>)',
+          'accent-text': 'rgb(var(--lp-accent-text) / <alpha-value>)',
+          success: 'rgb(var(--lp-success) / <alpha-value>)',
+          warning: 'rgb(var(--lp-warning) / <alpha-value>)',
+          destructive: 'rgb(var(--lp-destructive) / <alpha-value>)',
+        },
+
+        // Product interface tokens (always dark) used by landing product frames
+        ui: {
+          bg: 'rgb(var(--ui-bg) / <alpha-value>)',
+          surface: 'rgb(var(--ui-surface) / <alpha-value>)',
+          fg: 'rgb(var(--ui-fg) / <alpha-value>)',
+          muted: 'rgb(var(--ui-muted) / <alpha-value>)',
+          border: 'rgb(var(--ui-border) / <alpha-value>)',
+          accent: 'rgb(var(--ui-accent) / <alpha-value>)',
+        },
       },
       fontFamily: {
         brand: ['var(--font-brand)', 'serif'],

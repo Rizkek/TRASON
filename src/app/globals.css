@@ -2,14 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-/* CSS Variables for fonts and colors */
+/* CSS Variables for fonts and colors.
+   --font-sans, --font-mono, --font-brand and --font-display are set on <html>
+   by next/font in app/layout.tsx (self-hosted, preloaded). */
 :root {
   --font-cormorant: 'Cormorant Garamond', serif;
   --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-display: 'Plus Jakarta Sans', sans-serif;
-  --font-brand: 'DM Serif Display', serif;
+
+  /* Landing page semantic tokens (light editorial canvas). Scoped by usage in
+     the landing components only; the authenticated app keeps its own palette. */
+  --lp-background: 250 250 247;      /* #FAFAF7 warm paper */
+  --lp-surface: 255 255 255;         /* #FFFFFF */
+  --lp-foreground: 11 15 20;         /* #0B0F14 */
+  --lp-muted: 91 100 114;            /* #5B6472 — 6.1:1 on paper */
+  --lp-border: 11 15 20;             /* used with alpha, e.g. border-border/10 */
+  --lp-accent: 244 201 93;           /* #F4C95D brand gold, fills only */
+  --lp-accent-foreground: 11 15 20;
+  --lp-accent-text: 138 100 16;      /* #8A6410 — gold that passes AA on paper */
+  --lp-success: 22 130 93;           /* #16825D */
+  --lp-warning: 180 96 20;           /* #B46014 */
+  --lp-destructive: 190 48 48;       /* #BE3030 */
+
+  /* Product interface tokens (always dark, regardless of page theme) */
+  --ui-bg: 11 15 20;                 /* #0B0F14 */
+  --ui-surface: 17 24 39;            /* #111827 */
+  --ui-fg: 244 245 247;
+  --ui-muted: 148 163 184;
+  --ui-border: 255 255 255;
+  --ui-accent: 244 201 93;
 
   /* TRASON New Color Palette - WCAG Compliant */
   /* Using RGB format (R G B) for Tailwind opacity modifiers to work */
@@ -179,13 +199,88 @@ p, body {
   }
 }
 
-/* Landing page utilities */
-.landing-section {
-  @apply py-24 md:py-32 px-6 md:px-12 relative;
+/* ── Landing page scope ──────────────────────────────────────────────────────
+   The public landing renders on a fixed light editorial canvas with dark
+   product frames. Everything inside .landing opts out of the app's
+   element-level typography rules and theme class. */
+.landing {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  color: rgb(var(--lp-foreground));
+  background-color: rgb(var(--lp-background));
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-.landing-container {
-  @apply max-w-6xl mx-auto;
+/* The app's global `p` rule points at an unloaded font; landing copy uses Geist. */
+.landing p {
+  font-family: inherit;
+}
+
+.landing :is(h1, h2, h3) {
+  font-family: var(--font-brand), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.landing p {
+  text-wrap: pretty;
+}
+
+.landing :focus-visible {
+  outline: 2px solid rgb(var(--lp-foreground));
+  outline-offset: 3px;
+}
+
+.landing ::selection {
+  background: rgb(var(--lp-accent) / 0.45);
+  color: rgb(var(--lp-foreground));
+}
+
+/* Motion system: one entrance (hero), one emphasis (accent dot), one
+   transition (product tab panels). Nothing scroll-jacked. */
+@keyframes lp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lp-panel {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lp-rise {
+  animation: lp-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.lp-rise-delay-1 { animation-delay: 80ms; }
+.lp-rise-delay-2 { animation-delay: 160ms; }
+.lp-rise-delay-3 { animation-delay: 260ms; }
+.lp-rise-delay-4 { animation-delay: 380ms; }
+
+.lp-panel {
+  animation: lp-panel 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-rise,
+  .lp-panel {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Card/Box utilities */
