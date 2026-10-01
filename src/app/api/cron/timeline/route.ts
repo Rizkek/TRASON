@@ -1,7 +1,9 @@
+/* eslint-disable no-console */
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
 import { z } from 'zod';
+import { shouldSendTaskReminder } from '@/libs/notificationLogic';
 
 export const runtime = 'nodejs';
 
@@ -99,22 +101,23 @@ export async function GET(request: Request) {
   console.log(`[CRON-TIMELINE] Valid tasks: ${tasks.length}, skipped: ${skippedTasks}`);
   // ──────────────────────────────────────────────────────────────────────────
 
-  // Fetch timezone per user from user_preferences
+  // Fetch timezone and notification preferences per user from user_preferences
   const uniqueUserIds = [...new Set(tasks.map((t) => t.user_id))];
   const { data: prefsRows } = await supabase
     .from('user_preferences')
-    .select('user_id, timezone')
+    .select('user_id, timezone, notifications_enabled, push_notifications_enabled')
     .in('user_id', uniqueUserIds);
 
   const userTimezoneMap: Record<string, string> = {};
+  const enabledUsers = new Set<string>();
   (prefsRows || []).forEach((p) => {
     if (p.user_id && p.timezone) userTimezoneMap[p.user_id] = p.timezone;
+    if (p.user_id && (p.notifications_enabled ?? true) && (p.push_notifications_enabled ?? true)) {
+      enabledUsers.add(p.user_id);
+    }
   });
   console.log(`[CRON-TIMELINE] Resolved timezones for ${Object.keys(userTimezoneMap).length} users.`);
-
-  // Helper: get today's date string in a given timezone
-  const getTodayStrForTz = (tz: string): string =>
-    new Date().toLocaleDateString('en-CA', { timeZone: tz });
+  console.log(`[CRON-TIMELINE] Enabled task reminder users: ${enabledUsers.size}/${uniqueUserIds.length}.`);
 
   // Group incomplete tasks by user_id (using per-user timezone)
   const incompleteTasksByUser: Record<string, string[]> = {};
@@ -123,16 +126,16 @@ export async function GET(request: Request) {
     const userTz = userTimezoneMap[task.user_id] || 'UTC';
     const userNow = new Date(now.toLocaleString('en-US', { timeZone: userTz }));
     const todayStr = userNow.toLocaleDateString('en-CA');
-    const currentHour = userNow.getHours();
-    
-    // Only send reminders during the 9 AM or 7 PM window in the user's timezone
-    const isReminderWindow = currentHour === 9 || currentHour === 19;
-    
     const isIncomplete =
       !task.completed_today ||
       (task.completed_today && task.last_reset_date !== todayStr);
+    const isReminderWindow = shouldSendTaskReminder(now, userTz, task, { start: 6, end: 23 });
 
-    console.log(`[CRON-TIMELINE] Task "${task.title}" (${task.user_id}) tz=${userTz} today=${todayStr} window=${isReminderWindow} incomplete=${isIncomplete}`);
+    console.log(`[CRON-TIMELINE] Task "${task.title}" (${task.user_id}) tz=${userTz} today=${todayStr} window=${isReminderWindow} incomplete=${isIncomplete} enabled=${enabledUsers.has(task.user_id)}`);
+
+    if (!enabledUsers.has(task.user_id)) {
+      return;
+    }
 
     if (isIncomplete && isReminderWindow) {
       if (!incompleteTasksByUser[task.user_id]) {

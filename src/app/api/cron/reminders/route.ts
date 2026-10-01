@@ -1,7 +1,9 @@
+/* eslint-disable no-console */
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
 import { z } from 'zod';
+import { isReminderDue } from '@/libs/notificationLogic';
 
 export const runtime = 'nodejs';
 
@@ -125,53 +127,49 @@ export async function GET(request: Request) {
     return NextResponse.json({ success: true, sent: 0, message: 'No reminders today', skippedReminders });
   }
 
-  // Fetch per-user timezones from user_preferences
+  // Fetch per-user timezones and notification settings from user_preferences
   const allUserIds = [...new Set(allReminders.map((r) => r.user_id))];
   const { data: prefRows } = await supabase
     .from('user_preferences')
-    .select('user_id, timezone')
+    .select('user_id, timezone, notifications_enabled, push_notifications_enabled')
     .in('user_id', allUserIds);
 
   const userTimezoneMap: Record<string, string> = {};
+  const enabledUsers = new Set<string>();
   (prefRows || []).forEach((p) => {
     if (p.user_id && p.timezone) userTimezoneMap[p.user_id] = p.timezone;
-  });
-  console.log(`[CRON-REMINDERS] Resolved timezones for ${Object.keys(userTimezoneMap).length}/${allUserIds.length} users.`);
-
-  // Filter reminders to only those due around NOW in the user's own timezone.
-  // This narrow time window prevents spamming the Push Service every time the cron runs.
-  const todayReminders = allReminders.filter((r) => {
-    if (!r.due_datetime) return false;
-    
-    const userTz = userTimezoneMap[r.user_id] || 'UTC';
-    const userNow = new Date(now.toLocaleString('en-US', { timeZone: userTz }));
-    const todayStr = userNow.toLocaleDateString('en-CA');
-    const dueDateStr = new Date(r.due_datetime).toLocaleDateString('en-CA', { timeZone: userTz });
-    const isToday = dueDateStr === todayStr;
-    
-    if (!isToday) return false;
-
-    if (!r.due_time) {
-      // All-day reminder: Notify only between 08:00 and 08:59 in the user's timezone
-      const isMorningWindow = userNow.getHours() === 8;
-      console.log(`[CRON-REMINDERS] All-day reminder "${r.title}" (${r.user_id}) tz=${userTz} today=${todayStr} window=${isMorningWindow} → include=${isMorningWindow}`);
-      return isMorningWindow;
-    } else {
-      // Specific time reminder: Notify if due_datetime is within [-30m, +30m] of NOW.
-      const dueTimeMs = new Date(r.due_datetime).getTime();
-      const nowTimeMs = now.getTime();
-      const diffMins = (nowTimeMs - dueTimeMs) / 1000 / 60;
-      const isWithinWindow = diffMins >= -30 && diffMins <= 30;
-      
-      console.log(`[CRON-REMINDERS] Reminder "${r.title}" (${r.user_id}) tz=${userTz} diffMins=${diffMins.toFixed(1)} window=${isWithinWindow} → include=${isWithinWindow}`);
-      return isWithinWindow;
+    if (p.user_id && (p.notifications_enabled ?? true) && (p.push_notifications_enabled ?? true)) {
+      enabledUsers.add(p.user_id);
     }
   });
+  console.log(`[CRON-REMINDERS] Resolved timezones for ${Object.keys(userTimezoneMap).length}/${allUserIds.length} users.`);
+  console.log(`[CRON-REMINDERS] Enabled push users: ${enabledUsers.size}/${allUserIds.length}.`);
 
-  console.log(`[CRON-REMINDERS] ${todayReminders.length}/${allReminders.length} reminders qualify for the current time window.`);
+  // Use the reminder's actual configured notify_times instead of a fixed hour window.
+  const todayReminders = allReminders.filter((r) => {
+    if (!r.due_datetime) {
+      console.log(`[CRON-REMINDERS] Reminder "${r.title}" (${r.user_id}) skipped: missing due_datetime.`);
+      return false;
+    }
+
+    const userTz = userTimezoneMap[r.user_id] || 'UTC';
+    if (!enabledUsers.has(r.user_id)) {
+      console.log(`[CRON-REMINDERS] Reminder "${r.title}" (${r.user_id}) skipped: notifications disabled in user preferences (tz=${userTz}).`);
+      return false;
+    }
+
+    const notifyTimes = Array.isArray(r.notify_times) && r.notify_times.length > 0 ? r.notify_times : [60, 180, 360];
+    const isWithinWindow = isReminderDue(now, r.due_datetime, notifyTimes, 30);
+    const dueLabel = new Date(r.due_datetime).toLocaleString('en-US', { timeZone: userTz });
+
+    console.log(`[CRON-REMINDERS] Reminder "${r.title}" (${r.user_id}) tz=${userTz} due=${dueLabel} notify_times=${JSON.stringify(notifyTimes)} -> include=${isWithinWindow}`);
+    return isWithinWindow;
+  });
+
+  console.log(`[CRON-REMINDERS] ${todayReminders.length}/${allReminders.length} reminders qualify for the current notification window.`);
 
   if (todayReminders.length === 0) {
-    console.log('[CRON-REMINDERS] No reminders due in the current time window. Exiting early.');
+    console.log('[CRON-REMINDERS] No reminders match the configured notify_times window. Exiting early.');
     return NextResponse.json({ success: true, sent: 0, message: 'No reminders in current window', skippedReminders });
   }
 

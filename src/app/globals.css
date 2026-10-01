@@ -66,32 +66,32 @@ body {
 
 /* Base Typography */
 h1, .h1 {
-  @apply text-4xl font-serif font-normal;
+  @apply text-3xl font-serif font-normal;
   font-family: var(--font-brand);
   letter-spacing: -0.01em;
   line-height: 1.1;
 }
 
 h2, .h2 {
-  @apply text-3xl font-serif font-normal;
+  @apply text-2xl font-serif font-normal;
   font-family: var(--font-brand);
   letter-spacing: -0.005em;
   line-height: 1.2;
 }
 
 h3, .h3 {
-  @apply text-2xl font-serif font-normal;
+  @apply text-xl font-serif font-normal;
   font-family: var(--font-brand);
   line-height: 1.3;
 }
 
 h4, .h4 {
-  @apply text-xl font-semibold;
+  @apply text-lg font-semibold;
   font-family: var(--font-inter);
 }
 
 p, body {
-  @apply text-base font-normal;
+  @apply text-sm font-normal;
   font-family: var(--font-inter);
   line-height: 1.6;
 }

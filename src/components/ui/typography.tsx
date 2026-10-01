@@ -14,13 +14,13 @@ const headingVariants = cva("font-sans leading-tight tracking-tight", {
             inverse: "text-white dark:text-warm-black",
         },
         size: {
-            // Calibrated for app/dashboard context (not marketing pages)
-            h1: "text-3xl md:text-4xl",
-            h2: "text-2xl md:text-3xl",
-            h3: "text-xl md:text-2xl",
-            h4: "text-lg md:text-xl",
-            h5: "text-base md:text-lg",
-            h6: "text-sm md:text-base",
+            // Calibrated for compact app/dashboard usage
+            h1: "text-2xl md:text-3xl",
+            h2: "text-xl md:text-2xl",
+            h3: "text-lg md:text-xl",
+            h4: "text-base md:text-lg",
+            h5: "text-sm md:text-base",
+            h6: "text-xs md:text-sm",
         },
         alignment: {
             left: "text-left",
@@ -83,12 +83,12 @@ const paragraphVariants = cva("font-sans", {
             accent: "text-secondary dark:text-primary",
         },
         size: {
-            xxs: "text-[10px] md:text-xs",
-            xs: "text-xs md:text-sm",
-            sm: "text-sm md:text-base",
-            base: "text-base md:text-lg",
-            lg: "text-lg md:text-xl",
-            xl: "text-xl md:text-2xl",
+            xxs: "text-[8px] md:text-[10px]",
+            xs: "text-[10px] md:text-xs",
+            sm: "text-xs md:text-sm",
+            base: "text-sm md:text-base",
+            lg: "text-base md:text-lg",
+            xl: "text-lg md:text-xl",
         },
         alignment: {
             left: "text-left",

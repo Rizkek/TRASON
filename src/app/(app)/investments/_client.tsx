@@ -77,7 +77,13 @@ export function InvestmentsClient() {
   
   const [activeTab, setActiveTab] = useState<'financial' | 'physical' | 'liabilities'>('financial');
 
-  // Filter positions by tab
+  // =============================================================
+  // 1) FILTER / TAB LOGIC
+  // Tab ini memfilter portfolio berdasarkan kategori aset:
+  // - financial: stock, crypto, gold
+  // - physical: property, vehicle
+  // - liabilities: debt
+  // =============================================================
   const filteredPositions = useMemo(() => {
     return calculatedPositions.filter(pos => {
       if (activeTab === 'financial') return ['stock', 'crypto', 'gold'].includes(pos.asset_type);
@@ -87,10 +93,11 @@ export function InvestmentsClient() {
     });
   }, [calculatedPositions, activeTab]);
 
-  // SWR automatically handles portfolio fetching on mount
-
-
-
+  // =============================================================
+  // 2) AUTH GUARD
+  // Jika user belum login, redirect ke /login.
+  // Bagian ini penting supaya halaman investasi tidak bisa dibuka tanpa session.
+  // =============================================================
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login');
@@ -120,6 +127,11 @@ export function InvestmentsClient() {
     setIsModalOpen(true);
   };
 
+  // =============================================================
+  // 3) SAVE / UPDATE POSITION LOGIC
+  // Fungsi ini menangani pembuatan atau edit posisi investasi.
+  // Di sini logika validasi form, payload, dan panggilan createPosition/updatePosition terjadi.
+  // =============================================================
   const handleSave = async () => {
     // Basic validation
     setFormError(null);
@@ -222,6 +234,15 @@ export function InvestmentsClient() {
     <>
       {formError && <ErrorAlert error={formError} onDismiss={() => setFormError(null)} />}
       <Layout>
+        {/*
+          =============================================================
+          4) HALAMAN UTAMA / RENDER UI
+          - Header title & subtitle
+          - Summary cards
+          - Portfolio card + tabs + table
+          - Empty state
+          =============================================================
+        */}
         <div className="space-y-8 animate-fade-in">
           <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="space-y-2 max-w-2xl">
@@ -385,8 +406,7 @@ export function InvestmentsClient() {
               <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
                 <Shield size={28} />
               </div>
-              <Heading as="h3" size="h3" className="text-lg font-bold text-white">{t('dashboard.start_with_one_position')}</Heading>
-              <Paragraph className="text-sm text-gray-light max-w-lg mx-auto mt-2">
+              <Paragraph className="text-sm text-center text-gray-light max-w-lg mx-auto mt-2">
                 {t('investment_page.investment_empty_state_desc')}
               </Paragraph>
               <Button variant="primary" size="md" className="mt-6" onClick={openNewModal}>{t('investment_page.add_first_position')}</Button>
@@ -421,7 +441,12 @@ export function InvestmentsClient() {
         )}
       </div>
 
-      {/* Mobile-only FAB for Add Position */}
+      {/*
+        =============================================================
+        5) MOBILE ACTION BUTTON
+        Tombol floating untuk add position di device mobile.
+        =============================================================
+      */}
       <div className="md:hidden fixed bottom-24 right-4 z-40 flex flex-col gap-2">
         <Button 
           variant="ghost" 
@@ -442,6 +467,13 @@ export function InvestmentsClient() {
         </Button>
       </div>
 
+      {/*
+        =============================================================
+        6) MODAL FORM
+        Ini tempat form tambah/edit posisi investasi. 
+        Semua input di sini disimpan ke form state lalu dikirim via handleSave().
+        =============================================================
+      */}
       {isModalOpen && (
         <Modal
           isOpen={isModalOpen}
