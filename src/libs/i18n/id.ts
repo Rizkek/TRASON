@@ -614,8 +614,9 @@ export const id = {
     "disabled_in_settings": "Aktifkan pengingat di pengaturan untuk menerima notifikasi.",
     "edit_reminder": "Edit pengingat",
     "empty_date": "Tidak ada jadwal untuk hari ini.",
-    "empty_history": "Belum ada pengingat yang selesai.",
+    "empty_history": "Belum ada pengingat di riwayat.",
     "empty_reminders": "Belum ada pengingat. Mulai dengan menambahkan satu.",
+    "expired": "Kedaluwarsa",
     "filter_active": "Aktif",
     "filter_history": "Riwayat",
     "form": {

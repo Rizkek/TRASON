@@ -47,6 +47,19 @@ export function isReminderDue(
   return triggerWindows.some(({ triggerAt }) => Math.abs(triggerAt.getTime() - now.getTime()) <= toleranceMs);
 }
 
+export function isReminderPastDue(
+  now: Date,
+  reminder: { due_datetime?: string | null; due_date?: string | null; due_time?: string | null },
+): boolean {
+  const dueAt = reminder.due_datetime
+    ? new Date(reminder.due_datetime)
+    : reminder.due_date
+      ? new Date(`${reminder.due_date}T${reminder.due_time || '23:59:59'}`)
+      : null;
+
+  return dueAt !== null && !Number.isNaN(dueAt.getTime()) && dueAt.getTime() <= now.getTime();
+}
+
 export function shouldSendTaskReminder(
   now: Date,
   userTimezone: string,

@@ -15,6 +15,7 @@ import { getLocalISODate } from '@/libs/format';
 import { formatDateOnly } from '@/libs/date';
 import { useHolidays } from '@/hooks/useHolidays';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { isReminderPastDue } from '@/libs/notificationLogic';
 
 
 export function RemindersClient() {
@@ -30,6 +31,7 @@ export function RemindersClient() {
 
   const [view, setView] = useState<'calendar' | 'list'>('calendar');
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [now, setNow] = useState(() => new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +41,17 @@ export function RemindersClient() {
 
   const remindersActiveEnabled = module_features?.['reminders_active'] !== false;
   const remindersHistoryEnabled = module_features?.['reminders_history'] !== false;
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  const isReminderInHistory = (reminder: Reminder) =>
+    reminder.status === 'completed' ||
+    (reminder.status === 'pending' && isReminderPastDue(now, reminder));
+  const isReminderActive = (reminder: Reminder) =>
+    reminder.status === 'pending' && !isReminderPastDue(now, reminder);
 
   // Default filter based on which sub-features are on
   const defaultFilter: 'active' | 'history' = remindersActiveEnabled ? 'active' : 'history';
@@ -297,7 +310,7 @@ export function RemindersClient() {
                     <Paragraph className="text-gray-light font-light italic">{t('reminders_page.disabled_in_settings')}</Paragraph>
                   </div>
                 ) : ((filter === 'active' && remindersActiveEnabled) || (filter === 'history' && remindersHistoryEnabled)) && (
-                  reminders.filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed').length === 0 ? (
+                  reminders.filter(r => filter === 'active' ? isReminderActive(r) : isReminderInHistory(r)).length === 0 ? (
                     <div className="glass-card p-24 text-center space-y-4">
                       <Bell size={48} className="mx-auto text-deep-sage opacity-20" />
                       <Paragraph className="text-gray-light font-light italic">
@@ -306,7 +319,7 @@ export function RemindersClient() {
                     </div>
                   ) : (
                     reminders
-                      .filter(r => filter === 'active' ? r.status === 'pending' : r.status === 'completed')
+                      .filter(r => filter === 'active' ? isReminderActive(r) : isReminderInHistory(r))
                       .map(reminder => (
                       <div key={reminder.id} className="glass-card p-8 flex items-center justify-between group">
                         <div className="flex items-center gap-8">
@@ -320,6 +333,9 @@ export function RemindersClient() {
                           </button>
                           <div>
                             <Heading as="h4" size="h4" className={`text-lg font-medium ${reminder.status === 'completed' ? 'line-through opacity-40' : ''}`}>{reminder.title}</Heading>
+                            {reminder.status === 'pending' && isReminderPastDue(now, reminder) && (
+                              <Paragraph className="text-xs text-warning">{t('reminders_page.expired')}</Paragraph>
+                            )}
                             <div className="flex items-center gap-4 text-micro text-gray-light uppercase tracking-widest mt-1">
                               <Clock size={12} />
                               <span>{(() => { const raw = reminder.due_datetime || reminder.due_date; if (!raw) return '—'; const d = new Date(raw); return isNaN(d.getTime()) ? '—' : d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone || 'UTC' }); })()}</span>
@@ -384,7 +400,7 @@ export function RemindersClient() {
                 <Heading as="h4" size="h4" className="text-micro uppercase tracking-[0.3em] text-deep-sage font-bold mb-4">{t('reminders_page.weekly_focus')}</Heading>
                 <Paragraph className="text-sm font-light text-gray-very-light leading-relaxed">
                   {t('reminders_page.weekly_focus_desc').split('{count}').map((part, i, arr) => 
-                    i === arr.length - 1 ? part : <React.Fragment key={i}>{part}<span className="text-warm-gold font-bold">{reminders.filter(r => r.status === 'pending').length}</span></React.Fragment>
+                    i === arr.length - 1 ? part : <React.Fragment key={i}>{part}<span className="text-warm-gold font-bold">{reminders.filter(isReminderActive).length}</span></React.Fragment>
                   )}
                 </Paragraph>
              </div>

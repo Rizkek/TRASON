@@ -18,6 +18,15 @@ const urlBase64ToUint8Array = (base64String: string) => {
   return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
 };
 
+const subscriptionMatchesVapidKey = (subscription: PushSubscription, vapidPublicKey: string) => {
+  const subscribedKey = subscription.options.applicationServerKey;
+  if (!subscribedKey) return false;
+
+  const expectedKey = urlBase64ToUint8Array(vapidPublicKey);
+  const actualKey = new Uint8Array(subscribedKey);
+  return expectedKey.length === actualKey.length && expectedKey.every((byte, index) => byte === actualKey[index]);
+};
+
 /**
  * Safely converts an ArrayBuffer to a base64 string.
  * Uses forEach instead of String.fromCharCode.apply to avoid
@@ -162,17 +171,29 @@ export const usePushNotification = () => {
         throw new Error('Failed to register service worker');
       }
 
-      // Subscribe to push manager
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-      });
-
       // Get current user
       const { data } = await supabase.auth.getSession();
       const user = data.session?.user;
       if (!user) {
         throw new Error('Not authenticated');
+      }
+
+      // Reuse a subscription only when it was created with the current VAPID key.
+      let subscription = await registration.pushManager.getSubscription();
+      if (subscription && !subscriptionMatchesVapidKey(subscription, vapidPublicKey)) {
+        await subscription.unsubscribe();
+        subscription = null;
+      }
+
+      subscription ??= await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+      });
+
+      const p256dh = subscription.getKey('p256dh');
+      const auth = subscription.getKey('auth');
+      if (!p256dh || !auth) {
+        throw new Error('Browser push subscription is missing encryption keys');
       }
 
       // Deactivate all OLD subscriptions for this user before inserting the new one.
@@ -194,8 +215,8 @@ export const usePushNotification = () => {
               user_id: user.id,
               endpoint: subscription.endpoint,
               // Use forEach-based encoding to avoid RangeError on large buffers
-              p256dh: arrayBufferToBase64(subscription.getKey('p256dh')!),
-              auth: arrayBufferToBase64(subscription.getKey('auth')!),
+              p256dh: arrayBufferToBase64(p256dh),
+              auth: arrayBufferToBase64(auth),
               user_agent: navigator.userAgent,
               is_active: true,
               last_used_at: new Date().toISOString(),

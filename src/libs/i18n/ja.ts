@@ -614,8 +614,9 @@ export const ja = {
     "disabled_in_settings": "リマインダーは設定で無効化されています。",
     "edit_reminder": "リマインダーを編集",
     "empty_date": "この日の予定はありません。",
-    "empty_history": "完了したリマインダーはまだありません。",
+    "empty_history": "履歴にリマインダーはまだありません。",
     "empty_reminders": "リマインダーはまだありません。1つ追加することから始めましょう。",
+    "expired": "期限切れ",
     "filter_active": "アクティブ",
     "filter_history": "履歴",
     "form": {

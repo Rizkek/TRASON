@@ -227,19 +227,18 @@ export function SettingsClient() {
         originalPrefs.notifications_enabled !== prefs.notifications_enabled ||
         originalPrefs.push_notifications_enabled !== prefs.push_notifications_enabled;
 
-      if (pushSettingChanged) {
-        if (prefs.notifications_enabled && prefs.push_notifications_enabled) {
-          try {
-            await push.subscribe();
-          } catch (pushErr) {
-            pushWarning = pushErr instanceof Error ? pushErr.message : 'Push subscription failed';
-          }
-        } else {
-          try {
-            await push.unsubscribe();
-          } catch {
-            // Silently ignore unsubscribe errors
-          }
+      const pushEnabled = prefs.notifications_enabled && prefs.push_notifications_enabled;
+      if (pushEnabled) {
+        try {
+          await push.subscribe();
+        } catch (pushErr) {
+          pushWarning = pushErr instanceof Error ? pushErr.message : 'Push subscription failed';
+        }
+      } else if (pushSettingChanged) {
+        try {
+          await push.unsubscribe();
+        } catch {
+          // Silently ignore unsubscribe errors
         }
       }
 

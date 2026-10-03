@@ -614,8 +614,9 @@ export const es = {
     "disabled_in_settings": "Los recordatorios están desactivados en los ajustes.",
     "edit_reminder": "Editar recordatorio",
     "empty_date": "No hay nada programado para este día.",
-    "empty_history": "Aún no hay recordatorios completados.",
+    "empty_history": "Aún no hay recordatorios en el historial.",
     "empty_reminders": "Aún no hay recordatorios. Empieza añadiendo uno.",
+    "expired": "Vencido",
     "filter_active": "Activo",
     "filter_history": "Historial",
     "form": {

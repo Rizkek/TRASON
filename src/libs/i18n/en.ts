@@ -614,8 +614,9 @@ export const en = {
     "disabled_in_settings": "Enable reminders in settings to receive notifications.",
     "edit_reminder": "Edit reminder",
     "empty_date": "Nothing scheduled for this day.",
-    "empty_history": "No completed reminders yet.",
+    "empty_history": "No reminders in history yet.",
     "empty_reminders": "Your agenda is clear.",
+    "expired": "Expired",
     "filter_active": "Active",
     "filter_history": "History",
     "form": {
