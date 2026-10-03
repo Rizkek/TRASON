@@ -22,44 +22,53 @@ export function detectDuplicates(
   const amount = 'amount' in newEntry ? newEntry.amount : newEntry.total;
   const title = 'title' in newEntry ? newEntry.title : (newEntry.merchant || 'Unknown');
   const dateStr = newEntry.date || new Date().toISOString().split('T')[0];
-  const dateObj = new Date(dateStr);
+  const dateObj = new Date(`${dateStr.split('T')[0]}T00:00:00Z`);
+  const type = 'type' in newEntry ? newEntry.type : undefined;
   
-  if (!amount || amount === 0) return matches;
+  if (!amount || amount === 0 || Number.isNaN(dateObj.getTime())) return matches;
 
   for (const t of existingTransactions) {
-    // 1. Check date proximity (within 3 days)
-    const tDate = new Date(t.date);
+    // Compare calendar dates in UTC so local daylight-saving changes cannot shift the result.
+    const tDate = new Date(`${t.date.split('T')[0]}T00:00:00Z`);
+    if (Number.isNaN(tDate.getTime())) continue;
+
     const timeDiff = Math.abs(dateObj.getTime() - tDate.getTime());
     const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    
-    if (daysDiff > 3) continue;
+    if (daysDiff > 1) continue;
 
-    // 2. Check amount exact match
+    if (type && t.type !== type) continue;
+
+    // 1. Amount alone is common; require a similar merchant name as well.
     const isAmountExact = t.amount === amount || t.original_amount === amount;
-    
-    // 3. Check name similarity (simple inclusion/lowercase check for now)
-    const tTitleLower = t.title.toLowerCase();
-    const newTitleLower = title.toLowerCase();
-    
-    const isNameSimilar = 
-      tTitleLower.includes(newTitleLower) || 
-      newTitleLower.includes(tTitleLower);
+    const tTitleNormalized = t.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const newTitleNormalized = title.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const shorterTitleLength = Math.min(tTitleNormalized.length, newTitleNormalized.length);
+    const isNameSimilar = Boolean(tTitleNormalized && newTitleNormalized) && (
+      tTitleNormalized === newTitleNormalized ||
+      (shorterTitleLength >= 4 && (
+        tTitleNormalized.includes(newTitleNormalized) ||
+        newTitleNormalized.includes(tTitleNormalized)
+      ))
+    );
 
-    if (isAmountExact && daysDiff === 0 && isNameSimilar) {
+    if (isAmountExact && isNameSimilar && daysDiff === 0) {
       matches.push({
         transaction: t,
         confidence: 'high',
         reason: 'Exact same amount, date, and similar merchant name.',
       });
-    } else if (isAmountExact && daysDiff <= 1) {
+    } else if (isAmountExact && isNameSimilar) {
       matches.push({
         transaction: t,
         confidence: 'medium',
-        reason: 'Same amount on the same or adjacent day.',
+        reason: 'Same amount and similar merchant name on an adjacent day.',
       });
     }
   }
 
   // Return highest confidence first
-  return matches.sort((a, b) => (a.confidence === 'high' ? -1 : 1));
+  return matches.sort((a, b) => {
+    if (a.confidence === b.confidence) return 0;
+    return a.confidence === 'high' ? -1 : 1;
+  });
 }
