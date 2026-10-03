@@ -285,6 +285,36 @@ export const en = {
     "welcome_back": "Welcome back"
   },
   "finance": {
+    "driverPayout": {
+      "confirmed": "Confirmed",
+      "date": "Statement date",
+      "estimateDisclaimer": "The 8% fee up to IDR 10,000, 8.1% above that, and 11% VAT are estimates. Values on the statement take precedence. A blank tip means unknown.",
+      "estimateConfirmed": "Estimate confirmed",
+      "estimated": "Estimated",
+      "fare": "Trip fare",
+      "fromImage": "From image",
+      "importButton": "Import inDrive",
+      "invalidImage": "Choose a valid image file.",
+      "invalidAmounts": "Amounts must be valid numbers greater than or equal to zero.",
+      "missingPayout": "Enter or confirm the net payout before saving.",
+      "netPayout": "Net payout",
+      "notShown": "Not shown",
+      "ocrConfidence": "OCR confidence",
+      "readFailed": "Could not read the statement.",
+      "reading": "Reading statement...",
+      "reviewDescription": "Review and correct the amounts before saving this income.",
+      "reviewTitle": "Review driver income",
+      "saveFailed": "Could not save the income.",
+      "saveIncome": "Save income",
+      "saving": "Saving...",
+      "servicePayment": "Service payment",
+      "tip": "Tip",
+      "tipUnknownHint": "Leave blank if no tip is shown; TRASON will not guess it.",
+      "transactionCurrency": "Transaction currency",
+      "uploadFailed": "Image upload failed.",
+      "useEstimate": "Use estimated payout",
+      "vat": "VAT"
+    },
     "activeSubscriptions": "Active subscriptions",
     "addSubscription": "Add subscription",
     "allShown": "· all shown ·",
@@ -655,6 +685,8 @@ export const en = {
   "settings": {
     "alerts": {
       "daily": "Daily",
+      "dndDescription": "Do Not Disturb or device settings may silence notifications. TRASON cannot detect or bypass those settings. Notification sounds are controlled by your device; custom sounds and Android notification channels require a native app.",
+      "dndTitle": "Why might a reminder be silent?",
       "email": "Email digest",
       "emailDesc": "Receive periodic summary reports via email.",
       "frequency": "Digest frequency",
@@ -663,6 +695,12 @@ export const en = {
       "push": "Push notifications",
       "pushDesc": "Receive instant notifications on this device.",
       "sectionTitle": "Notifications",
+      "testBody": "This is a test notification from TRASON.",
+      "testButton": "Test notification",
+      "testFailed": "Could not show a test notification on this device.",
+      "testNoPermission": "Enable notifications and save your settings before testing.",
+      "testSent": "Test notification sent. Your device may still silence it.",
+      "testTitle": "TRASON notification test",
       "weekly": "Weekly"
     },
     "interface": {

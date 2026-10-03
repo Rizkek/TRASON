@@ -12,6 +12,7 @@ import { TextCaptureForm } from './components/TextCaptureForm';
 import { InstallmentList } from './components/InstallmentList';
 import { InstallmentSheet } from './components/InstallmentSheet';
 const ReceiptUpload = dynamic(() => import('./components/ReceiptUpload').then(m => m.ReceiptUpload), { ssr: false });
+const DriverPayoutImport = dynamic(() => import('./components/DriverPayoutImport').then(m => m.DriverPayoutImport), { ssr: false });
 const ReceiptReviewSheet = dynamic(() => import('./components/ReceiptReviewSheet').then(m => m.ReceiptReviewSheet), { ssr: false });
 import { DuplicateAlert } from './components/DuplicateAlert';
 import { FinanceTabBar, FinanceTab } from './components/FinanceTabBar';
@@ -569,6 +570,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                 onUploadSuccess={(txId) => setReviewTransactionId(txId)} 
                 onError={(err) => setError(err)} 
               />
+              <DriverPayoutImport onSaved={() => setError(null)} onError={setError} />
             </div>
 
         {/* Budget Progress Bar */}

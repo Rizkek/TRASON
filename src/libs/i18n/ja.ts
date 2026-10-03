@@ -285,6 +285,36 @@ export const ja = {
     "welcome_back": "お帰りなさい"
   },
   "finance": {
+    "driverPayout": {
+      "confirmed": "確認済み",
+      "date": "明細の日付",
+      "estimateDisclaimer": "IDR 10,000以下は8%、それを超える場合は8.1%のサービス料と、11%のVATは推定値です。明細の金額を優先します。チップ欄が空の場合は不明です。",
+      "estimateConfirmed": "推定額を確認済み",
+      "estimated": "推定",
+      "fare": "乗車料金",
+      "fromImage": "画像から読取",
+      "importButton": "inDriveをインポート",
+      "invalidImage": "有効な画像ファイルを選択してください。",
+      "invalidAmounts": "金額は0以上の有効な数値で入力してください。",
+      "missingPayout": "保存する前に純受取額を入力または確認してください。",
+      "netPayout": "純受取額",
+      "notShown": "記載なし",
+      "ocrConfidence": "OCR信頼度",
+      "readFailed": "明細を読み取れませんでした。",
+      "reading": "明細を読み取り中...",
+      "reviewDescription": "収入として保存する前に金額を確認・修正してください。",
+      "reviewTitle": "ドライバー収入を確認",
+      "saveFailed": "収入を保存できませんでした。",
+      "saveIncome": "収入を保存",
+      "saving": "保存中...",
+      "servicePayment": "サービス手数料",
+      "tip": "チップ",
+      "tipUnknownHint": "チップが記載されていない場合は空欄にしてください。TRASONは推測しません。",
+      "transactionCurrency": "取引通貨",
+      "uploadFailed": "画像をアップロードできませんでした。",
+      "useEstimate": "推定受取額を使用",
+      "vat": "VAT"
+    },
     "activeSubscriptions": "アクティブなサブスクリプション",
     "addSubscription": "サブスクリプションを追加",
     "allShown": "· すべて表示 ·",
@@ -655,6 +685,8 @@ export const ja = {
   "settings": {
     "alerts": {
       "daily": "毎日",
+      "dndDescription": "おやすみモードや端末の設定により通知が消音される場合があります。TRASONはこれらの設定を検出したり回避したりできません。通知音は端末側で設定します。カスタム音やAndroidの通知チャンネルにはネイティブアプリが必要です。",
+      "dndTitle": "リマインダーが鳴らないことがあるのはなぜですか？",
       "email": "Eメールダイジェスト",
       "emailDesc": "Eメールで概要レポートを受信します。",
       "frequency": "ダイジェスト頻度",
@@ -663,6 +695,12 @@ export const ja = {
       "push": "プッシュ通知",
       "pushDesc": "デバイスで即時アラートを受信します。",
       "sectionTitle": "通知設定",
+      "testBody": "TRASONからのテスト通知です。",
+      "testButton": "通知をテスト",
+      "testFailed": "この端末でテスト通知を表示できませんでした。",
+      "testNoPermission": "通知を有効にして設定を保存してからテストしてください。",
+      "testSent": "テスト通知を送信しました。端末の設定により消音される場合があります。",
+      "testTitle": "TRASON通知テスト",
       "weekly": "毎週"
     },
     "interface": {

@@ -285,6 +285,36 @@ export const es = {
     "welcome_back": "Bienvenido de nuevo"
   },
   "finance": {
+    "driverPayout": {
+      "confirmed": "Confirmado",
+      "date": "Fecha del resumen",
+      "estimateDisclaimer": "La comisión del 8% hasta IDR 10.000, del 8,1% por encima y el IVA del 11% son estimaciones. Los valores del resumen tienen prioridad. Una propina vacía significa desconocida.",
+      "estimateConfirmed": "Estimación confirmada",
+      "estimated": "Estimado",
+      "fare": "Tarifa del viaje",
+      "fromImage": "De la imagen",
+      "importButton": "Importar inDrive",
+      "invalidImage": "Elige un archivo de imagen válido.",
+      "invalidAmounts": "Los importes deben ser números válidos mayores o iguales a cero.",
+      "missingPayout": "Introduce o confirma el pago neto antes de guardar.",
+      "netPayout": "Pago neto",
+      "notShown": "No aparece",
+      "ocrConfidence": "Confianza OCR",
+      "readFailed": "No se pudo leer el resumen.",
+      "reading": "Leyendo resumen...",
+      "reviewDescription": "Revisa y corrige los importes antes de guardar el ingreso.",
+      "reviewTitle": "Revisar ingresos del conductor",
+      "saveFailed": "No se pudo guardar el ingreso.",
+      "saveIncome": "Guardar ingreso",
+      "saving": "Guardando...",
+      "servicePayment": "Cargo por servicio",
+      "tip": "Propina",
+      "tipUnknownHint": "Déjalo vacío si no aparece la propina; TRASON no la estimará.",
+      "transactionCurrency": "Moneda de la transacción",
+      "uploadFailed": "No se pudo subir la imagen.",
+      "useEstimate": "Usar pago neto estimado",
+      "vat": "IVA"
+    },
     "activeSubscriptions": "Suscripciones Activas",
     "addSubscription": "Añadir Suscripción",
     "allShown": "· mostrados todos ·",
@@ -655,6 +685,8 @@ export const es = {
   "settings": {
     "alerts": {
       "daily": "Diario",
+      "dndDescription": "No molestar o los ajustes del dispositivo pueden silenciar las notificaciones. TRASON no puede detectar ni omitir esos ajustes. El dispositivo controla el sonido; los sonidos personalizados y los canales de notificación de Android requieren una aplicación nativa.",
+      "dndTitle": "¿Por qué podría no sonar un recordatorio?",
       "email": "Resumen por correo",
       "emailDesc": "Recibe informes resumidos por correo electrónico.",
       "frequency": "Frecuencia de resumen",
@@ -663,6 +695,12 @@ export const es = {
       "push": "Notificaciones Push",
       "pushDesc": "Recibe alertas instantáneas en tu dispositivo.",
       "sectionTitle": "Preferencias de notificación",
+      "testBody": "Esta es una notificación de prueba de TRASON.",
+      "testButton": "Probar notificación",
+      "testFailed": "No se pudo mostrar una notificación de prueba en este dispositivo.",
+      "testNoPermission": "Activa las notificaciones y guarda la configuración antes de probar.",
+      "testSent": "Notificación de prueba enviada. El dispositivo aún podría silenciarla.",
+      "testTitle": "Prueba de notificación de TRASON",
       "weekly": "Semanal"
     },
     "interface": {

@@ -21,6 +21,30 @@ export function NotificationsSection({
   onSavePreferences,
 }: NotificationsSectionProps) {
   const { t } = useTranslation();
+  const [testNotificationStatus, setTestNotificationStatus] = React.useState('');
+
+  const sendTestNotification = async () => {
+    setTestNotificationStatus('');
+
+    if (typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') {
+      setTestNotificationStatus(t('settings.alerts.testNoPermission'));
+      return;
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) throw new Error('Service worker is not registered');
+
+      await registration.showNotification(t('settings.alerts.testTitle'), {
+        body: t('settings.alerts.testBody'),
+        icon: '/icon-192x192.png',
+        tag: 'trason-notification-test',
+      });
+      setTestNotificationStatus(t('settings.alerts.testSent'));
+    } catch {
+      setTestNotificationStatus(t('settings.alerts.testFailed'));
+    }
+  };
 
   return (
     <Card className="glass border-none" title={t('settings.alerts.sectionTitle')}>
@@ -57,6 +81,33 @@ export function NotificationsSection({
               }`}
             />
           </button>
+        </div>
+
+        <div className="rounded-md border border-secondary/20 bg-secondary/5 p-4">
+          <details>
+            <summary className="cursor-pointer text-sm font-medium text-soft-cream">
+              {t('settings.alerts.dndTitle')}
+            </summary>
+            <Paragraph className="mt-3 text-xs text-gray-light">
+              {t('settings.alerts.dndDescription')}
+            </Paragraph>
+          </details>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={sendTestNotification}
+              disabled={!prefs.notifications_enabled || !prefs.push_notifications_enabled}
+              leftIcon={<BellRinging size={16} />}
+            >
+              {t('settings.alerts.testButton')}
+            </Button>
+            {testNotificationStatus && (
+              <Paragraph role="status" className="text-xs text-gray-light">
+                {testNotificationStatus}
+              </Paragraph>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center justify-between p-6 rounded-md border bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">

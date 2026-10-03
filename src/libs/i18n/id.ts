@@ -285,6 +285,36 @@ export const id = {
     "welcome_back": "Selamat datang kembali"
   },
   "finance": {
+    "driverPayout": {
+      "confirmed": "Dikonfirmasi",
+      "date": "Tanggal rekap",
+      "estimateDisclaimer": "Fee 8% sampai Rp10.000, 8,1% di atasnya, dan VAT 11% adalah estimasi. Angka pada rekap lebih diutamakan. Tip kosong berarti belum diketahui.",
+      "estimateConfirmed": "Estimasi dikonfirmasi",
+      "estimated": "Estimasi",
+      "fare": "Tarif perjalanan",
+      "fromImage": "Dari gambar",
+      "importButton": "Impor inDrive",
+      "invalidImage": "Pilih file gambar yang valid.",
+      "invalidAmounts": "Jumlah harus berupa angka nol atau lebih.",
+      "missingPayout": "Masukkan atau pastikan jumlah payout bersih sebelum menyimpan.",
+      "netPayout": "Payout bersih",
+      "notShown": "Tidak tercantum",
+      "ocrConfidence": "Keyakinan OCR",
+      "readFailed": "Rekap tidak dapat dibaca.",
+      "reading": "Membaca rekap...",
+      "reviewDescription": "Periksa dan koreksi angka sebelum menyimpan pemasukan.",
+      "reviewTitle": "Tinjau pemasukan driver",
+      "saveFailed": "Pemasukan gagal disimpan.",
+      "saveIncome": "Simpan pemasukan",
+      "saving": "Menyimpan...",
+      "servicePayment": "Biaya layanan",
+      "tip": "Tip",
+      "tipUnknownHint": "Kosongkan jika tip tidak tercantum; TRASON tidak akan menebaknya.",
+      "transactionCurrency": "Mata uang transaksi",
+      "uploadFailed": "Gambar gagal diunggah.",
+      "useEstimate": "Gunakan estimasi payout",
+      "vat": "VAT"
+    },
     "activeSubscriptions": "Langganan Aktif",
     "addSubscription": "Tambah Langganan",
     "allShown": "· semua ditampilkan ·",
@@ -655,6 +685,8 @@ export const id = {
   "settings": {
     "alerts": {
       "daily": "Harian",
+      "dndDescription": "Jangan Ganggu atau pengaturan perangkat dapat membisukan notifikasi. TRASON tidak dapat mendeteksi atau melewati pengaturan tersebut. Nada notifikasi diatur oleh perangkat; nada khusus dan kanal notifikasi Android memerlukan aplikasi native.",
+      "dndTitle": "Mengapa pengingat bisa tidak berbunyi?",
       "email": "Ringkasan email",
       "emailDesc": "Terima laporan ringkasan melalui email.",
       "frequency": "Frekuensi ringkasan",
@@ -663,6 +695,12 @@ export const id = {
       "push": "Notifikasi push",
       "pushDesc": "Terima notifikasi instan di perangkat Anda.",
       "sectionTitle": "Notifikasi",
+      "testBody": "Ini adalah notifikasi percobaan dari TRASON.",
+      "testButton": "Tes notifikasi",
+      "testFailed": "Notifikasi percobaan tidak dapat ditampilkan di perangkat ini.",
+      "testNoPermission": "Aktifkan notifikasi dan simpan pengaturan sebelum melakukan tes.",
+      "testSent": "Notifikasi percobaan dikirim. Perangkat mungkin tetap membisukannya.",
+      "testTitle": "Tes notifikasi TRASON",
       "weekly": "Mingguan"
     },
     "interface": {

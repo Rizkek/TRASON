@@ -7,12 +7,22 @@ export const runtime = 'nodejs';
 
 
 // ─── Web Push setup ──────────────────────────────────────────────────────────
-const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
-const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY!;
-const vapidEmail = process.env.VAPID_EMAIL || 'mailto:admin@trason.app';
+function configureWebPush(): boolean {
+  const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY;
+  if (!vapidPublicKey || !vapidPrivateKey) return false;
 
-if (vapidPublicKey && vapidPrivateKey) {
-  webpush.setVapidDetails(vapidEmail, vapidPublicKey, vapidPrivateKey);
+  try {
+    webpush.setVapidDetails(
+      process.env.VAPID_EMAIL || 'mailto:admin@trason.app',
+      vapidPublicKey,
+      vapidPrivateKey
+    );
+    return true;
+  } catch (error) {
+    console.error('[push/send-reminder] Invalid VAPID configuration:', error);
+    return false;
+  }
 }
 
 // ─── Supabase admin client (lazy — created inside handler to avoid build-time errors) ─────
@@ -26,10 +36,10 @@ function getSupabaseAdmin() {
 export async function POST(req: NextRequest) {
 
   try {
-    // Validate VAPID config
-    if (!vapidPublicKey || !vapidPrivateKey) {
+    // Configure VAPID at request time so invalid environment values cannot break builds.
+    if (!configureWebPush()) {
       return NextResponse.json(
-        { error: 'Push notifications not configured (missing VAPID keys)' },
+        { error: 'Push notifications not configured (missing or invalid VAPID keys)' },
         { status: 503 }
       );
     }

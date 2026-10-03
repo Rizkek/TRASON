@@ -185,8 +185,11 @@ self.addEventListener('push', (event) => {
         body: data.body || 'You have a new update.',
         icon: '/icon-192x192.png',
         badge: '/icon-192x192.png',
+        tag: data.tag,
+        requireInteraction: data.priority === 'high',
         data: {
           url: data.url || '/',
+          priority: data.priority || 'normal',
         },
       };
 

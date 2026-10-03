@@ -13,6 +13,7 @@ const ReminderRowSchema = z.object({
   id: z.string(),
   user_id: z.string(),
   title: z.string(),
+  priority: z.enum(['low', 'medium', 'high']).optional(),
   due_datetime: z.string().nullable().optional(),
   due_time: z.string().nullable().optional(),
   notify_times: z.array(z.number()).nullable().optional(),
@@ -86,7 +87,7 @@ export async function GET(request: Request) {
   console.log(`[CRON-REMINDERS] Fetching pending reminders in window: ${startOfWindowUTC.toISOString()} → ${endOfWindowUTC.toISOString()}`);
   const { data: rawReminders, error: remindersError } = await supabase
     .from('reminders')
-    .select('id, user_id, title, due_datetime, due_time, notify_times')
+    .select('id, user_id, title, priority, due_datetime, due_time, notify_times')
     .eq('status', 'pending')
     .is('deleted_at', null)
     .not('due_datetime', 'is', null)
@@ -266,6 +267,7 @@ export async function GET(request: Request) {
       body: bodyText,
       url: '/reminders',
       tag,
+      priority: userReminders.some((reminder) => reminder.priority === 'high') ? 'high' : 'normal',
     });
 
     let safeEndpoint = 'unknown';
