@@ -82,7 +82,7 @@ export async function GET(request: Request) {
   startOfWindowUTC.setUTCDate(startOfWindowUTC.getUTCDate() - 1); // cover UTC-12 (yesterday UTC)
   const endOfWindowUTC = new Date();
   endOfWindowUTC.setUTCHours(23, 59, 59, 999);
-  endOfWindowUTC.setUTCDate(endOfWindowUTC.getUTCDate() + 1); // cover UTC+14 (tomorrow UTC)
+  endOfWindowUTC.setUTCDate(endOfWindowUTC.getUTCDate() + 30); // look ahead up to 30 days for early notify_times
 
   console.log(`[CRON-REMINDERS] Fetching pending reminders in window: ${startOfWindowUTC.toISOString()} → ${endOfWindowUTC.toISOString()}`);
   const { data: rawReminders, error: remindersError } = await supabase
@@ -186,7 +186,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'VAPID keys missing', sent: 0 }, { status: 500 });
   }
 
-  webpush.setVapidDetails(vapidEmail, vapidPublic, vapidPrivate);
+  try {
+    webpush.setVapidDetails(vapidEmail, vapidPublic, vapidPrivate);
+  } catch (error) {
+    console.error('[CRON-REMINDERS] Invalid VAPID configuration:', error);
+    return NextResponse.json({ error: 'Invalid VAPID configuration', sent: 0 }, { status: 500 });
+  }
 
   // Group qualifying reminders by user_id
   const remindersByUser: Record<string, ReminderRow[]> = {};

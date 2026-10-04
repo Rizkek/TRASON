@@ -53,20 +53,6 @@ export async function GET(request: Request) {
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // VAPID Setup
-  const vapidPublic = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-  const vapidPrivate = process.env.VAPID_PRIVATE_KEY;
-  const vapidEmail = process.env.VAPID_EMAIL || 'mailto:admin@trason.app';
-
-  console.log(`[CRON-TIMELINE] VAPID Config - Public: ${vapidPublic ? 'Present' : 'MISSING'}, Private: ${vapidPrivate ? 'Present' : 'MISSING'}`);
-
-  if (!vapidPublic || !vapidPrivate) {
-    console.error('[CRON-TIMELINE] VAPID keys missing!');
-    return NextResponse.json({ error: 'VAPID keys missing' }, { status: 500 });
-  }
-
-  webpush.setVapidDetails(vapidEmail, vapidPublic, vapidPrivate);
-
   // todayStr will be resolved per-user based on their timezone preference (see below)
   console.log(`[CRON-TIMELINE] Will resolve todayStr per-user timezone from user_preferences`);
 
@@ -193,6 +179,25 @@ export async function GET(request: Request) {
   if (subscriptions.length === 0) {
     console.log('[CRON-TIMELINE] No valid push subscriptions found.');
     return NextResponse.json({ success: true, usersWithIncompleteTasks: userIds.length, sent: 0, skippedSubs });
+  }
+
+  // VAPID Setup
+  const vapidPublic = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const vapidPrivate = process.env.VAPID_PRIVATE_KEY;
+  const vapidEmail = process.env.VAPID_EMAIL || 'mailto:admin@trason.app';
+
+  console.log(`[CRON-TIMELINE] VAPID Config - Public: ${vapidPublic ? 'Present' : 'MISSING'}, Private: ${vapidPrivate ? 'Present' : 'MISSING'}`);
+
+  if (!vapidPublic || !vapidPrivate) {
+    console.error('[CRON-TIMELINE] VAPID keys missing!');
+    return NextResponse.json({ error: 'VAPID keys missing' }, { status: 500 });
+  }
+
+  try {
+    webpush.setVapidDetails(vapidEmail, vapidPublic, vapidPrivate);
+  } catch (error) {
+    console.error('[CRON-TIMELINE] Invalid VAPID configuration:', error);
+    return NextResponse.json({ error: 'Invalid VAPID configuration' }, { status: 500 });
   }
 
   let sentCount = 0;

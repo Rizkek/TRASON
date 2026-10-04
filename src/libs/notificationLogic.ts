@@ -15,7 +15,7 @@ export function getReminderNotifyWindows(
   const effectiveTolerance = Number.isFinite(toleranceMinutes) ? toleranceMinutes : 30;
   const normalizedTimes = Array.from(
     new Set((notifyTimes.length > 0 ? notifyTimes : [60, 180, 360]).map((minutes) => Number(minutes)))
-  ).filter((minutes) => Number.isFinite(minutes) && minutes >= 0 && minutes <= (24 * 60 + effectiveTolerance));
+  ).filter((minutes) => Number.isFinite(minutes) && minutes >= 0);
 
   return normalizedTimes.map((minutes) => ({
     triggerAt: new Date(dueAt.getTime() - minutes * 60 * 1000),
