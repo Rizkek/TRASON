@@ -8,13 +8,16 @@ import { ExtractionStatus } from './ExtractionStatus';
 import { ItemList } from './ItemList';
 import { Receipt } from '@phosphor-icons/react';
 
+import { updateTransactionWithInvalidation } from '@/libs/mutations';
+
 interface Props {
   transactionId: string | null;
   isOpen: boolean;
   onClose: () => void;
+  onConfirmSuccess?: () => void;
 }
 
-export function ReceiptReviewSheet({ transactionId, isOpen, onClose }: Props) {
+export function ReceiptReviewSheet({ transactionId, isOpen, onClose, onConfirmSuccess }: Props) {
   const { t } = useTranslation();
   const { currency, language: locale } = useUserPreferences();
   const { items, metadata, isLoading, error, saveItems } = useTransactionItems(transactionId);
@@ -59,6 +62,20 @@ export function ReceiptReviewSheet({ transactionId, isOpen, onClose }: Props) {
         .map(i => i.id as string);
         
       await saveItems(localItems, deletedIds);
+
+      // Update the main transaction with the extracted total and merchant name
+      if (metadata && transactionId) {
+        const extractedTitle = metadata.extracted_merchant || 'Receipt Expense';
+        const extractedAmount = metadata.extracted_total || localItems.reduce((acc, curr) => acc + (curr.total || 0), 0) || 1;
+        
+        await updateTransactionWithInvalidation(transactionId, {
+          title: extractedTitle,
+          amount: extractedAmount,
+          metadata: { ...metadata, status: 'completed', note: 'Analyzed via AI' }
+        });
+      }
+
+      if (onConfirmSuccess) onConfirmSuccess();
       onClose();
     } catch (err: any) {
       setSaveError(err.message || 'Failed to save items');

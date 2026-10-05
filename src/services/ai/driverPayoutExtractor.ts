@@ -9,6 +9,7 @@ export const driverPayoutExtractionSchema = z.object({
   vat_amount: optionalAmount,
   tip_amount: optionalAmount,
   net_payout_amount: optionalAmount,
+  distance_km: optionalAmount,
   currency: z.string().nullable().optional(),
 });
 

@@ -311,9 +311,20 @@ export const ja = {
       "tip": "チップ",
       "tipUnknownHint": "チップが記載されていない場合は空欄にしてください。TRASONは推測しません。",
       "transactionCurrency": "取引通貨",
-      "uploadFailed": "画像をアップロードできませんでした。",
+      "uploadFailed": "画像のアップロードに失敗しました。",
       "useEstimate": "推定受取額を使用",
-      "vat": "VAT"
+      "vat": "VAT",
+      "operationalCost": "ガソリン代（運用コスト）",
+      "orderDistance": "注文距離 (Km)",
+      "returnDistance": "追加距離",
+      "optionalKm": "任意 (Km)",
+      "fuelPrice": "ガソリン価格 / リットル",
+      "vehicleType": "車種",
+      "realNetProfit": "実際の純利益"
+    },
+    "categoryBreakdown": {
+      "title": "カテゴリー別の支出",
+      "others": "その他"
     },
     "activeSubscriptions": "アクティブなサブスクリプション",
     "addSubscription": "サブスクリプションを追加",

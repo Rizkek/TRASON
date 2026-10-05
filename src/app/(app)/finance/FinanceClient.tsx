@@ -60,7 +60,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
   
   const isCurrentMonth = selectedMonth === now.getMonth() && selectedYear === now.getFullYear();
   
-  const { transactions, isLoading: isTransactionsLoading, createTransaction, updateTransaction, deleteTransaction } = useTransaction(
+  const { transactions, isLoading: isTransactionsLoading, createTransaction, updateTransaction, deleteTransaction, mutate: mutateTransactions } = useTransaction(
     start, 
     end, 
     undefined, 
@@ -1149,6 +1149,9 @@ export default function FinanceClient({ initialTransactions }: Props) {
         transactionId={reviewTransactionId}
         isOpen={!!reviewTransactionId}
         onClose={() => setReviewTransactionId(null)}
+        onConfirmSuccess={() => {
+          if (typeof mutateTransactions === 'function') mutateTransactions();
+        }}
       />
       </Layout>
     </>

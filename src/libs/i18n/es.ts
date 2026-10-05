@@ -310,10 +310,21 @@ export const es = {
       "servicePayment": "Cargo por servicio",
       "tip": "Propina",
       "tipUnknownHint": "Déjalo vacío si no aparece la propina; TRASON no la estimará.",
-      "transactionCurrency": "Moneda de la transacción",
-      "uploadFailed": "No se pudo subir la imagen.",
-      "useEstimate": "Usar pago neto estimado",
-      "vat": "IVA"
+      "transactionCurrency": "Moneda de transacción",
+      "uploadFailed": "Error al cargar la imagen.",
+      "useEstimate": "Usar pago estimado",
+      "vat": "IVA",
+      "operationalCost": "Costo Operativo de Combustible",
+      "orderDistance": "Distancia del Pedido (Km)",
+      "returnDistance": "Distancia Adicional",
+      "optionalKm": "Opcional (Km)",
+      "fuelPrice": "Precio del Combustible / Litro",
+      "vehicleType": "Tipo de Vehículo",
+      "realNetProfit": "Beneficio Neto Real"
+    },
+    "categoryBreakdown": {
+      "title": "Gastos por Categoría",
+      "others": "Otros"
     },
     "activeSubscriptions": "Suscripciones Activas",
     "addSubscription": "Añadir Suscripción",

@@ -1,7 +1,7 @@
 import { generateObject } from 'ai';
-import { google } from '@ai-sdk/google';
 import { z } from 'zod';
 import { VisionProvider, VisionExtractionResult } from './visionProvider';
+import { aiModels } from './provider';
 
 export const receiptItemSchema = z.object({
   name: z.string(),
@@ -22,28 +22,35 @@ export const receiptExtractionSchema = z.object({
 export type ExtractedReceipt = z.infer<typeof receiptExtractionSchema>;
 
 export class GeminiReceiptExtractor implements VisionProvider {
-  async extractJSON<ExtractedReceipt>(
-    imageUrl: string,
-    schema: any, // We'll just pass receiptExtractionSchema from outside or ignore
+  async extractJSON<T>(
+    imageUrlOrBase64: string,
+    schema: any, // Zod schema
     prompt: string
-  ): Promise<VisionExtractionResult<ExtractedReceipt>> {
+  ): Promise<VisionExtractionResult<T>> {
     try {
-      // For Vercel AI SDK, we can pass image URLs if the model supports it.
-      // Gemini 1.5 Flash supports image URLs or base64. 
-      // If we have a public URL, we fetch it and pass as base64 or pass the URL directly.
-      
-      // Let's fetch the image and convert to base64 to ensure Gemini can read it.
-      const imageResponse = await fetch(imageUrl);
-      if (!imageResponse.ok) {
-        throw new Error(`Failed to fetch image from ${imageUrl}`);
+      let base64 = '';
+      let mimeType = 'image/jpeg';
+
+      if (imageUrlOrBase64.startsWith('data:image/')) {
+        // It's already a base64 data URL
+        const [header, data] = imageUrlOrBase64.split(',');
+        mimeType = header.replace('data:', '').replace(';base64', '');
+        base64 = data;
+      } else {
+        // Let's fetch the image and convert to base64 to ensure Gemini can read it.
+        const imageResponse = await fetch(imageUrlOrBase64);
+        if (!imageResponse.ok) {
+          const errorText = await imageResponse.text();
+          throw new Error(`Failed to fetch image from ${imageUrlOrBase64}: ${imageResponse.status} ${errorText}`);
+        }
+        const arrayBuffer = await imageResponse.arrayBuffer();
+        base64 = Buffer.from(arrayBuffer).toString('base64');
+        mimeType = imageResponse.headers.get('content-type') || 'image/jpeg';
       }
-      const arrayBuffer = await imageResponse.arrayBuffer();
-      const base64 = Buffer.from(arrayBuffer).toString('base64');
-      const mimeType = imageResponse.headers.get('content-type') || 'image/jpeg';
 
       const { object } = await generateObject({
-        model: google('gemini-2.5-flash'),
-        schema: receiptExtractionSchema,
+        model: aiModels.vision(),
+        schema: schema,
         messages: [
           {
             role: 'user',
@@ -56,10 +63,10 @@ export class GeminiReceiptExtractor implements VisionProvider {
       });
 
       return {
-        data: object as unknown as ExtractedReceipt,
+        data: object as unknown as T,
         raw: object,
-        confidence: object.confidence || 0.8,
-        provider: 'gemini-2.5-flash',
+        confidence: (object as any).confidence || 0.8,
+        provider: aiModels.getProviderName(),
       };
     } catch (error: any) {
       console.error('Gemini extraction error:', error);
@@ -67,7 +74,7 @@ export class GeminiReceiptExtractor implements VisionProvider {
         data: null,
         raw: null,
         confidence: 0,
-        provider: 'gemini-2.5-flash',
+        provider: aiModels.getProviderName(),
         error: error.message || 'Failed to extract JSON from image',
       };
     }

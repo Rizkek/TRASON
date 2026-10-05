@@ -311,9 +311,20 @@ export const en = {
       "tip": "Tip",
       "tipUnknownHint": "Leave blank if no tip is shown; TRASON will not guess it.",
       "transactionCurrency": "Transaction currency",
-      "uploadFailed": "Image upload failed.",
+      "uploadFailed": "Failed to upload image.",
       "useEstimate": "Use estimated payout",
-      "vat": "VAT"
+      "vat": "VAT",
+      "operationalCost": "Fuel Operational Cost",
+      "orderDistance": "Order Distance (Km)",
+      "returnDistance": "Additional Distance",
+      "optionalKm": "Optional (Km)",
+      "fuelPrice": "Fuel Price / Liter",
+      "vehicleType": "Vehicle Type",
+      "realNetProfit": "Real Net Profit"
+    },
+    "categoryBreakdown": {
+      "title": "Expenses by Category",
+      "others": "Others"
     },
     "activeSubscriptions": "Active subscriptions",
     "addSubscription": "Add subscription",

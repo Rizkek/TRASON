@@ -38,11 +38,11 @@ export function ReceiptUpload({ onUploadSuccess, onError }: Props) {
         date: getLocalISODate(),
         category_id: null as any,
         time: '00:00:00',
-        description: 'AI is analyzing this receipt.',
         payment_method: 'cash',
         tags: [],
-        source: 'receipt'
-      } as any);
+        source: 'receipt',
+        metadata: { status: 'processing', note: 'AI is analyzing this receipt.' },
+      });
 
       if (!placeholderTx || !('id' in placeholderTx) && !(placeholderTx[0] && 'id' in placeholderTx[0])) {
         throw new Error('Failed to create placeholder transaction.');

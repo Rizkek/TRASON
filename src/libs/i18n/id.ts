@@ -175,8 +175,9 @@ export const id = {
     "optional": "Opsional",
     "save": "Simpan",
     "saving": "Menyimpan...",
-    "success": "Sukses"
-  },
+    "success": "Sukses",
+    "view_all": "Lihat Semua"
+    },
   "dailyTasks": {
     "empty": "Belum ada tugas. Tambahkan tugas harian pertamamu."
   },
@@ -313,7 +314,18 @@ export const id = {
       "transactionCurrency": "Mata uang transaksi",
       "uploadFailed": "Gambar gagal diunggah.",
       "useEstimate": "Gunakan estimasi payout",
-      "vat": "VAT"
+      "vat": "VAT",
+      "operationalCost": "Biaya Operasional Bensin",
+      "orderDistance": "Jarak Order (Km)",
+      "returnDistance": "Jarak Tambahan",
+      "optionalKm": "Opsional (Km)",
+      "fuelPrice": "Harga Bensin / Liter",
+      "vehicleType": "Tipe Kendaraan",
+      "realNetProfit": "Laba Bersih Nyata"
+    },
+    "categoryBreakdown": {
+      "title": "Pengeluaran per Kategori",
+      "others": "Lainnya"
     },
     "activeSubscriptions": "Langganan Aktif",
     "addSubscription": "Tambah Langganan",

@@ -45,7 +45,31 @@ export async function POST(req: Request) {
     If you see a total but the items don't add up to it (due to tax/service), include tax/service as items if possible, or just extract exactly what's printed. 
     Do not guess amounts.`;
 
-    const result = await extractor.extractJSON(receiptUrl, receiptExtractionSchema, prompt);
+    let dataUrl = receiptUrl;
+    if (receiptUrl.includes('supabase.co')) {
+      // Since the bucket might be private, download the file using the server-side Supabase client
+      let filePath = fileName;
+      if (!filePath) {
+        try {
+          const urlObj = new URL(receiptUrl);
+          filePath = decodeURIComponent(urlObj.pathname.split('/storage/v1/object/public/receipts/')[1]);
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      if (filePath) {
+        const { data: fileData, error: downloadError } = await supabase.storage.from('receipts').download(filePath);
+        if (!downloadError && fileData) {
+          const arrayBuffer = await fileData.arrayBuffer();
+          const base64 = Buffer.from(arrayBuffer).toString('base64');
+          const mime = fileData.type || mimeType || 'image/jpeg';
+          dataUrl = `data:${mime};base64,${base64}`;
+        }
+      }
+    }
+
+    const result = await extractor.extractJSON(dataUrl, receiptExtractionSchema, prompt);
 
     if (result.error || !result.data) {
       // Mark as failed

@@ -1,6 +1,6 @@
-import { google } from '@ai-sdk/google';
 import { generateObject } from 'ai';
 import { z } from 'zod';
+import { aiModels } from './provider';
 
 // Define the expected output schemas
 const transactionSchema = z.object({
@@ -31,7 +31,7 @@ const transactionSchema = z.object({
 export async function parseNaturalLanguageInput(userInput: string) {
   try {
     const { object } = await generateObject({
-      model: google('gemini-2.5-flash'),
+      model: aiModels.balanced(),
       schema: transactionSchema,
       prompt: `
         You are a helpful personal assistant for TRASON, a personal life OS dashboard (finance, habits, reminders, sports/vitality).

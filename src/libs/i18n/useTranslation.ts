@@ -26,8 +26,8 @@ export function useTranslation() {
   const dict = dictionaries[currentLanguage] || en;
 
   // Simple key dot-notation resolver (e.g. 'nav.dashboard')
-  const t = (key: string): string => {
-    const keys = key.split('.');
+  const t = (key: any): string => {
+    const keys = String(key).split('.');
     
     // First try the requested language dictionary
     let value: any = dict;

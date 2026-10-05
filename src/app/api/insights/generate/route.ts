@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { google } from '@ai-sdk/google';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { getAuthenticatedUser } from '@/utils/supabase/server';
+import { aiModels } from '@/services/ai/provider';
 
 // Tambah maxDuration agar Vercel memberi waktu lebih untuk AI generation
 // Free: max 10s, Pro: max 60s — set 25s sebagai kompromi
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     }
 
     const { object } = await generateObject({
-      model: google('gemini-2.5-flash'),
+      model: aiModels.pro(),
       schema: insightsSchema,
       prompt: `
         You are a highly analytical and empathetic lifestyle architect and coach AI for TRASON (Personal Life OS).

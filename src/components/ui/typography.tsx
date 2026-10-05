@@ -14,13 +14,13 @@ const headingVariants = cva("font-sans leading-tight tracking-tight", {
             inverse: "text-white dark:text-warm-black",
         },
         size: {
-            // Calibrated for compact app/dashboard usage
+            display: "text-4xl md:text-5xl",
             h1: "text-2xl md:text-3xl",
             h2: "text-xl md:text-2xl",
             h3: "text-lg md:text-xl",
             h4: "text-base md:text-lg",
             h5: "text-sm md:text-base",
-            h6: "text-xs md:text-sm",
+            h6: "text-sm",
         },
         alignment: {
             left: "text-left",
