@@ -297,7 +297,9 @@ export async function GET(request: Request) {
         message: err.message,
         statusCode: err.statusCode,
       });
-      if (err.statusCode === 410 || err.statusCode === 404) {
+      // 400, 401, 403 indicate bad VAPID or invalid subscription payload
+      // 404, 410 indicate the subscription has expired or was removed by the user
+      if ([400, 401, 403, 404, 410].includes(err.statusCode)) {
         await supabase
           .from('push_subscriptions')
           .update({ is_active: false })

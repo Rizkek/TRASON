@@ -93,12 +93,13 @@ export async function POST(req: NextRequest) {
     const sent = results.filter((r) => r.status === 'fulfilled').length;
     const failed = results.filter((r) => r.status === 'rejected').length;
 
-    // Deactivate expired/invalid subscriptions (410 Gone)
+    // Deactivate expired/invalid subscriptions (400, 401, 403, 404, 410)
     const expiredEndpoints: string[] = [];
     results.forEach((result, i) => {
       if (
         result.status === 'rejected' &&
-        (result.reason?.statusCode === 410 || result.reason?.statusCode === 404)
+        result.reason?.statusCode &&
+        [400, 401, 403, 404, 410].includes(result.reason.statusCode)
       ) {
         expiredEndpoints.push(subs[i].endpoint);
       }

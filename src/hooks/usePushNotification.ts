@@ -67,6 +67,23 @@ export const usePushNotification = () => {
       if (!reg) return;
       const sub = await reg.pushManager.getSubscription().catch(() => null);
 
+      // If the existing subscription was generated with an old VAPID key, discard it
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      if (sub && vapidPublicKey && !subscriptionMatchesVapidKey(sub, vapidPublicKey)) {
+        await sub.unsubscribe().catch(() => {});
+        try {
+          const { data } = await supabase.auth.getSession();
+          if (data.session?.user) {
+            await supabase
+              .from('push_subscriptions')
+              .update({ is_active: false })
+              .eq('endpoint', sub.endpoint);
+          }
+        } catch {}
+        setState((prev) => ({ ...prev, isSubscribed: false }));
+        return;
+      }
+
       // Update UI state
       setState((prev) => ({ ...prev, isSubscribed: sub !== null }));
 

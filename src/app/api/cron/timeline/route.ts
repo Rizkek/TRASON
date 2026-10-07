@@ -248,8 +248,10 @@ export async function GET(request: Request) {
         headers: err.headers,
       });
 
-      if (err.statusCode === 410 || err.statusCode === 404) {
-        console.warn(`[CRON-TIMELINE] Subscription expired (${err.statusCode}). Deactivating ${safeEndpoint}`);
+      // 400, 401, 403 indicate bad VAPID or invalid subscription payload
+      // 404, 410 indicate the subscription has expired or was removed by the user
+      if ([400, 401, 403, 404, 410].includes(err.statusCode)) {
+        console.warn(`[CRON-TIMELINE] Subscription invalid/expired (${err.statusCode}). Deactivating ${safeEndpoint}`);
         const { error: updateErr } = await supabase
           .from('push_subscriptions')
           .update({ is_active: false })
