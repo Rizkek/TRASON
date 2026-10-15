@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Loading, Badge } from '@/components';
+import { Card, Button, Loading, Badge } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useInvestmentJournal } from '@/hooks/useInvestmentJournal';
 import { formatCurrency, formatNumber } from '@/libs/format';
@@ -29,11 +29,11 @@ export function InvestmentJournalClient() {
 
   if (authLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex items-center justify-center h-[60vh]">
           <Loading text={t('dashboard.checking_session')} />
         </div>
-      </Layout>
+      </>
     );
   }
 
@@ -52,7 +52,7 @@ export function InvestmentJournalClient() {
   });
 
   return (
-    <Layout>
+    <>
       <div className="space-y-8 animate-fade-in">
         {/* Header Section */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -99,7 +99,7 @@ export function InvestmentJournalClient() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {[...Array(2)].map((_, i) => (
-              <Card key={i} className="p-8 animate-pulse h-64 bg-white/5" />
+              <Card key={i} className="p-8 h-64 bg-white/5" />
             ))}
           </div>
         ) : filteredJournals.length === 0 ? (
@@ -199,6 +199,6 @@ export function InvestmentJournalClient() {
           </div>
         )}
       </div>
-    </Layout>
+    </>
   );
 }

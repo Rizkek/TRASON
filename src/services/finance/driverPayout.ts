@@ -22,7 +22,10 @@ export function estimateDriverPayout(fareAmount: number, tipAmount = 0, serviceC
   if (!Number.isFinite(fareAmount) || fareAmount < 0) {
     throw new RangeError('Fare amount must be a finite, non-negative number.');
   }
-  
+  if (!Number.isFinite(tipAmount) || tipAmount < 0) {
+    throw new RangeError('Tip amount must be a finite, non-negative number.');
+  }
+
   // Rate base pada layanan: Moto ~8.1%, Courier ~11.7%
   let servicePaymentRate = 0.081;
   

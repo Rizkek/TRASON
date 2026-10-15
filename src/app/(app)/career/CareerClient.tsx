@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, Select, DatePicker, CreatableAutocomplete } from '@/components';
+import { Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, Select, DatePicker, CreatableAutocomplete } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useCareer } from '@/hooks/useCareer';
 import { useCareerAnalytics } from '@/hooks/useCareerAnalytics';
@@ -122,8 +122,8 @@ export default function CareerClient({ initialApplications }: Props) {
     { label: string; color: string; badgeVariant: 'default' | 'success' | 'warning' | 'danger' | 'income' | 'expense' | 'activity' | 'insight' | 'info' | undefined }
   > = {
     applied:    { label: t('career_page.form.options.status_applied'),    color: 'text-primary', badgeVariant: 'default' },
-    reviewing:  { label: t('career_page.form.options.status_reviewing'),  color: 'text-amber-400', badgeVariant: 'warning' },
-    interview:  { label: t('career_page.form.options.status_interview'),  color: 'text-purple-400', badgeVariant: 'info' },
+    reviewing:  { label: t('career_page.form.options.status_reviewing'),  color: 'text-warning', badgeVariant: 'warning' },
+    interview:  { label: t('career_page.form.options.status_interview'),  color: 'text-accent-purple', badgeVariant: 'info' },
     offer:      { label: t('career_page.form.options.status_offer'),      color: 'text-income', badgeVariant: 'income' },
     accepted:   { label: t('career_page.form.options.status_accepted'),   color: 'text-income', badgeVariant: 'success' },
     rejected:   { label: t('career_page.form.options.status_rejected'),   color: 'text-expense', badgeVariant: 'expense' },
@@ -363,9 +363,9 @@ export default function CareerClient({ initialApplications }: Props) {
 
   if (authLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex justify-center py-12"><Loading text={t('dashboard.checking_session')} /></div>
-      </Layout>
+      </>
     );
   }
   if (!isAuthenticated) return null;
@@ -373,7 +373,7 @@ export default function CareerClient({ initialApplications }: Props) {
   return (
     <>
       <ErrorAlert error={pageError || error} onDismiss={() => setPageError(null)} />
-      <Layout>
+      <>
         <div className="space-y-8 animate-fade-in pb-24">
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -402,8 +402,8 @@ export default function CareerClient({ initialApplications }: Props) {
             <div className="flex flex-row justify-between gap-2 md:gap-4 overflow-x-auto snap-x no-scrollbar pb-2">
               {[
                 { label: t('career_page.stats.applied'), value: stats.applied, color: 'text-primary' },
-                { label: t('career_page.stats.reviewing'), value: stats.reviewing, color: 'text-amber-400' },
-                { label: t('career_page.stats.interview'), value: stats.interview, color: 'text-purple-400' },
+                { label: t('career_page.stats.reviewing'), value: stats.reviewing, color: 'text-warning' },
+                { label: t('career_page.stats.interview'), value: stats.interview, color: 'text-accent-purple' },
                 { label: t('career_page.stats.offer'), value: stats.offer, color: 'text-income' },
               ].map((s) => (
                 <Card key={s.label} className="glass border-none p-2 md:p-8 text-center flex-1 min-w-[70px] snap-center">
@@ -448,7 +448,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   <div className="flex-1 min-w-[200px] shrink-0 ml-auto snap-center">
                     <div className="space-y-1">
                       {analytics.insights.slice(0, 2).map((insight, i) => (
-                        <Paragraph key={i} className="text-xs text-amber-400 truncate">{insight}</Paragraph>
+                        <Paragraph key={i} className="text-xs text-warning truncate">{insight}</Paragraph>
                       ))}
                     </div>
                   </div>
@@ -579,14 +579,14 @@ export default function CareerClient({ initialApplications }: Props) {
                           </span>
                         )}
                         {hasInterview && (
-                          <span className="flex items-center gap-1 text-purple-400 opacity-100">
+                          <span className="flex items-center gap-1 text-accent-purple opacity-100">
                             <Clock size={10} />
                             {t('career_page.interview_on')} {new Date(app.interview_date!).toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })}
                           </span>
                         )}
                         {app.salary_range && (
-                          <span className="inline-flex items-center gap-1 text-emerald-400 font-mono text-[11px] bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">
-                            <Money size={12} className="shrink-0 text-emerald-400" />
+                          <span className="inline-flex items-center gap-1 text-success font-mono text-[11px] bg-success/10 px-2 py-0.5 rounded border border-success/20 font-bold">
+                            <Money size={12} className="shrink-0 text-success" />
                             {app.salary_range}
                           </span>
                         )}
@@ -648,7 +648,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 {journals.map((journal: any) => {
                   const difficultyColor = 
                     journal.difficulty === 'hard' ? 'text-expense' : 
-                    journal.difficulty === 'medium' ? 'text-amber-400' : 'text-income';
+                    journal.difficulty === 'medium' ? 'text-warning' : 'text-income';
                   
                   return (
                     <div
@@ -896,7 +896,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   {t('career_page.form.salary')} <span className="font-normal opacity-70 normal-case">({t('common.optional')})</span>
                 </label>
                 {(form.salary_min.trim() || form.salary_max.trim()) && (
-                  <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                  <span className="text-xs font-mono font-bold text-success bg-success/10 border border-success/25 px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                     <Money size={12} />
                     {form.salary_currency}{' '}
                     {form.salary_min && form.salary_max
@@ -1132,7 +1132,7 @@ export default function CareerClient({ initialApplications }: Props) {
             <Plus size={24} />
           </Button>
         </div>
-      </Layout>
+      </>
     </>
   );
 }

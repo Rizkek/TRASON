@@ -176,6 +176,7 @@ export const id = {
     "save": "Simpan",
     "saving": "Menyimpan...",
     "success": "Sukses",
+    "try_again": "Coba lagi",
     "view_all": "Lihat Semua"
     },
   "dailyTasks": {
@@ -687,6 +688,9 @@ export const id = {
     "notif_push_denied": "Notifikasi diblokir — aktifkan di pengaturan browser untuk menerima pengingat.",
     "notif_push_denied_alert": "Browser memblokir notifikasi atau Anda membatalkan permintaan. Silakan izinkan dari pengaturan browser.",
     "notif_push_request": "Klik untuk mengaktifkan notifikasi reminder →",
+    "past_due_message": "Pengingat ini diatur untuk waktu yang sudah lewat. Pilih tanggal atau jam yang lebih akhir.",
+    "past_due_ok": "Mengerti",
+    "past_due_title": "Waktu sudah terlewat",
     "save_reminder": "Simpan",
     "title": "Pengingat",
     "title_highlight": "",

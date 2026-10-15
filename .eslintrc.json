@@ -19,5 +19,32 @@
     "react-hooks/exhaustive-deps": "warn",
     "react-hooks/set-state-in-effect": "off",
     "react-hooks/preserve-manual-memoization": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/app/(app)/**/*.{ts,tsx}", "src/app/(auth)/**/*.{ts,tsx}", "src/components/**/*.{ts,tsx}"],
+      "excludedFiles": ["src/components/landing/**"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "Literal[value=/bg-gradient-|linear-gradient|radial-gradient/], TemplateElement[value.raw=/bg-gradient-|linear-gradient|radial-gradient/]",
+            "message": "No gradients in the app UI. Use a solid token color."
+          },
+          {
+            "selector": "Literal[value=/animate-(spin|pulse|bounce|ping)/], TemplateElement[value.raw=/animate-(spin|pulse|bounce|ping)/]",
+            "message": "No loading animations. Use static text for loading states."
+          },
+          {
+            "selector": "Literal[value=/\\b(bg|text|border|ring|from|to|via|fill|stroke)-(red|green|blue|amber|emerald|rose|yellow|orange|purple|violet|pink|sky|indigo|teal|cyan|lime|fuchsia|slate|zinc|neutral|stone)-[0-9]{2,3}/], TemplateElement[value.raw=/\\b(bg|text|border|ring|from|to|via|fill|stroke)-(red|green|blue|amber|emerald|rose|yellow|orange|purple|violet|pink|sky|indigo|teal|cyan|lime|fuchsia|slate|zinc|neutral|stone)-[0-9]{2,3}/]",
+            "message": "Use the project color tokens (success, danger, warning, info, accent-purple, primary, gray-*) instead of raw Tailwind palette colors."
+          },
+          {
+            "selector": "Literal[value=/\\b(drop-)?shadow-\\[0_0_/], TemplateElement[value.raw=/\\b(drop-)?shadow-\\[0_0_/]",
+            "message": "No glow shadows. The UI is flat."
+          }
+        ]
+      }
+    }
+  ]
 }

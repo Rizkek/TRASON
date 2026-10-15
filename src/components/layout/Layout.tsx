@@ -95,7 +95,7 @@ function OfflineBanner() {
     >
       {justReconnected ? (
         <>
-          <span className="w-1.5 h-1.5 rounded-full bg-success shadow-[0_0_6px_rgba(16,185,129,0.8)] animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-success" />
           <span className="text-success/90">Connection restored</span>
         </>
       ) : (
@@ -139,7 +139,7 @@ const NotificationToggle = () => {
     <button
       disabled={isUpdating || push.isLoading}
       onClick={handleToggle}
-      className={`p-1.5 rounded-full transition-colors flex items-center justify-center shrink-0 ${
+      className={`p-2.5 rounded-full transition-colors flex items-center justify-center shrink-0 ${
         notifications_enabled 
           ? 'text-primary bg-primary/10 hover:bg-primary/20' 
           : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/10'
@@ -162,6 +162,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const signOut = useAuthStore((s) => s.signOut);
   const pathname = usePathname();
+  const mainRef = React.useRef<HTMLElement>(null);
+
+  // The shell persists across navigations, so the scroll container must be reset by hand.
+  React.useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0 });
+  }, [pathname]);
   const router = useRouter();
   const [isBottomSheetOpen, setIsBottomSheetOpen] = React.useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
@@ -239,7 +245,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const { t } = useTranslation();
 
-  if (!isAuthenticated) {
+  // Onboarding is a full-screen flow without navigation.
+  if (!isAuthenticated || pathname.startsWith('/onboarding')) {
     return <>{children}</>;
   }
 
@@ -252,16 +259,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="flex h-screen bg-warm-black text-soft-cream font-sans">
+    <div className="flex h-dvh bg-warm-black text-soft-cream font-sans">
       <OfflineBanner />
 
       {/* ── Desktop Sidebar (md+) — hidden on mobile ─────────────────── */}
-      <aside className="hidden md:flex fixed inset-y-0 left-0 z-50 w-72 shrink-0 bg-gray-strong border-r border-soft-cream/10 flex-col glass h-screen overflow-y-auto">
+      <aside className="hidden md:flex fixed inset-y-0 left-0 z-50 w-72 shrink-0 bg-gray-strong border-r border-soft-cream/10 flex-col glass h-dvh overflow-y-auto">
         <div className="px-6 py-8 flex flex-col items-center">
           <div className="w-12 h-12 flex items-center justify-center mb-4">
             <Logo size={40} variant="gold" />
           </div>
-          <h1 className="text-heading-lg font-serif text-gradient">
+          <h1 className="text-heading-lg font-serif text-primary">
             TRASON
           </h1>
           <p className="text-token-micro uppercase text-gray-light mt-1">Personal Operating System</p>
@@ -282,18 +289,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   }`}
               >
                 {isActive(item.href) && (
-                  <div className="absolute left-0 top-[15%] bottom-[15%] w-1 bg-primary rounded-r-full shadow-[0_0_12px_rgba(244,201,93,0.8)]" />
+                  <div className="absolute left-0 top-[15%] bottom-[15%] w-1 bg-primary rounded-r-full" />
                 )}
 
                 <NavIcon icon={Icon} isActive={isActive(item.href)} size={20} />
                 
-                <span className={`text-label-md tracking-wide transition-colors duration-300 ${isActive(item.href) ? 'text-soft-cream drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]' : ''}`}>
+                <span className={`text-label-md tracking-wide transition-colors duration-300 ${isActive(item.href) ? 'text-soft-cream' : ''}`}>
                   {t(`nav.${item.href.replace('/', '')}`)}
                 </span>
-
-                {isActive(item.href) && (
-                  <div className="absolute right-[-20%] top-[-50%] w-24 h-24 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
-                )}
               </Link>
             );
           })}
@@ -302,7 +305,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="p-4 mt-auto mb-4 space-y-2">
           {/* User Profile */}
           <div className="flex items-center gap-4 px-6 py-4 rounded-md bg-soft-cream/5 border border-soft-cream/10">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-medium text-white shadow-lg overflow-hidden shrink-0">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs font-medium text-warm-black overflow-hidden shrink-0">
               {(user as any)?.avatar_url ? (
                 <Image src={(user as any).avatar_url} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
               ) : (
@@ -328,9 +331,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* ── Main content area ─────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative md:ml-72">
-        <div className="absolute top-0 right-0 w-[70%] max-w-[500px] h-[500px] bg-[radial-gradient(circle_at_top_right,rgba(var(--color-primary),0.15),transparent_60%)] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[70%] max-w-[400px] h-[400px] bg-[radial-gradient(circle_at_bottom_left,rgba(var(--color-secondary),0.1),transparent_60%)] pointer-events-none" />
-
         {/* Mobile top header */}
         <header className="bg-warm-black/95 backdrop-blur-md border-b border-soft-cream/5 px-4 py-2 pt-[max(env(safe-area-inset-top),16px)] flex items-center justify-between md:hidden relative z-40 transition-colors">
           <div className="flex items-center gap-2">
@@ -345,7 +345,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               onClick={() => setIsBottomSheetOpen(true)} 
               aria-label="Open mobile menu"
               aria-expanded={isBottomSheetOpen}
-              className="relative w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-token-micro text-white shadow-lg overflow-hidden shrink-0"
+              className="relative w-7 h-7 rounded-full bg-primary flex items-center justify-center text-token-micro text-warm-black overflow-hidden shrink-0"
             >
               {(user as any)?.avatar_url ? (
                 <Image src={(user as any).avatar_url} alt="Avatar" fill sizes="28px" className="object-cover" />
@@ -356,7 +356,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto relative z-10 pb-24 md:pb-0">
+        <main ref={mainRef} className="flex-1 overflow-y-auto relative z-10 pb-24 md:pb-0">
           <div className="container mx-auto px-4 py-4 md:px-8 md:py-8 lg:px-12 max-w-6xl">
             {children}
           </div>
@@ -381,10 +381,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <div className="relative p-1.5 transition-all duration-300">
                   <NavIcon icon={Icon} isActive={active} size={22} />
                   {active && (
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-1 rounded-full bg-primary shadow-[0_0_8px_rgba(244,201,93,0.9)] opacity-80" />
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-1 rounded-full bg-primary opacity-80" />
                   )}
                 </div>
-                <span className={`text-label-sm mt-1 tracking-wide transition-colors ${active ? 'text-soft-cream drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]' : ''}`}>
+                <span className={`text-label-sm mt-1 tracking-wide transition-colors ${active ? 'text-soft-cream' : ''}`}>
                   {t(`nav.${item.href.replace('/', '')}`)}
                 </span>
               </Link>
@@ -465,7 +465,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         }`}
                       >
                         <NavIcon icon={Icon} isActive={active} size={24} />
-                        <span className={`text-label-sm text-center leading-tight transition-colors ${active ? 'text-soft-cream drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]' : ''}`}>
+                        <span className={`text-label-sm text-center leading-tight transition-colors ${active ? 'text-soft-cream' : ''}`}>
                           {t(`nav.${item.href.replace('/', '')}`)}
                         </span>
                       </Link>
@@ -494,7 +494,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 {/* User profile row */}
                 <div className="flex items-center gap-4 px-4 py-2 rounded-xl bg-soft-cream/5 border border-soft-cream/5">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-purple flex items-center justify-center text-xs font-medium text-white shadow-lg flex-shrink-0 overflow-hidden">
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs font-medium text-warm-black flex-shrink-0 overflow-hidden">
                     {(user as any)?.avatar_url ? (
                       <Image src={(user as any).avatar_url} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
                     ) : (

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, Alert, ErrorAlert, ConfirmModal, Select, DatePicker } from '@/components';
+import { Card, Button, Badge, Loading, Modal, Input, Alert, ErrorAlert, ConfirmModal, Select, DatePicker } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useInvestment } from '@/hooks/useInvestment';
 import { validateTransaction, sanitizeError } from '@/libs/validation';
@@ -220,11 +220,11 @@ export function InvestmentsClient() {
 
   if (authLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex items-center justify-center h-[60vh]">
           <Loading text={t('dashboard.checking_session')} />
         </div>
-      </Layout>
+      </>
     );
   }
 
@@ -233,7 +233,7 @@ export function InvestmentsClient() {
   return (
     <>
       {formError && <ErrorAlert error={formError} onDismiss={() => setFormError(null)} />}
-      <Layout>
+      <>
         {/*
           =============================================================
           4) HALAMAN UTAMA / RENDER UI
@@ -253,7 +253,7 @@ export function InvestmentsClient() {
           </div>
           <div className="hidden md:flex gap-4">
             <Button variant="ghost" size="md" onClick={() => refreshPortfolio()} disabled={isRefreshing}>
-              <ArrowsClockwise size={16} className={`mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <ArrowsClockwise size={16} className="mr-2" />
               {t('investment_page.refresh_prices')}
             </Button>
             <Button variant="primary" size="md" onClick={openNewModal}>
@@ -270,7 +270,7 @@ export function InvestmentsClient() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          <Card className="p-8 bg-gradient-to-br from-black/20 to-black/5 border-primary/20 backdrop-blur-md">
+          <Card className="p-8 bg-black/20 border-primary/20 backdrop-blur-md">
             <Paragraph className="text-micro text-primary/80 uppercase tracking-widest font-semibold mb-2">{t('dashboard.netWorth.title')}</Paragraph>
             <Paragraph className="text-3xl font-sans font-semibold tracking-tight tabular-nums text-white">{formatCurrency(summary?.netWorth || 0, currency, locale)}</Paragraph>
           </Card>
@@ -455,7 +455,7 @@ export function InvestmentsClient() {
           className="rounded-full w-12 h-12 flex items-center justify-center shadow-lg bg-black/80 dark:bg-white/10 text-white"
           aria-label={t('investment_page.refresh_prices')}
         >
-          <ArrowsClockwise size={20} className={isRefreshing ? 'animate-spin' : ''} />
+          <ArrowsClockwise size={20} />
         </Button>
         <Button 
           variant="primary" 
@@ -643,7 +643,7 @@ export function InvestmentsClient() {
         isDangerous={true}
         onConfirm={handleConfirmDelete}
       />
-      </Layout>
+      </>
     </>
   );
 }

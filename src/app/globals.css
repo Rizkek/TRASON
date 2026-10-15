@@ -6,9 +6,6 @@
    --font-sans, --font-mono, --font-brand and --font-display are set on <html>
    by next/font in app/layout.tsx (self-hosted, preloaded). */
 :root {
-  --font-cormorant: 'Cormorant Garamond', serif;
-  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-
   /* Landing page semantic tokens (light editorial canvas). Scoped by usage in
      the landing components only; the authenticated app keeps its own palette. */
   --lp-background: 250 250 247;      /* #FAFAF7 warm paper */
@@ -42,9 +39,6 @@
   --color-gray-medium: 55 65 81;   /* #374151 */
   --color-gray-light: 148 163 184; /* #94A3B8 */
   --color-gray-very-light: 203 213 225; /* #CBD5E1 */
-
-  --gradient-primary: linear-gradient(135deg, rgb(244, 201, 93) 0%, rgb(227, 184, 77) 100%);
-  --gradient-dark: linear-gradient(180deg, rgba(11, 15, 20, 0.8) 0%, rgba(11, 15, 20, 1) 100%);
 
   /* Glass/card overrides */
   --glass-bg: rgba(0, 0, 0, 0.4);
@@ -107,13 +101,23 @@ h3, .h3 {
 
 h4, .h4 {
   @apply text-lg font-semibold;
-  font-family: var(--font-inter);
+  font-family: var(--font-sans);
 }
 
 p, body {
   @apply text-sm font-normal;
-  font-family: var(--font-inter);
+  font-family: var(--font-sans);
   line-height: 1.6;
+}
+
+/* iOS Safari zooms the page when a focused field is under 16px. Pinch-zoom stays enabled for
+   accessibility, so fields are 16px on phones; !important beats utility classes like text-sm. */
+@media (max-width: 767px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
 
 /* Custom animations */
@@ -137,25 +141,12 @@ p, body {
   }
 }
 
-@keyframes subtle-pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
 .animate-fade-in {
   animation: fade-in 0.3s ease-in-out;
 }
 
 .animate-slide-up {
   animation: slide-up 0.3s ease-in-out;
-}
-
-.animate-subtle-pulse {
-  animation: subtle-pulse 2s ease-in-out infinite;
 }
 
 /* Custom scrollbar */
@@ -294,46 +285,15 @@ p, body {
   border-color: rgba(244, 201, 93, 0.3);
   background-color: rgba(42, 42, 42, 0.5);
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(244, 201, 93, 0.1);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
 
 .glass {
   @apply bg-white bg-opacity-[0.03] backdrop-blur-xl border border-white border-opacity-[0.05];
 }
 
-.bg-gradient-primary {
-  background: var(--gradient-primary);
-}
-
-/* Animated shimmer — for headings (h1, display text) only */
-@keyframes text-shimmer {
-  0%   { background-position: 200% center; }
-  100% { background-position: -200% center; }
-}
-
-.text-gradient {
-  background: linear-gradient(
-    90deg,
-    #b8923a 0%,
-    #F4C95D 20%,
-    #fff5d6 42%,
-    #F4C95D 62%,
-    #b8923a 82%,
-    #F4C95D 100%
-  );
-  background-size: 200% auto;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: text-shimmer 4s linear infinite;
-}
-
-/* Static variant — for numbers, badges, small stats */
-.text-gradient-static {
-  background: var(--gradient-primary);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.glass-card {
+  @apply bg-white/[0.03] backdrop-blur-xl border border-white/5 rounded-md;
 }
 
 /* Text utilities */
@@ -353,15 +313,6 @@ p, body {
 .text-micro {
   font-size: 12px;
   @apply font-sans font-medium uppercase tracking-wider;
-}
-
-/* Glow effects */
-.glow-primary {
-  box-shadow: 0 0 20px -5px var(--color-primary);
-}
-
-.glow-secondary {
-  box-shadow: 0 0 20px -5px var(--color-secondary);
 }
 
 /* Remove autocomplete background for Chrome/Webkit */

@@ -107,12 +107,12 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
           </label>
           <div className="flex flex-wrap gap-2">
             {[
-              { id: 'lift', label: '🏋️ Lifting / Gym' },
-              { id: 'run', label: '🏃 Running' },
-              { id: 'cycle', label: '🚴 Cycling' },
-              { id: 'swim', label: '🏊 Swimming' },
-              { id: 'yoga', label: '🧘 Yoga' },
-              { id: 'other', label: '🏸 Sport & Other' },
+              { id: 'lift', label: 'Lifting / Gym' },
+              { id: 'run', label: 'Running' },
+              { id: 'cycle', label: 'Cycling' },
+              { id: 'swim', label: 'Swimming' },
+              { id: 'yoga', label: 'Yoga' },
+              { id: 'other', label: 'Sport & Other' },
             ].map((item) => (
               <button
                 key={item.id}
@@ -124,7 +124,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold tracking-wide transition-all ${
                   sportType === item.id
-                    ? 'bg-primary text-warm-black shadow-[0_0_15px_rgba(244,201,93,0.3)]'
+                    ? 'bg-primary text-warm-black'
                     : 'bg-black/5 dark:bg-white/5 text-gray-light hover:bg-black/10 dark:bg-white/10'
                 }`}
               >
@@ -159,7 +159,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
               className="w-full h-11 px-6 bg-gray-strong/70 border border-gray-light/25 rounded-md focus:ring-2 focus:ring-secondary/40 text-soft-cream text-sm outline-none transition-all placeholder:text-gray-light/50"
             />
             {isSearchingExercises && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-light">Searching</span>
             )}
           </div>
 

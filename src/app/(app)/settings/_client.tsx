@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Loading, Toast, ErrorAlert } from '@/components';
+import { Loading, Toast, ErrorAlert } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { supabase } from '@/services/supabase/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -293,11 +293,11 @@ export function SettingsClient() {
 
   if (authLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex items-center justify-center h-[60vh]">
           <Loading text="Loading your settings..." />
         </div>
-      </Layout>
+      </>
     );
   }
 
@@ -314,7 +314,7 @@ export function SettingsClient() {
   return (
     <>
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
-      <Layout>
+      <>
         <div className="space-y-8 animate-fade-in max-w-4xl">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
             <div>
@@ -346,7 +346,7 @@ export function SettingsClient() {
                   aria-label={tab.label}
                   className={`flex items-center justify-center p-4 md:px-8 md:py-4 gap-4 text-[10px] font-bold whitespace-nowrap rounded-md border transition-all shrink-0 ${
                     activeTab === tab.id
-                      ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20'
+                      ? 'bg-primary text-warm-black border-primary'
                       : 'bg-black/[0.02] dark:bg-white/[0.02] text-gray-light border-black/[0.05] dark:border-white/[0.05] hover:border-black/[0.1] dark:hover:border-white/[0.1] hover:text-soft-cream'
                   }`}
                 >
@@ -403,7 +403,7 @@ export function SettingsClient() {
             />
           )}
         </div>
-      </Layout>
+      </>
     </>
   );
 }

@@ -129,17 +129,15 @@ export function OnboardingClient() {
 
   if (prefsLoading) {
     return (
-      <div className="min-h-screen bg-warm-black flex items-center justify-center">
+      <div className="min-h-dvh bg-warm-black flex items-center justify-center">
         <Loading text="Preparing your space..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-warm-black flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden">
+    <div className="min-h-dvh bg-warm-black flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden">
       {/* Background Ornaments */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary opacity-5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary opacity-5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="w-full max-w-2xl relative z-10 space-y-6 animate-fade-in">
         <ErrorAlert error={error} onDismiss={() => setError(null)} />
@@ -240,7 +238,7 @@ export function OnboardingClient() {
                         onClick={() => setCurrency(c)}
                         className={`px-6 py-2 rounded-lg border text-sm font-bold transition-all ${
                           currency === c 
-                            ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105' 
+                            ? 'bg-primary text-warm-black border-primary scale-105' 
                             : 'bg-black/10 border-white/5 text-gray-light hover:bg-black/20 hover:border-white/10'
                         }`}
                       >
@@ -261,7 +259,7 @@ export function OnboardingClient() {
                         onClick={() => setTheme(th as 'dark' | 'light')}
                         className={`px-6 py-2 rounded-lg border text-sm font-bold uppercase transition-all ${
                           theme === th 
-                            ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105' 
+                            ? 'bg-primary text-warm-black border-primary scale-105' 
                             : 'bg-black/10 border-white/5 text-gray-light hover:bg-black/20 hover:border-white/10'
                         }`}
                       >

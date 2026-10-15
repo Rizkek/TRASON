@@ -149,16 +149,3 @@ export const getCurrentUser = async () => {
   const session = await sessionPromise;
   return session?.user ?? null;
 };
-
-export const getCurrentSession = async () => {
-  if (!sessionPromise) {
-    sessionPromise = supabase.auth.getSession().then(({ data }) => {
-      sessionPromise = null;
-      return data.session;
-    }).catch((err) => {
-      sessionPromise = null;
-      throw err;
-    });
-  }
-  return await sessionPromise;
-};

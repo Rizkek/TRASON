@@ -78,7 +78,7 @@ export function ItemList({ items, onChange, currency = 'USD', locale = 'en-US' }
       ) : (
         <div className="space-y-2">
           {items.map((item, idx) => (
-            <div key={item.id || idx} className="bg-[#141414] border border-white/5 rounded-xl overflow-hidden">
+            <div key={item.id || idx} className="bg-gray-strong border border-white/5 rounded-xl overflow-hidden">
               {editingIndex === idx ? (
                 <div className="p-4 space-y-3">
                   <input

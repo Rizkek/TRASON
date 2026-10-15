@@ -182,7 +182,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
               <div className="bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md p-2 max-h-[250px] overflow-y-auto space-y-4 relative">
                 {ICON_CATEGORIES.map(category => (
                   <div key={category.name}>
-                    <div className="text-[10px] font-bold text-gray-light mb-2 uppercase tracking-widest sticky top-0 bg-[#252525]/90 dark:bg-gray-strong/90 backdrop-blur py-1 z-10">
+                    <div className="text-[10px] font-bold text-gray-light mb-2 uppercase tracking-widest sticky top-0 bg-gray-strong/90 backdrop-blur py-1 z-10">
                       {category.name}
                     </div>
                     <div className="grid grid-cols-5 sm:grid-cols-7 gap-1">

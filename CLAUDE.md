@@ -66,7 +66,7 @@ src/
   libs/           utilitas murni: date, format, validation (zod), apiErrors, cacheKeys,
                   mutations, notificationLogic, exchange, i18n/, analytics/ (rule-based), api/
   lib/utils.ts    hanya cn()
-  store/          zustand: authStore (persist), investmentStore, transactionStore
+  store/          zustand: authStore (persist)
   types/          database.ts = sumber kebenaran tipe tabel (re-export lewat index.ts)
   modules/        registry.ts + types.ts: metadata, setting, dependency, dan toggle modul
   utils/supabase/ server.ts (createClient, getAuthenticatedUser), middleware.ts (updateSession)
@@ -75,15 +75,15 @@ src/
 docs/             dokumentasi produk, API, skema DB (sebagian usang, lihat bagian 8)
 ```
 
-Folder kosong `src/modules/{finance,insights,investments,reminders,timeline}/` belum dipakai. `src/lib` (satu file) dan `src/libs` berbeda; fungsi baru masuk `src/libs`.
+`src/lib` (satu file) dan `src/libs` berbeda; fungsi baru masuk `src/libs`.
 
 ## 5. Pola Arsitektur
 
 **Alur data klien:** komponen -> hook (`src/hooks`) -> `services/*Queries` -> `supabase` browser client -> RLS. Setiap query membungkus `withAuthQuery` (mengambil user lewat `getSession()`, sengaja bukan `getUser()` agar tidak bentrok navigator lock) dan error lewat `logError` + `handleQueryError` (`libs/apiErrors.ts`, memetakan kode Postgres ke `ApiError`).
 
-**Hook dan SWR:** key harus dari `CACHE_KEYS` di `libs/cacheKeys.ts`; konfigurasi dari `config/swr.ts`. Mutasi memakai `executeMutation` (`libs/api/mutationBuilder.ts`) dengan update optimistik, lalu invalidasi lewat `INVALIDATION_PATTERNS`. Setelah mutasi yang memengaruhi dashboard, invalidasi `dashboard:overview`. Pola alternatif terpusat ada di `libs/mutations.ts`.
+**Hook dan SWR:** key harus dari `CACHE_KEYS` di `libs/cacheKeys.ts`; konfigurasi dari `config/swr.ts`. Mutasi memakai `executeMutation` (`libs/api/mutationBuilder.ts`) dengan update optimistik, lalu invalidasi lewat `INVALIDATION_PATTERNS`. Setelah mutasi yang memengaruhi dashboard, invalidasi `dashboard:overview`. Pola alternatif terpusat ada di `libs/mutations.ts`. Update optimistik memakai updater biasa `mutate((current) => ..., { revalidate: false })`, bukan `optimisticData` atau mutator async: keduanya menerima data committed dan menghapus perubahan lain yang masih berjalan (contoh benar: `hooks/useDailyTasks.ts`). Revalidasi setelah mutasi lewat `invalidateKeys` (`libs/cacheInvalidation.ts`) dengan pola dari `INVALIDATION_PATTERNS`, bukan `mutate()` lokal ditambah `globalMutate` terpisah (key yang sama ter-fetch dua kali). Satu mutasi cukup satu revalidasi. Data yang gagal dimuat harus ditampilkan dengan `InlineError`, bukan sebagai daftar kosong.
 
-**Halaman:** server component (`page.tsx`) mengambil data awal dengan `createServerClient` dan mengoper ke `*Client.tsx` / `_client.tsx` sebagai props; interaksi dan SWR ada di komponen klien. Halaman yang membaca cookie (contoh `finance`, `career`) memakai `export const dynamic = 'force-dynamic'`; halaman lain hanya merender shell klien.
+**Halaman:** server component (`page.tsx`) mengambil data awal dengan `createServerClient` dan mengoper ke `*Client.tsx` / `_client.tsx` sebagai props; interaksi dan SWR ada di komponen klien. Halaman yang membaca cookie (contoh `finance`, `career`) memakai `export const dynamic = 'force-dynamic'`; halaman lain hanya merender shell klien. Halaman di `(app)` tidak boleh membungkus diri dengan `<Layout>`: shell persisten ada di `(app)/layout.tsx` (onboarding dikecualikan di dalam `Layout`).
 
 **Auth:** `middleware.ts` memanggil `updateSession` yang me-redirect rute terproteksi ke `/login?redirect_to=...` dan `/login`, `/signup`, `/` ke `/dashboard` bila sudah login. Daftar rute terproteksi hardcoded di `utils/supabase/middleware.ts`; modul baru harus ditambahkan ke sana dan ke `NETWORK_ONLY_ROUTES` di `app/sw.ts`. `AuthProvider` memanggil `useAuth()` sekali sebagai satu-satunya subscription `onAuthStateChange`; komponen lain membaca `useAuthStore`.
 
@@ -138,15 +138,15 @@ Aturan: variabel tanpa awalan `NEXT_PUBLIC_` tidak boleh disentuh dari kode klie
 
 Aturan untuk semua kode UI baru:
 
-* Warna solid dan flat dari token proyek. Dilarang gradient, emoji, spinner/animasi loading klise, dan pewarnaan teks tanpa alasan fungsional.
-* Gunakan token Tailwind di `tailwind.config.js`: `primary`, `secondary`, `warm-black`, `soft-cream`, `gray-strong|medium|light|very-light`, `success|danger|warning|info`. Token `lp-*` hanya untuk landing page, `ui-*` untuk frame produk di landing. Hindari warna mentah seperti `bg-red-500`.
+* Warna solid dan flat dari token proyek. Dilarang gradient, glow (shadow berwarna, blob blur, drop-shadow), emoji, spinner/animasi loading (termasuk `animate-pulse`), dan pewarnaan teks tanpa alasan fungsional. State loading ditampilkan sebagai teks statis. Aturan ini ditegakkan ESLint (`no-restricted-syntax` di `.eslintrc.json`) untuk `(app)`, `(auth)`, dan `components/` di luar `landing/`.
+* Gunakan token Tailwind di `tailwind.config.js`: `primary`, `secondary`, `warm-black`, `soft-cream`, `gray-strong|medium|light|very-light`, `success|danger|warning|info`, `income|expense` (alias success/danger untuk uang), `accent-purple`, `deep-sage`, `insight-taupe`. Token `lp-*` hanya untuk landing page, `ui-*` untuk frame produk di landing. Jangan memakai warna palet mentah seperti `bg-red-500`.
+* Kode yang tidak bisa memakai class (opsi Chart.js, inline style) mengambil warna dari `src/config/colors.ts` (`TOKEN_COLORS`, `CATEGORY_PALETTE`, `withAlpha`), bukan hex baru.
+* Sebelum memakai class kustom, pastikan class itu benar-benar ada di `tailwind.config.js` atau `globals.css`; class yang tidak terdefinisi tidak memberi error, hanya tidak berefek.
 * Ukuran teks lewat token semantik (`text-heading-lg`, `text-body-md`, `text-label-sm`, dst) atau komponen di `components/ui/typography.tsx`. Font: Geist (`font-sans`), Geist Mono, DM Serif Display (`font-brand`, judul), Plus Jakarta Sans (`font-display`).
 * Mode tema lewat class `dark` / `light` pada `<html>` (`darkMode: 'class'`), variabel warna di `app/globals.css`.
 * Pakai komponen `components/ui` (`Button`, `Card`, `Input`, `Select`, `Badge`, `DatePicker`, `Toast`) dan `components/Modal`, `BottomSheet`, `ConfirmModal`. Jangan menulis elemen tombol mentah bila `Button` cukup.
 * Teks bersih: hindari bullet hyphen berlebihan dan kalimat hiperbolis. Ikuti `docs/product-language.md` untuk istilah.
 * Mobile-first (PWA, `BottomSheet` dipakai untuk form di layar kecil).
-
-Catatan: beberapa komponen lama (`Button` punya spinner dan efek kilau, `globals.css` punya variabel `--gradient-*`) melanggar aturan di atas. Jangan menyalin pola itu; refactor hanya bila diminta.
 
 ## 8. Dokumentasi: Mana yang Bisa Dipercaya
 
@@ -168,6 +168,7 @@ Bila mengubah perilaku yang tercakup dokumen di atas, perbarui dokumennya sekali
 
 * CSP di `next.config.js` hanya mengatur `script-src` dengan `'unsafe-inline'` dan `'unsafe-eval'`.
 * Server tidak boleh mem-fetch URL yang dikirim klien. Route receipt hanya menerima path storage milik user (`libs/receiptStorage.ts`), dan `GeminiReceiptExtractor` hanya menerima data URL.
-* Checklist daily task: jangan memakai `optimisticData` atau mutator async SWR untuk toggle, karena keduanya menerima data committed dan menghapus perubahan toggle lain yang masih berjalan (lihat `hooks/useDailyTasks.ts`).
+* Reminder baru ditolak bila waktunya sudah lewat. Aturannya ada di `reminderQueries.createReminder` (`ApiError` kode `REMINDER_PAST_DUE`) dan `validateReminder({ rejectPastDue: true })`; form menampilkan `NoticeModal`.
+* `useGoal` dan `useInvestmentJournal` masih hook mock berisi data contoh (lihat `docs/ui-audit.md`).
 * `getCurrentUser()` membaca sesi lokal tanpa validasi server; keamanan data bergantung penuh pada RLS. Setiap tabel baru wajib punya RLS aktif dan policy `auth.uid() = user_id`.
 * `eslint.ignoreDuringBuilds: true`: lint tidak memblokir build, jalankan `npm run lint` sendiri.

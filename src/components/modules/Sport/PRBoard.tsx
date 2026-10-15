@@ -34,13 +34,11 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
       {records.map((pr) => (
         <Card 
           key={pr.id} 
-          className="p-6 bg-gradient-to-br from-white/[0.05] to-transparent border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group hover:border-accent-gold/30 transition-colors"
+          className="p-6 bg-white/[0.03] border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group hover:border-primary/30 transition-colors"
         >
-          {/* Subtle gold glow for PRs */}
-          <div className="absolute -right-8 -top-8 w-24 h-24 bg-accent-gold opacity-10 blur-2xl rounded-full pointer-events-none group-hover:opacity-20 transition-opacity" />
           
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-full bg-accent-gold/10 text-accent-gold flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
               {getSportIcon(pr.sport_type)}
             </div>
             <div>
@@ -54,7 +52,7 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
           </div>
           
           <div className="flex items-end gap-2">
-            <span className="text-3xl font-serif font-semibold text-accent-gold tracking-tight">
+            <span className="text-3xl font-serif font-semibold text-primary tracking-tight">
               {pr.metric_value}
             </span>
             <span className="text-sm text-gray-light mb-1 font-medium">

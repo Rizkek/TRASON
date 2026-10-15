@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon, BottomSheet, DatePicker } from '@/components';
+import { Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon, BottomSheet, DatePicker } from '@/components';
 import { CategoryManagerModal } from './components/CategoryManagerModal';
 import { BudgetManagerModal } from './components/BudgetManagerModal';
 import { TransactionFeed } from './components/TransactionFeed';
@@ -413,9 +413,9 @@ export default function FinanceClient({ initialTransactions }: Props) {
 
   if (authLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex justify-center py-12"><Loading text="Checking your session..." /></div>
-      </Layout>
+      </>
     );
   }
 
@@ -424,7 +424,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
   return (
     <>
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
-      <Layout>
+      <>
       <div className="space-y-8 animate-fade-in">
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="space-y-2 w-full md:w-auto flex-1">
@@ -470,7 +470,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 w-full">
           {/* Income */}
           <Card className="p-2 md:p-8 relative overflow-hidden group">
-            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-all" />
             <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
               <div className="p-1 bg-success/10 rounded-md shrink-0 text-success">
                 <Coins size={12} />
@@ -480,7 +479,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
             <div className="flex items-end justify-between mt-2">
               <Paragraph className="text-sm md:text-2xl font-semibold text-success truncate">
                 {isTransactionsLoading ? (
-                  <span className="animate-pulse text-gray-light">...</span>
+                  <span className="text-gray-light">...</span>
                 ) : (
                   formatCurrency(totalIncome, currency, locale)
                 )}
@@ -490,7 +489,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
           
           {/* Expense */}
           <Card className="p-2 md:p-8 relative overflow-hidden group">
-            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-danger/5 rounded-full blur-2xl group-hover:bg-danger/10 transition-all" />
             <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
               <div className="p-1 bg-danger/10 rounded-md shrink-0 text-danger">
                 <Receipt size={12} />
@@ -500,7 +498,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
             <div className="flex items-end justify-between mt-2">
               <Paragraph className="text-sm md:text-2xl font-semibold text-danger truncate">
                 {isTransactionsLoading ? (
-                  <span className="animate-pulse text-gray-light">...</span>
+                  <span className="text-gray-light">...</span>
                 ) : (
                   formatCurrency(totalExpense, currency, locale)
                 )}
@@ -510,7 +508,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
 
           {/* Net Balance */}
           <Card className="p-2 md:p-8 relative overflow-hidden group border-b-2 border-primary/20">
-            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
             <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
               <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary">
                 <Landmark size={12} />
@@ -520,7 +517,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
             <div className="flex items-end justify-between mt-2">
               <Paragraph className="text-sm md:text-2xl font-semibold text-white truncate">
                 {isTransactionsLoading ? (
-                  <span className="animate-pulse text-gray-light">...</span>
+                  <span className="text-gray-light">...</span>
                 ) : (
                   formatCurrency(totalIncome - totalExpense, currency, locale)
                 )}
@@ -529,19 +526,18 @@ export default function FinanceClient({ initialTransactions }: Props) {
           </Card>
 
           {/* Wallet / Closing Balance card — always visible */}
-          <Card className="p-2 md:p-8 relative overflow-hidden group border-b-2 border-accent-gold/30">
-            <div className="absolute -right-4 -bottom-4 w-16 h-16 md:w-24 md:h-24 bg-accent-gold/5 rounded-full blur-2xl group-hover:bg-accent-gold/10 transition-all" />
+          <Card className="p-2 md:p-8 relative overflow-hidden group border-b-2 border-primary/30">
             <div className="flex items-center gap-1 mb-1 md:mb-4 text-gray-light">
-              <div className="p-1 bg-accent-gold/10 rounded-md shrink-0 text-accent-gold">
+              <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary">
                 <Wallet size={12} />
               </div>
               <Paragraph className="text-[9px] md:text-micro tracking-widest uppercase truncate">{t('finance.wallet')}</Paragraph>
             </div>
             <div className="flex items-end justify-between mt-2">
               <div className="min-w-0">
-                <Paragraph className={`text-sm md:text-2xl font-semibold truncate ${(isTransactionsLoading || isPrevLoading) ? 'text-gray-light' : (closingBalance >= 0 ? 'text-accent-gold' : 'text-danger')}`}>
+                <Paragraph className={`text-sm md:text-2xl font-semibold truncate ${(isTransactionsLoading || isPrevLoading) ? 'text-gray-light' : (closingBalance >= 0 ? 'text-primary' : 'text-danger')}`}>
                   {(isTransactionsLoading || isPrevLoading) ? (
-                    <span className="animate-pulse">...</span>
+                    <span>...</span>
                   ) : (
                     formatCurrency(closingBalance, currency, locale)
                   )}
@@ -575,8 +571,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
 
         {/* Budget Progress Bar */}
         {globalBudget && (
-          <div className="bg-[#141414] border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="bg-gray-strong border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
             <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
               <div>
                 <div className="flex items-center gap-2">
@@ -608,7 +603,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
         )}
 
         {!globalBudget && (
-          <div className="bg-[#141414] border border-white/5 border-dashed rounded-2xl p-2 md:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div className="bg-gray-strong border border-white/5 border-dashed rounded-2xl p-2 md:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <Paragraph className="text-xs md:text-sm text-gray-light flex items-center gap-2">
               <Wallet size={14} className="shrink-0" /> {t('finance.budget.no_target_set')}
             </Paragraph>
@@ -684,7 +679,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                 onClick={() => setFilterType(type)}
                 className={`px-8 py-2 text-[10px] font-bold rounded-sm transition-all uppercase tracking-widest ${
                   filterType === type 
-                    ? 'bg-primary text-warm-black shadow-lg shadow-primary/20' 
+                    ? 'bg-primary text-warm-black' 
                     : 'text-gray-light hover:text-soft-cream'
                 }`}
               >
@@ -1153,7 +1148,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
           if (typeof mutateTransactions === 'function') mutateTransactions();
         }}
       />
-      </Layout>
+      </>
     </>
   );
 }

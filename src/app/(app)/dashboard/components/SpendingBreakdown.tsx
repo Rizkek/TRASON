@@ -9,23 +9,13 @@ import { Transaction } from '@/services/supabase/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { formatCurrency } from '@/libs/format';
+import { CATEGORY_PALETTE, TOKEN_COLORS } from '@/config/colors';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface Props {
   transactions: Transaction[];
 }
-
-const COLORS = [
-  '#F4C95D', // Gold/Primary
-  '#10B981', // Emerald/Success
-  '#3B82F6', // Blue/Info
-  '#8B5CF6', // Purple/Timeline
-  '#EC4899', // Pink/Insights
-  '#F59E0B', // Amber/Warning
-  '#EF4444', // Red/Danger
-  '#14B8A6'  // Teal
-];
 
 export const SpendingBreakdown = ({ transactions }: Props) => {
   const { t } = useTranslation();
@@ -47,7 +37,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
         if (!categoryData[catName]) {
           categoryData[catName] = { 
             value: 0, 
-            color: cat?.color || (catName === 'Uncategorized' ? '#64748B' : undefined) 
+            color: cat?.color || (catName === 'Uncategorized' ? TOKEN_COLORS.grayLight : undefined) 
           };
         }
         categoryData[catName].value += t.amount;
@@ -57,7 +47,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
     const data = Object.keys(categoryData).map((key, index) => ({
       name: key,
       value: categoryData[key].value,
-      color: categoryData[key].color || COLORS[index % COLORS.length]
+      color: categoryData[key].color || CATEGORY_PALETTE[index % CATEGORY_PALETTE.length]
     })).sort((a, b) => b.value - a.value);
 
     return { data, totalExpense };
@@ -73,8 +63,8 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
       },
       tooltip: {
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: '#CBD5E1',
-        bodyColor: '#94A3B8',
+        titleColor: TOKEN_COLORS.grayVeryLight,
+        bodyColor: TOKEN_COLORS.grayLight,
         bodyFont: { size: 12 },
         titleFont: { size: 14, weight: 'bold' as const },
         padding: 12,
@@ -116,7 +106,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
       </div>
 
       {!isMounted ? (
-        <div className="w-full h-48 bg-white/[0.02] rounded-lg animate-pulse" />
+        <div className="w-full h-48 bg-white/[0.02] rounded-lg" />
       ) : chartData.data.length > 0 ? (
         <div className="flex flex-col md:flex-row items-center gap-8 h-[200px] md:h-[240px]">
           <div className="w-[45%] md:w-[40%] h-full relative shrink-0">

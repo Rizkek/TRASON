@@ -9,7 +9,9 @@ import {
   Insight,
   UserPreferences
 } from '../supabase/supabaseClient';
-import { handleQueryError, logError } from '@/libs/apiErrors';
+import { ApiError, handleQueryError, logError } from '@/libs/apiErrors';
+import { hasDueTimePassed } from '@/libs/notificationLogic';
+import { REMINDER_PAST_DUE_ERROR } from '@/libs/validation';
 import type { DailyTask } from '@/types/database';
 import { withAuthQuery } from "@/services/supabase/queryBuilder";
 
@@ -59,6 +61,12 @@ export const reminderQueries = {
   async createReminder(
     reminder: Omit<Reminder, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>
   ) {
+    // Every creation path (form, Smart Input, career sync) goes through here, so the rule lives here too.
+    const dueAt = reminder.due_datetime ?? (reminder.due_date ? `${reminder.due_date}T${reminder.due_time || '23:59'}` : null);
+    if (dueAt && hasDueTimePassed(dueAt)) {
+      throw new ApiError(400, 'REMINDER_PAST_DUE', REMINDER_PAST_DUE_ERROR);
+    }
+
     try {
   return await withAuthQuery(async (userId) => {
   const { data, error } = await supabase
@@ -94,46 +102,6 @@ export const reminderQueries = {
   });
   } catch (err) {
       logError(err, 'reminderQueries.updateReminder');
-      throw handleQueryError(err);
-    }
-  },
-
-  // Complete reminder
-  async completeReminder(id: string) {
-    try {
-  return await withAuthQuery(async (userId) => {
-  const data = await reminderQueries.updateReminder(id, { status: 'completed' });
-  await supabase.from('reminder_logs').insert([{
-          user_id: userId,
-          reminder_id: id,
-        }]);
-  return data;
-  });
-  } catch (err) {
-      logError(err, 'reminderQueries.completeReminder');
-      throw handleQueryError(err);
-    }
-  },
-
-  // Uncomplete reminder
-  async uncompleteReminder(id: string) {
-    try {
-  return await withAuthQuery(async (userId) => {
-  const data = await reminderQueries.updateReminder(id, { status: 'pending' });
-  const { data: latestLog } = await supabase.from('reminder_logs')
-          .select('id')
-          .eq('user_id', userId)
-          .eq('reminder_id', id)
-          .order('completed_at', { ascending: false })
-          .limit(1)
-          .single();
-  if (latestLog) {
-          await supabase.from('reminder_logs').delete().eq('id', latestLog.id);
-        }
-  return data;
-  });
-  } catch (err) {
-      logError(err, 'reminderQueries.uncompleteReminder');
       throw handleQueryError(err);
     }
   },

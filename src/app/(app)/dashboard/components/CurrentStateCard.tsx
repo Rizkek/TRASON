@@ -88,13 +88,13 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
               <div className="flex justify-between items-end">
                 <div>
                   <div className="text-[10px] text-gray-light uppercase tracking-wider">{t('dashboard.income')}</div>
-                  <div className="text-sm md:text-md font-semibold font-mono text-emerald-400">
+                  <div className="text-sm md:text-md font-semibold font-mono text-success">
                     {formatCurrency(totalIncome, currency, locale)}
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] text-gray-light uppercase tracking-wider">{t('dashboard.expenses')}</div>
-                  <div className="text-sm md:text-md font-semibold font-mono text-rose-400">
+                  <div className="text-sm md:text-md font-semibold font-mono text-danger">
                     {formatCurrency(totalExpense, currency, locale)}
                   </div>
                 </div>
@@ -116,8 +116,8 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
               <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden mt-3">
                 <div 
                   className={`h-full rounded-full transition-all duration-700 ${
-                    (totalExpense / globalBudget.amount) > 0.9 ? 'bg-rose-500' : 
-                    (totalExpense / globalBudget.amount) > 0.75 ? 'bg-amber-400' : 'bg-emerald-400'
+                    (totalExpense / globalBudget.amount) > 0.9 ? 'bg-danger' : 
+                    (totalExpense / globalBudget.amount) > 0.75 ? 'bg-warning' : 'bg-success'
                   }`}
                   style={{ width: `${Math.min((totalExpense / globalBudget.amount) * 100, 100)}%` }}
                 />
@@ -145,7 +145,7 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
             </div>
 
             {sportLoading ? (
-              <div className="h-10 bg-white/[0.02] rounded animate-pulse" />
+              <div className="h-10 bg-white/[0.02] rounded" />
             ) : (
               <div className="space-y-1">
                 <div className="flex items-baseline gap-2">
@@ -190,7 +190,7 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
             </div>
 
             {careerLoading ? (
-              <div className="h-10 bg-white/[0.02] rounded animate-pulse" />
+              <div className="h-10 bg-white/[0.02] rounded" />
             ) : (
               <div className="space-y-1">
                 <div className="flex items-baseline gap-2">

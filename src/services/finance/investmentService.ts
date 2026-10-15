@@ -275,14 +275,6 @@ export const generateInvestmentInsights = async (
   return (await response.json()) as InvestmentInsightResponse;
 };
 
-export const getAllocationLabel = (
-  summary: InvestmentPortfolioSummary,
-  type: InvestmentAssetType
-) => {
-  const value = summary.allocationByType[type];
-  return summary.totalValue ? safePercent(value, summary.totalValue) : 0;
-};
-
 export const buildInvestmentTimelineText = (position: InvestmentPosition, action: string) => {
   const label = `${position.symbol.toUpperCase()} ${position.asset_type}`;
   if (action === 'created') return `Added ${label} to your investment portfolio`;

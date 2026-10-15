@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Layout, Card, Badge, Loading, ConfirmModal } from '@/components';
+import { Card, Badge, Loading, ConfirmModal } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/authStore';
 import { insightQueries } from '@/services/analytics/insightQueries';
@@ -302,18 +302,18 @@ User Context Profile (TRASON Unified Life OS):
 
   if (authLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex items-center justify-center h-[60vh]">
           <Loading text={t('dashboard.checking_session')} />
         </div>
-      </Layout>
+      </>
     );
   }
 
   if (!isAuthenticated) return null;
 
   return (
-    <Layout>
+    <>
       <div className="space-y-8 animate-fade-in">
         <div className="flex items-start justify-between">
           <div className="space-y-2">
@@ -362,7 +362,6 @@ User Context Profile (TRASON Unified Life OS):
                   key={insight.id} 
                   className="p-8 relative overflow-hidden group hover:scale-[1.01] transition-transform"
                 >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full" />
                   
                   <div className="flex items-start gap-8 relative z-10">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
@@ -441,9 +440,8 @@ User Context Profile (TRASON Unified Life OS):
 
         <div className="pt-8">
            <Card className="p-8 glass overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent pointer-events-none" />
               <div className="flex items-center gap-8 relative z-10">
-                 <div className="p-4 bg-primary/20 rounded-full animate-pulse">
+                 <div className="p-4 bg-primary/20 rounded-full">
                     <Lightbulb size={24} className="text-primary" />
                  </div>
                  <div>
@@ -486,6 +484,6 @@ User Context Profile (TRASON Unified Life OS):
         description={t('insights_page.reset_insights_confirm')}
         isDangerous={false} // Use primary color as requested
       />
-    </Layout>
+    </>
   );
 }

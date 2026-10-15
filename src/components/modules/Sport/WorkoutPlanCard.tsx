@@ -16,16 +16,11 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
     <Card 
       className={`relative overflow-hidden group cursor-pointer transition-all duration-300 ${
         plan.is_active 
-          ? 'border-primary/50 shadow-[0_0_15px_rgba(244,201,93,0.15)] bg-gradient-to-br from-primary/10 to-transparent' 
+          ? 'border-primary/50 bg-primary/10' 
           : 'border-black/[0.05] dark:border-white/[0.05] hover:border-black/[0.15] dark:border-white/[0.15] bg-black/[0.02] dark:bg-white/[0.02]'
       }`}
       onClick={() => onSelect?.(plan)}
     >
-      {/* Active Indicator Glow */}
-      {plan.is_active && (
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary opacity-20 blur-[50px] rounded-full pointer-events-none" />
-      )}
-
       <div className="p-8 space-y-6 relative z-10">
         <div className="flex justify-between items-start gap-4">
           <div className="space-y-1">

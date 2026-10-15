@@ -16,8 +16,10 @@ export * from './ui/Toast';
 
 export * from './Modal';
 export * from './ConfirmModal';
+export * from './NoticeModal';
 export * from './Alert';
 export * from './ErrorAlert';
+export * from './InlineError';
 export * from './LogoLoading';
 export * from './Logo';
 export * from './BottomSheet';

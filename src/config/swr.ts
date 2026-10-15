@@ -54,17 +54,6 @@ export const SWR_CONFIG_DASHBOARD: SWRConfiguration = {
 };
 
 /**
- * Aggressive SWR Config for real-time data
- * Use for dashboards, notifications, prices
- */
-export const SWR_CONFIG_REALTIME: SWRConfiguration = {
-  ...SWR_CONFIG,
-  revalidateOnFocus: true,      // Revalidate when tab regains focus
-  focusThrottleInterval: 60000,  // But only every 1 minute
-  dedupingInterval: 500,         // Tighter deduping for real-time
-};
-
-/**
  * Light SWR Config for stable data
  * Use for user profiles, settings, static content
  */
@@ -75,17 +64,5 @@ export const SWR_CONFIG_STABLE: SWRConfiguration = {
   errorRetryCount: 1,            // Retry once only
   focusThrottleInterval: 600000, // 10 minutes
   dedupingInterval: 60000,       // 1 menit — data statis jarang berubah
-};
-
-/**
- * Offline-safe SWR Config for PWA
- * Use for data that should work offline
- */
-export const SWR_CONFIG_OFFLINE: SWRConfiguration = {
-  ...SWR_CONFIG,
-  revalidateOnFocus: false,
-  revalidateOnReconnect: true,   // Critical for PWA
-  revalidateOnMount: true,       // Always load from cache first
-  dedupingInterval: 5000,        // Higher dedup for reliability
 };
 

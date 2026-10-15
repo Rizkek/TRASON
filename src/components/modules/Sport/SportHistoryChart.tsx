@@ -13,6 +13,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 import type { WorkoutSession } from '@/types/database';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { TOKEN_COLORS } from '@/config/colors';
 
 ChartJS.register(
   CategoryScale,
@@ -75,7 +76,7 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
     datasets: [
       {
         data: chartData.map(d => d.minutes),
-        backgroundColor: chartData.map(d => d.hasWorkout ? '#4e4feb' : 'rgba(255,255,255,0.05)'),
+        backgroundColor: chartData.map(d => d.hasWorkout ? TOKEN_COLORS.primary : 'rgba(255,255,255,0.05)'),
         borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
         borderSkipped: false,
         maxBarThickness: 40
@@ -92,9 +93,9 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
       },
       tooltip: {
         backgroundColor: 'rgba(11, 15, 20, 0.9)',
-        titleColor: '#FFFFFF',
+        titleColor: TOKEN_COLORS.softCream,
         titleFont: { size: 14, weight: 'bold' as const },
-        bodyColor: '#4e4feb',
+        bodyColor: TOKEN_COLORS.primary,
         bodyFont: { size: 14 },
         padding: 12,
         cornerRadius: 6,
@@ -118,8 +119,8 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
           labelTextColor: (context: any) => {
             const index = context.dataIndex;
             const dataItem = chartData[index];
-            if (!dataItem.hasWorkout) return '#94A3B8'; // gray-light for rest day
-            return '#4e4feb'; // primary
+            if (!dataItem.hasWorkout) return TOKEN_COLORS.grayLight;
+            return TOKEN_COLORS.primary;
           }
         }
       }
@@ -157,7 +158,7 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
           <h3 className="text-lg font-serif font-semibold text-white">Activity ClockCounterClockwise</h3>
           <p className="text-sm text-gray-light">Last {days} days of training</p>
         </div>
-        <div className="h-[250px] w-full bg-black/[0.01] dark:bg-white/[0.01] rounded-lg animate-pulse" />
+        <div className="h-[250px] w-full bg-black/[0.01] dark:bg-white/[0.01] rounded-lg" />
       </Card>
     );
   }

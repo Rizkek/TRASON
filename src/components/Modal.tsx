@@ -137,14 +137,12 @@ export const Modal: React.FC<ModalProps> = ({
           className={`bg-gray-strong border border-black/10 dark:border-white/10 rounded-md shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] ${maxWidthMap[maxWidth]} w-full max-h-[85dvh] flex flex-col pointer-events-auto animate-slide-up relative`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Top highlight glow */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
           
           {/* Header */}
           {(title || closeButton) && (
-            <div className="flex-none flex items-center justify-between px-8 py-8 border-b border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none flex items-center justify-between px-4 py-4 sm:px-8 sm:py-8 border-b border-black/[0.05] dark:border-white/[0.05]">
               {title && (
-                <h2 id="modal-title" className="text-xl font-semibold tracking-tight text-white uppercase italic">
+                <h2 id="modal-title" className="text-xl font-semibold tracking-tight text-soft-cream uppercase italic">
                    {title}
                 </h2>
               )}
@@ -163,7 +161,7 @@ export const Modal: React.FC<ModalProps> = ({
 
           {/* Description */}
           {description && (
-            <div className="px-8 pt-8">
+            <div className="px-4 pt-4 sm:px-8 sm:pt-8">
               <p className="text-sm text-gray-light italic opacity-80 leading-relaxed">
                 {description}
               </p>
@@ -171,11 +169,11 @@ export const Modal: React.FC<ModalProps> = ({
           )}
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto px-8 py-8">{children}</div>
+          <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-8 sm:py-8">{children}</div>
 
           {/* Footer */}
           {footer && (
-            <div className="flex-none px-8 py-8 bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none px-4 py-4 sm:px-8 sm:py-8 bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
               {footer}
             </div>
           )}

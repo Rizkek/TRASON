@@ -3,6 +3,8 @@
  * Centralized form validation for all pages
  */
 
+import { hasDueTimePassed } from '@/libs/notificationLogic';
+
 export interface ValidationResult {
   isValid: boolean;
   errors: Record<string, string>;
@@ -162,7 +164,15 @@ export interface ReminderForm {
   is_recurring?: boolean;
 }
 
-export const validateReminder = (data: ReminderForm): ValidationResult => {
+export const REMINDER_PAST_DUE_ERROR = 'The due time has already passed';
+
+export interface ReminderValidationOptions {
+  /** Reject due times that already passed. Use for new reminders and for edits that change the due time. */
+  rejectPastDue?: boolean;
+  now?: Date;
+}
+
+export const validateReminder = (data: ReminderForm, options: ReminderValidationOptions = {}): ValidationResult => {
   const errors: Record<string, string> = {};
 
   // Title validation
@@ -179,6 +189,11 @@ export const validateReminder = (data: ReminderForm): ValidationResult => {
     errors.due_datetime = 'Invalid due datetime format';
   } else if (data.due_date && isNaN(new Date(data.due_date).getTime())) {
     errors.due_date = 'Invalid due date format';
+  } else if (options.rejectPastDue) {
+    const dueValue = data.due_datetime ?? `${data.due_date}T${data.due_time || '23:59'}`;
+    if (hasDueTimePassed(dueValue, options.now)) {
+      errors.due_datetime = REMINDER_PAST_DUE_ERROR;
+    }
   }
 
   // Priority validation

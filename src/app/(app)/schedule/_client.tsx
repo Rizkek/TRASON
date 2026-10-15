@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Loading, ErrorAlert, ConfirmModal } from '@/components';
+import { Loading, ErrorAlert, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useActivity } from '@/hooks/useActivity';
 import { useDailyTasks } from '@/hooks/useDailyTasks';
@@ -249,11 +249,11 @@ export function TimelineClient() {
 
   if (authLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex justify-center py-12">
           <Loading text={t('dashboard.checking_session')} />
         </div>
-      </Layout>
+      </>
     );
   }
 
@@ -305,7 +305,7 @@ export function TimelineClient() {
   return (
     <>
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
-      <Layout>
+      <>
         <div className="space-y-8 animate-fade-in">
           {/* Header & Overview Stats */}
           <TimelineHeader
@@ -422,7 +422,7 @@ export function TimelineClient() {
           isDangerous={true}
           onConfirm={handleConfirmDelete}
         />
-      </Layout>
+      </>
     </>
   );
 }

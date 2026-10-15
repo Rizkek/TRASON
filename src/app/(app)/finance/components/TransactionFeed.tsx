@@ -273,7 +273,7 @@ export function TransactionFeed({
             style={{ animation: 'slideUp 0.22s ease-out' }}
           >
             <style>{`@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }`}</style>
-            <div className="bg-[#141414] rounded-t-2xl border-t border-white/10 shadow-2xl">
+            <div className="bg-gray-strong rounded-t-2xl border-t border-white/10 shadow-2xl">
               {/* Drag handle */}
               <div className="flex justify-center pt-4 pb-2">
                 <div className="w-10 h-1 bg-white/20 rounded-full" />

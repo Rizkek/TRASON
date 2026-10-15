@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import useSWR from 'swr';
 import { dailyTaskQueries } from '@/services/activity/dailyTaskQueries';
 import type { DailyTask } from '@/types/database';
@@ -39,59 +39,77 @@ export function useDailyTasks(): UseDailyTasksReturn {
 
   const tasks = data || [];
 
-  // Refs (not state) so guards don't trigger extra renders
-  const pendingToggleIds = useRef<Set<string>>(new Set());
-  const pendingDeleteIds = useRef<Set<string>>(new Set());
+  // The ref blocks a double click synchronously (state updates are async); the state is what makes
+  // the rows re-render while a request is running. A Set kept only in a ref never triggers a render.
+  const inFlight = useRef(new Set<string>());
+  const [pendingToggleIds, setPendingToggleIds] = useState<Set<string>>(new Set());
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(new Set());
+
+  /**
+   * Patches the list currently displayed. SWR's `optimisticData` and async mutators receive the last
+   * *committed* data, which excludes other mutations still in flight, so using them let one checkbox
+   * wipe another's pending state. A plain updater always works on the displayed data.
+   */
+  const patchCache = useCallback(
+    (updater: (current: DailyTask[]) => DailyTask[]) =>
+      mutate((current) => updater(current ?? []), { revalidate: false }),
+    [mutate]
+  );
+
+  const runGuarded = useCallback(
+    async (key: string, id: string, setPending: Dispatch<SetStateAction<Set<string>>>, run: () => Promise<void>) => {
+      if (inFlight.current.has(key)) return;
+      inFlight.current.add(key);
+      setPending((prev) => new Set(prev).add(id));
+      try {
+        await run();
+      } finally {
+        inFlight.current.delete(key);
+        setPending((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }
+    },
+    []
+  );
 
   const createTask = useCallback(
     async (taskData: Pick<DailyTask, 'title' | 'description' | 'category'>) => {
-      return await executeMutation(
-        (async () => {
-          const optimisticTask: any = { 
-            ...taskData, 
-            id: `temp-${Date.now()}`, 
-            sort_order: tasks.length, // this is slightly stale potentially but it's fine for sort_order
-            completed_today: false,
-            created_at: new Date().toISOString()
-          };
-          await mutate(
-            async (current: DailyTask[] | undefined) => {
-              const newTask = await dailyTaskQueries.createTask({
-                ...taskData,
-                sort_order: current ? current.length : 0,
-              });
-              return current ? [...current, newTask] : [newTask];
-            },
-            {
-              optimisticData: (current: DailyTask[] | undefined) =>
-                current ? [...current, optimisticTask] : [optimisticTask],
-              rollbackOnError: true,
-              revalidate: false,
-            }
-          );
-          return optimisticTask;
-        })(),
-        'useDailyTasks.createTask'
-      );
+      const tempId = `temp-${Date.now()}`;
+      const sortOrder = tasks.length;
+      const optimisticTask = {
+        ...taskData,
+        id: tempId,
+        sort_order: sortOrder,
+        completed_today: false,
+        created_at: new Date().toISOString(),
+      } as DailyTask;
+
+      await patchCache((current) => [...current, optimisticTask]);
+
+      try {
+        const saved = await executeMutation(
+          dailyTaskQueries.createTask({ ...taskData, sort_order: sortOrder }),
+          'useDailyTasks.createTask'
+        );
+        await patchCache((current) => current.map((t) => (t.id === tempId ? saved : t)));
+        return saved;
+      } catch (err) {
+        await patchCache((current) => current.filter((t) => t.id !== tempId));
+        throw err;
+      }
     },
-    [tasks.length, mutate]
+    [tasks.length, patchCache]
   );
 
   const toggleTask = useCallback(
-    async (id: string, completed: boolean) => {
-      // Guard: ignore clicks while a toggle for this task is already in flight
-      if (pendingToggleIds.current.has(id)) return;
-      pendingToggleIds.current.add(id);
+    (id: string, completed: boolean) =>
+      runGuarded(`toggle:${id}`, id, setPendingToggleIds, async () => {
+        const patchTask = (changes: Partial<DailyTask>) =>
+          patchCache((current) => current.map((t) => (t.id === id ? { ...t, ...changes } : t)));
 
-      // SWR's `optimisticData` and async mutators receive the last *committed* data, which excludes
-      // other toggles still in flight. Using them made a second checkbox wipe the first one's pending
-      // state. Plain updaters run on the data currently displayed, so each toggle patches only its own row.
-      const patchTask = (changes: Partial<DailyTask>) =>
-        mutate((current) => current?.map((t) => (t.id === id ? { ...t, ...changes } : t)), {
-          revalidate: false,
-        });
-
-      try {
         await patchTask({ completed_today: completed });
 
         const saved = await executeMutation(
@@ -101,42 +119,31 @@ export function useDailyTasks(): UseDailyTasksReturn {
         );
 
         await patchTask(saved ?? { completed_today: !completed });
-      } finally {
-        pendingToggleIds.current.delete(id);
-      }
-    },
-    [mutate]
+      }),
+    [runGuarded, patchCache]
   );
 
   const deleteTask = useCallback(
-    async (id: string) => {
-      // Guard: ignore if delete for this task is already in flight
-      if (pendingDeleteIds.current.has(id)) return;
-      pendingDeleteIds.current.add(id);
-      try {
-        await executeMutation(
-          (async () => {
-            await mutate(
-              async (current: DailyTask[] | undefined) => {
-                await dailyTaskQueries.deleteTask(id);
-                if (!current) return current;
-                return current.filter((t) => t.id !== id);
-              },
-              {
-                optimisticData: (current: DailyTask[] | undefined) =>
-                  current ? current.filter((t) => t.id !== id) : [],
-                rollbackOnError: true,
-                revalidate: false,
-              }
-            );
-          })(),
-          'useDailyTasks.deleteTask'
+    (id: string) =>
+      runGuarded(`delete:${id}`, id, setPendingDeleteIds, async () => {
+        let removed: DailyTask | undefined;
+        await patchCache((current) => {
+          removed = current.find((t) => t.id === id);
+          return current.filter((t) => t.id !== id);
+        });
+
+        const ok = await executeMutation(
+          dailyTaskQueries.deleteTask(id).then(() => true),
+          'useDailyTasks.deleteTask',
+          { throwOnError: false }
         );
-      } finally {
-        pendingDeleteIds.current.delete(id);
-      }
-    },
-    [mutate]
+
+        if (!ok && removed) {
+          const restored = removed;
+          await patchCache((current) => [...current, restored].sort((a, b) => a.sort_order - b.sort_order));
+        }
+      }),
+    [runGuarded, patchCache]
   );
 
   return {
@@ -145,8 +152,8 @@ export function useDailyTasks(): UseDailyTasksReturn {
     error: error as Error | null,
     completedCount: tasks.filter((t) => t.completed_today).length,
     totalCount: tasks.length,
-    pendingToggleIds: pendingToggleIds.current,
-    pendingDeleteIds: pendingDeleteIds.current,
+    pendingToggleIds,
+    pendingDeleteIds,
     createTask,
     toggleTask,
     deleteTask,

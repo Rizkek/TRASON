@@ -13,6 +13,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { TOKEN_COLORS, withAlpha } from '@/config/colors';
 import { Card } from '@/components';
 import { Heading, Paragraph } from '@/components/ui/typography';
 import { Transaction } from '@/services/supabase/supabaseClient';
@@ -85,16 +86,8 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
         {
           label: t('dashboard.income'),
           data: chartData.map(d => d.income),
-          borderColor: '#10B981',
-          backgroundColor: (context: any) => {
-            const chart = context.chart;
-            const { ctx, chartArea } = chart;
-            if (!chartArea) return 'transparent';
-            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
-            gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
-            return gradient;
-          },
+          borderColor: TOKEN_COLORS.success,
+          backgroundColor: withAlpha(TOKEN_COLORS.success, 0.12),
           borderWidth: 2,
           pointRadius: 0,
           pointHoverRadius: 6,
@@ -104,16 +97,8 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
         {
           label: t('dashboard.expenses'),
           data: chartData.map(d => d.expense),
-          borderColor: '#EF4444',
-          backgroundColor: (context: any) => {
-            const chart = context.chart;
-            const { ctx, chartArea } = chart;
-            if (!chartArea) return 'transparent';
-            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            gradient.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
-            gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
-            return gradient;
-          },
+          borderColor: TOKEN_COLORS.danger,
+          backgroundColor: withAlpha(TOKEN_COLORS.danger, 0.12),
           borderWidth: 2,
           pointRadius: 0,
           pointHoverRadius: 6,
@@ -137,7 +122,7 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
       },
       tooltip: {
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: '#CBD5E1',
+        titleColor: TOKEN_COLORS.grayVeryLight,
         titleFont: { size: 12, weight: 'bold' as const },
         bodyFont: { size: 14, weight: 'bold' as const },
         padding: 12,
@@ -183,7 +168,6 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
 
   return (
     <Card className="p-4 md:p-8 bg-black/[0.03] dark:bg-black/40 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
-      <div className="absolute top-0 left-1/4 w-1/2 h-full bg-primary/5 blur-3xl rounded-full pointer-events-none" />
 
       <div className="flex items-center justify-between mb-4 md:mb-8 relative z-10">
         <div>
@@ -194,7 +178,7 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
 
       <div className="w-full h-[120px] md:h-[200px] relative z-10">
         {!isMounted || !chartDataState ? (
-          <div className="w-full h-full bg-white/[0.02] rounded-lg animate-pulse" />
+          <div className="w-full h-full bg-white/[0.02] rounded-lg" />
         ) : (
           <Line data={chartDataState} options={options} />
         )}

@@ -1,12 +1,12 @@
 import { Activity } from '@/services/supabase/supabaseClient';
 
 export const MOOD_OPTIONS = [
-  { labelKey: 'happy', emoji: '😊', value: 'Happy' },
-  { labelKey: 'neutral', emoji: '😐', value: 'Neutral' },
-  { labelKey: 'tired', emoji: '😴', value: 'Tired' },
-  { labelKey: 'energized', emoji: '💪', value: 'Energized' },
-  { labelKey: 'stressed', emoji: '😤', value: 'Stressed' },
-  { labelKey: 'calm', emoji: '🧘', value: 'Calm' },
+  { labelKey: 'happy', value: 'Happy' },
+  { labelKey: 'neutral', value: 'Neutral' },
+  { labelKey: 'tired', value: 'Tired' },
+  { labelKey: 'energized', value: 'Energized' },
+  { labelKey: 'stressed', value: 'Stressed' },
+  { labelKey: 'calm', value: 'Calm' },
 ];
 
 export const CATEGORY_OPTIONS = [

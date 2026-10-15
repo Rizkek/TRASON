@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Layout, Button, Loading, ErrorAlert } from '@/components';
+import { Button, Loading, ErrorAlert } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useSportHistory } from '@/hooks/useSportHistory';
 import { useWorkoutPlan } from '@/hooks/useWorkoutPlan';
@@ -14,7 +14,7 @@ import dynamic from 'next/dynamic';
 
 const SportHistoryChart = dynamic(() => import('@/components/modules/Sport/SportHistoryChart').then(mod => mod.SportHistoryChart), {
   ssr: false,
-  loading: () => <div className="h-64 w-full bg-slate-800 animate-pulse rounded-xl" />
+  loading: () => <div className="h-64 w-full bg-gray-strong rounded-xl" />
 });
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Heading, Paragraph } from '@/components/ui/typography';
@@ -78,7 +78,7 @@ export const SportPageClient: React.FC = () => {
   return (
     <>
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
-      <Layout>
+      <>
         <div className="space-y-8 animate-fade-in pb-12">
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
@@ -92,7 +92,7 @@ export const SportPageClient: React.FC = () => {
               <Button
                 variant="primary"
                 onClick={() => setIsLogModalOpen(true)}
-                className="w-full sm:w-auto shadow-[0_0_20px_rgba(244,201,93,0.3)] hover:shadow-[0_0_30px_rgba(244,201,93,0.5)]"
+                className="w-full sm:w-auto"
               >
                 <Dumbbell size={18} className="mr-2" /> {t('sport_page.quick_log_workout')}
               </Button>
@@ -146,7 +146,7 @@ export const SportPageClient: React.FC = () => {
 
                 <div className="bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] rounded-xl p-4">
                   <div className="flex items-center gap-2 text-gray-light mb-2">
-                    <Timer size={16} className="text-accent-gold" />
+                    <Timer size={16} className="text-primary" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">{t('sport_page.avg_session')}</span>
                   </div>
                   <Paragraph className="text-2xl font-semibold text-white">{stats.avgSessionMinutes} <span className="text-sm font-normal text-gray-light">{t('sport_page.min_label')}</span></Paragraph>
@@ -175,7 +175,7 @@ export const SportPageClient: React.FC = () => {
               {/* PR Board */}
               <div className="space-y-4">
                 <Heading as="h2" size="h2" className="text-xl font-sans font-semibold tracking-tight text-white flex items-center gap-2">
-                  <Flame className="text-accent-gold" size={20} /> {t('sport_page.personal_records')}
+                  <Flame className="text-primary" size={20} /> {t('sport_page.personal_records')}
                 </Heading>
                 <PRBoard records={prBoard} />
               </div>
@@ -233,7 +233,7 @@ export const SportPageClient: React.FC = () => {
             </>
           )}
         </div>
-      </Layout>
+      </>
 
       {/* Mobile-only FAB for Quick Log */}
       <div className="md:hidden fixed bottom-24 right-4 z-40">

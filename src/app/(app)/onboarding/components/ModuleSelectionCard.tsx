@@ -25,7 +25,7 @@ export const ModuleSelectionCard: React.FC<ModuleSelectionCardProps> = ({
       onClick={() => onToggle(id)}
       className={`relative p-6 rounded-xl border transition-all cursor-pointer overflow-hidden group ${
         isSelected
-          ? 'bg-black/[0.04] dark:bg-white/[0.04] border-primary shadow-lg shadow-primary/10'
+          ? 'bg-black/[0.04] dark:bg-white/[0.04] border-primary'
           : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] hover:border-primary/50'
       }`}
     >

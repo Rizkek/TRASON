@@ -30,39 +30,6 @@ export const formatDate = (
   }).format(dateObj);
 };
 
-export const formatTime = (
-  date: Date | string,
-  locale = 'en-US',
-  timezone?: string
-): string => {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  const tzOption = timezone ? { timeZone: timezone } : {};
-
-  return new Intl.DateTimeFormat(locale, {
-    hour: '2-digit',
-    minute: '2-digit',
-    ...tzOption,
-  }).format(dateObj);
-};
-
-export const formatDatetime = (
-  date: Date | string,
-  locale = 'en-US',
-  timezone?: string
-): string => {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  const tzOption = timezone ? { timeZone: timezone } : {};
-
-  return new Intl.DateTimeFormat(locale, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    ...tzOption,
-  }).format(dateObj);
-};
-
 export const formatNumber = (num: number, decimals = 2): string => {
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 0,

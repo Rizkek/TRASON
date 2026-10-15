@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, DM_Serif_Display, Plus_Jakarta_Sans } from 'next/fon
 import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { SmartInput } from '@/components/SmartInput';
 import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import { ThemeSync } from '@/components/layout/ThemeSync';
 import NextTopLoader from 'nextjs-toploader';
@@ -124,7 +123,6 @@ export const viewport: Viewport = {
   themeColor: '#FAF9F6',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
 };
 
 // ── Structured Data (JSON-LD) ────────────────────────────────────────────────
@@ -244,7 +242,6 @@ export default function RootLayout({
           <AuthProvider>
             <ThemeSync />
             {children}
-            <SmartInput />
             <PwaInstallPrompt />
             <SpeedInsights />
           </AuthProvider>

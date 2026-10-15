@@ -175,7 +175,8 @@ export const en = {
     "optional": "Optional",
     "save": "Save",
     "saving": "Saving...",
-    "success": "Success"
+    "success": "Success",
+    "try_again": "Try again"
   },
   "dailyTasks": {
     "empty": "No tasks yet. Add your first daily task."
@@ -686,6 +687,9 @@ export const en = {
     "notif_push_denied": "Notifications blocked — enable in browser settings to receive reminders.",
     "notif_push_denied_alert": "Browser blocked notifications or you cancelled the request. Please allow from browser settings.",
     "notif_push_request": "Click to enable reminder notifications →",
+    "past_due_message": "This reminder is set for a time that has already passed. Choose a later date or time.",
+    "past_due_ok": "Got it",
+    "past_due_title": "Time has already passed",
     "save_reminder": "Save",
     "title": "Reminders",
     "title_highlight": "",

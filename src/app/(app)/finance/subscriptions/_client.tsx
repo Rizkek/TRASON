@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Layout, Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon, Select, DatePicker } from '@/components';
+import { Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon, Select, DatePicker } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useCategory } from '@/hooks/useCategory';
@@ -154,9 +154,9 @@ export function SubscriptionsClient() {
 
   if (authLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex justify-center py-12"><Loading text="Checking your session..." /></div>
-      </Layout>
+      </>
     );
   }
 
@@ -165,7 +165,7 @@ export function SubscriptionsClient() {
   return (
     <>
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
-      <Layout>
+      <>
       <div className="space-y-8 animate-fade-in">
         
         <Link href="/finance" className="flex items-center gap-2 text-xs font-bold text-gray-light hover:text-white uppercase tracking-widest transition-colors w-fit">
@@ -187,7 +187,6 @@ export function SubscriptionsClient() {
         </div>
 
         <Card className="p-8 relative overflow-hidden group">
-          <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all" />
           <div className="flex items-center gap-1 mb-4 text-gray-light">
              <Repeat size={16} className="text-primary" />
              <Paragraph className="text-xs font-bold uppercase tracking-widest">{t('finance.estimatedMonthlyCost') || 'Estimated Monthly Cost'}</Paragraph>
@@ -490,7 +489,7 @@ export function SubscriptionsClient() {
         isDangerous={true}
         onConfirm={handleConfirmDelete}
       />
-      </Layout>
+      </>
     </>
   );
 }

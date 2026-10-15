@@ -91,12 +91,12 @@ interface CategoryIconProps {
 
 export function CategoryIcon({ name, size = 18, className = '' }: CategoryIconProps) {
   // If the name is in our icon map, render as Phosphor icon. Otherwise fallback to text/emoji.
-  const Icon = iconMap[name];
+  const Icon = iconMap[name] ?? (name ? undefined : iconMap.Package);
   
   if (Icon) {
     return <Icon size={size} className={className} />;
   }
 
   // Fallback for emojis or legacy data
-  return <span className={className} style={{ fontSize: size }}>{name || '📦'}</span>;
+  return <span className={className} style={{ fontSize: size }}>{name}</span>;
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import useSWR, { mutate as globalMutate } from 'swr';
+import useSWR from 'swr';
 import { transactionQueries } from '@/services/finance/transactionQueries';
 import { Transaction } from '@/services/supabase/supabaseClient';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
@@ -9,6 +9,10 @@ import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { executeMutation } from "@/libs/api/mutationBuilder";
 import { getUserErrorMessage } from "@/libs/apiErrors";
 import { formatDateOnly } from '@/libs/date';
+import { invalidateKeys } from '@/libs/cacheInvalidation';
+
+// One revalidation per write: it covers this hook's key, every other date range, and the dashboard.
+const invalidateTransactions = () => invalidateKeys(INVALIDATION_PATTERNS.onTransactionChange(), 'transactions');
 
 export interface UseTransactionReturn {
   transactions: Transaction[];
@@ -60,20 +64,8 @@ export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income'
                     { revalidate: false }
                   );
           const result = await transactionQueries.createTransaction(newData);
-          const keysToInvalidate = INVALIDATION_PATTERNS.onTransactionChange();
-          await Promise.all(keysToInvalidate.map(k => {
-                    if (typeof k === 'string') {
-                      return globalMutate(k);
-                    }
-                    // Invalidate wildcard patterns
-                    return globalMutate(
-                      (key) => Array.isArray(key) && key[0] === 'transactions',
-                      undefined,
-                      { revalidate: true }
-                    );
-                  }));
-          // Force local re-fetch to replace optimistic data (which lacks joined categories) with real DB data
-          await mutate();
+          // The refetch replaces the optimistic row, which lacks the joined category, with the DB row.
+          await invalidateTransactions();
           return result;
             })(),
             'useTransaction.create', { onError: async (err) => { await mutate(); } }
@@ -105,8 +97,7 @@ export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income'
                     { revalidate: false }
                   );
           const result = await transactionQueries.updateTransaction(id, updates);
-          // Force re-fetch with joined category data from DB
-          await mutate();
+          await invalidateTransactions();
           return result;
             })(),
             'useTransaction.update', { onError: async (err) => { await mutate(); } }
@@ -124,17 +115,7 @@ export const useTransaction = (startDate?: Date, endDate?: Date, type?: 'income'
               { revalidate: false }
             );
       await transactionQueries.deleteTransaction(id);
-      const keysToInvalidate = INVALIDATION_PATTERNS.onTransactionChange();
-      await Promise.all(keysToInvalidate.map(k => {
-              if (typeof k === 'string') {
-                return globalMutate(k);
-              }
-              return globalMutate(
-                (key) => Array.isArray(key) && key[0] === 'transactions',
-                undefined,
-                { revalidate: true }
-              );
-            }));
+      await invalidateTransactions();
       return true;
         })(),
         'useTransaction.delete', { onError: async (err) => { await mutate(); } }

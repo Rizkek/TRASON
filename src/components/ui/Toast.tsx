@@ -30,13 +30,13 @@ export function Toast({ message, type = 'info', duration = 3000, onClose }: Toas
   }, [duration, onClose]);
 
   const icons = {
-    success: <CheckCircle size={20} className="text-emerald-500" weight="fill" />,
+    success: <CheckCircle size={20} className="text-success" weight="fill" />,
     error: <Warning size={20} className="text-danger" weight="fill" />,
     info: <Info size={20} className="text-info" weight="fill" />,
   };
 
   const bgColors = {
-    success: 'bg-emerald-500/10 border-emerald-500/20',
+    success: 'bg-success/10 border-success/20',
     error: 'bg-danger/10 border-danger/20',
     info: 'bg-info/10 border-info/20',
   };

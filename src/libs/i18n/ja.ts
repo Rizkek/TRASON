@@ -175,7 +175,8 @@ export const ja = {
     "optional": "任意",
     "save": "保存",
     "saving": "保存中...",
-    "success": "成功"
+    "success": "成功",
+    "try_again": "再試行"
   },
   "dailyTasks": {
     "empty": "タスクはまだありません。最初の日課タスクを追加してください。"
@@ -686,6 +687,9 @@ export const ja = {
     "notif_push_denied": "通知がブロックされています — ブラウザの設定で有効にしてリマインダーを受け取ってください。",
     "notif_push_denied_alert": "ブラウザが通知をブロックしたか、リクエストをキャンセルしました。ブラウザの設定から許可してください。",
     "notif_push_request": "クリックしてリマインダー通知を有効にする →",
+    "past_due_message": "このリマインダーは過ぎた時刻に設定されています。これより後の日付または時刻を選んでください。",
+    "past_due_ok": "了解",
+    "past_due_title": "時間がすでに過ぎています",
     "save_reminder": "保存",
     "title": "リマインダー",
     "title_highlight": "",

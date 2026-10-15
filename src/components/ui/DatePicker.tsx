@@ -134,7 +134,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             id={id}
             className={`w-full h-10 px-3 bg-gray-strong/80 hover:bg-gray-strong/95 border ${
               error
-                ? 'border-red-500/70 focus:border-red-500 focus:ring-red-500/30'
+                ? 'border-danger/70 focus:border-danger focus:ring-danger/30'
                 : 'border-white/10 hover:border-white/20 focus:border-primary focus:ring-primary/30'
             } transition-all duration-200 rounded-lg text-sm text-left flex items-center justify-between gap-2 shadow-sm focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group`}
           >
@@ -174,8 +174,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           >
             <style>{`
               .rdp-root {
-                --rdp-accent-color: #F4C95D;
-                --rdp-accent-background-color: rgba(244, 201, 93, 0.15);
+                --rdp-accent-color: rgb(var(--color-primary));
+                --rdp-accent-background-color: rgb(var(--color-primary) / 0.15);
                 font-family: inherit;
               }
               .rdp-month_caption {
@@ -185,7 +185,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 font-family: var(--font-display), sans-serif;
                 font-weight: 700;
                 font-size: 1rem;
-                color: #F8FAFC;
+                color: rgb(var(--color-soft-cream));
                 padding-bottom: 0.75rem;
                 margin-bottom: 0.5rem;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -203,13 +203,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 border-radius: 8px;
                 border: 1px solid rgba(255, 255, 255, 0.08);
                 background: rgba(255, 255, 255, 0.04);
-                color: #94A3B8;
+                color: rgb(var(--color-gray-light));
                 transition: all 0.2s;
               }
               .rdp-button_previous:hover, .rdp-button_next:hover {
                 background: rgba(255, 255, 255, 0.1);
-                color: #F8FAFC;
-                border-color: rgba(244, 201, 93, 0.3);
+                color: rgb(var(--color-soft-cream));
+                border-color: rgb(var(--color-primary) / 0.3);
               }
               .rdp-weeks {
                 border-collapse: collapse;
@@ -219,7 +219,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 0.1em;
-                color: #94A3B8;
+                color: rgb(var(--color-gray-light));
                 opacity: 0.6;
                 padding: 0.5rem 0.25rem;
                 text-align: center;
@@ -231,7 +231,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 border-radius: 8px;
                 transition: all 0.15s;
                 text-align: center;
-                color: #F8FAFC;
+                color: rgb(var(--color-soft-cream));
               }
               .rdp-day_button {
                 width: 100%;
@@ -243,17 +243,16 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               }
               .rdp-day_button:hover:not([disabled]) {
                 background-color: rgba(255, 255, 255, 0.08);
-                color: #F4C95D;
+                color: rgb(var(--color-primary));
               }
               .rdp-selected .rdp-day_button {
-                background: #F4C95D !important;
-                color: #0B0F14 !important;
+                background: rgb(var(--color-primary)) !important;
+                color: rgb(var(--color-warm-black)) !important;
                 font-weight: 700 !important;
-                box-shadow: 0 0 14px rgba(244, 201, 93, 0.4);
               }
               .rdp-today:not(.rdp-selected) .rdp-day_button {
-                border: 1px solid rgba(244, 201, 93, 0.5);
-                color: #F4C95D;
+                border: 1px solid rgb(var(--color-primary) / 0.5);
+                color: rgb(var(--color-primary));
                 font-weight: 600;
               }
               .rdp-outside {
@@ -266,24 +265,24 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               /* Holiday day styles */
               .rdp-day.rdp-holiday .rdp-day_button {
                 border: 1px solid rgba(248, 113, 113, 0.5) !important;
-                color: #fca5a5 !important;
+                color: #F87171 !important;
                 font-weight: 700;
-                background: rgba(239, 68, 68, 0.08);
+                background: rgba(248, 113, 113, 0.08);
               }
               .rdp-day.rdp-holiday.rdp-selected .rdp-day_button {
-                background: #ef4444 !important;
-                color: #fff !important;
+                background: #F87171 !important;
+                color: rgb(var(--color-warm-black)) !important;
               }
               /* Cuti bersama day styles */
               .rdp-day.rdp-cuti .rdp-day_button {
-                border: 1px solid rgba(251, 191, 36, 0.5) !important;
-                color: #fbbf24 !important;
+                border: 1px solid rgba(251, 146, 60, 0.5) !important;
+                color: #FB923C !important;
                 font-weight: 700;
-                background: rgba(245, 158, 11, 0.08);
+                background: rgba(251, 146, 60, 0.08);
               }
               .rdp-day.rdp-cuti.rdp-selected .rdp-day_button {
-                background: #f59e0b !important;
-                color: #000 !important;
+                background: #FB923C !important;
+                color: rgb(var(--color-warm-black)) !important;
               }
             `}</style>
 
@@ -316,9 +315,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                   const dateObj = new Date(y, m - 1, d);
                   return (
                     <div key={h.date} className="flex items-center gap-1.5">
-                      <span className="text-[10px]">{h.is_cuti_bersama ? '🏖️' : '🔴'}</span>
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${h.is_cuti_bersama ? 'bg-warning' : 'bg-danger'}`} />
                       <span className={`text-[10px] font-semibold ${
-                        h.is_cuti_bersama ? 'text-amber-300' : 'text-rose-300'
+                        h.is_cuti_bersama ? 'text-warning' : 'text-danger'
                       }`}>
                         {d} —
                       </span>
@@ -350,7 +349,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         </Popover.Portal>
       </Popover.Root>
 
-      {error && <p className="text-xs text-red-400 font-medium">{error}</p>}
+      {error && <p className="text-xs text-danger font-medium">{error}</p>}
     </div>
   );
 };

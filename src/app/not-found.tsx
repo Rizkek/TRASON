@@ -8,10 +8,8 @@ import { LandingFooter } from '@/components/landing/LandingFooter';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-warm-black text-soft-cream flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-dvh bg-warm-black text-soft-cream flex items-center justify-center p-4 relative overflow-hidden">
       {/* Dynamic Background Elements */}
-      <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-warm-gold/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-deep-sage/5 blur-[100px] rounded-full pointer-events-none" />
 
       <Card className="w-full max-w-xl p-12 text-center space-y-8 border border-white/5 bg-black/40 backdrop-blur-xl shadow-2xl relative z-10">
         <div className="mx-auto w-14 h-14 rounded-full bg-danger/15 text-danger flex items-center justify-center">

@@ -73,29 +73,29 @@ export const Calendar: React.FC<CalendarProps> = ({
           isSelected 
             ? 'bg-warm-gold/10 border-warm-gold/40 shadow-inner' 
             : isHolidayRed 
-            ? 'bg-rose-500/[0.07] hover:bg-rose-500/[0.12]' 
+            ? 'bg-danger/[0.07] hover:bg-danger/[0.12]' 
             : isCutiAmber 
-            ? 'bg-amber-500/[0.07] hover:bg-amber-500/[0.12]' 
+            ? 'bg-warning/[0.07] hover:bg-warning/[0.12]' 
             : ''
         }`}
       >
         <div className="flex justify-between items-start">
           <span className={`text-xs font-sans transition-colors ${
             isToday 
-              ? 'bg-warm-gold text-warm-black w-6 h-6 flex items-center justify-center rounded-full font-semibold shadow-[0_0_10px_rgba(244,201,93,0.4)]' 
+              ? 'bg-warm-gold text-warm-black w-6 h-6 flex items-center justify-center rounded-full font-semibold' 
               : isSelected 
               ? 'text-warm-gold font-semibold' 
               : isHolidayRed || isSunday 
-              ? 'text-rose-400 font-extrabold' 
+              ? 'text-danger font-extrabold' 
               : isCutiAmber 
-              ? 'text-amber-300 font-semibold' 
+              ? 'text-warning font-semibold' 
               : 'text-gray-light'
           }`}>
             {d}
           </span>
           <div className="flex items-center gap-1">
             {dateEvents.some(e => e.status !== 'completed') && (
-              <div className="w-1.5 h-1.5 bg-warm-gold rounded-full shadow-[0_0_8px_rgba(212,165,116,0.6)]" />
+              <div className="w-1.5 h-1.5 bg-warm-gold rounded-full" />
             )}
           </div>
         </div>
@@ -105,8 +105,8 @@ export const Calendar: React.FC<CalendarProps> = ({
           <div className="mt-1 hidden md:block">
             <div className={`text-[9px] px-1.5 py-0.5 rounded border truncate font-medium ${
               holiday.is_cuti_bersama
-                ? 'bg-amber-500/15 text-amber-200 border-amber-500/30'
-                : 'bg-rose-500/15 text-rose-200 border-rose-500/30'
+                ? 'bg-warning/15 text-warning border-warning/30'
+                : 'bg-danger/15 text-danger border-danger/30'
             }`}>
               {holiday.name}
             </div>
@@ -165,7 +165,7 @@ export const Calendar: React.FC<CalendarProps> = ({
           <div 
             key={day} 
             className={`py-2 text-center text-[10px] uppercase tracking-[0.2em] font-medium ${
-              i === 0 ? 'text-rose-400 font-extrabold' : 'text-gray-light/60'
+              i === 0 ? 'text-danger font-extrabold' : 'text-gray-light/60'
             }`}
           >
             {day}
@@ -193,8 +193,8 @@ export const Calendar: React.FC<CalendarProps> = ({
                   key={h.date}
                   className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium border ${
                     h.is_cuti_bersama
-                      ? 'bg-amber-500/10 text-amber-200 border-amber-500/20'
-                      : 'bg-rose-500/10 text-rose-200 border-rose-500/20'
+                      ? 'bg-warning/10 text-warning border-warning/20'
+                      : 'bg-danger/10 text-danger border-danger/20'
                   }`}
                 >
                   <span className="font-semibold font-mono">{d}</span>

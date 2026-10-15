@@ -21,7 +21,7 @@ export function InstallmentList({ onAddClick, onPayClick }: InstallmentListProps
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <span className="animate-pulse text-gray-light">Loading installments...</span>
+        <span className="text-gray-light">Loading installments...</span>
       </div>
     );
   }
@@ -89,7 +89,7 @@ export function InstallmentList({ onAddClick, onPayClick }: InstallmentListProps
               const percentage = Math.min((inst.paid_months / inst.total_months) * 100, 100);
               
               return (
-                <div key={inst.id} className="bg-[#141414] border border-white/5 rounded-2xl p-5 relative overflow-hidden group">
+                <div key={inst.id} className="bg-gray-strong border border-white/5 rounded-2xl p-5 relative overflow-hidden group">
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h4 className="text-sm font-semibold text-soft-cream">{inst.title}</h4>

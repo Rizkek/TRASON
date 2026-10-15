@@ -82,12 +82,10 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
             <div className="w-12 h-1.5 bg-gray-light/30 rounded-full" />
           </div>
 
-          {/* Top highlight glow (Desktop only for a cleaner modal look, or keep it?) */}
-          <div className="hidden md:block absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
           
           {/* Header */}
           {(title || closeButton) && (
-            <div className="flex-none flex items-center justify-between px-8 pb-4 pt-2 md:py-8 border-b border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none flex items-center justify-between px-4 sm:px-8 pb-4 pt-2 md:py-8 border-b border-black/[0.05] dark:border-white/[0.05]">
               {title && (
                 <h2 className="text-xl font-bold tracking-tight text-white uppercase italic">
                    {title}
@@ -108,7 +106,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 
           {/* Description */}
           {description && (
-            <div className="px-8 pt-8">
+            <div className="px-4 pt-4 sm:px-8 sm:pt-8">
               <p className="text-sm text-gray-light italic opacity-80 leading-relaxed">
                 {description}
               </p>
@@ -116,11 +114,11 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           )}
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto min-h-0 px-8 py-8">{children}</div>
+          <div className="flex-1 overflow-y-auto min-h-0 px-4 py-4 sm:px-8 sm:py-8">{children}</div>
 
           {/* Footer */}
           {footer && (
-            <div className="flex-none px-8 py-8 bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none px-4 py-4 sm:px-8 sm:py-8 bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
               {footer}
             </div>
           )}

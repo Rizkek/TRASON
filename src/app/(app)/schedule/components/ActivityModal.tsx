@@ -55,9 +55,9 @@ export function ActivityModal({
     >
       <div className="space-y-8">
         {/* Weekly Routine Template selector */}
-        <div className="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-between gap-3">
+        <div className="p-3 rounded-lg bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <Repeat size={18} className="text-indigo-400 shrink-0" />
+            <Repeat size={18} className="text-accent-purple shrink-0" />
             <div>
               <label htmlFor="routine-checkbox" className="text-xs font-bold text-soft-cream cursor-pointer block">
                 Jadwal Rutin Mingguan (Template)
@@ -72,7 +72,7 @@ export function ActivityModal({
             id="routine-checkbox"
             checked={form.isWeeklyRoutine}
             onChange={(e) => setForm((f) => ({ ...f, isWeeklyRoutine: e.target.checked }))}
-            className="w-4 h-4 rounded border-indigo-400 text-indigo-500 focus:ring-indigo-400 bg-black/20"
+            className="w-4 h-4 rounded border-accent-purple text-accent-purple focus:ring-accent-purple bg-black/20"
           />
         </div>
 
@@ -154,7 +154,7 @@ export function ActivityModal({
               { value: 'none', label: t('timeline_page.form.none') },
               ...MOOD_OPTIONS.map((m) => ({
                 value: m.value,
-                label: `${m.emoji} ${t(`timeline_page.form.moods.${m.labelKey}`)}`,
+                label: t(`timeline_page.form.moods.${m.labelKey}`),
               })),
             ]}
           />

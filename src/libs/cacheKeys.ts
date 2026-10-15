@@ -105,9 +105,6 @@ export const INVALIDATION_PATTERNS = {
   onTransactionChange: () => [
     CACHE_KEYS.transactions.all(),
     CACHE_KEYS.dashboard.overview,
-    'financial-summary',
-    'financial-overview',
-    'dashboard-finance',
   ],
 
   // When activity changes, invalidate these
@@ -125,8 +122,7 @@ export const INVALIDATION_PATTERNS = {
 
   // When investment changes, invalidate these
   onInvestmentChange: () => [
-    CACHE_KEYS.investments.portfolio,
-    CACHE_KEYS.investments.summary,
+    CACHE_KEYS.investments.positions(),
     CACHE_KEYS.investments.insights,
     CACHE_KEYS.dashboard.overview,
   ],
@@ -144,17 +140,3 @@ export const INVALIDATION_PATTERNS = {
     CACHE_KEYS.settings.notifications(userId),
   ],
 } as const;
-
-/**
- * Utility to generate wildcard patterns for SWR mutate
- * Example: mutate(key => matchesPattern(key, CACHE_KEYS.transactions.all()))
- */
-export function matchesPattern(key: any, pattern: any[]): boolean {
-  if (!Array.isArray(key)) return false;
-  if (key.length !== pattern.length) return false;
-  
-  return key.every((k, i) => {
-    const p = pattern[i];
-    return p === '*' || p === k;
-  });
-}

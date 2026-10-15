@@ -23,7 +23,7 @@ export function TrasonIcon({
       <div
         className={`transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
           active
-            ? 'text-warm-gold drop-shadow-[0_0_8px_rgba(244,201,93,0.5)] scale-110'
+            ? 'text-warm-gold scale-110'
             : 'text-gray-light hover:text-soft-cream hover:scale-105'
         }`}
       >
@@ -41,7 +41,7 @@ export function TrasonIcon({
   if (variant === 'card') {
     return (
       <div
-        className={`p-2 rounded-xl bg-gray-medium/20 transition-all duration-300 hover:shadow-lg hover:shadow-warm-gold/10 group flex items-center justify-center ${className}`}
+        className={`p-2 rounded-xl bg-gray-medium/20 transition-all duration-300 group flex items-center justify-center ${className}`}
       >
         <Icon
           weight="duotone"
@@ -71,13 +71,12 @@ export function TrasonIcon({
   if (variant === 'hero') {
     return (
       <div
-        className={`relative p-4 rounded-2xl bg-gradient-to-br from-gray-strong to-warm-black border border-gray-medium/50 shadow-2xl flex items-center justify-center ${className}`}
+        className={`relative p-4 rounded-2xl bg-gray-strong border border-gray-medium/50 flex items-center justify-center ${className}`}
       >
-        <div className="absolute inset-0 bg-warm-gold/10 blur-xl rounded-full pointer-events-none"></div>
         <Icon
           weight="duotone"
           size={size || 48}
-          className="text-warm-gold relative z-10 drop-shadow-[0_0_15px_rgba(244,201,93,0.6)]"
+          className="text-warm-gold relative z-10"
           {...props}
         />
       </div>

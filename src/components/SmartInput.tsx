@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MagnifyingGlass as Search, Spinner as Loader2, PaperPlaneRight } from '@phosphor-icons/react';
+import { MagnifyingGlass as Search, PaperPlaneRight } from '@phosphor-icons/react';
 import { getLocalISODate } from '@/libs/format';
+import { ApiError } from '@/libs/apiErrors';
 import { 
   createTransactionWithInvalidation,
   createActivityWithInvalidation,
@@ -109,7 +110,11 @@ export function SmartInput() {
       setResult(null);
     } catch (error) {
       console.error('Failed to save:', error);
-      setResult({ ...result, error: 'Failed to save to database.' });
+      const message =
+        error instanceof ApiError && error.code === 'REMINDER_PAST_DUE'
+          ? 'That time has already passed. Add a later date or time, for example "tomorrow at 9".'
+          : 'Failed to save to database.';
+      setResult({ ...result, error: message });
     } finally {
       setIsLoading(false);
     }
@@ -135,9 +140,10 @@ export function SmartInput() {
           <button 
             type="submit" 
             disabled={isLoading || !input.trim()}
+            aria-busy={isLoading}
             className="absolute right-6 text-primary hover:text-white disabled:opacity-50"
           >
-            {isLoading ? <Loader2 className="animate-spin" size={20} /> : <PaperPlaneRight size={20} />}
+            <PaperPlaneRight size={20} />
           </button>
         </form>
 
@@ -172,7 +178,7 @@ export function SmartInput() {
         )}
         
         {result?.error && (
-          <div className="p-8 bg-red-500/10 text-red-500 text-sm">
+          <div className="p-8 bg-danger/10 text-danger text-sm">
             {result.error}
           </div>
         )}

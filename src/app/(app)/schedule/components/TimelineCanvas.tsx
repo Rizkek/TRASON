@@ -77,7 +77,7 @@ export function TimelineCanvas({
                   }`}
                 >
                   {isToday && (
-                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
                   )}
                   <Paragraph
                     className={`text-[11px] font-bold uppercase tracking-[0.15em] ${
@@ -100,7 +100,7 @@ export function TimelineCanvas({
           <div
             ref={gridRef}
             className="overflow-y-auto"
-            style={{ maxHeight: 'calc(100vh - 280px)' }}
+            style={{ maxHeight: 'calc(100dvh - 280px)' }}
             role="grid"
             aria-label="Weekly schedule grid"
           >
@@ -111,8 +111,8 @@ export function TimelineCanvas({
                 style={{ top: `${currentTimeOffset}px` }}
               >
                 <div className="flex items-center">
-                  <div className="w-2 h-2 rounded-full bg-red-500 -ml-1 flex-shrink-0" />
-                  <div className="flex-1 h-px bg-red-500/70" />
+                  <div className="w-2 h-2 rounded-full bg-danger -ml-1 flex-shrink-0" />
+                  <div className="flex-1 h-px bg-danger/70" />
                 </div>
               </div>
 
@@ -129,7 +129,7 @@ export function TimelineCanvas({
                     {/* Hour label */}
                     <div
                       className={`flex items-start justify-end pr-2 pt-2 border-r border-black/[0.03] dark:border-white/[0.03] sticky left-0 bg-gray-strong/40 ${
-                        isCurrentHour ? 'text-red-400' : 'text-gray-light opacity-40'
+                        isCurrentHour ? 'text-danger' : 'text-gray-light opacity-40'
                       }`}
                     >
                       <span className="text-[10px] font-bold font-mono">{formatHour(hour)}</span>
@@ -168,7 +168,7 @@ export function TimelineCanvas({
 
                           {/* Clash indicator */}
                           {hasClash && (
-                            <div className="flex items-center gap-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded px-1.5 py-0.5 mb-1 text-[8px] font-bold">
+                            <div className="flex items-center gap-1 bg-warning/20 text-warning border border-warning/40 rounded px-1.5 py-0.5 mb-1 text-[8px] font-bold">
                               <Warning size={10} className="shrink-0" />
                               <span className="truncate">Bentrok ({cellReminders.length} Pengingat)</span>
                             </div>
@@ -178,17 +178,17 @@ export function TimelineCanvas({
                           {cellReminders.map((rem) => (
                             <div
                               key={rem.id}
-                              className="rounded p-1 mb-1 text-left border-l-2 border-amber-400 bg-amber-500/10 text-soft-cream relative group/rem"
+                              className="rounded p-1 mb-1 text-left border-l-2 border-warning bg-warning/10 text-soft-cream relative group/rem"
                               title={`Pengingat: ${rem.title}${rem.due_time ? ' (' + rem.due_time + ')' : ''}`}
                             >
                               <div className="flex items-center gap-1">
-                                <Bell size={10} className="text-amber-400 shrink-0" />
-                                <Paragraph className="text-[9px] font-bold text-amber-200 truncate leading-tight flex-1">
+                                <Bell size={10} className="text-warning shrink-0" />
+                                <Paragraph className="text-[9px] font-bold text-warning truncate leading-tight flex-1">
                                   {rem.title}
                                 </Paragraph>
                               </div>
                               {rem.due_time && (
-                                <span className="text-[8px] text-amber-300/70 font-mono block mt-0.5">
+                                <span className="text-[8px] text-warning/70 font-mono block mt-0.5">
                                   {rem.due_time}
                                 </span>
                               )}
@@ -213,8 +213,8 @@ export function TimelineCanvas({
                                 }`}
                                 style={{
                                   background: isRoutine
-                                    ? `linear-gradient(135deg, rgb(var(--color-primary) / 0.15), rgb(var(--color-primary) / 0.05))`
-                                    : `linear-gradient(135deg, rgb(var(--color-primary) / 0.1), rgb(var(--color-primary) / 0.05))`,
+                                    ? 'rgb(var(--color-primary) / 0.15)'
+                                    : 'rgb(var(--color-primary) / 0.1)',
                                   borderLeft: isRoutine ? '2px dashed rgb(var(--color-primary))' : '2px solid rgb(var(--color-primary) / 0.5)',
                                 }}
                                 role="button"
@@ -250,7 +250,7 @@ export function TimelineCanvas({
                                     e.stopPropagation();
                                     onConfirmDelete(act.id);
                                   }}
-                                  className="absolute top-0.5 right-0.5 opacity-0 group-hover/card:opacity-100 text-gray-light hover:text-red-400 transition-all"
+                                  className="absolute top-0.5 right-0.5 opacity-0 group-hover/card:opacity-100 text-gray-light hover:text-danger transition-all"
                                   aria-label={`Delete ${act.title}`}
                                 >
                                   <Trash2 size={9} />
@@ -320,18 +320,18 @@ export function TimelineCanvas({
               {todaysReminders.map((rem) => (
                 <div
                   key={rem.id}
-                  className="p-2 rounded-lg border border-amber-500/30 bg-amber-500/10 flex items-start gap-4"
+                  className="p-2 rounded-lg border border-warning/30 bg-warning/10 flex items-start gap-4"
                 >
-                  <Bell size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                  <Bell size={16} className="text-warning shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <Paragraph className="font-bold text-sm text-amber-200 truncate">{rem.title}</Paragraph>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-bold uppercase tracking-wider">
+                      <Paragraph className="font-bold text-sm text-warning truncate">{rem.title}</Paragraph>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-warning/20 text-warning font-bold uppercase tracking-wider">
                         Pengingat
                       </span>
                     </div>
                     {rem.due_time && (
-                      <Paragraph className="text-xs text-amber-300/80 font-mono mt-0.5">
+                      <Paragraph className="text-xs text-warning/80 font-mono mt-0.5">
                         Waktu: {rem.due_time}
                       </Paragraph>
                     )}
@@ -355,16 +355,16 @@ export function TimelineCanvas({
                     </div>
                     <div
                       className={`flex-1 border-l-2 ${
-                        isRoutine ? 'border-indigo-400 border-dashed' : 'border-primary'
+                        isRoutine ? 'border-accent-purple border-dashed' : 'border-primary'
                       } pl-4 relative group min-w-0`}
                     >
                       <div className="flex items-center gap-1.5">
-                        {isRoutine && <Repeat size={12} className="text-indigo-400 shrink-0" />}
+                        {isRoutine && <Repeat size={12} className="text-accent-purple shrink-0" />}
                         <Paragraph className="font-bold text-sm text-soft-cream truncate">{act.title}</Paragraph>
                       </div>
                       <div className="flex flex-wrap gap-2 text-[8px] text-gray-light uppercase tracking-widest mt-1">
                         {isRoutine && (
-                          <span className="text-indigo-300 bg-indigo-500/20 px-1 rounded shrink-0">
+                          <span className="text-accent-purple bg-accent-purple/20 px-1 rounded shrink-0">
                             Rutin
                           </span>
                         )}

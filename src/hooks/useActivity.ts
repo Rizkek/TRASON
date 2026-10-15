@@ -1,13 +1,16 @@
 'use client';
 
 import { useCallback } from 'react';
-import useSWR, { mutate as globalMutate } from 'swr';
+import useSWR from 'swr';
 import { activityQueries } from '@/services/activity/activityQueries';
 import { Activity } from '@/services/supabase/supabaseClient';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { executeMutation } from "@/libs/api/mutationBuilder";
 import { getUserErrorMessage } from "@/libs/apiErrors";
+import { invalidateKeys } from '@/libs/cacheInvalidation';
+
+const invalidateActivities = (date: string) => invalidateKeys(INVALIDATION_PATTERNS.onActivityChange(date), 'activities');
 
 export interface UseActivityReturn {
   activities: Activity[];
@@ -60,17 +63,7 @@ export const useActivity = (startDate?: Date, endDate?: Date): UseActivityReturn
                     { revalidate: false }
                   );
           const newActivity = await activityQueries.createActivity(dataToCreate);
-          const keysToInvalidate = INVALIDATION_PATTERNS.onActivityChange(startStr);
-          await Promise.all(keysToInvalidate.map(k => {
-                    if (typeof k === 'string') {
-                      return globalMutate(k);
-                    }
-                    return globalMutate(
-                      (key) => Array.isArray(key) && key[0] === 'activities',
-                      undefined,
-                      { revalidate: true }
-                    );
-                  }));
+          await invalidateActivities(startStr);
           return newActivity;
             })(),
             'useActivity.create', { onError: async (err) => { await mutate(); } }
@@ -92,17 +85,7 @@ export const useActivity = (startDate?: Date, endDate?: Date): UseActivityReturn
                     { revalidate: false }
                   );
           const updatedActivity = await activityQueries.updateActivity(id, dataToUpdate);
-          const keysToInvalidate = INVALIDATION_PATTERNS.onActivityChange(startStr);
-          await Promise.all(keysToInvalidate.map(k => {
-                    if (typeof k === 'string') {
-                      return globalMutate(k);
-                    }
-                    return globalMutate(
-                      (key) => Array.isArray(key) && key[0] === 'activities',
-                      undefined,
-                      { revalidate: true }
-                    );
-                  }));
+          await invalidateActivities(startStr);
           return updatedActivity;
             })(),
             'useActivity.update', { onError: async (err) => { await mutate(); } }
@@ -120,17 +103,7 @@ export const useActivity = (startDate?: Date, endDate?: Date): UseActivityReturn
               { revalidate: false }
             );
       await activityQueries.deleteActivity(id);
-      const keysToInvalidate = INVALIDATION_PATTERNS.onActivityChange(startStr);
-      await Promise.all(keysToInvalidate.map(k => {
-              if (typeof k === 'string') {
-                return globalMutate(k);
-              }
-              return globalMutate(
-                (key) => Array.isArray(key) && key[0] === 'activities',
-                undefined,
-                { revalidate: true }
-              );
-            }));
+      await invalidateActivities(startStr);
       return true;
         })(),
         'useActivity.delete', { onError: async (err) => { await mutate(); } }

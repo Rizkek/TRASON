@@ -34,7 +34,6 @@ export function ProfileSection({
 
   return (
     <Card className="glass border-none shadow-2xl relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary opacity-[0.02] blur-3xl pointer-events-none" />
 
       <div className="p-8 space-y-8 relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-8 pb-8 border-b border-black/[0.05] dark:border-white/[0.05]">
@@ -48,7 +47,7 @@ export function ProfileSection({
               disabled={isUploadingAvatar}
             />
             <div
-              className="w-24 h-24 rounded-2xl bg-gradient-primary p-[2px] cursor-pointer"
+              className="w-24 h-24 rounded-2xl bg-primary p-[2px] cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
             >
               <div className="w-full h-full rounded-2xl bg-gray-strong flex items-center justify-center text-3xl font-sans font-bold tracking-tight text-white relative overflow-hidden">

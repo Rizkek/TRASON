@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import { BottomSheet, Button } from '@/components';
-import { Receipt, Spinner } from '@phosphor-icons/react';
+import { Receipt } from '@phosphor-icons/react';
 import { compressImage } from '@/libs/imageCompression';
 import { createTransactionWithInvalidation } from '@/libs/mutations';
 import { fetchExchangeRates } from '@/libs/exchange';
@@ -151,9 +151,12 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
   const fareAmount = parseField(draft.fare);
   const tipAmount = parseField(draft.tip);
 
+  // estimateDriverPayout throws on invalid input, so unusable fare or tip values are filtered out before the render path.
+  const usableTip = tipAmount != null && Number.isFinite(tipAmount) && tipAmount >= 0 ? tipAmount : 0;
+
   // Estimasi potongan platform dari fare (Moto / Courier)
   const estimate = fareAmount != null && Number.isFinite(fareAmount) && fareAmount >= 0
-    ? estimateDriverPayout(fareAmount, tipAmount || 0, draft.serviceCategory)
+    ? estimateDriverPayout(fareAmount, usableTip, draft.serviceCategory)
     : null;
 
   const extractedNet = extraction?.net_payout_amount;
@@ -254,7 +257,7 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
         size="md"
         disabled={isProcessing}
         onClick={() => fileInputRef.current?.click()}
-        leftIcon={isProcessing ? <Spinner size={18} className="animate-spin" /> : <Receipt size={18} />}
+        leftIcon={<Receipt size={18} />}
       >
         {isProcessing ? t('finance.driverPayout.reading') : t('finance.driverPayout.importButton')}
       </Button>

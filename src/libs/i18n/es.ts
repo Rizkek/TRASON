@@ -175,7 +175,8 @@ export const es = {
     "optional": "Opcional",
     "save": "Guardar",
     "saving": "Guardando...",
-    "success": "Éxito"
+    "success": "Éxito",
+    "try_again": "Reintentar"
   },
   "dailyTasks": {
     "empty": "Aún no hay tareas. Agrega tu primera tarea diaria."
@@ -686,6 +687,9 @@ export const es = {
     "notif_push_denied": "Notificaciones bloqueadas — actívalas en la configuración del navegador para recibir recordatorios.",
     "notif_push_denied_alert": "El navegador bloqueó las notificaciones o cancelaste la solicitud. Por favor, permite desde la configuración del navegador.",
     "notif_push_request": "Haz clic para activar las notificaciones de recordatorios →",
+    "past_due_message": "Este recordatorio está programado para una hora que ya pasó. Elige una fecha u hora posterior.",
+    "past_due_ok": "Entendido",
+    "past_due_title": "La hora ya pasó",
     "save_reminder": "Guardar",
     "title": "Recordatorios",
     "title_highlight": "",

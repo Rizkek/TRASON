@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Camera, Spinner } from '@phosphor-icons/react';
+import { Camera } from '@phosphor-icons/react';
 import { compressImage } from '@/libs/imageCompression';
 import { createTransactionWithInvalidation } from '@/libs/mutations';
 import { getLocalISODate } from '@/libs/format';
@@ -104,16 +104,13 @@ export function ReceiptUpload({ onUploadSuccess, onError }: Props) {
       <button
         type="button"
         disabled={isUploading}
+        aria-busy={isUploading}
         onClick={() => fileInputRef.current?.click()}
-        className="p-3.5 h-full bg-[#141414] border border-white/5 hover:border-primary/50 text-gray-light hover:text-primary rounded-xl flex items-center justify-center transition-colors disabled:opacity-50"
+        className="p-3.5 h-full bg-gray-strong border border-white/5 hover:border-primary/50 text-gray-light hover:text-primary rounded-xl flex items-center justify-center transition-colors disabled:opacity-50"
         title="Scan Receipt"
         aria-label="Scan Receipt"
       >
-        {isUploading ? (
-          <Spinner size={20} className="animate-spin text-primary" />
-        ) : (
-          <Camera size={20} weight="bold" />
-        )}
+        <Camera size={20} weight="bold" />
       </button>
     </div>
   );

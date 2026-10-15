@@ -23,13 +23,16 @@ module.exports = {
         'danger': '#F87171',
         'warning': '#FB923C',
         'info': '#60A5FA',
+        // Money aliases of the semantic colors, used by finance and career UI
+        'income': '#4ADE80',
+        'expense': '#F87171',
 
         // Neutral grays - Dynamic
         'gray-strong': 'rgb(var(--color-gray-strong) / <alpha-value>)',
         'gray-medium': 'rgb(var(--color-gray-medium) / <alpha-value>)',
         'gray-light': 'rgb(var(--color-gray-light) / <alpha-value>)',
         'gray-very-light': 'rgb(var(--color-gray-very-light) / <alpha-value>)',
-        'accent-purple': '#8B5CF6',  // Static — for avatar gradient
+        'accent-purple': '#8B5CF6',  // Static
 
         // Landing page semantic tokens (light editorial canvas), see globals.css.
         // Namespaced as `lp-*` so they never collide with app-level class names.
@@ -94,9 +97,6 @@ module.exports = {
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in',
         'slide-up': 'slideUp 0.3s ease-out',
-        'subtle-pulse': 'subtlePulse 2s ease-in-out infinite',
-        'shimmer': 'shimmer 4s infinite linear',
-        'marquee': 'marquee 30s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -106,18 +106,6 @@ module.exports = {
         slideUp: {
           '0%': { transform: 'translateY(100%)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        subtlePulse: {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.8' },
-        },
-        shimmer: {
-          '0%': { backgroundPosition: '200% center' },
-          '100%': { backgroundPosition: '-200% center' },
-        },
-        marquee: {
-          '0%': { transform: 'translateX(0%)' },
-          '100%': { transform: 'translateX(-50%)' },
         },
       },
       maxWidth: {

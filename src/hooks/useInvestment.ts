@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import useSWR, { mutate as globalMutate } from 'swr';
+import useSWR from 'swr';
 import { investmentQueries } from '@/services/finance/investmentQueries';
 import {
   buildInvestmentTimelineText,
@@ -20,6 +20,9 @@ import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { getUserErrorMessage, logError } from '@/libs/apiErrors';
 import { executeMutation } from "@/libs/api/mutationBuilder";
+import { invalidateKeys } from '@/libs/cacheInvalidation';
+
+const invalidateInvestments = () => invalidateKeys(INVALIDATION_PATTERNS.onInvestmentChange(), 'investments');
 
 const buildTimelinePayload = (title: string, description: string) => ({
   title,
@@ -124,17 +127,7 @@ export const useInvestment = (): UseInvestmentReturn => {
     return await executeMutation(
             (async () => {
           const position = await investmentQueries.createPosition(dataToCreate);
-          const keysToInvalidate = INVALIDATION_PATTERNS.onInvestmentChange();
-          await Promise.all(keysToInvalidate.map(k => {
-                  if (typeof k === 'string') {
-                    return globalMutate(k);
-                  }
-                  return globalMutate(
-                    (key) => Array.isArray(key) && key[0] === 'investments',
-                    undefined,
-                    { revalidate: true }
-                  );
-                }));
+          await invalidateInvestments();
           return position;
             })(),
             'useInvestment.createPosition'
@@ -149,17 +142,7 @@ export const useInvestment = (): UseInvestmentReturn => {
     return await executeMutation(
             (async () => {
           const updated = await investmentQueries.updatePosition(id, updates);
-          const keysToInvalidate = INVALIDATION_PATTERNS.onInvestmentChange();
-          await Promise.all(keysToInvalidate.map(k => {
-                  if (typeof k === 'string') {
-                    return globalMutate(k);
-                  }
-                  return globalMutate(
-                    (key) => Array.isArray(key) && key[0] === 'investments',
-                    undefined,
-                    { revalidate: true }
-                  );
-                }));
+          await invalidateInvestments();
           return updated;
             })(),
             'useInvestment.updatePosition'
@@ -169,24 +152,13 @@ export const useInvestment = (): UseInvestmentReturn => {
   const deletePosition = useCallback(async (id: string) => {
     return await executeMutation(
         (async () => {
-      const target = positions?.find(p => p.id === id);
       await investmentQueries.deletePosition(id);
-      const keysToInvalidate = INVALIDATION_PATTERNS.onInvestmentChange();
-      await Promise.all(keysToInvalidate.map(k => {
-              if (typeof k === 'string') {
-                return globalMutate(k);
-              }
-              return globalMutate(
-                (key) => Array.isArray(key) && key[0] === 'investments',
-                undefined,
-                { revalidate: true }
-              );
-            }));
+      await invalidateInvestments();
       return true;
         })(),
         'useInvestment.deletePosition'
       );
-  }, [positions]);
+  }, []);
 
   // Combine loading states
   const isLoading = positionsLoading || insightsLoading;

@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Spinner as Loader2, Sparkle } from '@phosphor-icons/react';
 
 interface LoadingProps {
   size?: 'sm' | 'md' | 'lg';
@@ -10,39 +9,32 @@ interface LoadingProps {
   showTip?: boolean;
 }
 
+const textSizeClasses = {
+  sm: 'text-xs',
+  md: 'text-sm',
+  lg: 'text-base',
+};
+
 export const Loading: React.FC<LoadingProps> = ({
   size = 'md',
-  text = 'Loading your experience...',
+  text = 'Loading...',
   fullPage = false,
   showTip = false,
 }) => {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-7 h-7',
-    lg: 'w-10 h-10',
-  };
-
-  const spinner = (
-    <div className="flex flex-col items-center justify-center gap-4" role="status" aria-live="polite">
-      <div className="relative">
-        <div className="absolute inset-0 rounded-full bg-primary/20 blur-md" />
-        <div className="relative flex items-center justify-center rounded-full border border-primary/30 bg-gray-strong/80 p-4">
-          <Loader2 className={`${sizeClasses[size]} animate-spin text-primary`} />
-        </div>
-      </div>
-      {text && <p className="text-gray-very-light text-sm font-medium">{text}</p>}
+  const content = (
+    <div className="flex flex-col items-center justify-center gap-1" role="status" aria-live="polite">
+      {text && <p className={`text-gray-very-light font-medium ${textSizeClasses[size]}`}>{text}</p>}
       {showTip && <p className="text-gray-light text-xs">This usually takes a few seconds.</p>}
-      <Sparkle size={14} className="text-secondary/80 animate-pulse" aria-hidden="true" />
     </div>
   );
 
   if (fullPage) {
     return (
       <div className="fixed inset-0 bg-warm-black/85 backdrop-blur-sm flex items-center justify-center z-50">
-        {spinner}
+        {content}
       </div>
     );
   }
 
-  return spinner;
+  return content;
 };

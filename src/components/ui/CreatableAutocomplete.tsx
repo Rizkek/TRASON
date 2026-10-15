@@ -287,7 +287,7 @@ export function CreatableAutocomplete({
 
         <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {isLoadingApi && (
-            <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+            <span className="text-xs text-gray-light">Loading</span>
           )}
 
           {inputValue && (
@@ -385,9 +385,9 @@ export function CreatableAutocomplete({
                         }}
                       />
                     ) : item.badgeType === 'saved' ? (
-                      <ClockCounterClockwise size={14} className="text-amber-400 shrink-0" />
+                      <ClockCounterClockwise size={14} className="text-warning shrink-0" />
                     ) : item.badgeType === 'api' ? (
-                      <Globe size={14} className="text-blue-400 shrink-0" />
+                      <Globe size={14} className="text-info shrink-0" />
                     ) : type === 'company' ? (
                       <Buildings size={14} className="text-gray-light/60 shrink-0" />
                     ) : (
@@ -409,9 +409,9 @@ export function CreatableAutocomplete({
                       <span
                         className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
                           item.badgeType === 'saved'
-                            ? 'bg-amber-400/15 text-amber-300 border border-amber-400/20'
+                            ? 'bg-warning/15 text-warning border border-warning/20'
                             : item.badgeType === 'api'
-                            ? 'bg-blue-400/15 text-blue-300 border border-blue-400/20'
+                            ? 'bg-info/15 text-info border border-info/20'
                             : 'bg-white/5 text-gray-light border border-white/10'
                         }`}
                       >

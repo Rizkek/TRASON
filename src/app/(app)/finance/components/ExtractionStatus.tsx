@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, WarningCircle, XCircle, Spinner, Robot } from '@phosphor-icons/react';
+import { CheckCircle, WarningCircle, XCircle, Clock, Robot } from '@phosphor-icons/react';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 
 interface Props {
@@ -14,7 +14,7 @@ export function ExtractionStatus({ status, confidence = 0 }: Props) {
     switch (status) {
       case 'processing':
         return {
-          icon: <Spinner size={16} className="animate-spin text-primary" />,
+          icon: <Clock size={16} className="text-primary" />,
           text: 'AI is extracting details...',
           bg: 'bg-primary/10',
           textColor: 'text-primary'

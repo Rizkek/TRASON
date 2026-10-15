@@ -8,7 +8,7 @@ import { Heading, Paragraph } from '@/components/ui/typography';
 import { supabase } from '@/services/supabase/supabaseClient';
 import { userQueries } from '@/services/core/userQueries';
 import { validateEmail, validatePassword, sanitizeError } from '@/libs/validation';
-import { Compass, ArrowLeft, Stack, CheckCircle, Warning as AlertTriangle, Spinner as Loader2, XCircle, Eye, EyeSlash as EyeOff } from '@phosphor-icons/react';
+import { Compass, ArrowLeft, Stack, CheckCircle, Warning as AlertTriangle, XCircle, Eye, EyeSlash as EyeOff } from '@phosphor-icons/react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -155,11 +155,9 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
+    <div className="min-h-dvh bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
       {/* Left Side: Aesthetic (Hidden on mobile) */}
       <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-24 overflow-hidden border-r border-black/[0.05] dark:border-white/[0.05]">
-         <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-deep-sage/10 blur-[100px] rounded-full" />
-         <div className="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-warm-gold/5 blur-[80px] rounded-full" />
          
          <div className="relative z-10 max-w-md space-y-8 animate-fade-in">
             <Stack size={48} className="text-warm-gold opacity-40 mb-6" />
@@ -182,7 +180,7 @@ export default function SignupPage() {
 
       {/* Right Side: Signup Form */}
       <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-24 relative overflow-y-auto">
-        {isLoading && <div className="absolute top-0 left-0 right-0 h-1 bg-warm-gold animate-pulse" />}
+        {isLoading && <div className="absolute top-0 left-0 right-0 h-1 bg-warm-gold" />}
         <Link href="/" className="absolute top-12 z-10 left-16 flex items-center gap-2 text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           <span>Back to Home</span>
@@ -233,10 +231,7 @@ export default function SignupPage() {
               {formData.email && !validationErrors.email && (
                 <div className="mt-1.5 flex items-center gap-1.5">
                   {emailDomainStatus === 'checking' && (
-                    <>
-                      <Loader2 size={12} className="text-gray-light animate-spin" />
-                      <span className="text-[10px] text-gray-light">Verifying email domain...</span>
-                    </>
+                    <span className="text-[10px] text-gray-light">Verifying email domain...</span>
                   )}
                   {emailDomainStatus === 'valid' && (
                     <>
@@ -308,7 +303,7 @@ export default function SignupPage() {
               fullWidth 
               isLoading={isLoading}
               loadingText="Initializing Workspace... (this might take up to a minute)"
-              className="py-6 rounded-full font-bold shadow-xl shadow-warm-gold/10 mt-8"
+              className="py-6 rounded-full font-bold mt-8"
             >
               Create Account
             </Button>

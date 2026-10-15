@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Button, Loading } from '@/components';
+import { Card, Button, Loading } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useGoal } from '@/hooks/useGoal';
 import { formatCurrency, formatNumber } from '@/libs/format';
@@ -10,6 +10,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Target, Plus, CheckCircle, Clock } from '@phosphor-icons/react';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { TOKEN_COLORS } from '@/config/colors';
 
 export function InvestmentGoalsClient() {
   const router = useRouter();
@@ -28,18 +29,18 @@ export function InvestmentGoalsClient() {
 
   if (authLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex items-center justify-center h-[60vh]">
           <Loading text={t('dashboard.checking_session')} />
         </div>
-      </Layout>
+      </>
     );
   }
 
   if (!isAuthenticated) return null;
 
   return (
-    <Layout>
+    <>
       <div className="space-y-8 animate-fade-in">
         {/* Header Section */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -61,7 +62,7 @@ export function InvestmentGoalsClient() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {[...Array(4)].map((_, i) => (
-              <Card key={i} className="p-8 animate-pulse h-48 bg-white/5" />
+              <Card key={i} className="p-8 h-48 bg-white/5" />
             ))}
           </div>
         ) : (
@@ -74,18 +75,12 @@ export function InvestmentGoalsClient() {
                   key={goal.id} 
                   className="p-8 relative overflow-hidden group hover:border-white/20 transition-all duration-300"
                 >
-                  {/* Glassmorphic Background Blur specific to goal color */}
-                  <div 
-                    className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-20 blur-3xl transition-opacity group-hover:opacity-40"
-                    style={{ backgroundColor: goal.color || '#4F46E5' }}
-                  />
-                  
                   <div className="relative z-10 flex flex-col h-full justify-between gap-6">
                     {/* Goal Header */}
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-1 mb-1">
-                          <Target size={16} weight="duotone" style={{ color: goal.color || '#4F46E5' }} />
+                          <Target size={16} weight="duotone" style={{ color: goal.color || TOKEN_COLORS.primary }} />
                           <Paragraph className="text-[10px] tracking-widest uppercase font-semibold text-gray-light">
                             {goal.status === 'completed' ? 'Tercapai' : 'Progres'}
                           </Paragraph>
@@ -123,8 +118,7 @@ export function InvestmentGoalsClient() {
                           className="h-full rounded-full transition-all duration-1000 ease-out"
                           style={{ 
                             width: `${progressPct}%`,
-                            backgroundColor: goal.color || '#4F46E5',
-                            boxShadow: `0 0 10px ${goal.color || '#4F46E5'}80`
+                            backgroundColor: goal.color || TOKEN_COLORS.primary,
                           }}
                         />
                       </div>
@@ -149,6 +143,6 @@ export function InvestmentGoalsClient() {
           </div>
         )}
       </div>
-    </Layout>
+    </>
   );
 }

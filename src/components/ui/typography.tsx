@@ -7,7 +7,6 @@ const headingVariants = cva("font-sans leading-tight tracking-tight", {
     variants: {
         variant: {
             default: "text-warm-black dark:text-soft-cream",
-            gradient: "bg-[linear-gradient(90deg,#A73033_0%,#E88127_50%,#A73033_100%)] bg-clip-text text-transparent w-fit",
             primary: "text-primary",
             secondary: "text-secondary",
             accent: "text-secondary dark:text-primary",
@@ -35,18 +34,6 @@ const headingVariants = cva("font-sans leading-tight tracking-tight", {
             extrabold: "font-extrabold",
         },
     },
-    compoundVariants: [
-        {
-            variant: "gradient",
-            alignment: "center",
-            class: "mx-auto",
-        },
-        {
-            variant: "gradient",
-            alignment: "right",
-            class: "ml-auto",
-        },
-    ],
     defaultVariants: {
         variant: "default",
         size: "h3",

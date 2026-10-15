@@ -10,6 +10,7 @@ import { DEFAULT_MODULE_STATUS, MODULE_METADATA } from '@/modules/registry';
 import { MODULE_ICONS } from './types';
 import { GridNine } from '@phosphor-icons/react';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { TOKEN_COLORS } from '@/config/colors';
 
 interface ModuleItemProps {
   id: ModuleId;
@@ -76,7 +77,7 @@ export const ModuleItem = React.memo(function ModuleItem({
           isEnabled && !allSubFeaturesOff
             ? 'bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]'
             : allSubFeaturesOff
-            ? 'bg-orange-500/[0.04] border-orange-500/20'
+            ? 'bg-warning/[0.04] border-warning/20'
             : 'bg-transparent border-black/[0.02] dark:border-white/[0.02] opacity-60'
         }`}
       >
@@ -85,13 +86,13 @@ export const ModuleItem = React.memo(function ModuleItem({
             className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
             style={{ backgroundColor: `${metadata.color}15` }}
           >
-            <Icon size={20} style={{ color: allSubFeaturesOff ? '#f97316' : metadata.color }} />
+            <Icon size={20} style={{ color: allSubFeaturesOff ? TOKEN_COLORS.warning : metadata.color }} />
           </div>
           <div className="min-w-0">
             <Heading as="h4" size="h4" className="text-sm font-medium text-soft-cream truncate">{t(`nav.${id}`)}</Heading>
             <Paragraph className="text-[10px] text-gray-light">
               {allSubFeaturesOff ? (
-                <span className="text-orange-400">{t('modules.all_sub_off_warning')}</span>
+                <span className="text-warning">{t('modules.all_sub_off_warning')}</span>
               ) : (
                 t(`modules.${id}_desc`)
               )}

@@ -39,7 +39,7 @@ export function PreferencesSection({
                     onClick={() => setPrefs((p) => ({ ...p, theme: th as 'light' | 'dark' }))}
                     className={`px-6 py-2 rounded-md border text-xs font-bold uppercase tracking-widest transition-all ${
                       prefs.theme === th
-                        ? 'bg-primary text-warm-black border-primary shadow-lg shadow-primary/20 scale-105'
+                        ? 'bg-primary text-warm-black border-primary scale-105'
                         : 'bg-soft-cream/5 text-gray-light border-soft-cream/10 hover:bg-soft-cream/10 hover:border-soft-cream/20'
                     }`}
                   >

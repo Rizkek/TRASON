@@ -1,5 +1,4 @@
 'use client';
-'use client';
 
 import { useCallback } from 'react';
 import useSWR, { mutate as globalMutate } from 'swr';
@@ -18,8 +17,6 @@ export interface UseReminderReturn {
   createReminder: (data: Omit<Reminder, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => Promise<Reminder | null>;
   updateReminder: (id: string, data: Partial<Omit<Reminder, 'id' | 'created_at' | 'updated_at'>>) => Promise<Reminder | null>;
   deleteReminder: (id: string) => Promise<boolean>;
-  markReminderDone: (id: string) => Promise<Reminder | null>;
-  unmarkReminderDone: (id: string) => Promise<Reminder | null>;
   mutate: () => Promise<Reminder[] | undefined>;
   refresh: () => Promise<Reminder[] | undefined>;
 }
@@ -51,6 +48,13 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
     SWR_CONFIG_DASHBOARD
   );
 
+  // One refetch per mutation: `mutate` refreshes the shared reminders key for every hook instance, and the
+  // dashboard overview is the only other cache that depends on reminders.
+  const revalidateReminders = useCallback(
+    () => Promise.all([mutate(), globalMutate(CACHE_KEYS.dashboard.overview)]),
+    [mutate]
+  );
+
   const createReminder = useCallback(
     async (dataToCreate: Omit<Reminder, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
       return await executeMutation(
@@ -61,16 +65,13 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
                     { revalidate: false }
                   );
           const newReminder = await reminderQueries.createReminder(dataToCreate);
-          await globalMutate(['reminders', 'pending'], undefined, { revalidate: true });
-          await globalMutate(['reminders', 'completed'], undefined, { revalidate: true });
-          await globalMutate('dashboard:overview', undefined, { revalidate: true });
-          await mutate();
+          await revalidateReminders();
           return newReminder;
             })(),
             'useReminder.create', { onError: async (err) => { await mutate(); } }
           );
     },
-    [mutate]
+    [mutate, revalidateReminders]
   );
 
   const updateReminder = useCallback(
@@ -83,16 +84,13 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
                     { revalidate: false }
                   );
           const updatedReminder = await reminderQueries.updateReminder(id, dataToUpdate);
-          await globalMutate(['reminders', 'pending'], undefined, { revalidate: true });
-          await globalMutate(['reminders', 'completed'], undefined, { revalidate: true });
-          await globalMutate('dashboard:overview', undefined, { revalidate: true });
-          await mutate();
+          await revalidateReminders();
           return updatedReminder;
             })(),
             'useReminder.update', { onError: async (err) => { await mutate(); } }
           );
     },
-    [mutate]
+    [mutate, revalidateReminders]
   );
 
   const deleteReminder = useCallback(async (id: string) => {
@@ -104,53 +102,12 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
               { revalidate: false }
             );
       await reminderQueries.deleteReminder(id);
-      await globalMutate(['reminders', 'pending'], undefined, { revalidate: true });
-      await globalMutate(['reminders', 'completed'], undefined, { revalidate: true });
-      await globalMutate('dashboard:overview', undefined, { revalidate: true });
-      await mutate();
+      await revalidateReminders();
       return true;
         })(),
         'useReminder.delete', { onError: async (err) => { await mutate(); } }
       );
-  }, [mutate]);
-
-  const markReminderDone = useCallback(async (id: string) => {
-    return await executeMutation(
-        (async () => {
-      await mutate(
-              (currentData: Reminder[] | undefined) => 
-                currentData ? currentData.map((r) => (r.id === id ? { ...r, status: 'completed' } : r)) : [],
-              { revalidate: false }
-            );
-      const updatedReminder = await reminderQueries.completeReminder(id);
-      await globalMutate(['reminders', 'pending'], undefined, { revalidate: true });
-      await globalMutate(['reminders', 'completed'], undefined, { revalidate: true });
-      await globalMutate('dashboard:overview', undefined, { revalidate: true });
-      await mutate();
-      return updatedReminder;
-        })(),
-        'useReminder.complete', { onError: async (err) => { await mutate(); } }
-      );
-  }, [mutate]);
-
-  const unmarkReminderDone = useCallback(async (id: string) => {
-    return await executeMutation(
-        (async () => {
-      await mutate(
-              (currentData: Reminder[] | undefined) => 
-                currentData ? currentData.map((r) => (r.id === id ? { ...r, status: 'pending' } : r)) : [],
-              { revalidate: false }
-            );
-      const updatedReminder = await reminderQueries.uncompleteReminder(id);
-      await globalMutate(['reminders', 'pending'], undefined, { revalidate: true });
-      await globalMutate(['reminders', 'completed'], undefined, { revalidate: true });
-      await globalMutate('dashboard:overview', undefined, { revalidate: true });
-      await mutate();
-      return updatedReminder;
-        })(),
-        'useReminder.uncomplete', { onError: async (err) => { await mutate(); } }
-      );
-  }, [mutate]);
+  }, [mutate, revalidateReminders]);
 
   // User-friendly error message
   const userErrorMessage = error ? getUserErrorMessage(error) : null;
@@ -163,8 +120,6 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
     createReminder,
     updateReminder,
     deleteReminder,
-    markReminderDone,
-    unmarkReminderDone,
     mutate,
     refresh: mutate
   };

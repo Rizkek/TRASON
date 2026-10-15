@@ -30,7 +30,7 @@ export function LifeScoreCard() {
   if (isLoading) {
     return (
       <Card className="p-4 bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
-        <div className="h-10 w-full bg-white/[0.02] rounded-lg animate-pulse" />
+        <div className="h-10 w-full bg-white/[0.02] rounded-lg" />
       </Card>
     );
   }
@@ -38,10 +38,10 @@ export function LifeScoreCard() {
   if (!lifeScore) return null;
 
   const scoreColor =
-    lifeScore.overall >= 80 ? 'text-emerald-400 border-emerald-400/30 bg-emerald-400/10' :
-    lifeScore.overall >= 60 ? 'text-amber-400 border-amber-400/30 bg-amber-400/10' :
-    lifeScore.overall >= 40 ? 'text-orange-400 border-orange-400/30 bg-orange-400/10' :
-    'text-red-400 border-red-400/30 bg-red-400/10';
+    lifeScore.overall >= 80 ? 'text-success border-success/30 bg-success/10' :
+    lifeScore.overall >= 60 ? 'text-primary border-primary/30 bg-primary/10' :
+    lifeScore.overall >= 40 ? 'text-warning border-warning/30 bg-warning/10' :
+    'text-danger border-danger/30 bg-danger/10';
 
   const scoreLabel =
     lifeScore.overall >= 80 ? t('life_score.labels.excellent') :
@@ -77,10 +77,10 @@ export function LifeScoreCard() {
           {activeDimensions.map((key) => {
             const val = lifeScore[key];
             const valColor =
-              val >= 80 ? 'text-emerald-400' :
-              val >= 60 ? 'text-amber-400' :
-              val >= 40 ? 'text-orange-400' :
-              'text-red-400';
+              val >= 80 ? 'text-success' :
+              val >= 60 ? 'text-primary' :
+              val >= 40 ? 'text-warning' :
+              'text-danger';
 
             return (
               <div key={key} className="flex items-center gap-1.5 font-medium">

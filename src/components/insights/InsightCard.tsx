@@ -15,10 +15,10 @@ export function InsightCard({ insight, className = '' }: InsightCardProps) {
 
   const renderIcon = () => {
     switch (insight.type) {
-      case 'attention': return <WarningCircle weight="fill" className="w-5 h-5 text-amber-500" />;
-      case 'progress': return <TrendUp weight="bold" className="w-5 h-5 text-emerald-500" />;
-      case 'pattern': return <Sparkle weight="fill" className="w-5 h-5 text-blue-500" />;
-      case 'change': return <TrendUp weight="bold" className="w-5 h-5 text-indigo-500" />;
+      case 'attention': return <WarningCircle weight="fill" className="w-5 h-5 text-warning" />;
+      case 'progress': return <TrendUp weight="bold" className="w-5 h-5 text-success" />;
+      case 'pattern': return <Sparkle weight="fill" className="w-5 h-5 text-info" />;
+      case 'change': return <TrendUp weight="bold" className="w-5 h-5 text-accent-purple" />;
       default: return <Info weight="bold" className="w-5 h-5 text-muted-foreground" />;
     }
   };

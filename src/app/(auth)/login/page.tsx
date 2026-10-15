@@ -34,7 +34,7 @@ function LoginForm() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-warm-black flex items-center justify-center">
+      <div className="min-h-dvh bg-warm-black flex items-center justify-center">
         <Loading text="Authenticating..." />
       </div>
     );
@@ -94,12 +94,10 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
+    <div className="min-h-dvh bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
       {/* Left Side: Aesthetic/Quotes (Hidden on mobile) */}
       <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-24 overflow-hidden border-r border-black/[0.05] dark:border-white/[0.05]">
          {/* Decorative elements */}
-         <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-deep-sage/10 blur-[100px] rounded-full" />
-         <div className="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-warm-gold/5 blur-[80px] rounded-full" />
          
          <div className="relative z-10 max-w-md space-y-8 animate-fade-in">
             <Quotes size={48} className="text-warm-gold opacity-40 mb-6" />
@@ -123,7 +121,7 @@ function LoginForm() {
 
       {/* Right Side: Login Form */}
       <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-24 relative">
-        {isLoading && <div className="absolute top-0 left-0 right-0 h-1 bg-warm-gold animate-pulse" />}
+        {isLoading && <div className="absolute top-0 left-0 right-0 h-1 bg-warm-gold" />}
         <Link href="/" className="absolute top-12 left-16 flex items-center gap-2 text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           <span>Back to Home</span>
@@ -180,7 +178,7 @@ function LoginForm() {
               variant="primary" 
               fullWidth 
               isLoading={isLoading}
-              className="py-6 rounded-full font-bold shadow-xl shadow-warm-gold/10"
+              className="py-6 rounded-full font-bold"
             >
               Open Dashboard
             </Button>
@@ -202,7 +200,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-warm-black flex items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-dvh bg-warm-black flex items-center justify-center">Loading...</div>}>
       <LoginForm />
     </Suspense>
   );

@@ -66,13 +66,13 @@ export function DailyTasksPanel({
             <div className="flex items-center gap-2">
               <div className="flex-1 h-1.5 bg-black/[0.05] dark:bg-white/[0.05] rounded-full overflow-hidden" style={{ width: '120px' }}>
                 <div
-                  className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500"
+                  className="h-full bg-primary rounded-full transition-all duration-500"
                   style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
                 />
               </div>
               <span className="text-[10px] text-gray-light">
                 {completedCount === totalCount && totalCount > 0
-                  ? `🎉 ${t('timeline_page.all_done')}`
+                  ? t('timeline_page.all_done')
                   : `${completedCount} of ${totalCount}`}
               </span>
             </div>
@@ -143,7 +143,7 @@ export function DailyTasksPanel({
                   aria-label={task.completed_today ? 'Mark as not done' : 'Mark as done'}
                 >
                   {task.completed_today ? (
-                    <CheckSquare size={20} className="drop-shadow-[0_0_6px_rgba(0,200,100,0.4)]" />
+                    <CheckSquare size={20} className="" />
                   ) : (
                     <Square size={20} />
                   )}

@@ -53,6 +53,18 @@ export function isReminderPastDue(
   return dueAt !== null && !Number.isNaN(dueAt.getTime()) && dueAt.getTime() <= now.getTime();
 }
 
+/**
+ * True when the due time is earlier than the start of the current minute. The time input has minute
+ * precision and defaults to "now", so a due time within the current minute must still be accepted.
+ */
+export function hasDueTimePassed(dueDatetime: string | Date, now: Date = new Date()): boolean {
+  const due = new Date(dueDatetime).getTime();
+  if (Number.isNaN(due)) return false;
+
+  const startOfMinute = Math.floor(now.getTime() / 60_000) * 60_000;
+  return due < startOfMinute;
+}
+
 /** Calendar date (YYYY-MM-DD) and hour (0-23) of `now` in the given IANA timezone; falls back to UTC. */
 export function getLocalDateHour(now: Date, timeZone: string): { date: string; hour: number } {
   try {

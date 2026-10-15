@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Button, Loading } from '@/components';
+import { Button, Loading, InlineError } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useTransaction } from '@/hooks/useTransaction';
 import { useReminder } from '@/hooks/useReminder';
@@ -35,11 +35,11 @@ import { LifeScoreCard } from './components/LifeScoreCard';
 
 const FinancialChart = dynamic(() => import('./components/FinancialChart').then(mod => mod.FinancialChart), {
   ssr: false,
-  loading: () => <div className="h-64 w-full bg-black/5 dark:bg-white/5 animate-pulse rounded-xl" />
+  loading: () => <div className="h-64 w-full bg-black/5 dark:bg-white/5 rounded-xl" />
 });
 const SpendingBreakdown = dynamic(() => import('./components/SpendingBreakdown').then(mod => mod.SpendingBreakdown), {
   ssr: false,
-  loading: () => <div className="h-64 w-full bg-black/5 dark:bg-white/5 animate-pulse rounded-xl" />
+  loading: () => <div className="h-64 w-full bg-black/5 dark:bg-white/5 rounded-xl" />
 });
 
 const CURRENT_DATE = new Date();
@@ -60,8 +60,8 @@ export function DashboardClient() {
   const { start: financeStart, end: financeEnd } = useMemo(() => getDateRange(financeMonth, financeYear), [financeMonth, financeYear]);
 
   // SWR Hooks
-  const { transactions } = useTransaction(financeStart, financeEnd);
-  const { reminders, isLoading: remindersLoading } = useReminder();
+  const { transactions, userErrorMessage: transactionsError, refresh: refreshTransactions } = useTransaction(financeStart, financeEnd);
+  const { reminders, isLoading: remindersLoading, userErrorMessage: remindersError, refresh: refreshReminders } = useReminder();
   const { summary: sportSummary, isLoading: sportLoading } = useWeeklySportSummary();
   const { stats: careerStats, nextInterview, isLoading: careerLoading } = useCareer();
   const { subscriptions } = useSubscription();
@@ -133,23 +133,33 @@ export function DashboardClient() {
 
   if (authLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex items-center justify-center h-[60vh]">
           <Loading text={t('dashboard.checking_session')} />
         </div>
-      </Layout>
+      </>
     );
   }
 
   if (!isAuthenticated) return null;
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6 animate-fade-in max-w-6xl mx-auto pb-12">
+        {(transactionsError || remindersError) && (
+          <InlineError
+            message={transactionsError || remindersError || ''}
+            retryLabel={t('common.try_again')}
+            onRetry={() => {
+              refreshTransactions();
+              refreshReminders();
+            }}
+          />
+        )}
         {/* 1. Contextual Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pt-1 pb-2">
           <div>
-            <Heading as="h1" size="h2" weight="semibold" className="flex flex-wrap items-baseline gap-x-2 text-gray-900 dark:text-soft-cream">
+            <Heading as="h1" size="h2" weight="semibold" className="flex flex-wrap items-baseline gap-x-2 text-warm-black dark:text-soft-cream">
               <span className="opacity-80">{greeting},</span>
               <span>{user?.first_name || user?.name?.split(' ')[0] || 'User'}</span>
             </Heading>
@@ -175,18 +185,18 @@ export function DashboardClient() {
 
         {/* 2. Needs Attention (Conditional Alerts) */}
         {isFinanceEnabled && dueSubscriptions.length > 0 && (
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-5 flex items-start sm:items-center justify-between gap-4">
+          <div className="bg-warning/10 border border-warning/30 rounded-xl p-5 flex items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="bg-amber-500/20 p-2 rounded-lg text-amber-400 shrink-0">
+              <div className="bg-warning/20 p-2 rounded-lg text-warning shrink-0">
                 <TrasonIcon icon={Warning} size={18} />
               </div>
               <div>
-                <Paragraph className="text-amber-600 dark:text-amber-300 text-label-sm font-bold">
+                <Paragraph className="text-warning text-label-sm font-bold">
                   {dueSubscriptions.length === 1
                     ? t('dashboard.subscriptions_due_single')
                     : t('dashboard.subscriptions_due_multiple').replace('{count}', dueSubscriptions.length.toString())}
                 </Paragraph>
-                <Paragraph className="text-token-micro text-amber-600/80 dark:text-amber-300/80 mt-0.5 truncate max-w-md">
+                <Paragraph className="text-token-micro text-warning/80 mt-0.5 truncate max-w-md">
                   {dueSubscriptions.map(s => s.name).join(', ')}
                 </Paragraph>
               </div>
@@ -195,7 +205,7 @@ export function DashboardClient() {
               variant="outline" 
               size="sm" 
               onClick={() => router.push('/finance/subscriptions')}
-              className="shrink-0 border-amber-500/40 text-amber-300 hover:bg-amber-500/20 text-label-sm px-3 py-1"
+              className="shrink-0 border-warning/40 text-warning hover:bg-warning/20 text-label-sm px-3 py-1"
             >
               {t('dashboard.review')}
             </Button>
@@ -289,6 +299,6 @@ export function DashboardClient() {
           </div>
         )}
       </div>
-    </Layout>
+    </>
   );
 }

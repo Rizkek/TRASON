@@ -2,15 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Button, Loading, Modal, Input, ErrorAlert, Calendar as CalendarUI, DatePicker } from '@/components';
+import { Button, Loading, Modal, NoticeModal, InlineError, Input, ErrorAlert, Calendar as CalendarUI, DatePicker } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useReminder } from '@/hooks/useReminder';
 
-import { validateReminder, sanitizeError } from '@/libs/validation';
+import { validateReminder, sanitizeError, REMINDER_PAST_DUE_ERROR } from '@/libs/validation';
+import { ApiError } from '@/libs/apiErrors';
 import { Reminder } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Bell, BellSlash as BellOff, CheckCircle, Clock, Plus, Trash as Trash2, PencilSimple as Edit2, List, Calendar as CalendarIcon } from '@phosphor-icons/react';
+import { Bell, BellSlash as BellOff, Clock, Plus, Trash as Trash2, PencilSimple as Edit2, List, Calendar as CalendarIcon } from '@phosphor-icons/react';
 import { getLocalISODate } from '@/libs/format';
 import { formatDateOnly } from '@/libs/date';
 import { useHolidays } from '@/hooks/useHolidays';
@@ -22,7 +23,7 @@ export function RemindersClient() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
-  const { reminders = [], isLoading: isRemindersLoading, createReminder, updateReminder, deleteReminder, markReminderDone, unmarkReminderDone } = useReminder();
+  const { reminders = [], isLoading: isRemindersLoading, userErrorMessage: loadError, refresh: refreshReminders, createReminder, updateReminder, deleteReminder } = useReminder();
   const { t } = useTranslation();
   const { locale, timezone } = useUserPreferences();
   const { holidays } = useHolidays();
@@ -37,7 +38,7 @@ export function RemindersClient() {
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
-
+  const [isPastDueNoticeOpen, setIsPastDueNoticeOpen] = useState(false);
 
   const remindersActiveEnabled = module_features?.['reminders_active'] !== false;
   const remindersHistoryEnabled = module_features?.['reminders_history'] !== false;
@@ -155,14 +156,30 @@ export function RemindersClient() {
       return;
     }
 
+    const dueLocal = form.dueDate && form.dueTime ? `${form.dueDate}T${form.dueTime}` : undefined;
+
+    // A past due time is refused for new reminders and for edits that move the due time; editing other
+    // fields of an already-overdue reminder stays allowed. Compared per minute, the input's precision.
+    const toMinute = (ms: number) => Math.floor(ms / 60_000);
+    const dueChanged =
+      !editingReminder?.due_datetime ||
+      !dueLocal ||
+      toMinute(new Date(dueLocal).getTime()) !== toMinute(new Date(editingReminder.due_datetime).getTime());
+
     // Validate first before setting loading state
-    const validation = validateReminder({
-      ...form,
-      due_datetime: form.dueDate && form.dueTime ? `${form.dueDate}T${form.dueTime}` : undefined,
-      status: editingReminder?.status || 'pending',
-    });
+    const validation = validateReminder(
+      {
+        ...form,
+        due_datetime: dueLocal,
+        status: editingReminder?.status || 'pending',
+      },
+      { rejectPastDue: !editingReminder || dueChanged }
+    );
     if (!validation.isValid) {
-      setFormErrors(validation.errors);
+      // The validator keys due errors as due_date/due_datetime; the inputs read dueDate.
+      const dueError = validation.errors.due_datetime ?? validation.errors.due_date;
+      setFormErrors({ ...validation.errors, ...(dueError ? { dueDate: dueError } : {}) });
+      if (dueError === REMINDER_PAST_DUE_ERROR) setIsPastDueNoticeOpen(true);
       return;
     }
 
@@ -195,6 +212,11 @@ export function RemindersClient() {
       }
       setIsModalOpen(false);
     } catch (err) {
+      if (err instanceof ApiError && err.code === 'REMINDER_PAST_DUE') {
+        setFormErrors({ dueDate: REMINDER_PAST_DUE_ERROR });
+        setIsPastDueNoticeOpen(true);
+        return;
+      }
       const errorMessage = sanitizeError(err);
       setError(errorMessage);
       console.error('Failed to save reminder:', err);
@@ -203,25 +225,22 @@ export function RemindersClient() {
     }
   };
 
-  const toggleStatus = async (reminder: Reminder) => {
-    try {
-      setIsSaving(true);
-      if (reminder.status === 'completed') {
-        await unmarkReminderDone(reminder.id);
-      } else {
-        await markReminderDone(reminder.id);
-      }
-    } catch (err) {
-      setError(sanitizeError(err));
-    } finally {
-      setIsSaving(false);
-    }
+  const formatReminderTime = (reminder: Reminder, withDate: boolean) => {
+    const raw = reminder.due_datetime || reminder.due_date;
+    const date = raw ? new Date(raw) : null;
+    if (!date || isNaN(date.getTime())) return '—';
+    return date.toLocaleString(locale, {
+      ...(withDate && { day: 'numeric', month: 'short', year: 'numeric' }),
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: timezone || 'UTC',
+    });
   };
 
   if (authLoading || isRemindersLoading) return (
-    <Layout>
+    <>
       <div className="flex justify-center py-12"><Loading text={t('dashboard.checking_session')} /></div>
-    </Layout>
+    </>
   );
 
   const selectedDateReminders = reminders.filter(r => {
@@ -233,8 +252,11 @@ export function RemindersClient() {
   });
 
   return (
-    <Layout>
+    <>
       <div className="space-y-12 animate-fade-in pb-24">
+        {loadError && (
+          <InlineError message={loadError} onRetry={() => refreshReminders()} retryLabel={t('common.try_again')} />
+        )}
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
@@ -321,37 +343,33 @@ export function RemindersClient() {
                     reminders
                       .filter(r => filter === 'active' ? isReminderActive(r) : isReminderInHistory(r))
                       .map(reminder => (
-                      <div key={reminder.id} className="glass-card p-8 flex items-center justify-between group">
-                        <div className="flex items-center gap-8">
-                          <button 
-                            onClick={() => toggleStatus(reminder)}
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-                              reminder.status === 'completed' ? 'bg-income border-income text-warm-black' : 'border-gray-medium hover:border-warm-gold'
-                            }`}
-                          >
-                            {reminder.status === 'completed' && <CheckCircle size={14} />}
-                          </button>
-                          <div>
-                            <Heading as="h4" size="h4" className={`text-lg font-medium ${reminder.status === 'completed' ? 'line-through opacity-40' : ''}`}>{reminder.title}</Heading>
-                            {reminder.status === 'pending' && isReminderPastDue(now, reminder) && (
-                              <Paragraph className="text-xs text-warning">{t('reminders_page.expired')}</Paragraph>
+                      <div key={reminder.id} className="glass-card p-5 md:p-8 flex items-center justify-between gap-4">
+                        <div className="min-w-0 space-y-1">
+                          <Heading as="h4" size="h4" className="text-lg font-medium break-words">{reminder.title}</Heading>
+                          {filter === 'history' && reminder.description && (
+                            <Paragraph className="text-sm text-gray-light font-light break-words">{reminder.description}</Paragraph>
+                          )}
+                          <div className="flex items-center gap-3 text-micro text-gray-light uppercase tracking-widest">
+                            <Clock size={12} />
+                            <span>{formatReminderTime(reminder, filter === 'history')}</span>
+                            {filter === 'active' && (
+                              <>
+                                <span>•</span>
+                                <span className={reminder.priority === 'high' ? 'text-expense font-bold' : ''}>{t(`career_page.form.options.${reminder.priority}`)}</span>
+                              </>
                             )}
-                            <div className="flex items-center gap-4 text-micro text-gray-light uppercase tracking-widest mt-1">
-                              <Clock size={12} />
-                              <span>{(() => { const raw = reminder.due_datetime || reminder.due_date; if (!raw) return '—'; const d = new Date(raw); return isNaN(d.getTime()) ? '—' : d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone || 'UTC' }); })()}</span>
-                              <span>•</span>
-                              <span className={reminder.priority === 'high' ? 'text-expense font-bold' : ''}>{t(`career_page.form.options.${reminder.priority}`)}</span>
-                            </div>
                           </div>
                         </div>
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">
-                           <button onClick={() => openEditModal(reminder)} className="text-gray-light hover:text-warm-gold p-2">
-                             <Edit2 size={16} />
-                           </button>
-                           <button onClick={() => deleteReminder(reminder.id)} className="text-gray-light hover:text-expense p-2">
-                             <Trash2 size={18} />
-                           </button>
-                        </div>
+                        {filter === 'active' && (
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <button onClick={() => openEditModal(reminder)} aria-label={t('common.edit')} className="text-gray-light hover:text-warm-gold p-3">
+                              <Edit2 size={18} />
+                            </button>
+                            <button onClick={() => deleteReminder(reminder.id)} aria-label={t('common.delete')} className="text-gray-light hover:text-expense p-3">
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))
                   )
@@ -396,7 +414,7 @@ export function RemindersClient() {
              </div>
              
              {/* Weekly Context - Small Summary */}
-             <div className="glass-card p-8 bg-gradient-to-br from-gray-strong to-warm-black">
+             <div className="glass-card p-8 bg-gray-strong">
                 <Heading as="h4" size="h4" className="text-micro uppercase tracking-[0.3em] text-deep-sage font-bold mb-4">{t('reminders_page.weekly_focus')}</Heading>
                 <Paragraph className="text-sm font-light text-gray-very-light leading-relaxed">
                   {t('reminders_page.weekly_focus_desc').split('{count}').map((part, i, arr) => 
@@ -407,6 +425,14 @@ export function RemindersClient() {
           </div>
         </div>
       </div>
+
+      <NoticeModal
+        isOpen={isPastDueNoticeOpen}
+        onClose={() => setIsPastDueNoticeOpen(false)}
+        title={t('reminders_page.past_due_title')}
+        message={t('reminders_page.past_due_message')}
+        buttonText={t('reminders_page.past_due_ok')}
+      />
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
@@ -512,6 +538,6 @@ export function RemindersClient() {
           <Plus size={24} />
         </Button>
       </div>
-    </Layout>
+    </>
   );
 }

@@ -51,7 +51,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         border: 'border-info/45',
         text: 'text-soft-cream',
         title: 'text-soft-cream font-semibold',
-        icon: 'ℹ',
+        icon: 'i',
       },
     };
 

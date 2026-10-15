@@ -6,17 +6,6 @@ export interface SportExercise {
   isCustom?: boolean;
 }
 
-export const EXERCISE_CATEGORIES = [
-  'Chest (Dada)',
-  'Back (Punggung)',
-  'Legs (Kaki)',
-  'Shoulders (Bahu)',
-  'Arms (Lengan)',
-  'Core (Perut)',
-  'Cardio',
-  'Racket & Team Sports',
-] as const;
-
 export const CURATED_EXERCISES: SportExercise[] = [
   // --- CHEST ---
   { id: 'bench-press', name: 'Barbell Bench Press', category: 'Chest (Dada)', equipment: 'Barbell' },

@@ -39,20 +39,3 @@ export async function fetchExchangeRates(): Promise<ExchangeRates | null> {
     return null;
   }
 }
-
-export function convertCurrency(
-  amount: number,
-  fromCurrency: string,
-  toCurrency: string,
-  ratesData: ExchangeRates
-): number {
-  if (fromCurrency === toCurrency) return amount;
-  
-  const rateFrom = ratesData.rates[fromCurrency];
-  const rateTo = ratesData.rates[toCurrency];
-  
-  if (!rateFrom || !rateTo) return amount; // fallback
-
-  // Convert to base (USD), then to target
-  return (amount / rateFrom) * rateTo;
-}

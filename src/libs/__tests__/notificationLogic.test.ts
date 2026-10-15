@@ -1,9 +1,30 @@
 import {
   getDueNotifications,
   getLocalDateHour,
+  hasDueTimePassed,
   isReminderPastDue,
   shouldSendTaskReminder,
 } from '@/libs/notificationLogic';
+
+describe('hasDueTimePassed', () => {
+  const now = new Date('2026-10-15T10:30:45.000Z');
+
+  it('accepts a due time within the current minute', () => {
+    expect(hasDueTimePassed('2026-10-15T10:30:00.000Z', now)).toBe(false);
+  });
+
+  it('rejects a due time in an earlier minute', () => {
+    expect(hasDueTimePassed('2026-10-15T10:29:59.000Z', now)).toBe(true);
+  });
+
+  it('accepts future due times', () => {
+    expect(hasDueTimePassed('2026-10-15T10:31:00.000Z', now)).toBe(false);
+  });
+
+  it('does not flag an unparseable value', () => {
+    expect(hasDueTimePassed('not-a-date', now)).toBe(false);
+  });
+});
 
 describe('isReminderPastDue', () => {
   const now = new Date('2026-10-03T10:00:00.000Z');

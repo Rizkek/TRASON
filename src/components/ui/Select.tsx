@@ -87,7 +87,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             id={id}
             className={`w-full bg-gray-strong/80 hover:bg-gray-strong/95 border ${
               error
-                ? 'border-red-500/70 focus:border-red-500 focus:ring-red-500/30'
+                ? 'border-danger/70 focus:border-danger focus:ring-danger/30'
                 : 'border-white/10 hover:border-white/20 focus:border-primary focus:ring-primary/30'
             } transition-all duration-200 text-soft-cream flex items-center justify-between gap-2 shadow-sm focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
               sizeClasses[size]
@@ -165,7 +165,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
           </SelectPrimitive.Portal>
         </SelectPrimitive.Root>
 
-        {error && <p className="text-xs text-red-400 font-medium">{error}</p>}
+        {error && <p className="text-xs text-danger font-medium">{error}</p>}
       </div>
     );
   }
