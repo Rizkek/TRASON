@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient, getAuthenticatedUser } from '@/utils/supabase/server';
+import { ALLOWED_RECEIPT_MIME_TYPES, MAX_RECEIPT_BYTES, sanitizeReceiptFileName } from '@/libs/receiptStorage';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,13 +18,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No receipt file provided.' }, { status: 400 });
     }
 
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'File must be an image.' }, { status: 400 });
+    if (!ALLOWED_RECEIPT_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json({ error: 'File must be a JPEG, PNG, WebP or HEIC image.' }, { status: 400 });
+    }
+
+    if (file.size > MAX_RECEIPT_BYTES) {
+      return NextResponse.json({ error: 'Image is too large (max 10 MB).' }, { status: 413 });
     }
 
     const supabase = await createClient();
     const uuid = crypto.randomUUID();
-    const fileName = `${user.id}/${uuid}-${file.name}`;
+    const fileName = `${user.id}/${uuid}-${sanitizeReceiptFileName(file.name)}`;
 
     const { data, error } = await supabase.storage
       .from('receipts')

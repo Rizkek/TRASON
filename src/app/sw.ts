@@ -219,6 +219,59 @@ self.addEventListener('push', (event) => {
   }
 });
 
+// The browser may rotate a push endpoint while the app is closed. Re-register the new one
+// with the server so the cron keeps reaching this device without waiting for the next app open.
+interface PushSubscriptionChangeEvent extends ExtendableEvent {
+  oldSubscription?: PushSubscription | null;
+  newSubscription?: PushSubscription | null;
+}
+
+const toBase64 = (buffer: ArrayBuffer) => {
+  let binary = '';
+  new Uint8Array(buffer).forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary);
+};
+
+self.addEventListener('pushsubscriptionchange', (rawEvent) => {
+  const event = rawEvent as PushSubscriptionChangeEvent;
+
+  event.waitUntil(
+    (async () => {
+      try {
+        const oldSubscription = event.oldSubscription ?? undefined;
+        const applicationServerKey = oldSubscription?.options.applicationServerKey;
+        const subscription =
+          event.newSubscription ??
+          (applicationServerKey
+            ? await self.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })
+            : null);
+        if (!subscription) return;
+
+        const p256dh = subscription.getKey('p256dh');
+        const auth = subscription.getKey('auth');
+        if (!p256dh || !auth) return;
+
+        await fetch('/api/push/subscribe', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            endpoint: subscription.endpoint,
+            p256dh: toBase64(p256dh),
+            auth: toBase64(auth),
+            userAgent: navigator.userAgent,
+            oldEndpoint: oldSubscription?.endpoint,
+          }),
+        });
+      } catch (err) {
+        console.error('[SW] pushsubscriptionchange handling failed:', err);
+      }
+    })()
+  );
+});
+
 // Handle Notification Clicks
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();

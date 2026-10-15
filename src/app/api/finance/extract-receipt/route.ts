@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuthenticatedUser, createClient } from '@/utils/supabase/server';
 import { GeminiReceiptExtractor, receiptExtractionSchema } from '@/services/ai/receiptExtractor';
 import { validateReceiptDeterministic } from '@/services/finance/capture/captureValidator';
+import { downloadReceiptAsDataUrl, isOwnedReceiptPath } from '@/libs/receiptStorage';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // Allow more time for AI processing on Vercel
@@ -13,13 +14,30 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { receiptUrl, transactionId, fileName, mimeType, fileSize } = await req.json();
+    const { transactionId, fileName, mimeType, fileSize } = await req.json();
 
-    if (!receiptUrl || !transactionId) {
-      return NextResponse.json({ error: 'Missing required parameters (receiptUrl, transactionId).' }, { status: 400 });
+    if (typeof transactionId !== 'string' || !isOwnedReceiptPath(fileName, user.id)) {
+      return NextResponse.json({ error: 'Missing or invalid parameters (transactionId, fileName).' }, { status: 400 });
     }
 
     const supabase = await createClient();
+
+    const { data: transaction } = await supabase
+      .from('transactions')
+      .select('id')
+      .eq('id', transactionId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (!transaction) {
+      return NextResponse.json({ error: 'Transaction not found.' }, { status: 404 });
+    }
+
+    // The server only reads files from the caller's own storage folder; client-supplied URLs are never fetched.
+    const download = await downloadReceiptAsDataUrl(supabase, fileName);
+    if ('error' in download) {
+      return NextResponse.json({ error: download.error }, { status: download.status });
+    }
 
     // 1. Initial metadata insert to indicate processing
     const { error: insertError } = await supabase
@@ -27,8 +45,8 @@ export async function POST(req: Request) {
       .insert({
         transaction_id: transactionId,
         user_id: user.id,
-        storage_path: fileName || null,
-        mime_type: mimeType || null,
+        storage_path: fileName,
+        mime_type: mimeType || download.mimeType,
         file_size_bytes: fileSize || null,
         extraction_status: 'processing',
       });
@@ -40,36 +58,12 @@ export async function POST(req: Request) {
 
     // 2. Extract with AI
     const extractor = new GeminiReceiptExtractor();
-    const prompt = `Extract the merchant name, date, total amount, and all itemized purchases from this receipt. 
-    Ensure the item names are concise and clean. 
-    If you see a total but the items don't add up to it (due to tax/service), include tax/service as items if possible, or just extract exactly what's printed. 
+    const prompt = `Extract the merchant name, date, total amount, and all itemized purchases from this receipt.
+    Ensure the item names are concise and clean.
+    If you see a total but the items don't add up to it (due to tax/service), include tax/service as items if possible, or just extract exactly what's printed.
     Do not guess amounts.`;
 
-    let dataUrl = receiptUrl;
-    if (receiptUrl.includes('supabase.co')) {
-      // Since the bucket might be private, download the file using the server-side Supabase client
-      let filePath = fileName;
-      if (!filePath) {
-        try {
-          const urlObj = new URL(receiptUrl);
-          filePath = decodeURIComponent(urlObj.pathname.split('/storage/v1/object/public/receipts/')[1]);
-        } catch (e) {
-          // ignore
-        }
-      }
-
-      if (filePath) {
-        const { data: fileData, error: downloadError } = await supabase.storage.from('receipts').download(filePath);
-        if (!downloadError && fileData) {
-          const arrayBuffer = await fileData.arrayBuffer();
-          const base64 = Buffer.from(arrayBuffer).toString('base64');
-          const mime = fileData.type || mimeType || 'image/jpeg';
-          dataUrl = `data:${mime};base64,${base64}`;
-        }
-      }
-    }
-
-    const result = await extractor.extractJSON(dataUrl, receiptExtractionSchema, prompt);
+    const result = await extractor.extractJSON(download.dataUrl, receiptExtractionSchema, prompt);
 
     if (result.error || !result.data) {
       // Mark as failed

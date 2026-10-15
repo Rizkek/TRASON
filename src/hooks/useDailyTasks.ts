@@ -82,27 +82,25 @@ export function useDailyTasks(): UseDailyTasksReturn {
       // Guard: ignore clicks while a toggle for this task is already in flight
       if (pendingToggleIds.current.has(id)) return;
       pendingToggleIds.current.add(id);
+
+      // SWR's `optimisticData` and async mutators receive the last *committed* data, which excludes
+      // other toggles still in flight. Using them made a second checkbox wipe the first one's pending
+      // state. Plain updaters run on the data currently displayed, so each toggle patches only its own row.
+      const patchTask = (changes: Partial<DailyTask>) =>
+        mutate((current) => current?.map((t) => (t.id === id ? { ...t, ...changes } : t)), {
+          revalidate: false,
+        });
+
       try {
-        await executeMutation(
-          (async () => {
-            await mutate(
-              async (current: DailyTask[] | undefined) => {
-                const updatedData = await dailyTaskQueries.toggleTask(id, completed);
-                if (!current) return [updatedData];
-                return current.map((t) => (t.id === id ? updatedData : t));
-              },
-              {
-                optimisticData: (current: DailyTask[] | undefined) =>
-                  current ? current.map((t) =>
-                    t.id === id ? { ...t, completed_today: completed } : t
-                  ) : [],
-                rollbackOnError: true,
-                revalidate: false,
-              }
-            );
-          })(),
-          'useDailyTasks.toggleTask'
+        await patchTask({ completed_today: completed });
+
+        const saved = await executeMutation(
+          dailyTaskQueries.toggleTask(id, completed),
+          'useDailyTasks.toggleTask',
+          { throwOnError: false }
         );
+
+        await patchTask(saved ?? { completed_today: !completed });
       } finally {
         pendingToggleIds.current.delete(id);
       }

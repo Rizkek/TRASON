@@ -28,25 +28,12 @@ export class GeminiReceiptExtractor implements VisionProvider {
     prompt: string
   ): Promise<VisionExtractionResult<T>> {
     try {
-      let base64 = '';
-      let mimeType = 'image/jpeg';
-
-      if (imageUrlOrBase64.startsWith('data:image/')) {
-        // It's already a base64 data URL
-        const [header, data] = imageUrlOrBase64.split(',');
-        mimeType = header.replace('data:', '').replace(';base64', '');
-        base64 = data;
-      } else {
-        // Let's fetch the image and convert to base64 to ensure Gemini can read it.
-        const imageResponse = await fetch(imageUrlOrBase64);
-        if (!imageResponse.ok) {
-          const errorText = await imageResponse.text();
-          throw new Error(`Failed to fetch image from ${imageUrlOrBase64}: ${imageResponse.status} ${errorText}`);
-        }
-        const arrayBuffer = await imageResponse.arrayBuffer();
-        base64 = Buffer.from(arrayBuffer).toString('base64');
-        mimeType = imageResponse.headers.get('content-type') || 'image/jpeg';
+      // Only inline data URLs are accepted: fetching arbitrary URLs from the server would be an SSRF vector.
+      if (!imageUrlOrBase64.startsWith('data:image/')) {
+        throw new Error('Only base64 image data URLs are supported.');
       }
+      const [header, base64] = imageUrlOrBase64.split(',');
+      const mimeType = header.replace('data:', '').replace(';base64', '');
 
       const { object } = await generateObject({
         model: aiModels.vision(),

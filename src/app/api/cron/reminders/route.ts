@@ -1,320 +1,249 @@
-/* eslint-disable no-console */
-import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import webpush from 'web-push';
 import { z } from 'zod';
-import { isReminderDue } from '@/libs/notificationLogic';
+import { getDueNotifications } from '@/libs/notificationLogic';
+import { authorizeCron } from '@/libs/cron/auth';
+import {
+  configureWebPush,
+  createAdminClient,
+  type AdminClient,
+  cronError,
+  cronResponse,
+  recordCronRun,
+  sendToSubscription,
+} from '@/libs/cron/push';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
-// ─── Zod Schemas ─────────────────────────────────────────────────────────────
+// How long a missed trigger stays deliverable; covers failed or skipped cron runs.
+const CATCHUP_MINUTES = 15;
+// Upper bound for notify_times offsets when selecting candidate reminders.
+const LOOKAHEAD_DAYS = 30;
+const PUSH_TTL_SECONDS = 4 * 60 * 60;
+const LEDGER_RETENTION_DAYS = 7;
+const CRON_RUN_RETENTION_DAYS = 30;
+const STALE_SUBSCRIPTION_DAYS = 90;
 
 const ReminderRowSchema = z.object({
   id: z.string(),
   user_id: z.string(),
   title: z.string(),
-  priority: z.enum(['low', 'medium', 'high']).optional(),
-  due_datetime: z.string().nullable().optional(),
+  priority: z.enum(['low', 'medium', 'high']).nullable().optional(),
+  due_datetime: z.string(),
   due_time: z.string().nullable().optional(),
   notify_times: z.array(z.number()).nullable().optional(),
 });
 
-const PushSubscriptionRowSchema = z.object({
+const SubscriptionRowSchema = z.object({
   user_id: z.string(),
-  endpoint: z.string().min(1, 'endpoint cannot be empty'),
-  p256dh: z.string().min(1, 'p256dh cannot be empty'),
-  auth: z.string().min(1, 'auth cannot be empty'),
+  endpoint: z.string().min(1),
+  p256dh: z.string().min(1),
+  auth: z.string().min(1),
+  failure_count: z.number().nullable().optional(),
 });
 
 type ReminderRow = z.infer<typeof ReminderRowSchema>;
 
-// ─────────────────────────────────────────────────────────────────────────────
+interface Candidate {
+  reminder: ReminderRow;
+  notifyMinutes: number;
+  dueAt: Date;
+}
 
-// ─────────────────────────────────────────────────────────────────────────────
+const claimKey = (reminderId: string, notifyMinutes: number, dueAt: Date | string) =>
+  `${reminderId}|${notifyMinutes}|${new Date(dueAt).getTime()}`;
+
+const daysAgo = (days: number, from: Date) => new Date(from.getTime() - days * 24 * 60 * 60 * 1000).toISOString();
 
 export async function GET(request: Request) {
-  const now = new Date();
-  console.log(`[CRON-REMINDERS] [${now.toISOString()}] Route invoked.`);
+  const unauthorized = authorizeCron(request);
+  if (unauthorized) return unauthorized;
 
-  // Validate Secret
-  const authHeader = request.headers.get('Authorization');
-  const url = new URL(request.url);
-  const querySecret = url.searchParams.get('secret');
-  const expectedSecret = process.env.CRON_SECRET;
-
-  console.log(`[CRON-REMINDERS] Auth present: ${!!authHeader}, CRON_SECRET set: ${!!expectedSecret}`);
-
-  if (expectedSecret && authHeader !== `Bearer ${expectedSecret}` && querySecret !== expectedSecret) {
-    console.warn('[CRON-REMINDERS] Unauthorized access attempt.');
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const startedAt = new Date();
+  const now = startedAt;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseKey) return cronError('Supabase credentials missing');
 
-  if (!supabaseUrl || !supabaseKey) {
-    console.error(`[CRON-REMINDERS] Supabase credentials missing!`);
-    return NextResponse.json({ error: 'Supabase credentials missing' }, { status: 500 });
+  const supabase = createAdminClient(supabaseUrl, supabaseKey);
+
+  if (now.getUTCMinutes() === 0) {
+    await runHourlyMaintenance(supabase, now);
   }
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const windowStart = new Date(now.getTime() - CATCHUP_MINUTES * 60 * 1000).toISOString();
+  const windowEnd = new Date(now.getTime() + LOOKAHEAD_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-  // --- Cleanup stale subscriptions (not used in 90+ days) ---
-  const staleThreshold = new Date();
-  staleThreshold.setDate(staleThreshold.getDate() - 90);
-  const { error: cleanupError } = await supabase
-    .from('push_subscriptions')
-    .update({ is_active: false })
-    .eq('is_active', true)
-    .lt('last_used_at', staleThreshold.toISOString());
-
-  if (cleanupError) {
-    console.warn('[CRON-REMINDERS] Stale cleanup failed (non-fatal):', cleanupError.message);
-  } else {
-    console.log('[CRON-REMINDERS] Stale subscription cleanup done.');
-  }
-  // -----------------------------------------------------------
-
-  // Fetch pending reminders with a wide UTC window that covers "today" across all timezones
-  // (UTC-12 to UTC+14 = 38h window). Per-user timezone filtering happens in memory below.
-  const startOfWindowUTC = new Date();
-  startOfWindowUTC.setUTCHours(0, 0, 0, 0);
-  startOfWindowUTC.setUTCDate(startOfWindowUTC.getUTCDate() - 1); // cover UTC-12 (yesterday UTC)
-  const endOfWindowUTC = new Date();
-  endOfWindowUTC.setUTCHours(23, 59, 59, 999);
-  endOfWindowUTC.setUTCDate(endOfWindowUTC.getUTCDate() + 30); // look ahead up to 30 days for early notify_times
-
-  console.log(`[CRON-REMINDERS] Fetching pending reminders in window: ${startOfWindowUTC.toISOString()} → ${endOfWindowUTC.toISOString()}`);
   const { data: rawReminders, error: remindersError } = await supabase
     .from('reminders')
     .select('id, user_id, title, priority, due_datetime, due_time, notify_times')
     .eq('status', 'pending')
     .is('deleted_at', null)
     .not('due_datetime', 'is', null)
-    .gte('due_datetime', startOfWindowUTC.toISOString())
-    .lte('due_datetime', endOfWindowUTC.toISOString());
+    .gte('due_datetime', windowStart)
+    .lte('due_datetime', windowEnd);
 
-  if (remindersError) {
-    console.error('[CRON-REMINDERS] Failed to fetch reminders:', remindersError);
-    return NextResponse.json({ error: remindersError.message }, { status: 500 });
-  }
+  if (remindersError) return cronError(`Failed to fetch reminders: ${remindersError.message}`);
 
-  if (!rawReminders || rawReminders.length === 0) {
-    console.log('[CRON-REMINDERS] No upcoming pending reminders. Exiting early.');
-    return NextResponse.json({ success: true, sent: 0, message: 'No upcoming pending reminders' });
-  }
-
-  // ── Zod: validate each reminder row ──────────────────────────────────────
-  const allReminders: ReminderRow[] = [];
+  const candidates: Candidate[] = [];
   let skippedReminders = 0;
-  for (const row of rawReminders) {
+  for (const row of rawReminders ?? []) {
     const parsed = ReminderRowSchema.safeParse(row);
-    if (parsed.success) {
-      allReminders.push(parsed.data);
-    } else {
+    if (!parsed.success) {
       skippedReminders++;
-      console.warn('[CRON-REMINDERS] Skipping malformed reminder row:', {
-        id: (row as any)?.id,
-        issues: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`),
-      });
+      continue;
+    }
+    const reminder = parsed.data;
+    for (const due of getDueNotifications(now, reminder.due_datetime, reminder.notify_times ?? [], CATCHUP_MINUTES)) {
+      candidates.push({ reminder, notifyMinutes: due.notifyMinutes, dueAt: due.dueAt });
     }
   }
-  // ─────────────────────────────────────────────────────────────────────────
 
-  console.log(`[CRON-REMINDERS] ${allReminders.length} reminders in window. Filtering by per-user timezone...`);
-
-  if (allReminders.length === 0) {
-    console.log('[CRON-REMINDERS] No valid reminders after Zod parse. Exiting early.');
-    return NextResponse.json({ success: true, sent: 0, message: 'No reminders today', skippedReminders });
+  if (candidates.length === 0) {
+    return cronResponse({ due: 0, sent: 0, failed: 0, skippedReminders });
   }
 
-  // Fetch per-user timezones and notification settings from user_preferences
-  const allUserIds = [...new Set(allReminders.map((r) => r.user_id))];
+  const userIds = [...new Set(candidates.map((c) => c.reminder.user_id))];
+
   const { data: prefRows } = await supabase
     .from('user_preferences')
-    .select('user_id, timezone, notifications_enabled, push_notifications_enabled')
-    .in('user_id', allUserIds);
+    .select('user_id, notifications_enabled, push_notifications_enabled')
+    .in('user_id', userIds);
 
-  const userTimezoneMap: Record<string, string> = {};
-  const enabledUsers = new Set<string>();
-  (prefRows || []).forEach((p) => {
-    if (p.user_id && p.timezone) userTimezoneMap[p.user_id] = p.timezone;
-    if (p.user_id && (p.notifications_enabled ?? true) && (p.push_notifications_enabled ?? true)) {
-      enabledUsers.add(p.user_id);
-    }
-  });
-  console.log(`[CRON-REMINDERS] Resolved timezones for ${Object.keys(userTimezoneMap).length}/${allUserIds.length} users.`);
-  console.log(`[CRON-REMINDERS] Enabled push users: ${enabledUsers.size}/${allUserIds.length}.`);
+  const disabledUsers = new Set(
+    (prefRows ?? [])
+      .filter((p) => !((p.notifications_enabled ?? true) && (p.push_notifications_enabled ?? true)))
+      .map((p) => p.user_id as string)
+  );
 
-  // Use the reminder's actual configured notify_times instead of a fixed hour window.
-  const todayReminders = allReminders.filter((r) => {
-    if (!r.due_datetime) {
-      console.log(`[CRON-REMINDERS] Reminder "${r.title}" (${r.user_id}) skipped: missing due_datetime.`);
-      return false;
-    }
-
-    const userTz = userTimezoneMap[r.user_id] || 'UTC';
-    if (!enabledUsers.has(r.user_id)) {
-      console.log(`[CRON-REMINDERS] Reminder "${r.title}" (${r.user_id}) skipped: notifications disabled in user preferences (tz=${userTz}).`);
-      return false;
-    }
-
-    const notifyTimes = Array.isArray(r.notify_times) && r.notify_times.length > 0 ? r.notify_times : [60, 180, 360];
-    const isWithinWindow = isReminderDue(now, r.due_datetime, notifyTimes, 30);
-    const dueLabel = new Date(r.due_datetime).toLocaleString('en-US', { timeZone: userTz });
-
-    console.log(`[CRON-REMINDERS] Reminder "${r.title}" (${r.user_id}) tz=${userTz} due=${dueLabel} notify_times=${JSON.stringify(notifyTimes)} -> include=${isWithinWindow}`);
-    return isWithinWindow;
-  });
-
-  console.log(`[CRON-REMINDERS] ${todayReminders.length}/${allReminders.length} reminders qualify for the current notification window.`);
-
-  if (todayReminders.length === 0) {
-    console.log('[CRON-REMINDERS] No reminders match the configured notify_times window. Exiting early.');
-    return NextResponse.json({ success: true, sent: 0, message: 'No reminders in current window', skippedReminders });
-  }
-
-  // VAPID Setup
-  const vapidPublic = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-  const vapidPrivate = process.env.VAPID_PRIVATE_KEY;
-  const vapidEmail = process.env.VAPID_EMAIL || 'mailto:admin@trason.app';
-
-  console.log(`[CRON-REMINDERS] VAPID - Public: ${vapidPublic ? 'Present' : 'MISSING'}, Private: ${vapidPrivate ? 'Present' : 'MISSING'}`);
-
-  if (!vapidPublic || !vapidPrivate) {
-    console.error('[CRON-REMINDERS] VAPID keys missing.');
-    return NextResponse.json({ error: 'VAPID keys missing', sent: 0 }, { status: 500 });
-  }
-
-  try {
-    webpush.setVapidDetails(vapidEmail, vapidPublic, vapidPrivate);
-  } catch (error) {
-    console.error('[CRON-REMINDERS] Invalid VAPID configuration:', error);
-    return NextResponse.json({ error: 'Invalid VAPID configuration', sent: 0 }, { status: 500 });
-  }
-
-  // Group qualifying reminders by user_id
-  const remindersByUser: Record<string, ReminderRow[]> = {};
-  todayReminders.forEach((r) => {
-    if (!remindersByUser[r.user_id]) remindersByUser[r.user_id] = [];
-    remindersByUser[r.user_id].push(r);
-  });
-
-  const userIds = Object.keys(remindersByUser);
-  console.log(`[CRON-REMINDERS] ${userIds.length} users have qualifying reminders.`);
-
-  // Fetch push subscriptions
   const { data: rawSubscriptions, error: subError } = await supabase
     .from('push_subscriptions')
-    .select('user_id, endpoint, p256dh, auth')
+    .select('user_id, endpoint, p256dh, auth, failure_count')
     .in('user_id', userIds)
     .eq('is_active', true);
 
-  if (subError) {
-    console.error('[CRON-REMINDERS] Failed to fetch push subscriptions:', subError);
-    return NextResponse.json({ error: subError.message }, { status: 500 });
+  if (subError) return cronError(`Failed to fetch push subscriptions: ${subError.message}`);
+
+  const subscriptionsByUser = new Map<string, z.infer<typeof SubscriptionRowSchema>[]>();
+  for (const row of rawSubscriptions ?? []) {
+    const parsed = SubscriptionRowSchema.safeParse(row);
+    if (!parsed.success) continue;
+    const list = subscriptionsByUser.get(parsed.data.user_id) ?? [];
+    list.push(parsed.data);
+    subscriptionsByUser.set(parsed.data.user_id, list);
   }
 
-  // ── Zod: validate each subscription row ──────────────────────────────────
-  const subscriptions: z.infer<typeof PushSubscriptionRowSchema>[] = [];
-  let skippedSubs = 0;
-  for (const row of rawSubscriptions || []) {
-    const parsed = PushSubscriptionRowSchema.safeParse(row);
-    if (parsed.success) {
-      subscriptions.push(parsed.data);
-    } else {
-      skippedSubs++;
-      console.warn('[CRON-REMINDERS] Malformed subscription (auto-deactivating):', {
-        user_id: (row as any)?.user_id,
-        issues: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`),
-      });
-      if ((row as any)?.endpoint) {
-        await supabase
-          .from('push_subscriptions')
-          .update({ is_active: false })
-          .eq('endpoint', (row as any).endpoint);
-      }
-    }
-  }
-  console.log(`[CRON-REMINDERS] Valid subscriptions: ${subscriptions.length}, skipped: ${skippedSubs}`);
-  // ─────────────────────────────────────────────────────────────────────────
+  // Users without an active subscription are left unclaimed so a late subscription
+  // (app reopened inside the catch-up window) still receives the notification.
+  const deliverable = candidates.filter(
+    (c) => !disabledUsers.has(c.reminder.user_id) && subscriptionsByUser.has(c.reminder.user_id)
+  );
 
-  if (subscriptions.length === 0) {
-    console.log('[CRON-REMINDERS] No valid push subscriptions found.');
-    return NextResponse.json({ success: true, processedUsers: userIds.length, sent: 0, skippedSubs });
+  if (deliverable.length === 0) {
+    return cronResponse({ due: 0, sent: 0, failed: 0, skippedReminders, noSubscription: candidates.length });
   }
 
-  let sentCount = 0;
+  // Claim before sending: the unique key makes concurrent or repeated runs deliver each notification once.
+  const { data: claimedRows, error: claimError } = await supabase
+    .from('reminder_notifications')
+    .upsert(
+      deliverable.map((c) => ({
+        reminder_id: c.reminder.id,
+        notify_minutes: c.notifyMinutes,
+        due_at: c.dueAt.toISOString(),
+        user_id: c.reminder.user_id,
+      })),
+      { onConflict: 'reminder_id,notify_minutes,due_at', ignoreDuplicates: true }
+    )
+    .select('reminder_id, notify_minutes, due_at');
 
-  for (const sub of subscriptions) {
-    const userId = sub.user_id;
-    const userReminders = remindersByUser[userId] || [];
-    if (userReminders.length === 0) continue;
+  if (claimError) return cronError(`Failed to claim notifications: ${claimError.message}`);
 
-    // Build notification body
-    let bodyText = '';
-    if (userReminders.length === 1) {
-      const r = userReminders[0];
-      bodyText = r.due_time ? `${r.title} at ${r.due_time}` : r.title;
-    } else if (userReminders.length <= 3) {
-      bodyText = `${userReminders.length} reminders: ${userReminders.map(r => r.title).join(', ')}`;
-    } else {
-      bodyText = `You have ${userReminders.length} reminders coming up.`;
-    }
+  const claimed = new Set((claimedRows ?? []).map((r) => claimKey(r.reminder_id, r.notify_minutes, r.due_at)));
+  const toSend = deliverable.filter((c) => claimed.has(claimKey(c.reminder.id, c.notifyMinutes, c.dueAt)));
 
-    // Tag per-reminder to prevent duplicate browser notifications
-    const tag = userReminders.length === 1
-      ? `reminder-${userReminders[0].id}`
-      : `reminders-batch-${now.getFullYear()}${now.getMonth()}${now.getDate()}${now.getHours()}`;
-
-    const payload = JSON.stringify({
-      title: 'TRASON Reminders',
-      body: bodyText,
-      url: '/reminders',
-      tag,
-      priority: userReminders.some((reminder) => reminder.priority === 'high') ? 'high' : 'normal',
-    });
-
-    let safeEndpoint = 'unknown';
-    try {
-      const epUrl = new URL(sub.endpoint);
-      safeEndpoint = `${epUrl.origin}${epUrl.pathname.substring(0, 15)}...`;
-    } catch {
-      safeEndpoint = sub.endpoint.substring(0, 25) + '...';
-    }
-
-    console.log(`[CRON-REMINDERS] Sending push to user ${userId} (${userReminders.length} reminders). Endpoint: ${safeEndpoint}`);
-
-    try {
-      const result = await webpush.sendNotification(
-        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-        payload
-      );
-      sentCount++;
-      console.log(`[CRON-REMINDERS] ✅ Sent to user ${userId}. Status: ${result.statusCode}`);
-    } catch (err: any) {
-      console.error(`[CRON-REMINDERS] ❌ Push failed for user ${userId}:`, {
-        message: err.message,
-        statusCode: err.statusCode,
-      });
-      // 400, 401, 403 indicate bad VAPID or invalid subscription payload
-      // 404, 410 indicate the subscription has expired or was removed by the user
-      if ([400, 401, 403, 404, 410].includes(err.statusCode)) {
-        await supabase
-          .from('push_subscriptions')
-          .update({ is_active: false })
-          .eq('endpoint', sub.endpoint);
-      }
-    }
+  if (toSend.length === 0) {
+    return cronResponse({ due: 0, sent: 0, failed: 0, skippedReminders, alreadySent: deliverable.length });
   }
 
-  console.log(`[CRON-REMINDERS] Done. Sent ${sentCount}/${subscriptions.length}.`);
-  return NextResponse.json({
-    success: true,
-    processedUsers: userIds.length,
-    sent: sentCount,
-    qualifyingReminders: allReminders.length,
-    skippedReminders,
-    skippedSubs,
+  const vapidError = configureWebPush();
+  if (vapidError) {
+    await releaseClaims(supabase, toSend);
+    return cronError(vapidError);
+  }
+
+  const byUser = new Map<string, Candidate[]>();
+  for (const c of toSend) {
+    byUser.set(c.reminder.user_id, [...(byUser.get(c.reminder.user_id) ?? []), c]);
+  }
+
+  let sent = 0;
+  let failed = 0;
+
+  await Promise.all(
+    [...byUser.entries()].map(async ([userId, items]) => {
+      const subs = subscriptionsByUser.get(userId) ?? [];
+      const payload = buildPayload(items.map((i) => i.reminder));
+      const results = await Promise.all(subs.map((sub) => sendToSubscription(supabase, sub, payload, PUSH_TTL_SECONDS)));
+
+      const userSent = results.filter(Boolean).length;
+      sent += userSent;
+      failed += results.length - userSent;
+
+      // Nothing reached the user: free the claim so the next run retries within the catch-up window.
+      if (userSent === 0) await releaseClaims(supabase, items);
+    })
+  );
+
+  const outcome = { due: toSend.length, sent, failed, skippedReminders };
+  await recordCronRun(supabase, 'reminders', startedAt, outcome);
+  return cronResponse(outcome);
+}
+
+function buildPayload(reminders: ReminderRow[]): string {
+  let body: string;
+  if (reminders.length === 1) {
+    const [r] = reminders;
+    body = r.due_time ? `${r.title} at ${r.due_time}` : r.title;
+  } else if (reminders.length <= 3) {
+    body = `${reminders.length} reminders: ${reminders.map((r) => r.title).join(', ')}`;
+  } else {
+    body = `You have ${reminders.length} reminders coming up.`;
+  }
+
+  return JSON.stringify({
+    title: 'TRASON Reminders',
+    body,
+    url: '/reminders',
+    tag: reminders.length === 1 ? `reminder-${reminders[0].id}` : 'reminders-batch',
+    priority: reminders.some((r) => r.priority === 'high') ? 'high' : 'normal',
+  });
+}
+
+async function releaseClaims(supabase: AdminClient, items: Candidate[]) {
+  await Promise.all(
+    items.map((c) =>
+      supabase
+        .from('reminder_notifications')
+        .delete()
+        .eq('reminder_id', c.reminder.id)
+        .eq('notify_minutes', c.notifyMinutes)
+    )
+  );
+}
+
+async function runHourlyMaintenance(supabase: AdminClient, now: Date) {
+  const results = await Promise.all([
+    supabase.from('reminder_notifications').delete().lt('sent_at', daysAgo(LEDGER_RETENTION_DAYS, now)),
+    supabase.from('cron_runs').delete().lt('started_at', daysAgo(CRON_RUN_RETENTION_DAYS, now)),
+    supabase
+      .from('push_subscriptions')
+      .update({ is_active: false })
+      .eq('is_active', true)
+      .lt('last_used_at', daysAgo(STALE_SUBSCRIPTION_DAYS, now)),
+  ]);
+  results.forEach(({ error }) => {
+    if (error) console.warn('[CRON-REMINDERS] Maintenance step failed (non-fatal):', error.message);
   });
 }

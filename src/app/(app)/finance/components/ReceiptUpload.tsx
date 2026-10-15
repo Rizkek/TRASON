@@ -68,7 +68,6 @@ export function ReceiptUpload({ onUploadSuccess, onError }: Props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          receiptUrl: uploadData.url,
           transactionId: txId,
           fileName: uploadData.fileName,
           mimeType: compressedFile.type,

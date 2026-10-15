@@ -1,13 +1,22 @@
-/* eslint-disable no-console */
-import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import webpush from 'web-push';
 import { z } from 'zod';
-import { shouldSendTaskReminder } from '@/libs/notificationLogic';
+import { getLocalDateHour, shouldSendTaskReminder } from '@/libs/notificationLogic';
+import { authorizeCron } from '@/libs/cron/auth';
+import {
+  configureWebPush,
+  createAdminClient,
+  type AdminClient,
+  cronError,
+  cronResponse,
+  recordCronRun,
+  sendToSubscription,
+} from '@/libs/cron/push';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
-// ─── Zod Schemas ─────────────────────────────────────────────────────────────
+const ACTIVE_HOURS = { start: 6, end: 23 };
+const PUSH_TTL_SECONDS = 2 * 60 * 60;
 
 const DailyTaskRowSchema = z.object({
   id: z.string(),
@@ -17,259 +26,174 @@ const DailyTaskRowSchema = z.object({
   last_reset_date: z.string().nullable().optional(),
 });
 
-const PushSubscriptionRowSchema = z.object({
+const SubscriptionRowSchema = z.object({
   user_id: z.string(),
-  endpoint: z.string().min(1, 'endpoint cannot be empty'),
-  p256dh: z.string().min(1, 'p256dh cannot be empty'),
-  auth: z.string().min(1, 'auth cannot be empty'),
+  endpoint: z.string().min(1),
+  p256dh: z.string().min(1),
+  auth: z.string().min(1),
+  failure_count: z.number().nullable().optional(),
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
+interface Nudge {
+  titles: string[];
+  localDate: string;
+  localHour: number;
+}
 
 export async function GET(request: Request) {
-  const now = new Date();
-  console.log(`[CRON-TIMELINE] [${now.toISOString()}] Route invoked.`);
+  const unauthorized = authorizeCron(request);
+  if (unauthorized) return unauthorized;
 
-  // Security check for cron secret (supports both Authorization header and ?secret= query param)
-  const authHeader = request.headers.get('Authorization');
-  const url = new URL(request.url);
-  const querySecret = url.searchParams.get('secret');
-  const expectedSecret = process.env.CRON_SECRET;
-
-  console.log(`[CRON-TIMELINE] Authorization header present: ${!!authHeader}, Expected secret present: ${!!expectedSecret}`);
-
-  if (expectedSecret && authHeader !== `Bearer ${expectedSecret}` && querySecret !== expectedSecret) {
-    console.warn('[CRON-TIMELINE] Unauthorized access attempt.');
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const startedAt = new Date();
+  const now = startedAt;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseKey) return cronError('Supabase credentials missing');
 
-  if (!supabaseUrl || !supabaseKey) {
-    console.error(`[CRON-TIMELINE] Supabase credentials missing! url: ${!!supabaseUrl}, key: ${!!supabaseKey}`);
-    return NextResponse.json({ error: 'Supabase credentials missing' }, { status: 500 });
-  }
+  const supabase = createAdminClient(supabaseUrl, supabaseKey);
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
-  // todayStr will be resolved per-user based on their timezone preference (see below)
-  console.log(`[CRON-TIMELINE] Will resolve todayStr per-user timezone from user_preferences`);
-
-  // Fetch all tasks
   const { data: rawTasks, error: tasksError } = await supabase
     .from('daily_tasks')
     .select('id, user_id, title, completed_today, last_reset_date')
     .is('deleted_at', null);
 
-  if (tasksError) {
-    console.error('[CRON-TIMELINE] Failed to fetch daily tasks:', tasksError);
-    return NextResponse.json({ error: tasksError.message }, { status: 500 });
-  }
+  if (tasksError) return cronError(`Failed to fetch daily tasks: ${tasksError.message}`);
 
-  console.log(`[CRON-TIMELINE] Fetched ${(rawTasks || []).length} total active daily tasks from DB.`);
-
-  // ── Zod: validate each task row, skip malformed ones ──────────────────────
-  let skippedTasks = 0;
   const tasks: z.infer<typeof DailyTaskRowSchema>[] = [];
-  for (const row of rawTasks || []) {
+  let skippedTasks = 0;
+  for (const row of rawTasks ?? []) {
     const parsed = DailyTaskRowSchema.safeParse(row);
-    if (parsed.success) {
-      tasks.push(parsed.data);
-    } else {
-      skippedTasks++;
-      console.warn('[CRON-TIMELINE] Skipping malformed task row:', {
-        id: (row as any)?.id,
-        issues: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`),
-      });
-    }
+    if (parsed.success) tasks.push(parsed.data);
+    else skippedTasks++;
   }
-  console.log(`[CRON-TIMELINE] Valid tasks: ${tasks.length}, skipped: ${skippedTasks}`);
-  // ──────────────────────────────────────────────────────────────────────────
 
-  // Fetch timezone and notification preferences per user from user_preferences
-  const uniqueUserIds = [...new Set(tasks.map((t) => t.user_id))];
-  const { data: prefsRows } = await supabase
+  const userIds = [...new Set(tasks.map((t) => t.user_id))];
+  if (userIds.length === 0) return cronResponse({ due: 0, sent: 0, failed: 0, skippedTasks });
+
+  const { data: prefRows } = await supabase
     .from('user_preferences')
     .select('user_id, timezone, notifications_enabled, push_notifications_enabled')
-    .in('user_id', uniqueUserIds);
+    .in('user_id', userIds);
 
-  const userTimezoneMap: Record<string, string> = {};
+  const timezoneByUser = new Map<string, string>();
   const enabledUsers = new Set<string>();
-  (prefsRows || []).forEach((p) => {
-    if (p.user_id && p.timezone) userTimezoneMap[p.user_id] = p.timezone;
-    if (p.user_id && (p.notifications_enabled ?? true) && (p.push_notifications_enabled ?? true)) {
-      enabledUsers.add(p.user_id);
-    }
-  });
-  console.log(`[CRON-TIMELINE] Resolved timezones for ${Object.keys(userTimezoneMap).length} users.`);
-  console.log(`[CRON-TIMELINE] Enabled task reminder users: ${enabledUsers.size}/${uniqueUserIds.length}.`);
-
-  // Group incomplete tasks by user_id (using per-user timezone)
-  const incompleteTasksByUser: Record<string, string[]> = {};
-
-  tasks.forEach((task) => {
-    const userTz = userTimezoneMap[task.user_id] || 'UTC';
-    const userNow = new Date(now.toLocaleString('en-US', { timeZone: userTz }));
-    const todayStr = userNow.toLocaleDateString('en-CA');
-    const isIncomplete =
-      !task.completed_today ||
-      (task.completed_today && task.last_reset_date !== todayStr);
-    const isReminderWindow = shouldSendTaskReminder(now, userTz, task, { start: 6, end: 23 });
-
-    console.log(`[CRON-TIMELINE] Task "${task.title}" (${task.user_id}) tz=${userTz} today=${todayStr} window=${isReminderWindow} incomplete=${isIncomplete} enabled=${enabledUsers.has(task.user_id)}`);
-
-    if (!enabledUsers.has(task.user_id)) {
-      return;
-    }
-
-    if (isIncomplete && isReminderWindow) {
-      if (!incompleteTasksByUser[task.user_id]) {
-        incompleteTasksByUser[task.user_id] = [];
-      }
-      incompleteTasksByUser[task.user_id].push(task.title);
-    }
-  });
-
-  const userIds = Object.keys(incompleteTasksByUser);
-  console.log(`[CRON-TIMELINE] Users with incomplete tasks: ${userIds.length}`);
-
-  if (userIds.length === 0) {
-    console.log('[CRON-TIMELINE] No incomplete tasks found. Exiting early.');
-    return NextResponse.json({ success: true, message: 'No incomplete tasks found', sent: 0, skippedTasks });
+  for (const p of prefRows ?? []) {
+    if (p.timezone) timezoneByUser.set(p.user_id, p.timezone);
+    if ((p.notifications_enabled ?? true) && (p.push_notifications_enabled ?? true)) enabledUsers.add(p.user_id);
   }
 
-  // Fetch push subscriptions for those users
+  const nudgesByUser = new Map<string, Nudge>();
+  for (const task of tasks) {
+    if (!enabledUsers.has(task.user_id)) continue;
+
+    const timezone = timezoneByUser.get(task.user_id) ?? 'UTC';
+    if (!shouldSendTaskReminder(now, timezone, task, ACTIVE_HOURS)) continue;
+
+    const nudge = nudgesByUser.get(task.user_id) ?? { titles: [], ...toLocal(now, timezone) };
+    nudge.titles.push(task.title);
+    nudgesByUser.set(task.user_id, nudge);
+  }
+
+  if (nudgesByUser.size === 0) return cronResponse({ due: 0, sent: 0, failed: 0, skippedTasks });
+
   const { data: rawSubscriptions, error: subError } = await supabase
     .from('push_subscriptions')
-    .select('user_id, endpoint, p256dh, auth')
-    .in('user_id', userIds)
+    .select('user_id, endpoint, p256dh, auth, failure_count')
+    .in('user_id', [...nudgesByUser.keys()])
     .eq('is_active', true);
 
-  if (subError) {
-    console.error('[CRON-TIMELINE] Failed to fetch subscriptions:', subError);
-    return NextResponse.json({ error: subError.message }, { status: 500 });
+  if (subError) return cronError(`Failed to fetch push subscriptions: ${subError.message}`);
+
+  const subscriptionsByUser = new Map<string, z.infer<typeof SubscriptionRowSchema>[]>();
+  for (const row of rawSubscriptions ?? []) {
+    const parsed = SubscriptionRowSchema.safeParse(row);
+    if (!parsed.success) continue;
+    const list = subscriptionsByUser.get(parsed.data.user_id) ?? [];
+    list.push(parsed.data);
+    subscriptionsByUser.set(parsed.data.user_id, list);
   }
 
-  // ── Zod: validate each subscription row, skip malformed ones ──────────────
-  const subscriptions: z.infer<typeof PushSubscriptionRowSchema>[] = [];
-  let skippedSubs = 0;
-  for (const row of rawSubscriptions || []) {
-    const parsed = PushSubscriptionRowSchema.safeParse(row);
-    if (parsed.success) {
-      subscriptions.push(parsed.data);
-    } else {
-      skippedSubs++;
-      console.warn('[CRON-TIMELINE] Skipping malformed subscription (missing keys):', {
-        user_id: (row as any)?.user_id,
-        issues: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`),
-      });
-      // Auto-deactivate subscriptions with missing keys
-      if ((row as any)?.endpoint) {
-        await supabase
-          .from('push_subscriptions')
-          .update({ is_active: false })
-          .eq('endpoint', (row as any).endpoint);
-      }
-    }
-  }
-  console.log(`[CRON-TIMELINE] Valid subscriptions: ${subscriptions.length}, skipped (malformed): ${skippedSubs}`);
-  // ──────────────────────────────────────────────────────────────────────────
-
-  if (subscriptions.length === 0) {
-    console.log('[CRON-TIMELINE] No valid push subscriptions found.');
-    return NextResponse.json({ success: true, usersWithIncompleteTasks: userIds.length, sent: 0, skippedSubs });
+  const deliverableUsers = [...nudgesByUser.keys()].filter((id) => subscriptionsByUser.has(id));
+  if (deliverableUsers.length === 0) {
+    return cronResponse({ due: 0, sent: 0, failed: 0, skippedTasks, noSubscription: nudgesByUser.size });
   }
 
-  // VAPID Setup
-  const vapidPublic = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-  const vapidPrivate = process.env.VAPID_PRIVATE_KEY;
-  const vapidEmail = process.env.VAPID_EMAIL || 'mailto:admin@trason.app';
+  // One nudge per user per local hour regardless of how often this endpoint is called.
+  const { data: claimedRows, error: claimError } = await supabase
+    .from('task_nudges')
+    .upsert(
+      deliverableUsers.map((userId) => {
+        const { localDate, localHour } = nudgesByUser.get(userId)!;
+        return { user_id: userId, local_date: localDate, local_hour: localHour };
+      }),
+      { onConflict: 'user_id,local_date,local_hour', ignoreDuplicates: true }
+    )
+    .select('user_id');
 
-  console.log(`[CRON-TIMELINE] VAPID Config - Public: ${vapidPublic ? 'Present' : 'MISSING'}, Private: ${vapidPrivate ? 'Present' : 'MISSING'}`);
+  if (claimError) return cronError(`Failed to claim task nudges: ${claimError.message}`);
 
-  if (!vapidPublic || !vapidPrivate) {
-    console.error('[CRON-TIMELINE] VAPID keys missing!');
-    return NextResponse.json({ error: 'VAPID keys missing' }, { status: 500 });
+  const claimedUsers = (claimedRows ?? []).map((r) => r.user_id as string);
+  if (claimedUsers.length === 0) {
+    return cronResponse({ due: 0, sent: 0, failed: 0, skippedTasks, alreadySent: deliverableUsers.length });
   }
 
-  try {
-    webpush.setVapidDetails(vapidEmail, vapidPublic, vapidPrivate);
-  } catch (error) {
-    console.error('[CRON-TIMELINE] Invalid VAPID configuration:', error);
-    return NextResponse.json({ error: 'Invalid VAPID configuration' }, { status: 500 });
+  const vapidError = configureWebPush();
+  if (vapidError) {
+    await releaseClaims(supabase, claimedUsers, nudgesByUser);
+    return cronError(vapidError);
   }
 
-  let sentCount = 0;
+  let sent = 0;
+  let failed = 0;
 
-  for (const sub of subscriptions) {
-    const userId = sub.user_id;
-    const missingTasks = incompleteTasksByUser[userId] || [];
+  await Promise.all(
+    claimedUsers.map(async (userId) => {
+      const subs = subscriptionsByUser.get(userId) ?? [];
+      const payload = buildPayload(nudgesByUser.get(userId)!.titles);
+      const results = await Promise.all(subs.map((sub) => sendToSubscription(supabase, sub, payload, PUSH_TTL_SECONDS)));
 
-    if (missingTasks.length === 0) {
-      console.log(`[CRON-TIMELINE] Skipping user ${userId} — no incomplete tasks.`);
-      continue;
-    }
+      const userSent = results.filter(Boolean).length;
+      sent += userSent;
+      failed += results.length - userSent;
 
-    const bodyText =
-      missingTasks.length <= 3
-        ? `You have ${missingTasks.length} task(s) left: ${missingTasks.join(', ')}`
-        : `You have ${missingTasks.length} tasks left today. Keep going!`;
+      if (userSent === 0) await releaseClaims(supabase, [userId], nudgesByUser);
+    })
+  );
 
-    const payload = JSON.stringify({
-      title: 'Daily Task Reminder',
-      body: bodyText,
-      url: '/schedule',
-      tag: 'daily-timeline',
-    });
+  const outcome = { due: claimedUsers.length, sent, failed, skippedTasks };
+  await recordCronRun(supabase, 'timeline', startedAt, outcome);
+  return cronResponse(outcome);
+}
 
-    let safeEndpoint = 'unknown';
-    try {
-      const epUrl = new URL(sub.endpoint);
-      safeEndpoint = `${epUrl.origin}${epUrl.pathname.substring(0, 15)}...`;
-    } catch {
-      safeEndpoint = sub.endpoint.substring(0, 25) + '...';
-    }
+function toLocal(now: Date, timezone: string) {
+  const { date, hour } = getLocalDateHour(now, timezone);
+  return { localDate: date, localHour: hour };
+}
 
-    console.log(`[CRON-TIMELINE] Sending push to user ${userId}. Endpoint: ${safeEndpoint}. p256dh: ${sub.p256dh.length}c, auth: ${sub.auth.length}c`);
+function buildPayload(titles: string[]): string {
+  const body =
+    titles.length <= 3
+      ? `You have ${titles.length} task(s) left: ${titles.join(', ')}`
+      : `You have ${titles.length} tasks left today.`;
 
-    try {
-      const result = await webpush.sendNotification(
-        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-        payload
-      );
-      sentCount++;
-      console.log(`[CRON-TIMELINE] ✅ Push sent to user ${userId}. Status: ${result.statusCode}`);
-    } catch (err: any) {
-      console.error(`[CRON-TIMELINE] ❌ Push failed for user ${userId}:`, {
-        message: err.message,
-        statusCode: err.statusCode,
-        body: err.body,
-        headers: err.headers,
-      });
+  return JSON.stringify({ title: 'Daily Task Reminder', body, url: '/schedule', tag: 'daily-timeline' });
+}
 
-      // 400, 401, 403 indicate bad VAPID or invalid subscription payload
-      // 404, 410 indicate the subscription has expired or was removed by the user
-      if ([400, 401, 403, 404, 410].includes(err.statusCode)) {
-        console.warn(`[CRON-TIMELINE] Subscription invalid/expired (${err.statusCode}). Deactivating ${safeEndpoint}`);
-        const { error: updateErr } = await supabase
-          .from('push_subscriptions')
-          .update({ is_active: false })
-          .eq('endpoint', sub.endpoint);
-
-        if (updateErr) {
-          console.error(`[CRON-TIMELINE] Failed to deactivate subscription for user ${userId}:`, updateErr);
-        }
-      }
-    }
-  }
-
-  console.log(`[CRON-TIMELINE] Finished. Sent ${sentCount}/${subscriptions.length} notifications.`);
-  return NextResponse.json({
-    success: true,
-    usersWithIncompleteTasks: userIds.length,
-    sent: sentCount,
-    skippedTasks,
-    skippedSubs,
-  });
+async function releaseClaims(
+  supabase: AdminClient,
+  userIds: string[],
+  nudges: Map<string, Nudge>
+) {
+  await Promise.all(
+    userIds.map((userId) => {
+      const { localDate, localHour } = nudges.get(userId)!;
+      return supabase
+        .from('task_nudges')
+        .delete()
+        .eq('user_id', userId)
+        .eq('local_date', localDate)
+        .eq('local_hour', localHour);
+    })
+  );
 }

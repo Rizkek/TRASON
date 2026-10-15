@@ -1,50 +1,43 @@
-export function getReminderNotifyWindows(
-  dueDatetime?: string | null,
-  notifyTimes: number[] = [],
-  toleranceMinutes = 30,
-): Array<{ triggerAt: Date; dueAt: Date }> {
-  if (!dueDatetime) {
-    return [];
-  }
+const DEFAULT_NOTIFY_MINUTES = [60, 180, 360];
 
-  const dueAt = new Date(dueDatetime);
-  if (Number.isNaN(dueAt.getTime())) {
-    return [];
-  }
-
-  const effectiveTolerance = Number.isFinite(toleranceMinutes) ? toleranceMinutes : 30;
-  const normalizedTimes = Array.from(
-    new Set((notifyTimes.length > 0 ? notifyTimes : [60, 180, 360]).map((minutes) => Number(minutes)))
-  ).filter((minutes) => Number.isFinite(minutes) && minutes >= 0);
-
-  return normalizedTimes.map((minutes) => ({
-    triggerAt: new Date(dueAt.getTime() - minutes * 60 * 1000),
-    dueAt,
-  }));
+export interface DueNotification {
+  notifyMinutes: number;
+  triggerAt: Date;
+  dueAt: Date;
 }
 
-export function isReminderDue(
+/**
+ * A notification is due once its trigger time has passed and stays due for `catchupMinutes`,
+ * so a missed cron run is recovered on the next one. It never fires before its trigger time.
+ * Exactly-once delivery is the caller's job (see the reminder_notifications ledger).
+ */
+export function getDueNotifications(
   now: Date,
   dueDatetime?: string | null,
   notifyTimes: number[] = [],
-  toleranceMinutes = 30,
-): boolean {
-  if (!dueDatetime) {
-    return false;
-  }
+  catchupMinutes = 15,
+): DueNotification[] {
+  if (!dueDatetime) return [];
 
   const dueAt = new Date(dueDatetime);
-  if (Number.isNaN(dueAt.getTime())) {
-    return false;
-  }
+  if (Number.isNaN(dueAt.getTime())) return [];
 
-  const triggerWindows = getReminderNotifyWindows(dueDatetime, notifyTimes, toleranceMinutes);
-  if (triggerWindows.length === 0) {
-    return Math.abs(dueAt.getTime() - now.getTime()) <= toleranceMinutes * 60 * 1000;
-  }
+  const minutesList = Array.from(
+    new Set((notifyTimes.length > 0 ? notifyTimes : DEFAULT_NOTIFY_MINUTES).map(Number))
+  ).filter((minutes) => Number.isFinite(minutes) && minutes >= 0);
 
-  const toleranceMs = toleranceMinutes * 60 * 1000;
-  return triggerWindows.some(({ triggerAt }) => Math.abs(triggerAt.getTime() - now.getTime()) <= toleranceMs);
+  const catchupMs = catchupMinutes * 60 * 1000;
+
+  return minutesList
+    .map((notifyMinutes) => ({
+      notifyMinutes,
+      dueAt,
+      triggerAt: new Date(dueAt.getTime() - notifyMinutes * 60 * 1000),
+    }))
+    .filter(({ triggerAt }) => {
+      const elapsed = now.getTime() - triggerAt.getTime();
+      return elapsed >= 0 && elapsed <= catchupMs;
+    });
 }
 
 export function isReminderPastDue(
@@ -60,18 +53,34 @@ export function isReminderPastDue(
   return dueAt !== null && !Number.isNaN(dueAt.getTime()) && dueAt.getTime() <= now.getTime();
 }
 
+/** Calendar date (YYYY-MM-DD) and hour (0-23) of `now` in the given IANA timezone; falls back to UTC. */
+export function getLocalDateHour(now: Date, timeZone: string): { date: string; hour: number } {
+  try {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(now);
+    const part = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+    return { date: `${part('year')}-${part('month')}-${part('day')}`, hour: Number(part('hour')) };
+  } catch {
+    return timeZone === 'UTC' ? { date: now.toISOString().slice(0, 10), hour: now.getUTCHours() } : getLocalDateHour(now, 'UTC');
+  }
+}
+
 export function shouldSendTaskReminder(
   now: Date,
   userTimezone: string,
   task: { completed_today: boolean; last_reset_date?: string | null },
   activeHours: { start: number; end: number } = { start: 6, end: 23 },
 ): boolean {
-  const localNow = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }));
-  const currentHour = localNow.getHours();
-  const todayStr = localNow.toLocaleDateString('en-CA');
+  const { date: today, hour } = getLocalDateHour(now, userTimezone);
 
-  const isIncomplete = !task.completed_today || (task.completed_today && task.last_reset_date !== todayStr);
-  const inWindow = currentHour >= activeHours.start && currentHour <= activeHours.end;
+  const isIncomplete = !task.completed_today || task.last_reset_date !== today;
+  const inWindow = hour >= activeHours.start && hour <= activeHours.end;
 
   return isIncomplete && inWindow;
 }

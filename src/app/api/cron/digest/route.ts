@@ -2,23 +2,17 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { generateDigestEmailHTML } from '@/libs/email/templates';
+import { authorizeCron } from '@/libs/cron/auth';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   const now = new Date();
   console.log(`[CRON-DIGEST] [${now.toISOString()}] Route invoked.`);
 
-  // Validate Secret
-  const authHeader = request.headers.get('Authorization');
-  const url = new URL(request.url);
-  const querySecret = url.searchParams.get('secret');
-  const expectedSecret = process.env.CRON_SECRET;
-  
-  if (expectedSecret && authHeader !== `Bearer ${expectedSecret}` && querySecret !== expectedSecret) {
-    console.warn('[CRON-DIGEST] Unauthorized access attempt.');
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const unauthorized = authorizeCron(request);
+  if (unauthorized) return unauthorized;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

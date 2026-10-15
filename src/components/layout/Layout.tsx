@@ -9,58 +9,35 @@ import { ConfirmModal } from '../ConfirmModal';
 import { Logo } from '../Logo';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useReminder } from '@/hooks/useReminder';
-import { useScheduleNotifications } from '@/hooks/useScheduleNotifications';
 import { usePushNotification } from '@/hooks/usePushNotification';
+import { ensureSWRegistered, syncPushSubscription } from '@/libs/pushSync';
 import { NavIcon } from '@/components/ui/NavIcon';
 import { ModuleId } from '@/modules/types';
 import { DEFAULT_MODULE_STATUS } from '@/modules/registry';
 import { SYS_ICONS } from '@/config/icons';
 import { TrasonIcon } from '@/components/ui/TrasonIcon';
 
+const PUSH_RESYNC_INTERVAL_MS = 30 * 60 * 1000;
+
 /**
- * ReminderScheduler lives here (not in AuthProvider root) so it only
- * fetches and schedules reminders when the user is on a protected page.
- * This prevents a SWR fetch on every public page (landing, login, etc.).
- *
- * Wrapped in its own error boundary logic — if notification scheduling fails
- * (e.g., browser blocks Notification API), it silently returns null.
+ * Mounted once on authenticated pages. Keeps this device's push endpoint registered in the
+ * database: the browser can rotate endpoints silently and the cron retires failing ones.
+ * It never asks for notification permission; that only happens from an explicit user action.
  */
-function ReminderScheduler() {
-  const [mounted, setMounted] = React.useState(false);
-
+function PushSubscriptionSync() {
   React.useEffect(() => {
-    setMounted(true);
+    let lastSync = Date.now();
+    ensureSWRegistered().then(syncPushSubscription);
+
+    const resyncWhenVisible = () => {
+      if (document.visibilityState !== 'visible' || Date.now() - lastSync < PUSH_RESYNC_INTERVAL_MS) return;
+      lastSync = Date.now();
+      syncPushSubscription();
+    };
+
+    document.addEventListener('visibilitychange', resyncWhenVisible);
+    return () => document.removeEventListener('visibilitychange', resyncWhenVisible);
   }, []);
-
-  if (!mounted) return null;
-  return <ReminderSchedulerInner />;
-}
-
-function ReminderSchedulerInner() {
-  const { reminders } = useReminder();
-  const { scheduleReminders } = useScheduleNotifications();
-
-  // Auto-register the Service Worker on first load (silent, no push subscription needed).
-  // This ensures SW-based notifications work even if the user hasn't visited Settings.
-  React.useEffect(() => {
-    import('@/hooks/useScheduleNotifications').then(({ ensureSWRegistered }) => {
-      ensureSWRegistered();
-    });
-  }, []);
-
-  React.useEffect(() => {
-    if (reminders.length > 0) {
-      try {
-        scheduleReminders(reminders);
-      } catch (e) {
-        // Notification API may be blocked or unavailable — fail silently
-        console.warn('[ReminderScheduler] Could not schedule notifications:', e);
-      }
-    }
-  // scheduleReminders is stable (useCallback with stable deps), so this is safe
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reminders]);
 
   return null;
 }
@@ -559,8 +536,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         isLoading={isLoggingOut}
       />
 
-      {/* Reminder Scheduler — only active on authenticated pages */}
-      <ReminderScheduler />
+      <PushSubscriptionSync />
     </div>
   );
 };
