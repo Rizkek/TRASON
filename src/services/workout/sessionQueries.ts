@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/supabaseClient';
 import { withAuthQuery } from '../supabase/queryBuilder';
+import { formatDateOnly } from '@/libs/date';
 import type { WorkoutSession } from '@/types/database';
 
 export const workoutSessionQueries = {
@@ -10,8 +11,8 @@ export const workoutSessionQueries = {
         .select('*')
         .eq('user_id', userId)
         .is('deleted_at', null)
-        .gte('session_date', startDate.toISOString().split('T')[0])
-        .lte('session_date', endDate.toISOString().split('T')[0])
+        .gte('session_date', formatDateOnly(startDate))
+        .lte('session_date', formatDateOnly(endDate))
         .order('session_date', { ascending: false })
         .limit(1000);
       if (error) throw error;

@@ -61,18 +61,18 @@ export function TimelineCanvas({
   }
 
   return (
-    <div className="glass rounded-xl border border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
+    <div className="glass rounded-xl border border-foreground/[0.05] overflow-hidden">
       {/* Desktop View */}
       <div className="hidden md:block overflow-x-auto custom-scrollbar">
         <div className="min-w-[700px] md:min-w-0">
-          <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/60 sticky top-0 z-20">
-            <div className="border-r border-black/[0.03] dark:border-white/[0.03]" />
+          <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-foreground/[0.05] bg-surface/60 sticky top-0 z-20">
+            <div className="border-r border-foreground/[0.03]" />
             {daysOfWeek.map((day, idx) => {
               const isToday = day.toDateString() === new Date().toDateString();
               return (
                 <div
                   key={idx}
-                  className={`px-2 py-4 text-center border-r border-black/[0.03] dark:border-white/[0.03] last:border-r-0 relative transition-colors ${
+                  className={`px-2 py-4 text-center border-r border-foreground/[0.03] last:border-r-0 relative transition-colors ${
                     isToday ? 'bg-primary/10' : ''
                   }`}
                 >
@@ -80,14 +80,14 @@ export function TimelineCanvas({
                     <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
                   )}
                   <Paragraph
-                    className={`text-[11px] font-bold uppercase tracking-[0.15em] ${
-                      isToday ? 'text-primary' : 'text-gray-light'
+                    className={`text-xs font-bold uppercase tracking-[0.15em] ${
+                      isToday ? 'text-primary' : 'text-muted-foreground'
                     }`}
                   >
                     {day.toLocaleDateString(locale, { weekday: 'short' })}
                   </Paragraph>
                   <Paragraph
-                    className="text-[10px] font-mono mt-0.5 text-gray-light/60"
+                    className="text-xs font-mono mt-0.5 text-muted-foreground/60"
                   >
                     {day.getDate()}
                   </Paragraph>
@@ -128,11 +128,11 @@ export function TimelineCanvas({
                   >
                     {/* Hour label */}
                     <div
-                      className={`flex items-start justify-end pr-2 pt-2 border-r border-black/[0.03] dark:border-white/[0.03] sticky left-0 bg-gray-strong/40 ${
-                        isCurrentHour ? 'text-danger' : 'text-gray-light opacity-40'
+                      className={`flex items-start justify-end pr-2 pt-2 border-r border-foreground/[0.03] sticky left-0 bg-surface/40 ${
+                        isCurrentHour ? 'text-danger' : 'text-muted-foreground opacity-40'
                       }`}
                     >
-                      <span className="text-[10px] font-bold font-mono">{formatHour(hour)}</span>
+                      <span className="text-xs font-bold font-mono">{formatHour(hour)}</span>
                     </div>
 
                     {/* Day cells */}
@@ -146,8 +146,8 @@ export function TimelineCanvas({
                         <div
                           key={dayIdx}
                           role="gridcell"
-                          className={`border-r border-b border-black/[0.03] dark:border-white/[0.03] last:border-r-0 p-1 cursor-pointer group relative ${
-                            isToday ? 'bg-primary/[0.02]' : 'hover:bg-black/[0.01] dark:bg-white/[0.01]'
+                          className={`border-r border-b border-foreground/[0.03] last:border-r-0 p-1 cursor-pointer group relative ${
+                            isToday ? 'bg-primary/[0.02]' : 'hover:bg-foreground/[0.01]'
                           }`}
                           onClick={() => {
                             if (cellActivities.length === 0 && cellReminders.length === 0)
@@ -168,7 +168,7 @@ export function TimelineCanvas({
 
                           {/* Clash indicator */}
                           {hasClash && (
-                            <div className="flex items-center gap-1 bg-warning/20 text-warning border border-warning/40 rounded px-1.5 py-0.5 mb-1 text-[8px] font-bold">
+                            <div className="flex items-center gap-1 bg-warning/20 text-warning border border-warning/40 rounded px-1.5 py-0.5 mb-1 text-xs font-bold">
                               <Warning size={10} className="shrink-0" />
                               <span className="truncate">Bentrok ({cellReminders.length} Pengingat)</span>
                             </div>
@@ -178,17 +178,17 @@ export function TimelineCanvas({
                           {cellReminders.map((rem) => (
                             <div
                               key={rem.id}
-                              className="rounded p-1 mb-1 text-left border-l-2 border-warning bg-warning/10 text-soft-cream relative group/rem"
+                              className="rounded p-1 mb-1 text-left border-l-2 border-warning bg-warning/10 text-foreground relative group/rem"
                               title={`Pengingat: ${rem.title}${rem.due_time ? ' (' + rem.due_time + ')' : ''}`}
                             >
                               <div className="flex items-center gap-1">
                                 <Bell size={10} className="text-warning shrink-0" />
-                                <Paragraph className="text-[9px] font-bold text-warning truncate leading-tight flex-1">
+                                <Paragraph className="text-xs font-bold text-warning truncate leading-tight flex-1">
                                   {rem.title}
                                 </Paragraph>
                               </div>
                               {rem.due_time && (
-                                <span className="text-[8px] text-warning/70 font-mono block mt-0.5">
+                                <span className="text-xs text-warning/70 font-mono block mt-0.5">
                                   {rem.due_time}
                                 </span>
                               )}
@@ -228,18 +228,18 @@ export function TimelineCanvas({
                                       <Repeat size={10} className="text-primary" />
                                     </span>
                                   )}
-                                  <Paragraph className="text-[9px] font-bold text-soft-cream truncate leading-tight flex-1">
+                                  <Paragraph className="text-xs font-bold text-foreground truncate leading-tight flex-1">
                                     {act.title}
                                   </Paragraph>
                                 </div>
                                 <div className="flex items-center gap-1 mt-0.5">
                                   {act.category && (
-                                    <span className="text-[8px] text-primary opacity-80 uppercase tracking-wide">
+                                    <span className="text-xs text-primary opacity-80 uppercase tracking-wide">
                                       {act.category}
                                     </span>
                                   )}
                                   {getDurationLabel(act) && (
-                                    <span className="text-[8px] text-gray-light opacity-60">
+                                    <span className="text-xs text-muted-foreground opacity-60">
                                       {getDurationLabel(act)}
                                     </span>
                                   )}
@@ -250,7 +250,7 @@ export function TimelineCanvas({
                                     e.stopPropagation();
                                     onConfirmDelete(act.id);
                                   }}
-                                  className="absolute top-0.5 right-0.5 opacity-0 group-hover/card:opacity-100 text-gray-light hover:text-danger transition-all"
+                                  className="absolute top-0.5 right-0.5 opacity-0 group-hover/card:opacity-100 text-muted-foreground hover:text-danger transition-all"
                                   aria-label={`Delete ${act.title}`}
                                 >
                                   <Trash2 size={9} />
@@ -270,14 +270,14 @@ export function TimelineCanvas({
       </div>
 
       <div className="md:hidden p-4 space-y-4 min-h-[50vh]">
-        <div className="flex items-center justify-between border-b border-black/[0.05] dark:border-white/[0.05] pb-2 mb-4">
+        <div className="flex items-center justify-between border-b border-foreground/[0.05] pb-2 mb-4">
           <button
             onClick={() => setMobileDayIdx((p) => (p > 0 ? p - 1 : 6))}
-            className="p-1 hover:bg-black/5 rounded-full"
+            className="p-1 hover:bg-foreground/5 rounded-full"
           >
             <CaretLeft size={20} />
           </button>
-          <Heading as="h3" size="h3" className="font-bold text-soft-cream uppercase tracking-widest text-sm flex-1 text-center">
+          <Heading as="h3" size="h3" className="font-bold text-foreground uppercase tracking-widest text-sm flex-1 text-center">
             {daysOfWeek[mobileDayIdx]?.toLocaleDateString(locale, {
               weekday: 'short',
               month: 'short',
@@ -286,7 +286,7 @@ export function TimelineCanvas({
           </Heading>
           <button
             onClick={() => setMobileDayIdx((p) => (p < 6 ? p + 1 : 0))}
-            className="p-1 hover:bg-black/5 rounded-full"
+            className="p-1 hover:bg-foreground/5 rounded-full"
           >
             <CaretRight size={20} />
           </button>
@@ -304,7 +304,7 @@ export function TimelineCanvas({
 
               {todaysActivities.length === 0 && todaysReminders.length === 0 && (
                 <div className="text-center py-8 space-y-2">
-                  <Paragraph className="text-gray-light italic text-xs">
+                  <Paragraph className="text-muted-foreground italic text-xs">
                     {t('timeline_page.no_activities_today')}
                   </Paragraph>
                   <button
@@ -326,7 +326,7 @@ export function TimelineCanvas({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <Paragraph className="font-bold text-sm text-warning truncate">{rem.title}</Paragraph>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-warning/20 text-warning font-bold uppercase tracking-wider">
+                      <span className="text-xs px-1.5 py-0.5 rounded bg-warning/20 text-warning font-bold uppercase tracking-wider">
                         Pengingat
                       </span>
                     </div>
@@ -348,9 +348,9 @@ export function TimelineCanvas({
                   <div
                     key={act.id}
                     onClick={() => onOpenEditModal(act)}
-                    className="glass-card p-2 flex items-start gap-4 active:bg-black/10 transition-colors"
+                    className="glass-card p-2 flex items-start gap-4 active:bg-foreground/10 transition-colors"
                   >
-                    <div className="text-[10px] font-bold text-gray-light w-10 text-right pt-0.5 shrink-0">
+                    <div className="text-xs font-bold text-muted-foreground w-10 text-right pt-0.5 shrink-0">
                       {formatHour(new Date(act.start_time).getHours())}
                     </div>
                     <div
@@ -360,9 +360,9 @@ export function TimelineCanvas({
                     >
                       <div className="flex items-center gap-1.5">
                         {isRoutine && <Repeat size={12} className="text-accent-purple shrink-0" />}
-                        <Paragraph className="font-bold text-sm text-soft-cream truncate">{act.title}</Paragraph>
+                        <Paragraph className="font-bold text-sm text-foreground truncate">{act.title}</Paragraph>
                       </div>
-                      <div className="flex flex-wrap gap-2 text-[8px] text-gray-light uppercase tracking-widest mt-1">
+                      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground uppercase tracking-widest mt-1">
                         {isRoutine && (
                           <span className="text-accent-purple bg-accent-purple/20 px-1 rounded shrink-0">
                             Rutin
@@ -376,7 +376,7 @@ export function TimelineCanvas({
                           e.stopPropagation();
                           onConfirmDelete(act.id);
                         }}
-                        className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 text-gray-light hover:text-expense transition-opacity"
+                        className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-expense transition-opacity"
                       >
                         <Trash2 size={12} />
                       </button>
@@ -386,7 +386,7 @@ export function TimelineCanvas({
               })}
               <button
                 onClick={() => onOpenAddModal()}
-                className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-white/10 hover:border-primary/50 text-gray-light hover:text-primary rounded-lg transition-colors text-xs font-bold uppercase tracking-widest mt-4"
+                className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-foreground/10 hover:border-primary/50 text-muted-foreground hover:text-primary rounded-lg transition-colors text-xs font-bold uppercase tracking-widest mt-4"
               >
                 <Plus size={14} /> {t('timeline_page.log_activity_btn')}
               </button>

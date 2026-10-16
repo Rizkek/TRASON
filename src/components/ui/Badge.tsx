@@ -10,13 +10,13 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   ({ variant = 'default', size = 'md', className = '', children, ...props }, ref) => {
     const variantStyles = {
-      default: 'bg-black/5 dark:bg-white/5 text-gray-very-light border border-black/10 dark:border-white/10',
+      default: 'bg-foreground/5 text-subtle border border-foreground/15',
       income: 'bg-success/10 text-success border border-success/20',
       success: 'bg-success/10 text-success border border-success/20',
       expense: 'bg-danger/10 text-danger border border-danger/20',
       danger: 'bg-danger/10 text-danger border border-danger/20',
       insight: 'bg-secondary/10 text-secondary border border-secondary/20',
-      info: 'bg-secondary/10 text-secondary border border-secondary/20',
+      info: 'bg-info/10 text-info border border-info/20',
       activity: 'bg-primary/10 text-primary border border-primary/20',
       warning: 'bg-warning/10 text-warning border border-warning/20',
     };
@@ -30,7 +30,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
     return (
       <span
         ref={ref}
-        className={`inline-flex items-center rounded-sm transition-all duration-300 ${variantStyles[variant as keyof typeof variantStyles]} ${sizeStyles[size]} ${className}`}
+        className={`inline-flex items-center rounded-sm ${variantStyles[variant as keyof typeof variantStyles]} ${sizeStyles[size]} ${className}`}
         {...props}
       >
         {children}

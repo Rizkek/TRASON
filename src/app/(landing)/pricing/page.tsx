@@ -1,12 +1,9 @@
-
-
 import React from 'react';
 import type { Metadata } from 'next';
-import { LandingNavbar } from '@/components/landing/LandingNavbar';
-import { LandingFooter } from '@/components/landing/LandingFooter';
 import { Check, X } from '@phosphor-icons/react/dist/ssr';
-import Link from 'next/link';
-import { Heading, Paragraph } from '@/components/ui/typography';
+import { PageShell } from '@/components/landing/page/PageShell';
+import { PageHeader } from '@/components/landing/page/PageHeader';
+import { CtaLink } from '@/components/landing/primitives/CtaLink';
 
 export const metadata: Metadata = {
   title: 'Pricing – Free Forever, Pro When You Need It',
@@ -22,100 +19,83 @@ export const metadata: Metadata = {
   },
 };
 
+interface Feature {
+  text: string;
+  included: boolean;
+  strong?: boolean;
+}
+
+const BASIC: Feature[] = [
+  { text: 'Basic Financial Tracking', included: true },
+  { text: 'Habit Heatmaps', included: true },
+  { text: 'Career Pipeline (Up to 10)', included: true },
+  { text: 'Advanced AI Insights', included: false },
+  { text: 'Investment Sync', included: false },
+];
+
+const PRO: Feature[] = [
+  { text: 'Everything in Basic', included: true, strong: true },
+  { text: 'Unlimited Career Pipeline', included: true },
+  { text: 'Advanced AI Insights & Correlations', included: true },
+  { text: 'Investment & Crypto Sync', included: true },
+  { text: 'Priority Support', included: true },
+];
+
+function FeatureList({ items }: { items: Feature[] }) {
+  return (
+    <ul className="mb-10 flex-1 space-y-4">
+      {items.map((f) => (
+        <li key={f.text} className={`flex items-center gap-3 ${f.included ? 'text-foreground' : 'text-muted-foreground'}`}>
+          {f.included ? (
+            <Check size={18} weight="bold" aria-label="Included" className="shrink-0 text-success" />
+          ) : (
+            <X size={18} weight="bold" aria-label="Not included" className="shrink-0 text-muted-foreground" />
+          )}
+          <span className={f.strong ? 'font-semibold' : ''}>{f.text}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function PricingPage() {
   return (
-    <div className="min-h-screen font-sans relative overflow-x-hidden">
-      <LandingNavbar />
-      
-      <main className="pt-32 md:pt-48 pb-24 px-6 max-w-7xl mx-auto space-y-16">
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-           <Heading as="h1" size="h1" className="text-soft-cream">Simple, transparent pricing</Heading>
-           <Paragraph size="xl" className="text-gray-light/60">Start for free, upgrade when you need more power. No hidden fees.</Paragraph>
-        </div>
+    <PageShell width="wide">
+      <PageHeader
+        align="center"
+        eyebrow="Pricing"
+        title="Simple, transparent pricing"
+        lede="Start for free, upgrade when you need more power. No hidden fees."
+      />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Free Tier */}
-          <div className="bg-black/20 border border-white/5 rounded-3xl p-8 flex flex-col">
-            <Heading as="h2" size="h4" className="mb-2 text-white">Basic</Heading>
-            <Paragraph size="sm" className="mb-6 text-gray-light">Perfect for getting started and organizing your life.</Paragraph>
-            <div className="text-5xl font-bold text-white mb-8">
-              $0<span className="text-lg text-gray-light font-normal">/mo</span>
-            </div>
-            
-            <ul className="space-y-4 mb-12 flex-1">
-              <li className="flex items-center gap-3 text-gray-light">
-                <Check size={18} className="text-emerald-400" />
-                <span>Basic Financial Tracking</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-light">
-                <Check size={18} className="text-emerald-400" />
-                <span>Habit Heatmaps</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-light">
-                <Check size={18} className="text-emerald-400" />
-                <span>Career Pipeline (Up to 10)</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-light/40">
-                <X size={18} />
-                <span>Advanced AI Insights</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-light/40">
-                <X size={18} />
-                <span>Investment Sync</span>
-              </li>
-            </ul>
+      <div className="mx-auto mt-14 grid max-w-4xl gap-6 md:grid-cols-2">
+        <section aria-labelledby="plan-basic" className="flex flex-col rounded-3xl border border-foreground/15 bg-surface p-8">
+          <h2 id="plan-basic" className="font-sans text-xl font-semibold text-foreground">Basic</h2>
+          <p className="mb-6 mt-2 text-sm text-muted-foreground">Perfect for getting started and organizing your life.</p>
+          <p className="mb-8 font-sans text-5xl font-bold text-foreground">
+            $0<span className="text-lg font-normal text-muted-foreground">/mo</span>
+          </p>
+          <FeatureList items={BASIC} />
+          <CtaLink href="/signup" variant="secondary" size="lg" className="w-full">
+            Get started for free
+          </CtaLink>
+        </section>
 
-            <Link href="/signup">
-              <button className="w-full bg-white/5 border border-white/10 text-white font-bold py-4 rounded-xl hover:bg-white/10 transition-colors">
-                Get Started for Free
-              </button>
-            </Link>
-          </div>
-
-          {/* Pro Tier */}
-          <div className="bg-gradient-to-br from-warm-gold/20 to-black/20 border border-warm-gold/30 rounded-3xl p-8 flex flex-col relative overflow-hidden">
-            <div className="absolute top-0 right-0 bg-warm-gold text-warm-black text-xs font-bold px-4 py-1 rounded-bl-xl">
-              RECOMMENDED
-            </div>
-            <Heading as="h2" size="h4" className="mb-2 text-warm-gold">Pro</Heading>
-            <Paragraph size="sm" className="mb-6 text-gray-light">For power users who want deep analytics and automation.</Paragraph>
-            <div className="text-5xl font-bold text-white mb-8">
-              $9<span className="text-lg text-gray-light font-normal">/mo</span>
-            </div>
-            
-            <ul className="space-y-4 mb-12 flex-1">
-              <li className="flex items-center gap-3 text-gray-light">
-                <Check size={18} className="text-warm-gold" />
-                <span className="font-bold text-white">Everything in Basic</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-light">
-                <Check size={18} className="text-warm-gold" />
-                <span>Unlimited Career Pipeline</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-light">
-                <Check size={18} className="text-warm-gold" />
-                <span>Advanced AI Insights & Correlations</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-light">
-                <Check size={18} className="text-warm-gold" />
-                <span>Investment & Crypto Sync</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-light">
-                <Check size={18} className="text-warm-gold" />
-                <span>Priority Support</span>
-              </li>
-            </ul>
-
-            <Link href="/signup">
-              <button className="w-full bg-warm-gold text-warm-black font-bold py-4 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-warm-gold/20">
-                Upgrade to Pro
-              </button>
-            </Link>
-          </div>
-        </div>
-      </main>
-
-      <LandingFooter />
-    </div>
+        <section aria-labelledby="plan-pro" className="relative flex flex-col rounded-3xl border-2 border-primary bg-surface p-8">
+          <span className="absolute right-6 top-0 -translate-y-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold uppercase tracking-wider text-on-primary">
+            Recommended
+          </span>
+          <h2 id="plan-pro" className="font-sans text-xl font-semibold text-primary">Pro</h2>
+          <p className="mb-6 mt-2 text-sm text-muted-foreground">For power users who want deep analytics and automation.</p>
+          <p className="mb-8 font-sans text-5xl font-bold text-foreground">
+            $9<span className="text-lg font-normal text-muted-foreground">/mo</span>
+          </p>
+          <FeatureList items={PRO} />
+          <CtaLink href="/signup" size="lg" className="w-full">
+            Upgrade to Pro
+          </CtaLink>
+        </section>
+      </div>
+    </PageShell>
   );
 }

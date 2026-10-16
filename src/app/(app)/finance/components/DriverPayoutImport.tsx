@@ -284,35 +284,35 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
       >
         <div className="space-y-4">
           {confidence != null && (
-            <p className="text-xs text-gray-light">
+            <p className="text-xs text-muted-foreground">
               {t('finance.driverPayout.ocrConfidence')}: {Math.round(confidence * 100)}%
             </p>
           )}
 
           {/* Date */}
           <label className="block space-y-1">
-            <span className="text-xs font-medium text-gray-light">{t('finance.driverPayout.date')}</span>
+            <span className="text-xs font-medium text-muted-foreground">{t('finance.driverPayout.date')}</span>
             <input
               type="date"
               value={draft.date}
               onChange={(e) => updateDraft('date', e.target.value)}
-              className="w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-soft-cream"
+              className="w-full rounded-md border border-foreground/10 bg-background/60 px-3 py-2 text-sm text-foreground"
             />
           </label>
 
           {/* Fare (pendapatan kotor dari pelanggan) */}
           <label className="block space-y-1">
-            <span className="flex items-center justify-between gap-2 text-xs font-medium text-gray-light">
+            <span className="flex items-center justify-between gap-2 text-xs font-medium text-muted-foreground">
               <span>{t('finance.driverPayout.fare')}</span>
               {extraction?.fare_amount != null && (
-                <span className="text-[10px] text-ui-accent">{t('finance.driverPayout.fromImage')}</span>
+                <span className="text-xs text-primary">{t('finance.driverPayout.fromImage')}</span>
               )}
             </span>
             <div className="flex gap-2">
               <select
                 value={draft.serviceCategory}
                 onChange={(e) => updateDraft('serviceCategory', e.target.value as ServiceCategory)}
-                className="rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-soft-cream w-[120px] shrink-0"
+                className="rounded-md border border-foreground/10 bg-background/60 px-3 py-2 text-sm text-foreground w-[120px] shrink-0"
               >
                 <option value="moto">Moto</option>
                 <option value="courier">Courier</option>
@@ -322,15 +322,15 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
                 value={draft.fare}
                 onChange={(e) => updateDraft('fare', e.target.value)}
                 placeholder="Contoh: 166500"
-                className="w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-soft-cream placeholder:text-gray-light/60"
+                className="w-full rounded-md border border-foreground/10 bg-background/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60"
               />
             </div>
           </label>
 
           {/* Info estimasi potongan platform (display only) */}
           {estimate != null && fareAmount != null && (
-            <div className="rounded-md bg-white/5 border border-white/10 p-3 space-y-1.5 text-xs text-gray-light">
-              <p className="font-semibold text-soft-cream text-[11px] uppercase tracking-wide mb-2">
+            <div className="rounded-md bg-foreground/5 border border-foreground/10 p-3 space-y-1.5 text-xs text-muted-foreground">
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">
                 {t('finance.driverPayout.estimated')}
               </p>
               <div className="flex justify-between">
@@ -341,7 +341,7 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
                 <span>{t('finance.driverPayout.vat')}</span>
                 <span className="font-mono tabular-nums">- {fmt(estimate.vatAmount)}</span>
               </div>
-              <div className="flex justify-between border-t border-white/10 pt-1.5 font-semibold text-soft-cream">
+              <div className="flex justify-between border-t border-foreground/10 pt-1.5 font-semibold text-foreground">
                 <span>Total</span>
                 <span className="font-mono tabular-nums">- {fmt(estimate.totalDeductionAmount)}</span>
               </div>
@@ -350,10 +350,10 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
 
           {/* Net payout — dari screenshot AI atau manual */}
           <label className="block space-y-1">
-            <span className="flex items-center justify-between gap-2 text-xs font-medium text-gray-light">
+            <span className="flex items-center justify-between gap-2 text-xs font-medium text-muted-foreground">
               <span>{t('finance.driverPayout.netPayout')}</span>
               {extraction?.net_payout_amount != null && (
-                <span className="text-[10px] text-ui-accent">{t('finance.driverPayout.fromImage')}</span>
+                <span className="text-xs text-primary">{t('finance.driverPayout.fromImage')}</span>
               )}
             </span>
             <input
@@ -361,13 +361,13 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
               value={draft.netPayout}
               onChange={(e) => updateDraft('netPayout', e.target.value)}
               placeholder={calculatedNet != null ? `${t('finance.driverPayout.estimated')}: ${fmt(calculatedNet)}` : ''}
-              className="w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-soft-cream placeholder:text-gray-light/60"
+              className="w-full rounded-md border border-foreground/10 bg-background/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60"
             />
             {!draft.netPayout && calculatedNet != null && (
               <button
                 type="button"
                 onClick={() => updateDraft('netPayout', String(calculatedNet))}
-                className="text-[11px] text-ui-accent underline underline-offset-2"
+                className="text-xs text-primary underline underline-offset-2"
               >
                 {t('finance.driverPayout.useEstimate')}: {fmt(calculatedNet)} {transactionCurrency}
               </button>
@@ -376,7 +376,7 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
 
               {/* Tip */}
           <label className="block space-y-1">
-            <span className="text-xs font-medium text-gray-light">
+            <span className="text-xs font-medium text-muted-foreground">
               {t('finance.driverPayout.tip')} {t('common.optional')}
             </span>
             <input
@@ -384,26 +384,26 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
               value={draft.tip}
               onChange={(e) => updateDraft('tip', e.target.value)}
               placeholder="0"
-              className="w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-soft-cream placeholder:text-gray-light/60"
+              className="w-full rounded-md border border-foreground/10 bg-background/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60"
             />
           </label>
 
           {/* Biaya Operasional Bensin */}
-          <div className="pt-2 border-t border-white/5 space-y-3">
-            <h3 className="text-sm font-semibold text-soft-cream">{t('finance.driverPayout.operationalCost')}</h3>
+          <div className="pt-2 border-t border-foreground/5 space-y-3">
+            <h3 className="text-sm font-semibold text-foreground">{t('finance.driverPayout.operationalCost')}</h3>
             <div className="grid grid-cols-2 gap-3">
               <label className="block space-y-1">
-                <span className="text-xs font-medium text-gray-light">{t('finance.driverPayout.orderDistance')}</span>
+                <span className="text-xs font-medium text-muted-foreground">{t('finance.driverPayout.orderDistance')}</span>
                 <input
                   type="number" min="0" step="0.1" inputMode="decimal"
                   value={draft.distance}
                   onChange={(e) => updateDraft('distance', e.target.value)}
                   placeholder={extraction?.distance_km != null ? String(extraction.distance_km) : '0'}
-                  className="w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-soft-cream placeholder:text-gray-light/60"
+                  className="w-full rounded-md border border-foreground/10 bg-background/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60"
                 />
               </label>
               <label className="block space-y-1">
-                <span className="text-xs font-medium text-gray-light">
+                <span className="text-xs font-medium text-muted-foreground">
                   {t('finance.driverPayout.returnDistance')}
                 </span>
                 <input
@@ -411,27 +411,27 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
                   value={draft.returnDistance}
                   onChange={(e) => updateDraft('returnDistance', e.target.value)}
                   placeholder={t('common.optional')}
-                  className="w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-soft-cream placeholder:text-gray-light/60"
+                  className="w-full rounded-md border border-foreground/10 bg-background/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60"
                 />
               </label>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <label className="block space-y-1">
-                <span className="text-xs font-medium text-gray-light">{t('finance.driverPayout.fuelPrice')}</span>
+                <span className="text-xs font-medium text-muted-foreground">{t('finance.driverPayout.fuelPrice')}</span>
                 <input
                   type="number" min="0" step="500" inputMode="numeric"
                   value={draft.fuelPrice}
                   onChange={(e) => updateDraft('fuelPrice', e.target.value)}
                   placeholder="10000"
-                  className="w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-soft-cream placeholder:text-gray-light/60"
+                  className="w-full rounded-md border border-foreground/10 bg-background/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60"
                 />
               </label>
               <label className="block space-y-1">
-                <span className="text-xs font-medium text-gray-light">{t('finance.driverPayout.vehicleType')}</span>
+                <span className="text-xs font-medium text-muted-foreground">{t('finance.driverPayout.vehicleType')}</span>
                 <select
                   value={draft.vehicleType}
                   onChange={(e) => updateDraft('vehicleType', e.target.value as VehicleType)}
-                  className="w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-soft-cream"
+                  className="w-full rounded-md border border-foreground/10 bg-background/60 px-3 py-2 text-sm text-foreground"
                 >
                   {(Object.keys(VEHICLE_LABELS) as VehicleType[]).map((key) => (
                     <option key={key} value={key}>{VEHICLE_LABELS[key]}</option>
@@ -442,14 +442,14 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
 
             {fuelCost > 0 && (
               <div className="rounded-md bg-danger/10 border border-danger/20 p-3 space-y-1.5 text-xs">
-                <div className="flex justify-between text-gray-light">
+                <div className="flex justify-between text-muted-foreground">
                   <span>
                     {fmt(totalDistanceKm)} km ÷ {VEHICLE_EFFICIENCY[draft.vehicleType]} km/L × {transactionCurrency}{fmt(parseField(draft.fuelPrice) || 10000)}/L
                   </span>
                   <span className="font-mono font-semibold text-danger-light">- {transactionCurrency}{fmt(fuelCost)}</span>
                 </div>
                 {realNetProfit != null && (
-                  <div className="flex justify-between border-t border-danger/20 pt-1.5 text-sm font-bold text-soft-cream">
+                  <div className="flex justify-between border-t border-danger/20 pt-1.5 text-sm font-bold text-foreground">
                     <span>{t('finance.driverPayout.realNetProfit')}</span>
                     <span className="font-mono">{transactionCurrency}{fmt(realNetProfit)}</span>
                   </div>
@@ -458,10 +458,10 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
             )}
           </div>
 
-          <p className="rounded-md border border-warning/20 bg-warning/5 p-3 text-xs text-gray-light">
+          <p className="rounded-md border border-warning/20 bg-warning/5 p-3 text-xs text-muted-foreground">
             {t('finance.driverPayout.estimateDisclaimer')}
           </p>
-          <p className="flex items-center gap-2 text-sm font-semibold text-soft-cream">
+          <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <Receipt size={16} />
             {t('finance.driverPayout.transactionCurrency')}: {transactionCurrency}
           </p>

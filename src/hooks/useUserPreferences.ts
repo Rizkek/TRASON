@@ -5,8 +5,9 @@ import { useAuthStore } from '@/store/authStore';
 import { userQueries } from '@/services/core/userQueries';
 import type { UserPreferences } from '@/types/database';
 import { executeMutation } from "@/libs/api/mutationBuilder";
+import { DEFAULT_THEME_PREFERENCE, type ThemePreference } from '@/libs/theme';
 
-export type AppTheme = 'light' | 'dark';
+export type AppTheme = ThemePreference;
 
 export interface AppPreferences {
   theme: AppTheme;
@@ -21,7 +22,7 @@ export interface AppPreferences {
 }
 
 const DEFAULT_PREFERENCES: AppPreferences = {
-  theme: 'dark',
+  theme: DEFAULT_THEME_PREFERENCE,
   language: 'en',
   currency: 'USD',
   timezone: 'UTC',

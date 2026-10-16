@@ -106,7 +106,7 @@ export function ReceiptUpload({ onUploadSuccess, onError }: Props) {
         disabled={isUploading}
         aria-busy={isUploading}
         onClick={() => fileInputRef.current?.click()}
-        className="p-3.5 h-full bg-gray-strong border border-white/5 hover:border-primary/50 text-gray-light hover:text-primary rounded-xl flex items-center justify-center transition-colors disabled:opacity-50"
+        className="p-3.5 h-full bg-surface border border-foreground/5 hover:border-primary/50 text-muted-foreground hover:text-primary rounded-xl flex items-center justify-center transition-colors disabled:opacity-50"
         title="Scan Receipt"
         aria-label="Scan Receipt"
       >

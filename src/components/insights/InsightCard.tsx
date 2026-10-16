@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { InsightCandidate } from '@/types/insight';
 import { Card } from '@/components/ui/Card';
-import { Info, ArrowRight, TrendUp, WarningCircle, Sparkle } from '@phosphor-icons/react';
+import { Info, ArrowRight, TrendUp, WarningCircle, ChartLineUp } from '@phosphor-icons/react';
 import { Heading, Paragraph } from '@/components/ui/typography';
 
 interface InsightCardProps {
@@ -17,7 +17,7 @@ export function InsightCard({ insight, className = '' }: InsightCardProps) {
     switch (insight.type) {
       case 'attention': return <WarningCircle weight="fill" className="w-5 h-5 text-warning" />;
       case 'progress': return <TrendUp weight="bold" className="w-5 h-5 text-success" />;
-      case 'pattern': return <Sparkle weight="fill" className="w-5 h-5 text-info" />;
+      case 'pattern': return <ChartLineUp weight="fill" className="w-5 h-5 text-info" />;
       case 'change': return <TrendUp weight="bold" className="w-5 h-5 text-accent-purple" />;
       default: return <Info weight="bold" className="w-5 h-5 text-muted-foreground" />;
     }

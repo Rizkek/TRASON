@@ -30,14 +30,14 @@ export const Button = memo(
       },
       ref
     ) => {
-      const baseStyles = 'inline-flex items-center justify-center font-semibold transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none tracking-tight overflow-hidden relative focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-warm-black';
-      
+      const baseStyles = 'inline-flex items-center justify-center font-semibold transition-colors duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none tracking-tight overflow-hidden relative focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background';
+
       const variants = {
-        primary: 'bg-warm-gold text-warm-black font-semibold hover:bg-secondary',
-        secondary: 'bg-gray-medium text-soft-cream border border-gray-light/30 hover:bg-gray-strong',
-        outline: 'bg-transparent border-2 border-warm-gold text-warm-gold hover:bg-warm-gold hover:text-warm-black',
-        ghost: 'bg-transparent text-soft-cream hover:bg-soft-cream/10',
-        danger: 'bg-danger text-white hover:bg-danger/90',
+        primary: 'bg-primary text-on-primary font-semibold hover:bg-secondary',
+        secondary: 'bg-surface-hover text-foreground border border-foreground/20 hover:bg-surface',
+        outline: 'bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-on-primary',
+        ghost: 'bg-transparent text-foreground hover:bg-foreground/10',
+        danger: 'bg-danger text-background hover:bg-danger/90',
       };
 
       const sizes = {

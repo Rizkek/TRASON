@@ -18,14 +18,18 @@ export const activityQueries = {
   async getActivitiesByDate(date: Date) {
     try {
     return await withAuthQuery(async (userId) => {
-    const dateStr = date.toISOString().split('T')[0];
+    // Local day boundaries as real instants; a bare 'YYYY-MM-DDT00:00:00' is read in the database timezone.
+    const dayStart = new Date(date);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(date);
+    dayEnd.setHours(23, 59, 59, 999);
     const { data, error } = await supabase
             .from('activities')
             .select('*')
             .eq('user_id', userId)
             .is('deleted_at', null)
-            .gte('start_time', `${dateStr}T00:00:00`)
-            .lte('start_time', `${dateStr}T23:59:59`)
+            .gte('start_time', dayStart.toISOString())
+            .lte('start_time', dayEnd.toISOString())
             .order('start_time', { ascending: false });
     if (error) throw error;
     return data;

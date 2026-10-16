@@ -16,6 +16,27 @@ export const formatDateOnly = (value: Date | string): string => {
   return `${year}-${month}-${day}`;
 };
 
+export type BillingCycle = 'monthly' | 'yearly' | 'weekly';
+
+// Works on the calendar date in UTC: a date-only string parses as UTC midnight, so local setters
+// would land on the previous day west of UTC. Month steps clamp to the last day (Jan 31 -> Feb 28).
+export const addBillingCycle = (dateOnly: string, cycle: BillingCycle): string => {
+  const [year, month, day] = dateOnly.slice(0, 10).split('-').map(Number);
+  const next = new Date(Date.UTC(year, month - 1, day));
+
+  if (cycle === 'weekly') {
+    next.setUTCDate(next.getUTCDate() + 7);
+  } else {
+    const months = cycle === 'yearly' ? 12 : 1;
+    const target = new Date(Date.UTC(year, month - 1 + months, 1));
+    const lastDay = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate();
+    target.setUTCDate(Math.min(day, lastDay));
+    return target.toISOString().slice(0, 10);
+  }
+
+  return next.toISOString().slice(0, 10);
+};
+
 export const getDateRange = (
   month: number,
   year: number

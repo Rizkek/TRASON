@@ -1,6 +1,6 @@
-# 📡 API Endpoint Specification & JWT Authentication
+# API Endpoint Specification & JWT Authentication
 
-This document details the Next.js Route Handlers deployed inside the `/src/app/api` directory, specifying their request schemas, output formats, and the server-side authentication system.
+This document details the Next.js Route Handlers deployed inside the `/src/app/api` directory, specifying their request schemas, output formats, and the server-side authentication system. Only `insights/generate`, `investments/insights`, `parse` and `validate-email` are specified in detail below; the full route list is in `docs/api-database.md`.
 
 ---
 

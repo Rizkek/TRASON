@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient, getAuthenticatedUser } from '@/utils/supabase/server';
-import { getDateRange } from '@/libs/date';
+import { formatDateOnly, getDateRange } from '@/libs/date';
 import {
   calculateFinanceScore,
   calculateProductivityScore,
@@ -44,8 +44,8 @@ export async function GET() {
         .from('transactions')
         .select('amount, type, category_id')
         .eq('user_id', user.id)
-        .gte('date', monthStart.toISOString().split('T')[0])
-        .lte('date', monthEnd.toISOString().split('T')[0])
+        .gte('date', formatDateOnly(monthStart))
+        .lte('date', formatDateOnly(monthEnd))
         .is('deleted_at', null),
       
       // 2. Activities (last 7 days)

@@ -1,9 +1,13 @@
-
-
 import React from 'react';
-import { LandingNavbar } from '@/components/landing/LandingNavbar';
-import { LandingFooter } from '@/components/landing/LandingFooter';
-import { Heading, Paragraph } from '@/components/ui/typography';
+import type { Metadata } from 'next';
+import { PageShell } from '@/components/landing/page/PageShell';
+import { PageHeader } from '@/components/landing/page/PageHeader';
+
+export const metadata: Metadata = {
+  title: 'Changelog',
+  description: 'New updates and improvements to TRASON.',
+  alternates: { canonical: '/changelog' },
+};
 
 const CHANGES = [
   {
@@ -14,8 +18,8 @@ const CHANGES = [
       'Refactored UI to remove casual emojis for a more professional, polished look.',
       'Completely redesigned the Landing Footer with comprehensive SaaS links.',
       'Introduced a highly realistic Interactive Preview on the landing page.',
-      'Added Contact, Pricing, Changelog, and Legal pages.'
-    ]
+      'Added Contact, Pricing, Changelog, and Legal pages.',
+    ],
   },
   {
     version: 'v1.0.0',
@@ -25,62 +29,46 @@ const CHANGES = [
       'Launched the TRASON Core Operating System.',
       'Financial Tracking: Income, Expenses, and Saving Rate.',
       'Vitality Tracking: Habit 30-day heatmaps.',
-      'Career Pipeline: Job application tracking with stages.'
-    ]
+      'Career Pipeline: Job application tracking with stages.',
+    ],
   },
   {
     version: 'Beta',
     date: 'May 2026',
     title: 'Closed Beta',
-    items: [
-      'Invited first 100 power users to test the platform.',
-      'Iterated on the Life Score algorithm.'
-    ]
-  }
+    items: ['Invited first 100 power users to test the platform.', 'Iterated on the Life Score algorithm.'],
+  },
 ];
 
 export default function ChangelogPage() {
   return (
-    <div className="min-h-screen font-sans relative overflow-x-hidden">
-      <LandingNavbar />
-      
-      <main className="pt-32 md:pt-48 pb-24 px-6 max-w-3xl mx-auto space-y-16">
-        <div className="space-y-4 mb-16">
-           <Heading as="h1" size="h1" className="text-soft-cream">Changelog</Heading>
-           <Paragraph size="xl" className="text-gray-light/60">New updates and improvements to TRASON.</Paragraph>
-        </div>
+    <PageShell>
+      <PageHeader eyebrow="Changelog" title="What changed" lede="New updates and improvements to TRASON." />
 
-        <div className="space-y-16">
-          {CHANGES.map((release, i) => (
-            <div key={i} className="relative pl-8 md:pl-0">
-              {/* Timeline Line for Mobile */}
-              <div className="md:hidden absolute left-0 top-2 bottom-0 w-px bg-white/10" />
-              <div className="md:hidden absolute left-[-4px] top-2 w-2 h-2 rounded-full bg-warm-gold" />
-              
-              <div className="flex flex-col md:flex-row gap-4 md:gap-12">
-                <div className="md:w-48 shrink-0">
-                  <p className="text-sm font-bold text-gray-light">{release.date}</p>
-                  <p className="text-xs text-gray-light/60 mt-1">{release.version}</p>
-                </div>
-                
-                <div className="flex-1 space-y-4">
-                  <Heading as="h2" size="h4" className="text-white">{release.title}</Heading>
-                  <ul className="space-y-3">
-                    {release.items.map((item, j) => (
-                      <li key={j} className="flex gap-3 text-gray-light text-sm">
-                        <span className="text-white/20 mt-1">•</span>
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+      <ol className="mt-16 space-y-14">
+        {CHANGES.map((release) => (
+          <li key={release.version} className="grid gap-4 md:grid-cols-[12rem_1fr] md:gap-10">
+            <div>
+              <p className="text-sm font-semibold text-foreground">{release.date}</p>
+              <p className="mt-1 inline-block rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-on-primary">
+                {release.version}
+              </p>
             </div>
-          ))}
-        </div>
-      </main>
 
-      <LandingFooter />
-    </div>
+            <div className="space-y-4 border-l-2 border-primary pl-5 md:pl-6">
+              <h2 className="text-heading-lg text-foreground">{release.title}</h2>
+              <ul className="space-y-2.5">
+                {release.items.map((item) => (
+                  <li key={item} className="flex gap-3 text-sm leading-relaxed text-muted-foreground">
+                    <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </PageShell>
   );
 }

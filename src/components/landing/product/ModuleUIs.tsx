@@ -41,28 +41,28 @@ export function FinanceUI() {
 
         <div className="grid gap-4 lg:grid-cols-5">
           <div className="lg:col-span-3">
-            <div className="mb-2 flex gap-4 border-b border-ui-border/[0.06] text-[12px]">
+            <div className="mb-2 flex gap-4 border-b border-foreground/[0.06] text-xs">
               {['Transactions', 'Installments', 'Subscriptions'].map((tab, i) => (
                 <span
                   key={tab}
                   className={`-mb-px border-b-2 pb-2 ${
-                    i === 0 ? 'border-ui-accent font-medium text-ui-fg' : 'border-transparent text-ui-muted'
+                    i === 0 ? 'border-primary font-medium text-foreground' : 'border-transparent text-muted-foreground'
                   }`}
                 >
                   {tab}
                 </span>
               ))}
             </div>
-            <ul className="divide-y divide-ui-border/[0.06]">
+            <ul className="divide-y divide-foreground/[0.06]">
               {TRANSACTIONS.map((t) => (
                 <li key={t.name} className="flex items-center justify-between gap-3 py-2.5">
                   <div className="min-w-0">
-                    <p className="truncate text-[13px] text-ui-fg">{t.name}</p>
-                    <p className="text-[11px] text-ui-muted">
+                    <p className="truncate text-body-sm text-foreground">{t.name}</p>
+                    <p className="text-xs text-muted-foreground">
                       {t.cat} · {t.date}
                     </p>
                   </div>
-                  <span className="text-[13px]">
+                  <span className="text-body-sm">
                     <UiMoney value={t.amount} tone={t.income ? 'positive' : 'default'} />
                   </span>
                 </li>
@@ -74,10 +74,10 @@ export function FinanceUI() {
             <UiCard>
               <div className="flex items-center justify-between">
                 <UiLabel>Monthly budget</UiLabel>
-                <span className="font-mono text-[11px] text-ui-muted">62%</span>
+                <span className="font-mono text-xs text-muted-foreground">62%</span>
               </div>
-              <p className="mt-1.5 text-[13px]">
-                <UiMoney value="Rp 3.720.000" /> <span className="text-ui-muted">of Rp 6.000.000</span>
+              <p className="mt-1.5 text-body-sm">
+                <UiMoney value="Rp 3.720.000" /> <span className="text-muted-foreground">of Rp 6.000.000</span>
               </p>
               <div className="mt-2.5">
                 <UiBar value={62} tone="accent" />
@@ -85,22 +85,22 @@ export function FinanceUI() {
             </UiCard>
             <UiCard>
               <UiLabel className="mb-2">Upcoming bills</UiLabel>
-              <ul className="space-y-1.5 text-[12px]">
+              <ul className="space-y-1.5 text-xs">
                 <li className="flex justify-between">
-                  <span className="text-ui-fg">Spotify · 20 Sep</span>
+                  <span className="text-foreground">Spotify · 20 Sep</span>
                   <UiMoney value="Rp 54.990" />
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-ui-fg">Kost · 1 Oct</span>
+                  <span className="text-foreground">Kost · 1 Oct</span>
                   <UiMoney value="Rp 1.500.000" />
                 </li>
               </ul>
             </UiCard>
             <UiCard accent>
               <div className="flex items-center gap-2.5">
-                <Camera size={14} className="text-ui-accent" />
-                <p className="text-[12px] text-ui-fg/90">
-                  Receipt scanned · <span className="text-ui-accent">3 items to review</span>
+                <Camera size={14} className="text-primary" />
+                <p className="text-xs text-foreground/90">
+                  Receipt scanned · <span className="text-primary">3 items to review</span>
                 </p>
               </div>
             </UiCard>
@@ -146,13 +146,13 @@ export function CareerUI() {
           {PIPELINE.map((col, i) => (
             <div key={col.stage} className="min-w-0 space-y-2">
               <div className="flex items-center justify-between px-1">
-                <UiLabel className={i === 3 ? 'text-emerald-300' : i === 2 ? 'text-sky-300' : ''}>{col.stage}</UiLabel>
-                <span className="font-mono text-[11px] text-ui-muted">{col.count}</span>
+                <UiLabel className={i === 3 ? 'text-success' : i === 2 ? 'text-info' : ''}>{col.stage}</UiLabel>
+                <span className="font-mono text-xs text-muted-foreground">{col.count}</span>
               </div>
               {col.items.map((item) => (
                 <UiCard key={item.role + item.company} className="p-3">
-                  <p className="truncate text-[13px] text-ui-fg">{item.role}</p>
-                  <p className="truncate text-[11px] text-ui-muted">{item.company}</p>
+                  <p className="truncate text-body-sm text-foreground">{item.role}</p>
+                  <p className="truncate text-xs text-muted-foreground">{item.company}</p>
                   {'note' in item && item.note && (
                     <div className="mt-2">
                       <UiTag tone="info">{item.note}</UiTag>
@@ -168,16 +168,16 @@ export function CareerUI() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <UiLabel>Resume match</UiLabel>
-              <p className="mt-1 text-[13px] text-ui-fg">Senior Designer — Tokopedia</p>
+              <p className="mt-1 text-body-sm text-foreground">Senior Designer — Tokopedia</p>
             </div>
             <div className="flex items-center gap-3">
-              <span className="font-mono text-2xl font-semibold text-ui-fg">
-                78<span className="text-xs text-ui-muted">/100</span>
+              <span className="font-mono text-2xl font-semibold text-foreground">
+                78<span className="text-xs text-muted-foreground">/100</span>
               </span>
               <UiTag tone="positive">High match</UiTag>
             </div>
           </div>
-          <p className="mt-2 text-[12px] text-ui-muted">
+          <p className="mt-2 text-xs text-muted-foreground">
             Your CV aligns well with the requirements. Missing: design systems, Figma variables.
           </p>
         </UiCard>
@@ -205,15 +205,15 @@ export function VitalityUI() {
         <div className="grid grid-cols-3 gap-3">
           <UiCard>
             <UiLabel>Total sessions</UiLabel>
-            <p className="mt-1.5 font-mono text-base text-ui-fg">3</p>
+            <p className="mt-1.5 font-mono text-base text-foreground">3</p>
           </UiCard>
           <UiCard>
             <UiLabel>Total time</UiLabel>
-            <p className="mt-1.5 font-mono text-base text-ui-fg">2h 10m</p>
+            <p className="mt-1.5 font-mono text-base text-foreground">2h 10m</p>
           </UiCard>
           <UiCard>
             <UiLabel>Avg session</UiLabel>
-            <p className="mt-1.5 font-mono text-base text-ui-fg">43 min</p>
+            <p className="mt-1.5 font-mono text-base text-foreground">43 min</p>
           </UiCard>
         </div>
 
@@ -227,10 +227,10 @@ export function VitalityUI() {
               <div key={`${d}-${i}`} className="flex flex-col items-center gap-1.5">
                 <span
                   className={`h-8 w-8 rounded-full border ${
-                    active[i] ? 'border-emerald-400 bg-emerald-400/20' : 'border-ui-border/10'
+                    active[i] ? 'border-success bg-success/20' : 'border-foreground/10'
                   }`}
                 />
-                <span className="text-[10px] text-ui-muted">{d}</span>
+                <span className="text-xs text-muted-foreground">{d}</span>
               </div>
             ))}
           </div>
@@ -239,14 +239,14 @@ export function VitalityUI() {
         <div className="grid gap-4 lg:grid-cols-5">
           <UiCard className="lg:col-span-3">
             <UiLabel className="mb-2">Recent workouts</UiLabel>
-            <ul className="divide-y divide-ui-border/[0.06]">
+            <ul className="divide-y divide-foreground/[0.06]">
               {SESSIONS.map((s) => (
                 <li key={s.type} className="flex items-center gap-3 py-2">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-ui-border/[0.06] text-ui-muted">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-foreground/[0.06] text-muted-foreground">
                     <Timer size={13} />
                   </span>
-                  <span className="flex-1 text-[13px] text-ui-fg">{s.type}</span>
-                  <span className="font-mono text-[11px] text-ui-muted">{s.duration}</span>
+                  <span className="flex-1 text-body-sm text-foreground">{s.type}</span>
+                  <span className="font-mono text-xs text-muted-foreground">{s.duration}</span>
                   <UiTag tone={s.intensity === 'High' ? 'warning' : 'default'}>{s.intensity}</UiTag>
                 </li>
               ))}
@@ -254,17 +254,17 @@ export function VitalityUI() {
           </UiCard>
           <UiCard className="lg:col-span-2">
             <div className="flex items-center gap-2">
-              <Trophy size={13} className="text-ui-accent" />
+              <Trophy size={13} className="text-primary" />
               <UiLabel>Personal records</UiLabel>
             </div>
-            <ul className="mt-2.5 space-y-2 text-[12px]">
+            <ul className="mt-2.5 space-y-2 text-xs">
               <li className="flex justify-between">
-                <span className="text-ui-fg">Deadlift</span>
-                <span className="font-mono text-ui-accent">100 kg</span>
+                <span className="text-foreground">Deadlift</span>
+                <span className="font-mono text-primary">100 kg</span>
               </li>
               <li className="flex justify-between">
-                <span className="text-ui-fg">5K run</span>
-                <span className="font-mono text-ui-accent">26:40</span>
+                <span className="text-foreground">5K run</span>
+                <span className="font-mono text-primary">26:40</span>
               </li>
             </ul>
           </UiCard>
@@ -310,28 +310,28 @@ export function ScheduleUI() {
           <div className="space-y-3 lg:col-span-3">
             <div className="flex items-center justify-between">
               <UiLabel>Weekly log</UiLabel>
-              <span className="text-[11px] text-ui-muted">Add activity</span>
+              <span className="text-xs text-muted-foreground">Add activity</span>
             </div>
             <div className="grid grid-cols-7 gap-1">
               {DAYS.map((day) => (
                 <div
                   key={day.d}
                   className={`flex flex-col items-center rounded-lg py-1.5 ${
-                    day.today ? 'bg-ui-accent text-ui-bg' : 'text-ui-muted'
+                    day.today ? 'bg-primary text-background' : 'text-muted-foreground'
                   }`}
                 >
-                  <span className="text-[10px]">{day.d}</span>
-                  <span className={`font-mono text-[13px] ${day.today ? 'font-semibold' : 'text-ui-fg'}`}>{day.n}</span>
+                  <span className="text-xs">{day.d}</span>
+                  <span className={`font-mono text-body-sm ${day.today ? 'font-semibold' : 'text-foreground'}`}>{day.n}</span>
                 </div>
               ))}
             </div>
             <ul className="space-y-2">
               {ACTIVITIES.map((a) => (
-                <li key={a.title} className="flex items-center gap-3 rounded-lg border border-ui-border/[0.06] bg-ui-surface/40 px-3 py-2">
-                  <span className="w-10 font-mono text-[11px] text-ui-muted">{a.time}</span>
+                <li key={a.title} className="flex items-center gap-3 rounded-lg border border-foreground/[0.06] bg-surface/40 px-3 py-2">
+                  <span className="w-10 font-mono text-xs text-muted-foreground">{a.time}</span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] text-ui-fg">{a.title}</p>
-                    <p className="text-[11px] text-ui-muted">
+                    <p className="truncate text-body-sm text-foreground">{a.title}</p>
+                    <p className="text-xs text-muted-foreground">
                       {a.cat} · {a.dur}
                     </p>
                   </div>
@@ -344,17 +344,17 @@ export function ScheduleUI() {
           <UiCard className="lg:col-span-2">
             <div className="mb-3 flex items-center justify-between">
               <UiLabel>Tasks</UiLabel>
-              <span className="text-[11px] text-ui-muted">Today</span>
+              <span className="text-xs text-muted-foreground">Today</span>
             </div>
             <ul className="space-y-2.5">
               {CHECKLIST.map((t) => (
                 <li key={t.title} className="flex items-center gap-3">
                   <UiCheck done={t.done} />
-                  <span className={`text-[13px] ${t.done ? 'text-ui-muted line-through' : 'text-ui-fg'}`}>{t.title}</span>
+                  <span className={`text-body-sm ${t.done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{t.title}</span>
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-[11px] text-ui-muted">Completed tasks count toward Productivity in your Life Score.</p>
+            <p className="mt-4 text-xs text-muted-foreground">Completed tasks count toward Productivity in your Life Score.</p>
           </UiCard>
         </div>
       </div>

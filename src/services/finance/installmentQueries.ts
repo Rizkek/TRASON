@@ -1,6 +1,7 @@
 import { supabase } from '../supabase/supabaseClient';
 import { handleQueryError, logError } from '@/libs/apiErrors';
 import { withAuthQuery } from "@/services/supabase/queryBuilder";
+import { getProfileToday } from '@/libs/profileDate';
 import { Installment, InstallmentPayment } from '@/types/database';
 
 export const installmentQueries = {
@@ -68,7 +69,7 @@ export const installmentQueries = {
         
         for (let i = 0; i < installment.total_months; i++) {
           const dueDate = new Date(startDate);
-          dueDate.setMonth(dueDate.getMonth() + i);
+          dueDate.setUTCMonth(dueDate.getUTCMonth() + i);
           
           paymentsToInsert.push({
             installment_id: newInst.id,
@@ -102,7 +103,7 @@ export const installmentQueries = {
           .from('installment_payments')
           .update({
             status: 'paid',
-            paid_date: new Date().toISOString().split('T')[0],
+            paid_date: getProfileToday(),
             transaction_id: transactionId
           })
           .eq('id', paymentId)

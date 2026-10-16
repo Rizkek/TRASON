@@ -31,7 +31,7 @@ export function MediaFrame({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl bg-lp-foreground/[0.04] ${className}`}
+      className={`relative overflow-hidden rounded-2xl bg-foreground/[0.04] ${className}`}
       style={{ aspectRatio: ratio }}
     >
       <Image

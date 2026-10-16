@@ -1,15 +1,18 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono, DM_Serif_Display, Plus_Jakarta_Sans } from 'next/font/google';
+import { Geist, Geist_Mono, DM_Serif_Display } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import { ThemeSync } from '@/components/layout/ThemeSync';
+import { NO_FLASH_THEME_SCRIPT, THEME_META_COLOR } from '@/libs/theme';
 import NextTopLoader from 'nextjs-toploader';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const BASE_URL = 'https://www.trason.web.id';
 
+// Geist carries the UI. Mono (numbers) and the serif (wordmark, landing titles) are used less, so
+// they load when needed instead of being preloaded on every route.
 const fontSans = Geist({
   subsets: ['latin'],
   variable: '--font-sans',
@@ -20,6 +23,7 @@ const fontMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
+  preload: false,
 });
 
 const fontBrand = DM_Serif_Display({
@@ -28,12 +32,7 @@ const fontBrand = DM_Serif_Display({
   subsets: ['latin'],
   variable: '--font-brand',
   display: 'swap',
-});
-
-const fontDisplay = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
+  preload: false,
 });
 
 const SITE_DESCRIPTION =
@@ -120,9 +119,15 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#FAF9F6',
+  // Device-based until ThemeSync resolves the real theme; it then rewrites both tags.
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: THEME_META_COLOR.light },
+    { media: '(prefers-color-scheme: dark)', color: THEME_META_COLOR.dark },
+  ],
   width: 'device-width',
   initialScale: 1,
+  // Lets fixed bars extend under the notch; they pad themselves with env(safe-area-inset-*).
+  viewportFit: 'cover',
 };
 
 // ── Structured Data (JSON-LD) ────────────────────────────────────────────────
@@ -197,9 +202,11 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${fontSans.variable} ${fontMono.variable} ${fontBrand.variable} ${fontDisplay.variable}`}
+      className={`${fontSans.variable} ${fontMono.variable} ${fontBrand.variable}`}
+      suppressHydrationWarning
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: NO_FLASH_THEME_SCRIPT }} />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <link rel="icon" href="/favicon.png" type="image/png" />
@@ -237,7 +244,7 @@ export default function RootLayout({
             showSpinner={false}
             easing="ease"
             speed={200}
-            shadow="0 0 10px #F4C95D,0 0 5px #F4C95D"
+            shadow={false}
           />
           <AuthProvider>
             <ThemeSync />

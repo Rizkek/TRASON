@@ -11,25 +11,25 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 export const Card: React.FC<CardProps> = ({
   title,
   description,
-  hover = false,
+  hover: _hover,
   className = '',
   children,
   ...props
 }) => {
   return (
     <div
-      className={`card ${hover ? 'hover:shadow-2xl' : ''} ${className}`}
+      className={`card ${className}`}
       {...props}
     >
       {(title || description) && (
-        <div className="px-4 py-3 md:px-6 md:py-4 border-b border-soft-cream/10">
+        <div className="px-4 py-3 md:px-6 md:py-4 border-b border-foreground/10">
           {title && (
-            <h3 className="text-sm font-semibold tracking-tight text-soft-cream uppercase opacity-90">
+            <h3 className="text-sm font-semibold tracking-tight text-foreground uppercase">
               {title}
             </h3>
           )}
           {description && (
-            <p className="text-[10px] text-gray-light mt-0.5 tracking-wide uppercase">
+            <p className="text-xs text-muted-foreground mt-0.5 tracking-wide uppercase">
               {description}
             </p>
           )}

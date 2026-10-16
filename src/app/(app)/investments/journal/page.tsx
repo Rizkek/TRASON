@@ -1,6 +1,5 @@
-import React from 'react';
-import { InvestmentJournalClient } from './_client';
+import { redirect } from 'next/navigation';
 
 export default function InvestmentJournalPage() {
-  return <InvestmentJournalClient />;
+  redirect('/investments');
 }

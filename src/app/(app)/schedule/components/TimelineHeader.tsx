@@ -34,7 +34,7 @@ export function TimelineHeader({
   return (
     <div className="flex items-start justify-between flex-wrap gap-4">
       <div className="space-y-1">
-        <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-soft-cream">
+        <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-foreground">
           {t('timeline_page.title')}
         </Heading>
         <Paragraph className="text-subtext flex items-center gap-2">
@@ -46,7 +46,7 @@ export function TimelineHeader({
           <div className="flex items-center gap-8 text-center">
             <div>
               <Paragraph className="text-2xl font-semibold text-primary">{activitiesCount}</Paragraph>
-              <Paragraph className="text-[10px] text-gray-light uppercase tracking-widest">
+              <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest">
                 {t('timeline_page.logs_upper')}
               </Paragraph>
             </div>
@@ -54,7 +54,7 @@ export function TimelineHeader({
               <Paragraph className="text-2xl font-semibold text-secondary">
                 {totalHours > 0 ? `${totalHours}h` : `${remMinutes}m`}
               </Paragraph>
-              <Paragraph className="text-[10px] text-gray-light uppercase tracking-widest">
+              <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest">
                 {t('timeline_page.logged_upper')}
               </Paragraph>
             </div>
@@ -65,9 +65,9 @@ export function TimelineHeader({
             <div className="text-center">
               <Paragraph className="text-2xl font-semibold text-primary">
                 {completedCount}
-                <span className="text-gray-light opacity-50 text-lg">/{totalCount}</span>
+                <span className="text-muted-foreground opacity-50 text-lg">/{totalCount}</span>
               </Paragraph>
-              <Paragraph className="text-[10px] text-gray-light uppercase tracking-widest">
+              <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest">
                 {t('timeline_page.done_today')}
               </Paragraph>
             </div>

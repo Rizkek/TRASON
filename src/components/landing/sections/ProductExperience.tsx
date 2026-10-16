@@ -119,7 +119,7 @@ export function ProductExperience() {
         <div
           role="tablist"
           aria-label="TRASON pages"
-          className="-mx-5 mt-10 flex gap-1 overflow-x-auto border-b border-lp-border/10 px-5 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="-mx-5 mt-10 flex gap-1 overflow-x-auto border-b border-foreground/10 px-5 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {TABS.map((tab, index) => {
             const selected = tab.id === active;
@@ -139,8 +139,8 @@ export function ProductExperience() {
                 onKeyDown={(e) => onKeyDown(e, index)}
                 className={`-mb-px shrink-0 border-b-2 px-4 py-3 text-sm transition-colors ${
                   selected
-                    ? 'border-lp-foreground font-medium text-lp-foreground'
-                    : 'border-transparent text-lp-muted hover:text-lp-foreground'
+                    ? 'border-primary font-medium text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {tab.label}
@@ -158,16 +158,16 @@ export function ProductExperience() {
         >
           <div className="grid gap-6 lg:grid-cols-12 lg:gap-10">
             <div className="lg:col-span-4">
-              <h3 className="text-2xl leading-tight text-lp-foreground sm:text-[1.75rem]">{current.what}</h3>
+              <h3 className="text-heading-lg leading-tight text-foreground sm:text-heading-xl">{current.what}</h3>
             </div>
             <div className="grid gap-5 sm:grid-cols-2 lg:col-span-8">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-lp-muted">How</p>
-                <p className="mt-2 text-[15px] leading-relaxed text-lp-foreground/90">{current.how}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">How</p>
+                <p className="mt-2 text-base leading-relaxed text-foreground/90">{current.how}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-lp-muted">Why it matters</p>
-                <p className="mt-2 text-[15px] leading-relaxed text-lp-foreground/90">{current.why}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Why it matters</p>
+                <p className="mt-2 text-base leading-relaxed text-foreground/90">{current.why}</p>
               </div>
             </div>
           </div>

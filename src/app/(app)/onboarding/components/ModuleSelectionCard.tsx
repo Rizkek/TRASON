@@ -1,12 +1,11 @@
 import React from 'react';
-import { Heading, Paragraph } from '@/components/ui/typography';
+import { Check } from '@phosphor-icons/react';
 
 interface ModuleSelectionCardProps {
   id: string;
   title: string;
   description: string;
   icon: React.ElementType;
-  color: string;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
@@ -16,49 +15,40 @@ export const ModuleSelectionCard: React.FC<ModuleSelectionCardProps> = ({
   title,
   description,
   icon: Icon,
-  color,
   isSelected,
   onToggle,
-}) => {
-  return (
-    <div
-      onClick={() => onToggle(id)}
-      className={`relative p-6 rounded-xl border transition-all cursor-pointer overflow-hidden group ${
-        isSelected
-          ? 'bg-black/[0.04] dark:bg-white/[0.04] border-primary'
-          : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] hover:border-primary/50'
+}) => (
+  <button
+    type="button"
+    role="checkbox"
+    aria-checked={isSelected}
+    onClick={() => onToggle(id)}
+    className={`flex min-h-20 w-full items-start gap-4 rounded-xl border p-4 text-left transition-colors ${
+      isSelected
+        ? 'border-primary bg-primary/[0.06]'
+        : 'border-foreground/15 bg-foreground/[0.03] hover:border-foreground/30'
+    }`}
+  >
+    <span
+      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${
+        isSelected ? 'bg-primary/20 text-primary' : 'bg-foreground/[0.06] text-muted-foreground'
       }`}
     >
-      {/* Background glow when selected */}
-      {isSelected && (
-        <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />
-      )}
-      
-      <div className="relative z-10 flex items-start gap-4">
-        <div
-          className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-            isSelected ? 'bg-primary/20' : 'bg-black/5 dark:bg-white/5'
-          }`}
-          style={isSelected ? { color: color, backgroundColor: `${color}20` } : {}}
-        >
-          <Icon size={24} style={isSelected ? { color: color } : {}} className={!isSelected ? 'text-gray-light' : ''} />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-1">
-            <Heading as="h4" size="h4" className={`text-base font-bold tracking-wide transition-colors ${isSelected ? 'text-soft-cream' : 'text-gray-light'}`}>
-              {title}
-            </Heading>
-            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-              isSelected ? 'border-primary bg-primary' : 'border-gray-light/50 bg-transparent'
-            }`}>
-              {isSelected && <span className="w-2.5 h-2.5 bg-warm-black rounded-full" />}
-            </div>
-          </div>
-          <Paragraph className="text-xs text-gray-light leading-relaxed pr-6">
-            {description}
-          </Paragraph>
-        </div>
-      </div>
-    </div>
-  );
-};
+      <Icon size={22} aria-hidden="true" />
+    </span>
+
+    <span className="min-w-0 flex-1">
+      <span className="block text-title-md text-foreground">{title}</span>
+      <span className="mt-0.5 block text-body-md text-muted-foreground">{description}</span>
+    </span>
+
+    <span
+      aria-hidden="true"
+      className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+        isSelected ? 'border-primary bg-primary text-on-primary' : 'border-muted-foreground/60'
+      }`}
+    >
+      {isSelected && <Check size={14} weight="bold" />}
+    </span>
+  </button>
+);

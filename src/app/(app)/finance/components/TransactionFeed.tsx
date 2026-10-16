@@ -125,14 +125,14 @@ export function TransactionFeed({
         <div className="relative">
           <Search
             size={15}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-light pointer-events-none"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
           />
           <input
             type="text"
             placeholder={t('finance.feed.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-12 pr-4 py-2 bg-gray-strong/60 border border-white/[0.06] rounded-lg text-sm focus:border-primary focus:outline-none transition-all"
+            className="w-full pl-12 pr-4 py-2 bg-surface/60 border border-foreground/[0.06] rounded-lg text-sm focus:border-primary focus:outline-none transition-all"
           />
         </div>
         <div className="flex gap-1 overflow-x-auto no-scrollbar">
@@ -141,10 +141,10 @@ export function TransactionFeed({
               key={type}
               type="button"
               onClick={() => onFilterChange(type)}
-              className={`px-4 py-1 text-[10px] font-bold rounded-full transition-all uppercase tracking-widest whitespace-nowrap shrink-0 ${
+              className={`px-4 py-1 text-xs font-bold rounded-full transition-all uppercase tracking-widest whitespace-nowrap shrink-0 ${
                 filterType === type
-                  ? 'bg-primary text-white'
-                  : 'bg-white/[0.05] text-gray-light hover:bg-white/[0.1] hover:text-soft-cream'
+                  ? 'bg-primary text-on-primary'
+                  : 'bg-foreground/[0.05] text-muted-foreground hover:bg-foreground/[0.1] hover:text-foreground'
               }`}
             >
               {type === 'all' ? t('finance.feed.filterAll') : type === 'income' ? t('finance.feed.filterIncome') : t('finance.feed.filterExpense')}
@@ -156,11 +156,11 @@ export function TransactionFeed({
       {/* Transaction list */}
       <Card className="overflow-hidden">
         <div className="px-4 pt-4 pb-1 flex items-center justify-between">
-          <Heading as="h3" size="h3" className="text-[10px] md:text-xs font-bold text-gray-light tracking-widest uppercase">
+          <Heading as="h3" size="h3" className="text-xs font-bold text-muted-foreground tracking-widest uppercase">
             {t('finance.feed.transactionHistory')}
           </Heading>
           {filtered.length > 0 && (
-            <span className="text-[9px] text-gray-light">{filtered.length} {t('finance.table.transaction').toLowerCase()}</span>
+            <span className="text-xs text-muted-foreground">{filtered.length} {t('finance.table.transaction').toLowerCase()}</span>
           )}
         </div>
 
@@ -171,8 +171,8 @@ export function TransactionFeed({
         ) : visibleGroups.length === 0 ? (
           <div className="py-12 flex flex-col items-center justify-center gap-4 opacity-50">
             <div className="text-center">
-              <Paragraph className="text-sm font-semibold text-soft-cream">{t('finance.feed.empty')}</Paragraph>
-              <Paragraph className="text-xs text-gray-light mt-1">
+              <Paragraph className="text-sm font-semibold text-foreground">{t('finance.feed.empty')}</Paragraph>
+              <Paragraph className="text-xs text-muted-foreground mt-1">
                 {searchQuery || filterType !== 'all'
                   ? t('finance.feed.filterAll')
                   : t('moduleCommon.emptyDesc')}
@@ -185,8 +185,8 @@ export function TransactionFeed({
               <div key={group.date}>
                 {/* Date group header */}
                 <div className="px-4 py-1 mt-2 flex items-center gap-2">
-                  <Calendar size={10} className="text-gray-light shrink-0" />
-                  <span className="text-[10px] font-bold text-gray-light uppercase tracking-widest">
+                  <Calendar size={10} className="text-muted-foreground shrink-0" />
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                     {group.label}
                   </span>
                 </div>
@@ -198,7 +198,7 @@ export function TransactionFeed({
                       key={tx.id}
                       type="button"
                       onClick={() => setSelected(tx)}
-                      className="w-full flex items-center gap-4 px-4 py-2 hover:bg-white/[0.03] active:bg-white/[0.05] transition-colors border-b border-white/[0.03] last:border-0 text-left"
+                      className="w-full flex items-center gap-4 px-4 py-2 hover:bg-foreground/[0.03] active:bg-foreground/[0.05] transition-colors border-b border-foreground/[0.03] last:border-0 text-left"
                     >
                       {/* Icon */}
                       <div
@@ -217,19 +217,19 @@ export function TransactionFeed({
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <Paragraph className="text-sm font-semibold text-soft-cream truncate">{tx.title}</Paragraph>
+                          <Paragraph className="text-sm font-semibold text-foreground truncate">{tx.title}</Paragraph>
                           {(tx.source === 'receipt' || tx.source === 'text') && onViewReceipt && (
                             <Receipt size={14} className="text-primary shrink-0" weight="fill" />
                           )}
                         </div>
-                        <Paragraph className="text-[10px] text-gray-light truncate">
+                        <Paragraph className="text-xs text-muted-foreground truncate">
                           {cat?.name || 'Lainnya'}
                         </Paragraph>
                       </div>
                       {/* Amount */}
                       <Paragraph
                         className={`text-sm font-bold tabular-nums shrink-0 ${
-                          tx.type === 'income' ? 'text-success' : 'text-soft-cream'
+                          tx.type === 'income' ? 'text-success' : 'text-foreground'
                         }`}
                       >
                         {tx.type === 'income' ? '+' : '-'}
@@ -250,7 +250,7 @@ export function TransactionFeed({
 
             {/* End of list indicator */}
             {!hasMore && allGroups.length > 0 && visibleCount >= filtered.length && filtered.length > PAGE_SIZE && (
-              <Paragraph className="text-center text-[10px] text-gray-light py-6 tracking-widest uppercase">
+              <Paragraph className="text-center text-xs text-muted-foreground py-6 tracking-widest uppercase">
                 {t('finance.feed.allShown')}
               </Paragraph>
             )}
@@ -273,10 +273,10 @@ export function TransactionFeed({
             style={{ animation: 'slideUp 0.22s ease-out' }}
           >
             <style>{`@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }`}</style>
-            <div className="bg-gray-strong rounded-t-2xl border-t border-white/10 shadow-2xl">
+            <div className="bg-surface rounded-t-2xl border-t border-foreground/10 ">
               {/* Drag handle */}
               <div className="flex justify-center pt-4 pb-2">
-                <div className="w-10 h-1 bg-white/20 rounded-full" />
+                <div className="w-10 h-1 bg-foreground/20 rounded-full" />
               </div>
 
               <div className="px-6">
@@ -297,14 +297,14 @@ export function TransactionFeed({
                       )}
                     </div>
                     <div className="min-w-0">
-                      <Paragraph className="text-base font-bold text-soft-cream truncate">{selected.title}</Paragraph>
-                      <Paragraph className="text-xs text-gray-light">{formatDate(selected.date)}</Paragraph>
+                      <Paragraph className="text-base font-bold text-foreground truncate">{selected.title}</Paragraph>
+                      <Paragraph className="text-xs text-muted-foreground">{formatDate(selected.date)}</Paragraph>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setSelected(null)}
-                    className="p-2 text-gray-light hover:text-soft-cream rounded-lg hover:bg-white/[0.05] transition-all shrink-0 ml-2"
+                    className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-foreground/[0.05] transition-all shrink-0 ml-2"
                     aria-label="Tutup"
                   >
                     <X size={18} />
@@ -312,7 +312,7 @@ export function TransactionFeed({
                 </div>
 
                 {/* Amount */}
-                <div className="text-center py-6 border-y border-white/[0.05] mb-6">
+                <div className="text-center py-6 border-y border-foreground/[0.05] mb-6">
                   <Paragraph
                     className={`text-3xl font-bold ${
                       selected.type === 'income' ? 'text-success' : 'text-danger'
@@ -322,7 +322,7 @@ export function TransactionFeed({
                     {formatCurrency(selected.amount, selected.original_currency || currency, locale)}
                   </Paragraph>
                   {selected.original_currency && (
-                    <Paragraph className="text-xs text-gray-light mt-1">{selected.original_currency}</Paragraph>
+                    <Paragraph className="text-xs text-muted-foreground mt-1">{selected.original_currency}</Paragraph>
                   )}
                 </div>
 
@@ -330,7 +330,7 @@ export function TransactionFeed({
                 <div className="space-y-2 mb-6">
                   {selectedCat && (
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-light">{t('finance.feed.category')}</span>
+                      <span className="text-muted-foreground">{t('finance.feed.category')}</span>
                       <Badge
                         variant={selected.type === 'income' ? 'success' : 'danger'}
                         size="sm"
@@ -341,10 +341,10 @@ export function TransactionFeed({
                   )}
                   {(selected.metadata?.decision_notes as string) && (
                     <div className="bg-primary/5 border border-primary/10 rounded-lg p-4 mt-2">
-                      <Paragraph className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">
+                      <Paragraph className="text-xs font-bold text-primary uppercase tracking-widest mb-1">
                         Reasoning
                       </Paragraph>
-                      <Paragraph className="text-xs text-soft-cream">
+                      <Paragraph className="text-xs text-foreground">
                         {selected.metadata?.decision_notes as string}
                       </Paragraph>
                     </div>
@@ -360,7 +360,7 @@ export function TransactionFeed({
                       setSelected(null);
                       onEdit(tx);
                     }}
-                    className="flex items-center justify-center gap-2 py-4 px-6 bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-soft-cream rounded-xl text-sm font-semibold transition-all"
+                    className="flex items-center justify-center gap-2 py-4 px-6 bg-foreground/[0.05] hover:bg-foreground/[0.1] border border-foreground/10 text-foreground rounded-xl text-sm font-semibold transition-all"
                   >
                     <Edit2 size={15} />
                     Edit

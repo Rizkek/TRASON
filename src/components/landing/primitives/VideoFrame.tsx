@@ -68,7 +68,7 @@ export function VideoFrame({ video, sizes, aspect, className = '', children }: V
   return (
     <div
       ref={wrapperRef}
-      className={`relative overflow-hidden bg-ui-bg ${className}`}
+      className={`relative overflow-hidden bg-background ${className}`}
       style={{ aspectRatio: ratio }}
     >
       <Image

@@ -6,9 +6,13 @@ interface SectionHeadingProps {
   title: React.ReactNode;
   lede?: React.ReactNode;
   align?: 'left' | 'center';
-  /** Use when the heading sits on a dark surface. */
-  inverted?: boolean;
+  as?: 'h1' | 'h2';
   className?: string;
+}
+
+/** An emphasized phrase inside a title: solid gold highlight with dark text, readable in both themes. */
+export function Mark({ children }: { children: React.ReactNode }) {
+  return <mark className="box-decoration-clone rounded-md bg-primary px-2 text-on-primary">{children}</mark>;
 }
 
 /**
@@ -21,30 +25,23 @@ export function SectionHeading({
   title,
   lede,
   align = 'left',
-  inverted = false,
+  as: Tag = 'h2',
   className = '',
 }: SectionHeadingProps) {
-  const alignClass = align === 'center' ? 'text-center items-center mx-auto' : 'text-left items-start';
-  const eyebrowColor = inverted ? 'text-ui-muted' : 'text-lp-muted';
-  const titleColor = inverted ? 'text-ui-fg' : 'text-lp-foreground';
-  const ledeColor = inverted ? 'text-ui-muted' : 'text-lp-muted';
+  const alignClass = align === 'center' ? 'mx-auto items-center text-center' : 'items-start text-left';
 
   return (
     <div className={`flex max-w-2xl flex-col gap-4 ${alignClass} ${className}`}>
       {eyebrow && (
-        <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${eyebrowColor}`}>
+        <p className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-primary" />
           {eyebrow}
         </p>
       )}
-      <h2
-        id={id}
-        className={`text-[2rem] leading-[1.08] sm:text-4xl lg:text-[2.75rem] ${titleColor}`}
-      >
+      <Tag id={id} className="text-heading-xl leading-[1.08] text-foreground sm:text-4xl lg:text-display-md">
         {title}
-      </h2>
-      {lede && (
-        <p className={`max-w-xl text-base leading-relaxed sm:text-lg ${ledeColor}`}>{lede}</p>
-      )}
+      </Tag>
+      {lede && <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">{lede}</p>}
     </div>
   );
 }

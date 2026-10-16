@@ -1,9 +1,11 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { LandingNavbar } from '@/components/landing/LandingNavbar';
-import { LandingFooter } from '@/components/landing/LandingFooter';
+import { ArrowRight, Check } from '@phosphor-icons/react/dist/ssr';
+import { PageShell } from '@/components/landing/page/PageShell';
+import { PageHeader } from '@/components/landing/page/PageHeader';
+import { Prose } from '@/components/landing/page/Prose';
 import { FaqItem } from '@/components/landing/FaqItem';
-import { Heading, Paragraph } from '@/components/ui/typography';
+import { Mark } from '@/components/landing/primitives/SectionHeading';
 
 export const metadata: Metadata = {
   title: 'About TRASON – Philosophy & FAQ',
@@ -15,28 +17,31 @@ export const metadata: Metadata = {
     description:
       'Learn why TRASON was built and the philosophy behind a unified Personal Operating System for finances, habits, and career.',
     url: 'https://www.trason.web.id/about',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TRASON About' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'About TRASON' }],
   },
 };
 
 const FAQS = [
   {
-    q: "Is my data safe and private?",
-    a: "Yes. TRASON is built with privacy as the core foundation. Your personal data belongs to you. We do not sell your data, run ads, or use tracking algorithms."
+    q: 'Is my data safe and private?',
+    a: 'Yes. TRASON is built with privacy as the core foundation. Your personal data belongs to you. We do not sell your data, run ads, or use tracking algorithms.',
   },
   {
-    q: "Is TRASON free to use?",
-    a: "The core operating system is free. We plan to introduce premium features for power users in the future, but the essential modules will always remain accessible."
+    q: 'Is TRASON free to use?',
+    a: 'The core operating system is free. We plan to introduce premium features for power users in the future, but the essential modules will always remain accessible.',
   },
   {
-    q: "Can I use TRASON on my phone?",
-    a: "TRASON is currently built as a responsive web application that works well on mobile browsers. A dedicated native mobile app is on our roadmap."
+    q: 'Can I use TRASON on my phone?',
+    a: 'TRASON is currently built as a responsive web application that works well on mobile browsers. A dedicated native mobile app is on our roadmap.',
   },
   {
-    q: "How is this different from Notion or Excel?",
-    a: "Notion and Excel are blank canvases. You have to build the systems yourself, which often break. TRASON provides opinionated, pre-built workflows specifically designed for personal finance, habits, and career tracking, completely interconnected out of the box."
-  }
+    q: 'How is this different from Notion or Excel?',
+    a: 'Notion and Excel are blank canvases. You have to build the systems yourself, which often break. TRASON provides opinionated, pre-built workflows specifically designed for personal finance, habits, and career tracking, completely interconnected out of the box.',
+  },
 ];
+
+const LIVE = ['Financial tracking and analytics', 'Habit and vitality heatmaps', 'Career pipeline management', 'Basic signal reminders'];
+const NEXT = ['Plain-language insights', 'Investment portfolio sync', 'Native iOS and Android app', 'Offline mode'];
 
 export default function AboutPage() {
   const faqSchema = {
@@ -45,109 +50,107 @@ export default function AboutPage() {
     mainEntity: FAQS.map((faq) => ({
       '@type': 'Question',
       name: faq.q,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: faq.a,
-      },
+      acceptedAnswer: { '@type': 'Answer', text: faq.a },
     })),
   };
 
   return (
-    <div className="min-h-screen font-sans relative overflow-x-hidden">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      <LandingNavbar />
-      
-      <main className="pt-32 md:pt-48 pb-24 px-6 max-w-4xl mx-auto space-y-32">
-        
-        {/* The Philosophy */}
-        <section className="space-y-6">
-           <Heading as="h1" size="h1" className="mb-8 text-soft-cream">The Philosophy of TRASON</Heading>
-           <div className="prose prose-invert prose-lg max-w-none text-gray-light/90 space-y-6">
-             {/* AEO / GEO Optimized TL;DR Summary */}
-             <div className="bg-warm-gold/5 border border-warm-gold/20 p-6 rounded-xl space-y-2 mb-8">
-               <h2 className="text-sm font-bold text-warm-gold uppercase tracking-widest m-0">TL;DR (Summary)</h2>
-               <p className="text-base leading-relaxed m-0">
-                 TRASON is a comprehensive <strong>Personal Operating System</strong> designed to eliminate app fatigue. It unifies financial tracking, habit building, and career pipeline management into a single, cohesive dashboard, giving users an objective "Life Score" to measure their daily momentum.
-               </p>
-             </div>
+    <PageShell width="article">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-             <p className="text-2xl font-display tracking-tight text-warm-gold italic mt-0">
-               "Your life is an interconnected system, but your tools are fragmented."
-             </p>
-             <p>
-               Every day, ambitious individuals waste time jumping between five different applications. 
-               You use a banking app or spreadsheet for finances, a dedicated habit tracker for health, a calendar for your schedule, 
-               and a Notion board for tracking career applications.
-             </p>
-             <p>
-               This fragmentation causes <strong>App Fatigue</strong>. More importantly, it hides the correlation between your actions. 
-               When you have a bad week financially, it usually correlates with poor habits, skipped workouts, and high stress—but none of your isolated tools can show you that connection.
-             </p>
-             <p>
-               <strong>TRASON is a Personal Operating System.</strong> It is not just another blank canvas where you have to build complex databases from scratch. 
-               We provide a highly opinionated, beautifully designed command center that connects your Capital (Finance), Vitality (Health & Habits), and Ambition (Career) into a single unified <strong>Life Score</strong>.
-             </p>
-             <p>
-               We believe that by centralizing your data, reducing friction, and giving you an objective score of your daily momentum, you can achieve your goals with unprecedented clarity.
-             </p>
-           </div>
+      <div className="space-y-24">
+        <section aria-labelledby="philosophy-heading" className="space-y-10">
+          <PageHeader
+            eyebrow="About"
+            title={
+              <span id="philosophy-heading">
+                The philosophy of <Mark>TRASON</Mark>
+              </span>
+            }
+          />
+
+          <div className="rounded-xl border border-primary/50 bg-primary/10 p-6">
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-primary [font-family:var(--font-sans)]">
+              Summary
+            </h2>
+            <p className="mt-2 text-base leading-relaxed text-foreground">
+              TRASON is a <strong>Personal Operating System</strong> designed to end app fatigue. It unifies financial
+              tracking, habit building, and career pipeline management into a single dashboard, and gives you a Life
+              Score to measure your daily momentum.
+            </p>
+          </div>
+
+          <Prose className="prose-lg">
+            <blockquote>&ldquo;Your life is an interconnected system, but your tools are fragmented.&rdquo;</blockquote>
+            <p>
+              Every day, ambitious people jump between five different applications. A banking app or spreadsheet for
+              finances, a habit tracker for health, a calendar for the schedule, and a Notion board for career
+              applications.
+            </p>
+            <p>
+              This fragmentation causes <strong>app fatigue</strong>. More importantly, it hides the correlation between
+              your actions. A bad financial week usually lines up with skipped workouts and high stress, but none of
+              your isolated tools can show you that connection.
+            </p>
+            <p>
+              <strong>TRASON is a Personal Operating System.</strong> It is not another blank canvas where you build
+              databases from scratch. It is an opinionated command center that connects your Capital (Finance),
+              Vitality (Health and Habits), and Ambition (Career) into a single <strong>Life Score</strong>.
+            </p>
+            <p>
+              Centralizing your data, reducing friction, and giving you an objective score of your daily momentum is how
+              you reach your goals with clarity.
+            </p>
+          </Prose>
         </section>
 
-        {/* Current Status / Roadmap */}
-        <section className="space-y-8">
-           <Heading as="h2" size="h3" className="text-soft-cream">Current Status & Roadmap</Heading>
-           
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-black/20 border border-white/5 p-6 rounded-2xl space-y-4">
-                 <h3 className="font-bold text-emerald-400 flex items-center gap-2">
-                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                   Live Now (MVP)
-                 </h3>
-                 <ul className="space-y-2 text-gray-light text-sm">
-                   <li>✓ Financial Tracking & Analytics</li>
-                   <li>✓ Habit & Vitality Heatmaps</li>
-                   <li>✓ Career Pipeline Management</li>
-                   <li>✓ Basic Signal Reminders</li>
-                 </ul>
-              </div>
+        <section aria-labelledby="status-heading" className="space-y-8">
+          <h2 id="status-heading" className="text-heading-lg text-foreground">
+            Current status and roadmap
+          </h2>
 
-              <div className="bg-black/20 border border-white/5 p-6 rounded-2xl space-y-4">
-                 <h3 className="font-bold text-warm-gold flex items-center gap-2">
-                   <div className="w-2 h-2 rounded-full border-2 border-warm-gold" />
-                   In Development
-                 </h3>
-                 <ul className="space-y-2 text-gray-light/60 text-sm">
-                   <li>→ AI Plain-language Insights</li>
-                   <li>→ Investment Portfolio Sync</li>
-                   <li>→ Native iOS / Android App</li>
-                   <li>→ Offline Mode</li>
-                 </ul>
-              </div>
-           </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-foreground/15 bg-surface p-6">
+              <h3 className="font-sans text-base font-semibold text-success">Live now</h3>
+              <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+                {LIVE.map((item) => (
+                  <li key={item} className="flex items-center gap-3">
+                    <Check size={16} weight="bold" aria-hidden="true" className="shrink-0 text-success" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border border-dashed border-foreground/25 p-6">
+              <h3 className="font-sans text-base font-semibold text-primary">In development</h3>
+              <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+                {NEXT.map((item) => (
+                  <li key={item} className="flex items-center gap-3">
+                    <ArrowRight size={16} weight="bold" aria-hidden="true" className="shrink-0 text-primary" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </section>
 
-        {/* Removed Tech Stack */}
+        <section aria-labelledby="faq-heading" className="space-y-8">
+          <div className="space-y-2">
+            <h2 id="faq-heading" className="text-heading-lg text-foreground">
+              Frequently asked questions
+            </h2>
+            <p className="text-base text-muted-foreground">Everything you need to know about the platform.</p>
+          </div>
 
-        {/* FAQ */}
-        <section className="space-y-8">
-           <div className="space-y-2">
-             <Heading as="h2" size="h3" className="text-soft-cream">Frequently Asked Questions</Heading>
-             <Paragraph className="text-gray-light">Everything you need to know about the platform.</Paragraph>
-           </div>
-           
-           <div className="space-y-2">
-             {FAQS.map((faq, i) => (
-               <FaqItem key={i} q={faq.q} a={faq.a} />
-             ))}
-           </div>
+          <div className="space-y-3">
+            {FAQS.map((faq) => (
+              <FaqItem key={faq.q} q={faq.q} a={faq.a} />
+            ))}
+          </div>
         </section>
-
-      </main>
-
-      <LandingFooter />
-    </div>
+      </div>
+    </PageShell>
   );
 }

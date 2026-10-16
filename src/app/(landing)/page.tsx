@@ -13,15 +13,15 @@ import { FinalCta } from '@/components/landing/sections/FinalCta';
 
 export default function Home() {
   return (
-    <div className="landing min-h-screen overflow-x-clip">
+    <div className="landing min-h-dvh overflow-x-clip">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-lp-foreground focus:px-4 focus:py-2 focus:text-sm focus:text-lp-background"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:text-on-primary"
       >
         Skip to content
       </a>
 
-      <LandingNavbar tone="light" />
+      <LandingNavbar />
 
       <main id="main-content">
         <Hero />
@@ -35,7 +35,7 @@ export default function Home() {
         <FinalCta />
       </main>
 
-      <LandingFooter tone="light" />
+      <LandingFooter />
       <AuthRedirect />
     </div>
   );

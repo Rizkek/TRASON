@@ -13,26 +13,13 @@
  *   It only needs to run on protected/authenticated pages, not on every public page load.
  */
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 function AuthInitializer({ children }: { children: React.ReactNode }) {
   // This call sets up the single onAuthStateChange subscription for the whole app.
-  const { user } = useAuth();
-  
-  // Handle Global Theme Application
-  useEffect(() => {
-    const theme = (user as any)?.user_preferences?.[0]?.theme || 'dark';
-    const root = window.document.documentElement;
-    
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else if (theme === 'light') {
-      root.classList.add('light');
-      root.classList.remove('dark');
-    }
-  }, [user]);
+  // The theme class is owned by ThemeSync, not by this provider.
+  useAuth();
 
   return <>{children}</>;
 }

@@ -17,6 +17,7 @@ import {
 } from '@/services/finance/investmentService';
 import { activityQueries } from '@/services/activity/activityQueries';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
+import { getProfileToday } from '@/libs/profileDate';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { getUserErrorMessage, logError } from '@/libs/apiErrors';
 import { executeMutation } from "@/libs/api/mutationBuilder";
@@ -104,7 +105,7 @@ export const useInvestment = (): UseInvestmentReturn => {
           try {
             await investmentQueries.upsertPriceSnapshot({
               position_id: position.id,
-              snapshot_date: new Date().toISOString().split('T')[0],
+              snapshot_date: getProfileToday(),
               price: quote.currentPrice,
               change_percent: quote.changePercent24h ?? 0,
               source: quote.source,

@@ -13,7 +13,39 @@ export const ja = {
     "signupBtn": "登録",
     "signupLink": "アカウントを作成",
     "signupSubtitle": "1分で完了します。",
-    "signupTitle": "アカウントを作成"
+    "signupTitle": "アカウントを作成",
+    "back_home": "ホームに戻る",
+    "email_address": "メールアドレス",
+    "email_ph": "email@example.com",
+    "password_required": "パスワードは必須です",
+    "name_required": "名前は必須です",
+    "passwords_mismatch": "パスワードが一致しません",
+    "show_password": "パスワードを表示",
+    "hide_password": "パスワードを隠す",
+    "login_quote": "大切なものに戻ろう。雑音は外に置いて。",
+    "login_panel_desc": "ダッシュボードで、お金、運動、リマインダー、勢いなど次に大切なことを確認できます。",
+    "login_error_title": "サインインエラー",
+    "open_dashboard": "ダッシュボードを開く",
+    "authenticating": "認証中...",
+    "new_to_trason": "TRASON は初めてですか？",
+    "begin_here": "ここから始める",
+    "signup_heading": "パーソナル OS を作成",
+    "signup_lede": "一日を記録し、勢いを把握できる落ち着いた場所を作りましょう。",
+    "signup_quote": "仕組みを作れば、仕組みがあなたを運んでくれる。",
+    "signup_panel_desc": "お金、習慣、運動、リマインダー、長期的な方向性のための、ひとつのプライベートな場所から始めましょう。",
+    "full_name": "氏名",
+    "full_name_ph": "お名前",
+    "confirm_password": "パスワード（確認）",
+    "domain_checking": "メールドメインを確認中...",
+    "domain_verified": "メールドメインを確認しました",
+    "register_error_title": "登録できません",
+    "register_success_title": "アカウントを作成しました",
+    "check_email": "アカウントを確認するためメールをご確認ください。",
+    "create_account": "アカウントを作成",
+    "creating": "ワークスペースを準備しています...",
+    "has_workspace": "すでにワークスペースをお持ちですか？",
+    "server_error": "登録中にサーバーエラーが発生しました。しばらくしてからもう一度お試しください。",
+    "email_taken": "このメールアドレスはすでに登録されています。サインインするか、別のメールアドレスをお使いください。"
   },
   "career_page": {
     "applied_on": "応募日",
@@ -176,7 +208,9 @@ export const ja = {
     "save": "保存",
     "saving": "保存中...",
     "success": "成功",
-    "try_again": "再試行"
+    "try_again": "再試行",
+    "user": "ユーザー",
+    "loading_section": "読み込み中"
   },
   "dailyTasks": {
     "empty": "タスクはまだありません。最初の日課タスクを追加してください。"
@@ -283,7 +317,17 @@ export const ja = {
     "view_all_tasks": "すべてのタスクを見る ({count}件)",
     "view_schedule": "スケジュールを見る",
     "vitality_this_week": "今週のバイタリティ",
-    "welcome_back": "お帰りなさい"
+    "welcome_back": "お帰りなさい",
+    "load_failed": "ダッシュボードの一部を読み込めませんでした。",
+    "section_load_failed": "このセクションを読み込めませんでした。",
+    "insights_title": "インサイト",
+    "prev_month": "前の月",
+    "next_month": "次の月",
+    "high_priority": "優先度: 高",
+    "max_budget": "上限 {amount}",
+    "tasks_empty_cta": "スケジュールでタスクを追加",
+    "sport_empty": "今週の記録はありません。",
+    "career_empty": "まだ応募はありません。"
   },
   "finance": {
     "driverPayout": {
@@ -630,7 +674,20 @@ export const ja = {
     "schedule": "スケジュール",
     "settings": "設定",
     "sport": "スポーツ",
-    "timeline": "スケジュール"
+    "timeline": "スケジュール",
+    "offline_banner": "オフラインです。再接続すると変更が同期されます。",
+    "back_online": "接続が回復しました",
+    "open_menu": "メニューを開く",
+    "close_menu": "メニューを閉じる",
+    "notifications_on": "通知オン",
+    "notifications_off": "通知オフ",
+    "enable_notifications": "通知をオンにする",
+    "disable_notifications": "通知をオフにする",
+    "all_in_bar": "すべてのモジュールはナビゲーションバーにあります。",
+    "tagline": "パーソナルオペレーティングシステム",
+    "skip_to_content": "コンテンツへスキップ",
+    "switch_to_light": "ライトテーマに切り替え",
+    "switch_to_dark": "ダークテーマに切り替え"
   },
   "onboarding": {
     "back": "Back",
@@ -648,7 +705,14 @@ export const ja = {
     "step3_desc": "Select the modules you want to activate. You can always change this later in settings.",
     "theme": "Theme",
     "timezone": "Timezone",
-    "welcome": "Welcome to TRASON"
+    "welcome": "Welcome to TRASON",
+    "preparing": "スペースを準備しています...",
+    "step_of": "ステップ {current} / {total}",
+    "name_required": "続けるには名前を入力してください。",
+    "theme_dark": "ダーク",
+    "theme_light": "ライト",
+    "error_failed": "オンボーディングを完了できませんでした。もう一度お試しください。",
+    "modules_selected": "{count} 件選択"
   },
   "reminders_page": {
     "add_to_day": "+ この日に追加",
@@ -667,6 +731,7 @@ export const ja = {
       "notes_placeholder": "詳細を追加...",
       "notify_help": "期限の前にいつ通知するかを選択してください",
       "notify_label": "通知",
+      "notify_none": "通知は送信されません。選択したすべての通知タイミングがすでに過ぎています。期限をより後にするか、通知タイミングを短くしてください。",
       "notify_options": {
         "d1": "1日前",
         "d2": "2日前",

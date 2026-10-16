@@ -17,7 +17,7 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
       className={`relative overflow-hidden group cursor-pointer transition-all duration-300 ${
         plan.is_active 
           ? 'border-primary/50 bg-primary/10' 
-          : 'border-black/[0.05] dark:border-white/[0.05] hover:border-black/[0.15] dark:border-white/[0.15] bg-black/[0.02] dark:bg-white/[0.02]'
+          : 'border-foreground/[0.05] hover:border-foreground/[0.15] bg-foreground/[0.02]'
       }`}
       onClick={() => onSelect?.(plan)}
     >
@@ -25,45 +25,45 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
         <div className="flex justify-between items-start gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <h3 className={`text-xl font-serif font-semibold tracking-tight ${plan.is_active ? 'text-primary' : 'text-soft-cream'}`}>
+              <h3 className={`text-heading-md tracking-tight ${plan.is_active ? 'text-primary' : 'text-foreground'}`}>
                 {plan.name}
               </h3>
               {plan.is_active && (
-                <Badge variant="info" className="text-[10px] uppercase tracking-widest px-2 py-0.5">
+                <Badge variant="info" className="text-xs uppercase tracking-widest px-2 py-0.5">
                   Active Plan
                 </Badge>
               )}
             </div>
             {plan.description && (
-              <p className="text-sm text-gray-light line-clamp-2">
+              <p className="text-sm text-muted-foreground line-clamp-2">
                 {plan.description}
               </p>
             )}
           </div>
           
-          <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-black/5 dark:bg-white/5 group-hover:bg-black/10 dark:bg-white/10 transition-colors">
-            <Activity size={20} className={plan.is_active ? 'text-primary' : 'text-gray-light'} />
+          <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-foreground/5 group-hover:bg-foreground/10 transition-colors">
+            <Activity size={20} className={plan.is_active ? 'text-primary' : 'text-muted-foreground'} />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-black/5 dark:bg-white/5 rounded-md p-4">
-            <div className="flex items-center gap-2 text-gray-light mb-1">
+          <div className="bg-foreground/5 rounded-md p-4">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <Calendar size={14} />
-              <span className="text-[10px] uppercase tracking-widest font-medium">Duration</span>
+              <span className="text-xs uppercase tracking-widest font-medium">Duration</span>
             </div>
-            <p className="text-lg font-semibold text-white">{plan.duration_weeks} Weeks</p>
+            <p className="text-lg font-semibold text-foreground">{plan.duration_weeks} Weeks</p>
           </div>
-          <div className="bg-black/5 dark:bg-white/5 rounded-md p-4">
-            <div className="flex items-center gap-2 text-gray-light mb-1">
+          <div className="bg-foreground/5 rounded-md p-4">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <CheckCircle size={14} />
-              <span className="text-[10px] uppercase tracking-widest font-medium">Training Days</span>
+              <span className="text-xs uppercase tracking-widest font-medium">Training Days</span>
             </div>
-            <p className="text-lg font-semibold text-white">{daysCount} Days/Week</p>
+            <p className="text-lg font-semibold text-foreground">{daysCount} Days/Week</p>
           </div>
         </div>
 
-        <div className="pt-2 flex items-center justify-between border-t border-black/[0.05] dark:border-white/[0.05]">
+        <div className="pt-2 flex items-center justify-between border-t border-foreground/[0.05]">
           <div className="flex items-center gap-2">
             {!plan.is_active && onActivate && (
               <Button 
@@ -79,7 +79,7 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
               </Button>
             )}
           </div>
-          <div className="text-xs font-medium text-gray-light group-hover:text-primary transition-colors flex items-center gap-1">
+          <div className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors flex items-center gap-1">
             View Details <ChevronRight size={14} />
           </div>
         </div>

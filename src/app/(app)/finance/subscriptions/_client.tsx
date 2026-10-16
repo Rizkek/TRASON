@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, CategoryIcon, Select, DatePicker } from '@/components';
 import { useAuthStore } from '@/store/authStore';
@@ -11,13 +10,13 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Plus, ArrowLeft, CreditCard, DotsThreeVertical as MoreVertical, Calendar, Info, Repeat } from '@phosphor-icons/react';
 import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
+import { formatDateOnly } from '@/libs/date';
 import { Subscription } from '@/types/database';
 import { Heading, Paragraph } from '@/components/ui/typography';
 
 const SUB_PAGE_SIZE = 5;
 
 export function SubscriptionsClient() {
-  const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
   const { t } = useTranslation();
@@ -43,12 +42,6 @@ export function SubscriptionsClient() {
     category_id: '',
     notes: '',
   });
-
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [authLoading, isAuthenticated, router]);
 
   const handleSave = async () => {
     if (!form.name || !form.amount || !form.next_billing_date) {
@@ -118,7 +111,7 @@ export function SubscriptionsClient() {
       amount: s.amount.toString(),
       currency: s.currency,
       billing_cycle: s.billing_cycle,
-      next_billing_date: new Date(s.next_billing_date).toISOString().split('T')[0],
+      next_billing_date: formatDateOnly(s.next_billing_date),
       category_id: s.category_id || '',
       notes: s.notes || '',
     });
@@ -168,13 +161,13 @@ export function SubscriptionsClient() {
       <>
       <div className="space-y-8 animate-fade-in">
         
-        <Link href="/finance" className="flex items-center gap-2 text-xs font-bold text-gray-light hover:text-white uppercase tracking-widest transition-colors w-fit">
+        <Link href="/finance" className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-widest transition-colors w-fit">
           <ArrowLeft size={14} /> {t('finance.backToFinance') || 'Back to Finance'}
         </Link>
 
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="space-y-2">
-            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-soft-cream">{t('finance.subscriptions') || 'Subscriptions'}</Heading>
+            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-foreground">{t('finance.subscriptions') || 'Subscriptions'}</Heading>
             <Paragraph className="text-subtext flex items-center gap-2">
               {t('finance.manageSubscriptions') || 'Manage your recurring payments.'}
             </Paragraph>
@@ -187,28 +180,28 @@ export function SubscriptionsClient() {
         </div>
 
         <Card className="p-8 relative overflow-hidden group">
-          <div className="flex items-center gap-1 mb-4 text-gray-light">
+          <div className="flex items-center gap-1 mb-4 text-muted-foreground">
              <Repeat size={16} className="text-primary" />
              <Paragraph className="text-xs font-bold uppercase tracking-widest">{t('finance.estimatedMonthlyCost') || 'Estimated Monthly Cost'}</Paragraph>
           </div>
           <div className="flex items-end justify-between">
-            <Paragraph className="text-4xl font-bold text-white">{formatCurrency(totalMonthlyCost, currency, locale)}</Paragraph>
+            <Paragraph className="text-4xl font-bold text-foreground">{formatCurrency(totalMonthlyCost, currency, locale)}</Paragraph>
           </div>
         </Card>
 
         {/* Desktop table */}
-        <Card className="hidden md:block overflow-hidden border-none shadow-2xl">
+        <Card className="hidden md:block overflow-hidden border-none ">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-black/[0.02] dark:bg-white/[0.02] border-b border-black/[0.05] dark:border-white/[0.05]">
-                  <th className="px-8 py-6 text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.service') || 'Service'}</th>
-                  <th className="px-8 py-6 text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.nextBilling') || 'Next Billing'}</th>
-                  <th className="px-8 py-6 text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.cycle') || 'Cycle'}</th>
-                  <th className="px-8 py-6 text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.amount') || 'Amount'}</th>
+                <tr className="bg-foreground/[0.02] border-b border-foreground/[0.05]">
+                  <th className="px-8 py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.service') || 'Service'}</th>
+                  <th className="px-8 py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.nextBilling') || 'Next Billing'}</th>
+                  <th className="px-8 py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.cycle') || 'Cycle'}</th>
+                  <th className="px-8 py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.amount') || 'Amount'}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white divide-opacity-[0.03]">
+              <tbody className="divide-y divide-foreground/5">
                 {isSubscriptionsLoading ? (
                   <tr>
                     <td colSpan={4} className="py-12 text-center"><Loading /></td>
@@ -217,19 +210,19 @@ export function SubscriptionsClient() {
                   subscriptions.map((s) => (
                     <tr 
                       key={s.id} 
-                      className={`group hover:bg-black/[0.02] dark:bg-white/[0.02] transition-colors cursor-pointer ${!s.is_active ? 'opacity-50' : ''}`}
+                      className={`group hover:bg-foreground/[0.02] transition-colors cursor-pointer ${!s.is_active ? 'opacity-50' : ''}`}
                       onClick={() => openEditModal(s)}
                     >
                       <td className="px-8 py-8">
                         <div className="flex items-center gap-4">
                           <div>
-                            <Paragraph className="text-sm font-bold text-soft-cream group-hover:text-primary transition-colors underline-offset-4 decoration-primary">{s.name}</Paragraph>
-                            {s.notes && <Paragraph className="text-[10px] text-gray-light truncate max-w-[200px] mt-1">{s.notes}</Paragraph>}
+                            <Paragraph className="text-sm font-bold text-foreground group-hover:text-primary transition-colors underline-offset-4 decoration-primary">{s.name}</Paragraph>
+                            {s.notes && <Paragraph className="text-xs text-muted-foreground truncate max-w-[200px] mt-1">{s.notes}</Paragraph>}
                           </div>
                         </div>
                       </td>
                       <td className="px-8 py-8">
-                        <div className="flex items-center gap-2 text-gray-light">
+                        <div className="flex items-center gap-2 text-muted-foreground">
                           <Calendar size={12} />
                           <span className="text-xs font-medium">{formatDate(s.next_billing_date)}</span>
                         </div>
@@ -241,7 +234,7 @@ export function SubscriptionsClient() {
                       </td>
                       <td className="px-8 py-8">
                         <div className="flex items-center justify-end gap-4">
-                          <Paragraph className="text-sm font-bold text-soft-cream">
+                          <Paragraph className="text-sm font-bold text-foreground">
                             {formatCurrency(s.amount, s.currency, locale)}
                           </Paragraph>
                           {s.is_active && (
@@ -265,9 +258,9 @@ export function SubscriptionsClient() {
                   <tr>
                     <td colSpan={4} className="py-12 text-center">
                       <div className="flex flex-col items-center justify-center opacity-50">
-                        <Info size={32} className="text-gray-light mb-4" />
-                        <Paragraph className="text-sm text-soft-cream">{t('finance.noSubscriptions') || 'No subscriptions yet'}</Paragraph>
-                        <Paragraph className="text-xs text-gray-light">{t('finance.trackSubscriptions') || 'Track your recurring payments here.'}</Paragraph>
+                        <Info size={32} className="text-muted-foreground mb-4" />
+                        <Paragraph className="text-sm text-foreground">{t('finance.noSubscriptions') || 'No subscriptions yet'}</Paragraph>
+                        <Paragraph className="text-xs text-muted-foreground">{t('finance.trackSubscriptions') || 'Track your recurring payments here.'}</Paragraph>
                       </div>
                     </td>
                   </tr>
@@ -284,23 +277,23 @@ export function SubscriptionsClient() {
           ) : subscriptions.length === 0 ? (
             <Card className="overflow-hidden">
               <div className="py-12 flex flex-col items-center justify-center gap-4 opacity-50">
-                <Info size={32} className="text-gray-light" />
-                <Paragraph className="text-sm text-soft-cream">{t('finance.noSubscriptions') || 'No subscriptions yet'}</Paragraph>
-                <Paragraph className="text-xs text-gray-light">{t('finance.trackSubscriptions') || 'Track your recurring payments here.'}</Paragraph>
+                <Info size={32} className="text-muted-foreground" />
+                <Paragraph className="text-sm text-foreground">{t('finance.noSubscriptions') || 'No subscriptions yet'}</Paragraph>
+                <Paragraph className="text-xs text-muted-foreground">{t('finance.trackSubscriptions') || 'Track your recurring payments here.'}</Paragraph>
               </div>
             </Card>
           ) : (
             <Card className="overflow-hidden">
               <div className="px-4 pt-4 pb-1 flex items-center justify-between">
-                <Heading as="h3" size="h3" className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('finance.activeSubscriptions')}</Heading>
-                <span className="text-[9px] text-gray-light">{subscriptions.length} {t('finance.servicesCount')}</span>
+                <Heading as="h3" size="h3" className="text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.activeSubscriptions')}</Heading>
+                <span className="text-xs text-muted-foreground">{subscriptions.length} {t('finance.servicesCount')}</span>
               </div>
               {visibleSubs.map((s) => (
                 <button
                   key={s.id}
                   type="button"
                   onClick={() => openEditModal(s)}
-                  className={`w-full flex items-center gap-4 px-4 py-2 hover:bg-white/[0.03] active:bg-white/[0.05] transition-colors border-b border-white/[0.03] last:border-0 text-left ${!s.is_active ? 'opacity-50' : ''}`}
+                  className={`w-full flex items-center gap-4 px-4 py-2 hover:bg-foreground/[0.03] active:bg-foreground/[0.05] transition-colors border-b border-foreground/[0.03] last:border-0 text-left ${!s.is_active ? 'opacity-50' : ''}`}
                 >
                   {/* Icon */}
                   <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -308,24 +301,24 @@ export function SubscriptionsClient() {
                   </div>
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <Paragraph className="text-sm font-semibold text-soft-cream truncate">{s.name}</Paragraph>
+                    <Paragraph className="text-sm font-semibold text-foreground truncate">{s.name}</Paragraph>
                     <div className="flex items-center gap-1 mt-[2px]">
-                      <Calendar size={9} className="text-gray-light shrink-0" />
-                      <span className="text-[10px] text-gray-light truncate">
+                      <Calendar size={9} className="text-muted-foreground shrink-0" />
+                      <span className="text-xs text-muted-foreground truncate">
                         {formatDate(s.next_billing_date)} · <span className="capitalize">{s.billing_cycle}</span>
                       </span>
                     </div>
                   </div>
                   {/* Amount + paid button */}
                   <div className="flex flex-col items-end gap-1 shrink-0">
-                    <Paragraph className="text-sm font-bold text-soft-cream tabular-nums">
+                    <Paragraph className="text-sm font-bold text-foreground tabular-nums">
                       {formatCurrency(s.amount, s.currency, locale)}
                     </Paragraph>
                     {s.is_active && (
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); markAsPaid(s); }}
-                        className="text-[9px] font-bold uppercase tracking-widest text-primary border border-primary/30 rounded-full px-1 py-[2px] hover:bg-primary/10 transition-all"
+                        className="text-xs font-bold uppercase tracking-widest text-primary border border-primary/30 rounded-full px-1 py-[2px] hover:bg-primary/10 transition-all"
                       >
                         Paid
                       </button>
@@ -342,7 +335,7 @@ export function SubscriptionsClient() {
               )}
 
               {!hasMore && subscriptions.length > SUB_PAGE_SIZE && (
-                <Paragraph className="text-center text-[10px] text-gray-light py-6 tracking-widest uppercase">
+                <Paragraph className="text-center text-xs text-muted-foreground py-6 tracking-widest uppercase">
                   {t('finance.allShown')}
                 </Paragraph>
               )}
@@ -355,7 +348,7 @@ export function SubscriptionsClient() {
         <Button 
           variant="primary" 
           onClick={openAddModal} 
-          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(244,201,93,0.4)]"
+          className="rounded-full w-14 h-14 flex items-center justify-center "
           aria-label="Add Subscription"
         >
           <Plus size={24} />
@@ -422,7 +415,7 @@ export function SubscriptionsClient() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-light tracking-widest block">CATEGORY (OPTIONAL)</label>
+            <label className="text-xs font-bold text-muted-foreground tracking-widest block">CATEGORY (OPTIONAL)</label>
             <div className="grid grid-cols-3 gap-2 max-h-[150px] overflow-y-auto">
               {categories.filter(c => c.type === 'expense').map(cat => (
                 <button
@@ -432,24 +425,24 @@ export function SubscriptionsClient() {
                   className={`flex flex-col items-center gap-1 p-2 rounded-md border transition-all ${
                     form.category_id === cat.id
                       ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-black/5 dark:border-white/5 bg-gray-strong/40 text-gray-light hover:text-soft-cream'
+                      : 'border-foreground/5 bg-surface/40 text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <CategoryIcon name={cat.icon || 'ShoppingCart'} />
-                  <span className="text-[10px] uppercase font-bold tracking-wider truncate w-full text-center">{cat.name}</span>
+                  <span className="text-xs uppercase font-bold tracking-wider truncate w-full text-center">{cat.name}</span>
                 </button>
               ))}
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-light tracking-widest block">{t('finance.notes_label')}</label>
+            <label className="text-xs font-bold text-muted-foreground tracking-widest block">{t('finance.notes_label')}</label>
             <textarea
               placeholder="Context or tags..."
               rows={2}
               value={form.notes}
               onChange={(e) => setForm(f => ({ ...f, notes: e.target.value }))}
-              className="w-full bg-gray-strong/40 border border-black/[0.05] dark:border-white/[0.05] rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-surface/40 border border-foreground/[0.05] rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
             />
           </div>
 
@@ -462,7 +455,7 @@ export function SubscriptionsClient() {
                     await cancelSubscription(editingSub.id);
                     setIsModalOpen(false);
                   }}
-                  className="w-full py-4 text-warning text-[10px] font-bold uppercase tracking-widest border border-warning/20 hover:bg-warning/5 rounded-md transition-all"
+                  className="w-full py-4 text-warning text-xs font-bold uppercase tracking-widest border border-warning/20 hover:bg-warning/5 rounded-md transition-all"
                 >
                   {t('finance.cancelSubscription') || 'CANCEL SUBSCRIPTION'}
                 </button>
@@ -470,7 +463,7 @@ export function SubscriptionsClient() {
               <button 
                 type="button"
                 onClick={() => setDeleteConfirmId(editingSub.id)}
-                className="w-full py-4 text-danger text-[10px] font-bold uppercase tracking-widest border border-danger/20 hover:bg-danger/5 rounded-md transition-all"
+                className="w-full py-4 text-danger text-xs font-bold uppercase tracking-widest border border-danger/20 hover:bg-danger/5 rounded-md transition-all"
               >
                 {t('finance.deleteSubscription') || 'DELETE THIS SUBSCRIPTION'}
               </button>

@@ -7,91 +7,89 @@ import { PaperPlaneRight } from '@phosphor-icons/react';
 const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
-  message: z.string().min(10, 'Message must be at least 10 characters')
+  message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
+type FieldName = keyof ContactFormData;
 
-export function ContactForm() {
+const FIELD =
+  'w-full resize-none rounded-xl border bg-foreground/[0.04] px-4 py-3 text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50';
+
+function FieldError({ name, message }: { name: FieldName; message?: string }) {
+  if (!message) return null;
+  return (
+    <p id={`${name}-error`} className="mt-1 text-xs font-medium text-danger">
+      {message}
+    </p>
+  );
+}
+
+// Opens the visitor's mail app with the message filled in; nothing is sent from the page itself.
+export function ContactForm({ recipient = 'riskiinferno@gmail.com' }: { recipient?: string }) {
   const [formData, setFormData] = useState<ContactFormData>({ name: '', email: '', message: '' });
-  const [errors, setErrors] = useState<Partial<Record<keyof ContactFormData, string>>>({});
-  
+  const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    if (errors[e.target.name as keyof ContactFormData]) {
-      setErrors({ ...errors, [e.target.name]: undefined });
-    }
+    const name = e.target.name as FieldName;
+    setFormData({ ...formData, [name]: e.target.value });
+    if (errors[name]) setErrors({ ...errors, [name]: undefined });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      contactSchema.parse(formData);
-      setErrors({});
-      // Generate mailto link
-      const subject = encodeURIComponent(`TRASON Contact from ${formData.name}`);
-      const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`);
-      window.location.href = `mailto:riskiinferno@gmail.com?subject=${subject}&body=${body}`;
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        const newErrors: Record<string, string> = {};
-        err.issues.forEach((errItem) => {
-          if (errItem.path[0]) newErrors[errItem.path[0].toString()] = errItem.message;
-        });
-        setErrors(newErrors);
+    const result = contactSchema.safeParse(formData);
+    if (!result.success) {
+      const next: Partial<Record<FieldName, string>> = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path[0] as FieldName | undefined;
+        if (key && !next[key]) next[key] = issue.message;
       }
+      setErrors(next);
+      return;
     }
+
+    setErrors({});
+    const subject = encodeURIComponent(`TRASON Contact from ${formData.name}`);
+    const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`);
+    window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
   };
 
+  const fieldProps = (name: FieldName) => ({
+    id: name,
+    name,
+    value: formData[name],
+    onChange: handleChange,
+    'aria-invalid': Boolean(errors[name]),
+    'aria-describedby': errors[name] ? `${name}-error` : undefined,
+    className: `${FIELD} ${errors[name] ? 'border-danger' : 'border-foreground/20'}`,
+  });
+
   return (
-    <div className="bg-black/20 border border-white/5 p-8 rounded-3xl space-y-6">
-      <h2 className="text-2xl font-bold font-display tracking-tight mb-6">PaperPlaneRight us a message</h2>
-      <form className="space-y-4" onSubmit={handleSubmit}>
+    <div className="space-y-6 rounded-3xl border border-foreground/15 bg-surface p-6 sm:p-8">
+      <h2 className="text-heading-lg text-foreground">Send us a message</h2>
+      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
         <div>
-          <label htmlFor="name" className="block text-sm font-bold text-gray-light mb-2">Name</label>
-          <input 
-            type="text" 
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className={`w-full bg-white/5 border ${errors.name ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:outline-none focus:border-warm-gold transition-colors`}
-            placeholder="Your name"
-          />
-          {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
+          <label htmlFor="name" className="mb-2 block text-sm font-semibold text-foreground">Name</label>
+          <input type="text" autoComplete="name" placeholder="Your name" {...fieldProps('name')} />
+          <FieldError name="name" message={errors.name} />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-bold text-gray-light mb-2">Email</label>
-          <input 
-            type="email" 
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={`w-full bg-white/5 border ${errors.email ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:outline-none focus:border-warm-gold transition-colors`}
-            placeholder="you@example.com"
-          />
-          {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+          <label htmlFor="email" className="mb-2 block text-sm font-semibold text-foreground">Email</label>
+          <input type="email" autoComplete="email" placeholder="you@example.com" {...fieldProps('email')} />
+          <FieldError name="email" message={errors.email} />
         </div>
         <div>
-          <label htmlFor="message" className="block text-sm font-bold text-gray-light mb-2">Message</label>
-          <textarea 
-            id="message"
-            name="message"
-            rows={5}
-            value={formData.message}
-            onChange={handleChange}
-            className={`w-full bg-white/5 border ${errors.message ? 'border-red-500/50' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:outline-none focus:border-warm-gold transition-colors resize-none`}
-            placeholder="How can we help you?"
-          />
-          {errors.message && <p className="text-red-400 text-xs mt-1">{errors.message}</p>}
+          <label htmlFor="message" className="mb-2 block text-sm font-semibold text-foreground">Message</label>
+          <textarea rows={5} placeholder="How can we help you?" {...fieldProps('message')} />
+          <FieldError name="message" message={errors.message} />
         </div>
-        <button 
+        <button
           type="submit"
-          className="w-full bg-warm-gold text-warm-black font-bold py-3 px-6 rounded-xl hover:bg-white transition-colors flex items-center justify-center gap-2 mt-4"
+          className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 font-semibold text-on-primary transition-colors hover:bg-secondary"
         >
-          <PaperPlaneRight size={18} />
-          PaperPlaneRight Message
+          <PaperPlaneRight size={18} aria-hidden="true" />
+          Send message
         </button>
       </form>
     </div>

@@ -4,12 +4,13 @@ import React, { useMemo } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { Card } from '@/components';
+import { Placeholder } from '@/components/ui/Placeholder';
 import { Heading, Paragraph } from '@/components/ui/typography';
 import { Transaction } from '@/services/supabase/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { formatCurrency } from '@/libs/format';
-import { CATEGORY_PALETTE, TOKEN_COLORS } from '@/config/colors';
+import { useChartTheme } from '@/hooks/useChartTheme';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -21,6 +22,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
   const { t } = useTranslation();
   const { currency, locale } = useUserPreferences();
   const [isMounted, setIsMounted] = React.useState(false);
+  const { colors, palette, chrome } = useChartTheme();
 
   React.useEffect(() => { setIsMounted(true); }, []);
 
@@ -37,7 +39,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
         if (!categoryData[catName]) {
           categoryData[catName] = { 
             value: 0, 
-            color: cat?.color || (catName === 'Uncategorized' ? TOKEN_COLORS.grayLight : undefined) 
+            color: cat?.color || (catName === 'Uncategorized' ? colors.grayLight : undefined)
           };
         }
         categoryData[catName].value += t.amount;
@@ -47,11 +49,11 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
     const data = Object.keys(categoryData).map((key, index) => ({
       name: key,
       value: categoryData[key].value,
-      color: categoryData[key].color || CATEGORY_PALETTE[index % CATEGORY_PALETTE.length]
+      color: categoryData[key].color || palette[index % palette.length]
     })).sort((a, b) => b.value - a.value);
 
     return { data, totalExpense };
-  }, [transactions]);
+  }, [transactions, colors, palette]);
 
   const options = {
     responsive: true,
@@ -62,16 +64,16 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
         display: false
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: TOKEN_COLORS.grayVeryLight,
-        bodyColor: TOKEN_COLORS.grayLight,
+        backgroundColor: chrome.tooltipBg,
+        titleColor: colors.foreground,
+        bodyColor: colors.grayVeryLight,
         bodyFont: { size: 12 },
         titleFont: { size: 14, weight: 'bold' as const },
         padding: 12,
         cornerRadius: 12,
         boxPadding: 6,
         usePointStyle: true,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: chrome.tooltipBorder,
         borderWidth: 1,
         callbacks: {
           label: (context: any) => {
@@ -97,23 +99,23 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
   };
 
   return (
-    <Card className="p-4 md:p-8 bg-black/[0.03] dark:bg-black/40 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group h-full">
+    <Card className="h-full p-4 md:p-8">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <Heading as="h3" size="h6" className="text-soft-cream">{t('dashboard.spending_breakdown')}</Heading>
-          <Paragraph className="text-[10px] md:text-micro text-gray-light mt-1">{t('dashboard.percentage_based')}</Paragraph>
+          <Heading as="h3" size="h6">{t('dashboard.spending_breakdown')}</Heading>
+          <Paragraph className="mt-1 text-xs text-muted-foreground">{t('dashboard.percentage_based')}</Paragraph>
         </div>
       </div>
 
       {!isMounted ? (
-        <div className="w-full h-48 bg-white/[0.02] rounded-lg" />
+        <Placeholder className="h-48 w-full" />
       ) : chartData.data.length > 0 ? (
         <div className="flex flex-col md:flex-row items-center gap-8 h-[200px] md:h-[240px]">
           <div className="w-[45%] md:w-[40%] h-full relative shrink-0">
             <Doughnut data={doughnutData} options={options} />
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-[10px] text-gray-light uppercase tracking-widest">{t('dashboard.total_label')}</span>
-              <span className="text-sm font-bold text-soft-cream">
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">{t('dashboard.total_label')}</span>
+              <span className="text-body-md font-bold text-foreground">
                 {formatCurrency(chartData.totalExpense, currency, locale)}
               </span>
             </div>
@@ -124,9 +126,9 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
                 <div key={i} className="flex justify-between items-center text-sm">
                   <div className="flex items-center gap-1 truncate pr-2">
                     <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                    <span className="text-gray-light truncate">{item.name}</span>
+                    <span className="truncate text-muted-foreground">{item.name}</span>
                   </div>
-                  <span className="text-soft-cream font-bold shrink-0">
+                  <span className="shrink-0 font-bold text-foreground">
                     {chartData.totalExpense > 0 ? ((item.value / chartData.totalExpense) * 100).toFixed(0) : 0}%
                   </span>
                 </div>
@@ -135,7 +137,7 @@ export const SpendingBreakdown = ({ transactions }: Props) => {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center h-48 text-gray-light text-sm opacity-50">
+        <div className="flex items-center justify-center h-48 text-body-md text-muted-foreground">
           {t('dashboard.no_expenses')}
         </div>
       )}

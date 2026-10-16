@@ -12,13 +12,14 @@ import {
 import { handleQueryError, logError } from '@/libs/apiErrors';
 import type { DailyTask } from '@/types/database';
 import { withAuthQuery } from "@/services/supabase/queryBuilder";
+import { getProfileToday } from '@/libs/profileDate';
 
 export const dailyTaskQueries = {
   // Fetch all tasks and lazily reset if today is a new day
   async getTodaysTasks(): Promise<DailyTask[]> {
     try {
     return await withAuthQuery(async (userId) => {
-    const today = getTodayDateStr();
+    const today = getProfileToday();
     const { data, error } = await supabase
             .from('daily_tasks')
             .select('*')
@@ -72,7 +73,7 @@ export const dailyTaskQueries = {
   ): Promise<DailyTask> {
     try {
   return await withAuthQuery(async (userId) => {
-  const today = getTodayDateStr();
+  const today = getProfileToday();
   const { data, error } = await supabase
           .from('daily_tasks')
           .insert([
@@ -98,7 +99,7 @@ export const dailyTaskQueries = {
   async toggleTask(id: string, completed: boolean): Promise<DailyTask> {
     try {
   return await withAuthQuery(async (userId) => {
-  const today = getTodayDateStr();
+  const today = getProfileToday();
   const { data, error } = await supabase
           .from('daily_tasks')
           .update({
@@ -214,5 +215,3 @@ export const dailyTaskQueries = {
   },
 };
 
-
-const getTodayDateStr = () => { const d = new Date(); const year = d.getFullYear(); const month = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); return `${year}-${month}-${day}`; };

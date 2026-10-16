@@ -44,18 +44,18 @@ export function Toast({ message, type = 'info', duration = 3000, onClose }: Toas
   return (
     <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none">
       <div
-        className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border backdrop-blur-xl shadow-2xl transition-all duration-300 transform ${
-          isVisible ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-8 opacity-0 scale-95'
-        } ${bgColors[type]} bg-warm-black/90`}
+        className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-300 transform ${
+ isVisible ? 'translate-y-0 opacity-100 ' : '-translate-y-8 opacity-0 scale-95'
+ } ${bgColors[type]} bg-background/90`}
       >
         {icons[type]}
-        <p className="text-sm font-medium text-soft-cream">{message}</p>
+        <p className="text-sm font-medium text-foreground">{message}</p>
         <button
           onClick={() => {
             setIsVisible(false);
             setTimeout(onClose, 300);
           }}
-          className="p-1 rounded-md hover:bg-white/10 text-gray-light hover:text-soft-cream transition-colors ml-2"
+          className="p-1 rounded-md hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors ml-2"
         >
           <X size={16} />
         </button>

@@ -13,7 +13,39 @@ export const id = {
     "signupBtn": "Daftar",
     "signupLink": "Buat akun",
     "signupSubtitle": "Hanya butuh satu menit.",
-    "signupTitle": "Buat akun Anda."
+    "signupTitle": "Buat akun Anda.",
+    "back_home": "Kembali ke beranda",
+    "email_address": "Alamat email",
+    "email_ph": "email@contoh.com",
+    "password_required": "Kata sandi wajib diisi",
+    "name_required": "Nama wajib diisi",
+    "passwords_mismatch": "Kata sandi tidak cocok",
+    "show_password": "Tampilkan kata sandi",
+    "hide_password": "Sembunyikan kata sandi",
+    "login_quote": "Kembali ke yang penting. Tinggalkan kebisingan di luar.",
+    "login_panel_desc": "Dashboard Anda siap menampilkan yang penting berikutnya: uang, gerak, pengingat, dan momentum.",
+    "login_error_title": "Gagal masuk",
+    "open_dashboard": "Buka dashboard",
+    "authenticating": "Memverifikasi...",
+    "new_to_trason": "Baru di TRASON?",
+    "begin_here": "Mulai di sini",
+    "signup_heading": "Buat sistem operasi pribadi Anda",
+    "signup_lede": "Siapkan tempat tenang untuk mencatat hari dan memahami momentum Anda.",
+    "signup_quote": "Bangun sistemnya, lalu biarkan sistem yang membawa Anda.",
+    "signup_panel_desc": "Mulai dengan satu ruang kerja pribadi untuk uang, kebiasaan, olahraga, pengingat, dan arah jangka panjang.",
+    "full_name": "Nama lengkap",
+    "full_name_ph": "Nama Anda",
+    "confirm_password": "Konfirmasi kata sandi",
+    "domain_checking": "Memeriksa domain email...",
+    "domain_verified": "Domain email terverifikasi",
+    "register_error_title": "Tidak dapat mendaftar",
+    "register_success_title": "Akun dibuat",
+    "check_email": "Periksa email Anda untuk mengonfirmasi akun.",
+    "create_account": "Buat akun",
+    "creating": "Menyiapkan ruang kerja Anda...",
+    "has_workspace": "Sudah punya ruang kerja?",
+    "server_error": "Kesalahan server saat mendaftar. Coba lagi sebentar lagi.",
+    "email_taken": "Email itu sudah terdaftar. Masuk saja, atau gunakan email lain."
   },
   "career_page": {
     "applied_on": "Dilamar",
@@ -177,8 +209,10 @@ export const id = {
     "saving": "Menyimpan...",
     "success": "Sukses",
     "try_again": "Coba lagi",
-    "view_all": "Lihat Semua"
-    },
+    "view_all": "Lihat Semua",
+    "user": "Pengguna",
+    "loading_section": "Memuat"
+  },
   "dailyTasks": {
     "empty": "Belum ada tugas. Tambahkan tugas harian pertamamu."
   },
@@ -284,7 +318,17 @@ export const id = {
     "view_all_tasks": "Lihat semua {count} tugas",
     "view_schedule": "Lihat jadwal",
     "vitality_this_week": "Vitalitas minggu ini",
-    "welcome_back": "Selamat datang kembali"
+    "welcome_back": "Selamat datang kembali",
+    "load_failed": "Beberapa bagian dashboard tidak dapat dimuat.",
+    "section_load_failed": "Bagian ini tidak dapat dimuat.",
+    "insights_title": "Wawasan",
+    "prev_month": "Bulan sebelumnya",
+    "next_month": "Bulan berikutnya",
+    "high_priority": "Prioritas tinggi",
+    "max_budget": "maks {amount}",
+    "tasks_empty_cta": "Tambah tugas di Jadwal",
+    "sport_empty": "Belum ada sesi minggu ini.",
+    "career_empty": "Belum ada lamaran."
   },
   "finance": {
     "driverPayout": {
@@ -631,7 +675,20 @@ export const id = {
     "schedule": "Jadwal",
     "settings": "Pengaturan",
     "sport": "Olahraga",
-    "timeline": "Jadwal"
+    "timeline": "Jadwal",
+    "offline_banner": "Offline. Perubahan akan disinkronkan saat terhubung kembali.",
+    "back_online": "Koneksi pulih",
+    "open_menu": "Buka menu",
+    "close_menu": "Tutup menu",
+    "notifications_on": "Notifikasi aktif",
+    "notifications_off": "Notifikasi nonaktif",
+    "enable_notifications": "Aktifkan notifikasi",
+    "disable_notifications": "Nonaktifkan notifikasi",
+    "all_in_bar": "Semua modul ada di bilah navigasi.",
+    "tagline": "Sistem Operasi Pribadi",
+    "skip_to_content": "Lewati ke konten",
+    "switch_to_light": "Ganti ke tema terang",
+    "switch_to_dark": "Ganti ke tema gelap"
   },
   "onboarding": {
     "back": "Kembali",
@@ -649,7 +706,14 @@ export const id = {
     "step3_desc": "Pilih modul yang ingin Anda aktifkan. Anda selalu dapat mengubahnya nanti di pengaturan.",
     "theme": "Tema",
     "timezone": "Zona waktu",
-    "welcome": "Selamat datang di TRASON"
+    "welcome": "Selamat datang di TRASON",
+    "preparing": "Menyiapkan ruang Anda...",
+    "step_of": "Langkah {current} dari {total}",
+    "name_required": "Isi nama depan untuk melanjutkan.",
+    "theme_dark": "Gelap",
+    "theme_light": "Terang",
+    "error_failed": "Gagal menyelesaikan onboarding. Silakan coba lagi.",
+    "modules_selected": "{count} dipilih"
   },
   "reminders_page": {
     "add_to_day": "+ Tambahkan ke hari ini",
@@ -668,6 +732,7 @@ export const id = {
       "notes_placeholder": "Tambahkan konteks...",
       "notify_help": "Pilih kapan Anda ingin diingatkan sebelum waktu jatuh tempo",
       "notify_label": "Ingatkan saya",
+      "notify_none": "Tidak ada notifikasi yang akan dikirim: semua waktu pengingat yang dipilih sudah lewat. Pilih waktu jatuh tempo yang lebih akhir atau waktu pengingat yang lebih singkat.",
       "notify_options": {
         "d1": "1 hari sebelumnya",
         "d2": "2 hari sebelumnya",

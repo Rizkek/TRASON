@@ -13,8 +13,10 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { TOKEN_COLORS, withAlpha } from '@/config/colors';
+import { withAlpha } from '@/config/colors';
+import { useChartTheme } from '@/hooks/useChartTheme';
 import { Card } from '@/components';
+import { Placeholder } from '@/components/ui/Placeholder';
 import { Heading, Paragraph } from '@/components/ui/typography';
 import { Transaction } from '@/services/supabase/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -42,6 +44,7 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
   const { t } = useTranslation();
   const { currency, locale } = useUserPreferences();
   const [isMounted, setIsMounted] = useState(false);
+  const { colors, chrome } = useChartTheme();
 
   useEffect(() => {
     setIsMounted(true);
@@ -86,8 +89,8 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
         {
           label: t('dashboard.income'),
           data: chartData.map(d => d.income),
-          borderColor: TOKEN_COLORS.success,
-          backgroundColor: withAlpha(TOKEN_COLORS.success, 0.12),
+          borderColor: colors.success,
+          backgroundColor: withAlpha(colors.success, 0.12),
           borderWidth: 2,
           pointRadius: 0,
           pointHoverRadius: 6,
@@ -97,8 +100,8 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
         {
           label: t('dashboard.expenses'),
           data: chartData.map(d => d.expense),
-          borderColor: TOKEN_COLORS.danger,
-          backgroundColor: withAlpha(TOKEN_COLORS.danger, 0.12),
+          borderColor: colors.danger,
+          backgroundColor: withAlpha(colors.danger, 0.12),
           borderWidth: 2,
           pointRadius: 0,
           pointHoverRadius: 6,
@@ -107,7 +110,7 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
         }
       ]
     };
-  }, [chartData, t]);
+  }, [chartData, t, colors]);
 
   const options = {
     responsive: true,
@@ -121,15 +124,16 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
         display: false
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: TOKEN_COLORS.grayVeryLight,
+        backgroundColor: chrome.tooltipBg,
+        titleColor: colors.grayVeryLight,
+        bodyColor: colors.foreground,
         titleFont: { size: 12, weight: 'bold' as const },
         bodyFont: { size: 14, weight: 'bold' as const },
         padding: 12,
         cornerRadius: 12,
         boxPadding: 6,
         usePointStyle: true,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: chrome.tooltipBorder,
         borderWidth: 1,
         callbacks: {
           label: (context: any) => {
@@ -152,8 +156,8 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
           display: false,
         },
         ticks: {
-          color: 'gray',
-          font: { size: 10 },
+          color: chrome.tick,
+          font: { size: 12 },
           maxTicksLimit: 10
         }
       },
@@ -167,18 +171,18 @@ export const FinancialChart = ({ transactions, month, year }: Props) => {
   };
 
   return (
-    <Card className="p-4 md:p-8 bg-black/[0.03] dark:bg-black/40 backdrop-blur-2xl border border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
+    <Card className="p-4 md:p-8">
 
       <div className="flex items-center justify-between mb-4 md:mb-8 relative z-10">
         <div>
-          <Heading as="h3" size="h6" className="text-soft-cream">{t('dashboard.financial_analytics')}</Heading>
-          <Paragraph className="text-[10px] md:text-micro text-gray-light mt-1">{t('dashboard.monthly_overview')}</Paragraph>
+          <Heading as="h3" size="h6">{t('dashboard.financial_analytics')}</Heading>
+          <Paragraph className="mt-1 text-xs text-muted-foreground">{t('dashboard.monthly_overview')}</Paragraph>
         </div>
       </div>
 
       <div className="w-full h-[120px] md:h-[200px] relative z-10">
         {!isMounted || !chartDataState ? (
-          <div className="w-full h-full bg-white/[0.02] rounded-lg" />
+          <Placeholder className="h-full w-full" />
         ) : (
           <Line data={chartDataState} options={options} />
         )}

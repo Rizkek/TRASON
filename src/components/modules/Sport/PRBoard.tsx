@@ -21,10 +21,10 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
   const { locale } = useUserPreferences();
   if (records.length === 0) {
     return (
-      <Card className="p-8 bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] text-center">
-        <Trophy size={32} className="mx-auto text-gray-light mb-4 opacity-50" />
-        <h4 className="text-white font-semibold mb-1">No Personal Records Yet</h4>
-        <p className="text-sm text-gray-light">Log your first workout to start tracking your bests.</p>
+      <Card className="p-8 bg-foreground/[0.02] border-foreground/[0.05] text-center">
+        <Trophy size={32} className="mx-auto text-muted-foreground mb-4 opacity-50" />
+        <h4 className="text-foreground font-semibold mb-1">No Personal Records Yet</h4>
+        <p className="text-sm text-muted-foreground">Log your first workout to start tracking your bests.</p>
       </Card>
     );
   }
@@ -34,7 +34,7 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
       {records.map((pr) => (
         <Card 
           key={pr.id} 
-          className="p-6 bg-white/[0.03] border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group hover:border-primary/30 transition-colors"
+          className="p-6 bg-foreground/[0.03] border-foreground/[0.05] relative overflow-hidden group hover:border-primary/30 transition-colors"
         >
           
           <div className="flex items-center gap-3 mb-4">
@@ -42,25 +42,25 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
               {getSportIcon(pr.sport_type)}
             </div>
             <div>
-              <p className="text-xs uppercase tracking-widest text-gray-light font-medium">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">
                 {pr.sport_type}
               </p>
-              <h4 className="text-sm font-semibold text-white leading-tight">
+              <h4 className="text-sm font-semibold text-foreground leading-tight">
                 {pr.exercise_name}
               </h4>
             </div>
           </div>
           
           <div className="flex items-end gap-2">
-            <span className="text-3xl font-serif font-semibold text-primary tracking-tight">
+            <span className="text-heading-xl text-primary tracking-tight">
               {pr.metric_value}
             </span>
-            <span className="text-sm text-gray-light mb-1 font-medium">
+            <span className="text-sm text-muted-foreground mb-1 font-medium">
               {pr.metric_unit}
             </span>
           </div>
           
-          <div className="mt-2 text-[10px] text-gray-very-light flex items-center justify-between border-t border-black/[0.05] dark:border-white/[0.05] pt-2">
+          <div className="mt-2 text-xs text-subtle flex items-center justify-between border-t border-foreground/[0.05] pt-2">
             <span>{pr.metric_type}</span>
             <span>{new Date(pr.record_date).toLocaleDateString(locale)}</span>
           </div>

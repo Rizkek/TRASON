@@ -2,92 +2,107 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Card, Badge, Loading } from '@/components';
+import { Card, Badge, InlineError } from '@/components';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { Placeholder } from '@/components/ui/Placeholder';
 import { useDailyTasks } from '@/hooks/useDailyTasks';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import { ListChecks, ArrowRight } from '@phosphor-icons/react';
+import { Check, ArrowRight } from '@phosphor-icons/react';
 
 const MAX_PREVIEW = 5;
 
 export const DailyTasksSummary = () => {
   const { t } = useTranslation();
-  const { tasks, isLoading, toggleTask, pendingToggleIds } = useDailyTasks();
+  const { tasks, isLoading, error, mutate, toggleTask, pendingToggleIds } = useDailyTasks();
 
   const totalCount = tasks.length;
-  const completedCount = tasks.filter(t => t.completed_today).length;
+  const completedCount = tasks.filter((task) => task.completed_today).length;
   const previewTasks = tasks.slice(0, MAX_PREVIEW);
   const hasMore = totalCount > MAX_PREVIEW;
 
   return (
-    <Card className="p-4 md:p-6 bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.05] flex flex-col">
-      <div className="flex items-center justify-between mb-4 pb-1 border-b border-black/[0.05] dark:border-white/[0.05]">
+    <Card className="flex flex-col p-4 md:p-6">
+      <div className="mb-4 flex items-center justify-between border-b border-foreground/10 pb-2">
         <div className="flex items-center gap-2">
-          <Heading as="h2" size="h6" className="uppercase tracking-widest text-soft-cream">
+          <Heading as="h2" size="h6" className="uppercase tracking-widest">
             {t('dashboard.dailyTasks.title')}
           </Heading>
-        </div>
-        <div className="flex items-center gap-2">
           {totalCount > 0 && (
             <Badge variant={completedCount === totalCount ? 'success' : 'default'} size="sm">
               {completedCount} / {totalCount}
             </Badge>
           )}
-          <Link
-            href="/schedule"
-            className="text-xs font-medium text-gray-light hover:text-primary transition-colors flex items-center gap-1 group/link ml-2"
-          >
-            <span>{t('dashboard.view_all')}</span>
-            <ArrowRight size={12} className="group-hover/link:translate-x-0.5 transition-transform" />
-          </Link>
         </div>
+        <Link
+          href="/schedule"
+          className="-mr-2 inline-flex min-h-11 items-center gap-1 px-2 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+        >
+          <span>{t('dashboard.view_all')}</span>
+          <ArrowRight size={12} aria-hidden="true" />
+        </Link>
       </div>
 
       <div className="flex-1">
-        {isLoading ? (
-          <div className="flex justify-center py-6"><Loading /></div>
+        {error ? (
+          <InlineError message={t('dashboard.section_load_failed')} retryLabel={t('common.try_again')} onRetry={() => mutate()} />
+        ) : isLoading ? (
+          <div className="space-y-2">
+            <Placeholder className="h-11 w-full" />
+            <Placeholder className="h-11 w-full" />
+          </div>
         ) : tasks.length === 0 ? (
-          <Paragraph className="text-xs text-gray-light italic text-center py-6 opacity-60">
-            {t('dashboard.dailyTasks.empty')}
-          </Paragraph>
+          <div className="space-y-3 py-4 text-center">
+            <Paragraph className="text-body-md text-muted-foreground">{t('dashboard.dailyTasks.empty')}</Paragraph>
+            <Link href="/schedule" className="inline-flex min-h-11 items-center text-body-md font-medium text-primary hover:underline">
+              {t('dashboard.tasks_empty_cta')}
+            </Link>
+          </div>
         ) : (
-          <div className="space-y-1.5">
-            {previewTasks.map(task => {
-              const isToggling = pendingToggleIds.has(task.id);
+          <ul className="space-y-1">
+            {previewTasks.map((task) => {
+              const toggling = pendingToggleIds.has(task.id);
               return (
-                <div 
-                  key={task.id} 
-                  className={`flex items-center gap-2.5 p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors ${
-                    isToggling ? 'cursor-wait opacity-60 pointer-events-none' : 'cursor-pointer'
-                  } group`} 
-                  onClick={() => !isToggling && toggleTask(task.id, !task.completed_today)}
-                >
-                  <div className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
-                    task.completed_today ? 'bg-primary border-primary' : 'border-gray-light/40 group-hover:border-primary'
-                  }`}>
-                    {task.completed_today && <ListChecks size={10} className="text-white" />}
-                  </div>
-                  <span className={`text-xs truncate transition-opacity flex-1 ${
-                    task.completed_today ? 'opacity-40 line-through text-gray-light' : 'text-soft-cream font-medium'
-                  }`}>
-                    {task.title}
-                  </span>
-                </div>
+                <li key={task.id}>
+                  <button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={task.completed_today}
+                    disabled={toggling}
+                    onClick={() => toggleTask(task.id, !task.completed_today)}
+                    className="flex min-h-11 w-full items-center gap-3 rounded-lg px-2 text-left transition-colors hover:bg-foreground/5 disabled:cursor-wait disabled:opacity-60"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
+                        task.completed_today ? 'border-primary bg-primary' : 'border-muted-foreground/60'
+                      }`}
+                    >
+                      {task.completed_today && <Check size={12} weight="bold" className="text-on-primary" />}
+                    </span>
+                    <span
+                      className={`flex-1 truncate text-body-md ${
+                        task.completed_today ? 'text-muted-foreground line-through' : 'font-medium text-foreground'
+                      }`}
+                    >
+                      {task.title}
+                    </span>
+                  </button>
+                </li>
               );
             })}
 
             {hasMore && (
-              <div className="pt-2 text-center">
+              <li className="pt-1 text-center">
                 <Link
                   href="/schedule"
-                  className="text-[11px] font-semibold text-gray-light hover:text-primary transition-colors inline-flex items-center gap-1"
+                  className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary"
                 >
                   {t('dashboard.view_all_tasks').replace('{count}', totalCount.toString())}
-                  <ArrowRight size={11} />
+                  <ArrowRight size={12} aria-hidden="true" />
                 </Link>
-              </div>
+              </li>
             )}
-          </div>
+          </ul>
         )}
       </div>
     </Card>

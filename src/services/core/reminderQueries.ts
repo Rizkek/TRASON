@@ -10,6 +10,7 @@ import {
   UserPreferences
 } from '../supabase/supabaseClient';
 import { ApiError, handleQueryError, logError } from '@/libs/apiErrors';
+import { formatDateOnly } from '@/libs/date';
 import { hasDueTimePassed } from '@/libs/notificationLogic';
 import { REMINDER_PAST_DUE_ERROR } from '@/libs/validation';
 import type { DailyTask } from '@/types/database';
@@ -45,8 +46,8 @@ export const reminderQueries = {
           .select('*')
           .eq('user_id', userId)
           .is('deleted_at', null)
-          .gte('due_date', startDate.toISOString().split('T')[0])
-          .lte('due_date', endDate.toISOString().split('T')[0])
+          .gte('due_date', formatDateOnly(startDate))
+          .lte('due_date', formatDateOnly(endDate))
           .order('due_date', { ascending: true });
   if (error) throw error;
   return data;

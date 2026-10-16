@@ -1,6 +1,8 @@
 import { supabase } from '../supabase/supabaseClient';
 import { handleQueryError, logError } from '@/libs/apiErrors';
 import { withAuthQuery } from "@/services/supabase/queryBuilder";
+import { formatDateOnly } from '@/libs/date';
+import { getProfileToday } from '@/libs/profileDate';
 
 export const analyticsQueries = {
   // Get task logs for the last 30 days
@@ -10,7 +12,7 @@ export const analyticsQueries = {
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(today.getDate() - 30);
-    const dateStr = thirtyDaysAgo.toISOString().split('T')[0];
+    const dateStr = formatDateOnly(thirtyDaysAgo);
     const { data, error } = await supabase
             .from('daily_task_logs')
             .select('completed_date, task_id')
@@ -35,7 +37,7 @@ export const analyticsQueries = {
   }) {
     try {
   return await withAuthQuery(async (userId) => {
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getProfileToday();
   const { error } = await supabase
           .from('life_scores')
           .upsert({

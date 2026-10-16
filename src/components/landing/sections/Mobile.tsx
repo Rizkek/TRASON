@@ -30,9 +30,9 @@ export function Mobile() {
             />
             <ul className="mt-10 grid gap-6 sm:grid-cols-3 lg:grid-cols-1 lg:gap-5">
               {POINTS.map((p) => (
-                <li key={p.title} className="border-l border-lp-border/15 pl-4">
-                  <h3 className="text-lg text-lp-foreground">{p.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-lp-muted">{p.body}</p>
+                <li key={p.title} className="border-l border-foreground/15 pl-4">
+                  <h3 className="text-lg text-foreground">{p.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
                 </li>
               ))}
             </ul>

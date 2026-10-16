@@ -1,42 +1,53 @@
 # Deployment & Maintenance Guide
 
-## 1. Langkah Rilis & Distribusi (Deployment)
+## 1. Sebelum rilis
 
-Aplikasi TRASON menggunakan tumpukan dasar _Next.js (App Router)_ yang mengandalkan kapabilitas *Server-Side Rendering* (SSR) dengan kombinasi statik. Panduan rilis ini sangat disarankan untuk diarahkan ke Edge Platform bawaan Next.js yakni **Vercel** atau platform yang kompatibel seperti **Netlify**.
+Jalankan dari terminal sebelum mendorong perubahan:
 
-### A. Persiapan Kompilasi Lokal (Pre-Flight)
-Sebelum sebuah perubahan dipublikasikan atau didorong melalui Git (`git push`), pastikan Anda memverifikasi dua metrik ini di _terminal_:
-1. **TypeScript Check**: 
-   Verifikasi tidak adanya tipe parameter yang menyimpang di seluruh proyek:
-   ```bash
-   npx tsc --noEmit
-   ```
-2. **Uji Coba Pembangunan (Local Build)**:
-   Membangun folder keluaran (Output Node) untuk menyadari potensi *error* rendering di sisi server jauh lebih awal.
-   ```bash
-   npm run build
-   ```
+```bash
+npm run type-check
+npm test
+npm run build
+```
 
-### B. Distribusi ke Produksi (Vercel)
-1. Pergilah ke antarmuka *Dashboard Provider* Vercel.
-2. Tambahkan Proyek (*Add New Project*) dan berikan wewenang pelacakan integrasi GitHub/GitLab ke repositori Anda.
-3. Di tab **Environment Variables**, isi dan masukkan nilai konfigurasi API sesuai pedoman di file *Setup Environment*. 
-   *(Contoh: `NEXT_PUBLIC_SUPABASE_URL` dan kuncinya, harus disertakan).*
-4. Tekan **Deploy**. Vercel akan otomatis menjalankan antrian instalasi paket, mendeteksi *build output*, serta mendistribusikan situs web ke server CDN Edge Network di penjuru dunia.
+`next build` tidak menjalankan ESLint (`eslint.ignoreDuringBuilds: true`), jadi jalankan `npm run lint` sendiri dan periksa hasilnya.
 
-## 2. Pemeliharaan Basis Data
-Karena TRASON berpusat di Supabase, jangan lupa untuk secara berkala menekan (*apply/migrate*) logika file SQL Migration terbaru yang berada di folder `docs/migrations/`. Pembaruan tabel `original_currency`, fungsionalitas kolom log (*history tracking*), dan integrasi perbaruan API dilakukan dengan mengeksekusi skrip SQL dari dashboard antarmuka SQL Supabase secara manual maupun melalui *Supabase CLI*.
+## 2. Deploy ke Vercel
 
-## 3. Catatan Rilis Historis (Changelog)
+1. Tambah proyek di Vercel dan hubungkan repositori.
+2. Isi seluruh environment variable di tab **Environment Variables**. Daftar lengkap ada di `docs/setup-environment.md`; jangan hanya mengisi variabel Supabase, karena AI, push, cron, email digest, dan harga investasi masing-masing butuh kuncinya.
+3. Jalankan migrasi SQL yang belum diterapkan (bagian 3) sebelum deploy kode yang bergantung padanya.
+4. Deploy. `public/sw.js` dibuat oleh Serwist saat build dari `src/app/sw.ts`; file itu tidak di-commit.
 
-- **v1.0.0 (MVP Phase)**:  
-  Perilisan arsitektur fundamental awal. Aplikasi sukses mendemonstrasikan pelacakan 5 pilar besar: (1) Dasbor Terpusat, (2) Pengelompokan *Finance*, (3) Catatan *Timeline* kalender harian, (4) Panel jadwal berulang dalam *Reminders*, serta (5) Jejak lamaran *Career*.
+## 3. Migrasi database
 
-- **v1.1.0 (Logs, SWR Bugfixes & Timezones)**:  
-  Fase penambalan kebocoran memori. Sinkronisasi SWR untuk pencatatan ganda pada fitur "centang" diubah agar memanggil kueri *uncomplete*. Perubahan masif pada basis algoritma *Timezone*, membuat siklus tugas (00:00 AM) dapat membedakan acuan waktu wilayah pengguna yang akurat, dengan penambahan skema tabel *tracking logs* riwayat database untuk keperluan analitika mendatang.
+File SQL ada di `docs/migrations/` dan dijalankan manual di Supabase SQL editor. Setiap file ditulis agar aman dijalankan berulang.
 
-- **v1.2.0 (The Premium Aesthetics Update)**:  
-  Transformasi fitur fungsional. 
-  1. Fitur konfigurasi multi-kurs dalam pengolahan nilai *original currency* dan *base_currency*. (Memanggil kalkulasi SDK dari nilai pasar saat entri _form_ ditekan).
-  2. Implementasi tab-Sub-Toggles konfigurasi khusus yang memungkinkan pengguna memilah jenis pilar mana yang mau dirender dari menu *Settings*.
-  3. Transformasi minimalisme modul Dasbor yang melahirkan area daftar _checklist_ instan tanpa distraksi antarmuka tabel grafik yang terlalu membebani beranda.
+| File | Isi | Wajib sebelum |
+|---|---|---|
+| `2026-10-15-push-reliability.sql` | kolom kesehatan di `push_subscriptions`, tabel `reminder_notifications`, `task_nudges`, `cron_runs` | deploy perubahan cron dan push |
+
+Setiap tabel baru wajib punya RLS aktif. Tabel yang hanya dipakai server (service role) boleh RLS aktif tanpa policy; tabel yang diakses klien butuh policy `auth.uid() = user_id`.
+
+## 4. Cron
+
+cron-job.org memanggil route berikut dengan header `Authorization: Bearer <CRON_SECRET>`:
+
+| Route | Jadwal |
+|---|---|
+| `/api/cron/reminders` | tiap menit |
+| `/api/cron/timeline` | tiap 6 jam |
+| `/api/cron/digest` | sesuai kebutuhan email digest |
+
+Pengiriman exactly-once dijamin tabel `reminder_notifications` dan `task_nudges`. Ringkasan run yang punya pekerjaan dicatat di `cron_runs`; run kosong tidak dicatat.
+
+Validasi setelah deploy: buat reminder yang jatuh tempo sekitar 62 menit lagi, lalu periksa `reminder_notifications`, `cron_runs`, dan `push_subscriptions.last_success_at`.
+
+## 5. Catatan perubahan
+
+- **v1.0.0**: dashboard, finance, timeline, reminders, career.
+- **v1.1.0**: perbaikan SWR pada checklist harian, siklus reset harian berdasarkan timezone pengguna, tabel log riwayat.
+- **v1.2.0**: multi-kurs pada transaksi, toggle sub-fitur per modul di Settings, dashboard yang lebih ringkas.
+- **Keandalan push dan reminder**: pengiriman cron exactly-once, setiap perangkat tetap berlangganan, reminder dengan waktu lampau ditolak, shell aplikasi persisten, `InlineError` untuk data yang gagal dimuat, invalidasi cache terpusat (`libs/cacheInvalidation.ts`).
+- **Tanggal dan timezone**: tanggal lokal selalu lewat helper `libs/date.ts` dan `libs/profileDate.ts`, "hari ini" mengikuti timezone profil, dan satu guard auth di `Layout`.
+- **Investments**: halaman Goals dan Journal disembunyikan (redirect ke `/investments`) sampai ada tabel dan query yang nyata.

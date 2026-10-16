@@ -1,4 +1,5 @@
 import { Transaction } from '@/types/database';
+import { getLocalISODate } from '@/libs/format';
 import { ParsedTransaction } from './textParser';
 import { ExtractedReceipt } from '../../ai/receiptExtractor';
 
@@ -21,7 +22,7 @@ export function detectDuplicates(
   // Extract amount and title based on entry type
   const amount = 'amount' in newEntry ? newEntry.amount : newEntry.total;
   const title = 'title' in newEntry ? newEntry.title : (newEntry.merchant || 'Unknown');
-  const dateStr = newEntry.date || new Date().toISOString().split('T')[0];
+  const dateStr = newEntry.date || getLocalISODate();
   const dateObj = new Date(`${dateStr.split('T')[0]}T00:00:00Z`);
   const type = 'type' in newEntry ? newEntry.type : undefined;
   

@@ -23,8 +23,8 @@ export function TrasonIcon({
       <div
         className={`transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
           active
-            ? 'text-warm-gold scale-110'
-            : 'text-gray-light hover:text-soft-cream hover:scale-105'
+            ? 'text-primary '
+            : 'text-muted-foreground hover:text-foreground '
         }`}
       >
         <Icon
@@ -41,12 +41,12 @@ export function TrasonIcon({
   if (variant === 'card') {
     return (
       <div
-        className={`p-2 rounded-xl bg-gray-medium/20 transition-all duration-300 group flex items-center justify-center ${className}`}
+        className={`p-2 rounded-xl bg-surface-hover/20 transition-all duration-300 group flex items-center justify-center ${className}`}
       >
         <Icon
           weight="duotone"
           size={size || 24}
-          className={`text-gray-light group-hover:text-warm-gold transition-colors duration-300`}
+          className={`text-muted-foreground group-hover:text-primary transition-colors duration-300`}
           {...props}
         />
       </div>
@@ -60,7 +60,7 @@ export function TrasonIcon({
         weight={active ? 'fill' : 'duotone'}
         size={size || 24}
         className={`transition-colors duration-300 ${
-          active ? 'text-warm-gold drop-shadow-md' : 'text-gray-light'
+          active ? 'text-primary ' : 'text-muted-foreground'
         } ${className}`}
         {...props}
       />
@@ -71,12 +71,12 @@ export function TrasonIcon({
   if (variant === 'hero') {
     return (
       <div
-        className={`relative p-4 rounded-2xl bg-gray-strong border border-gray-medium/50 flex items-center justify-center ${className}`}
+        className={`relative p-4 rounded-2xl bg-surface border border-surface-hover/50 flex items-center justify-center ${className}`}
       >
         <Icon
           weight="duotone"
           size={size || 48}
-          className="text-warm-gold relative z-10"
+          className="text-primary relative z-10"
           {...props}
         />
       </div>
@@ -88,7 +88,7 @@ export function TrasonIcon({
     <Icon
       weight="regular"
       size={size || 20}
-      className={`text-gray-light ${className}`}
+      className={`text-muted-foreground ${className}`}
       {...props}
     />
   );

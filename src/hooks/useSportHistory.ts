@@ -7,6 +7,7 @@ import { personalRecordQueries } from '@/services/workout/prQueries';
 import { activityQueries } from '@/services/activity/activityQueries';
 import type { WorkoutSession, PersonalRecord, Activity } from '@/types/database';
 import { CACHE_KEYS } from '@/libs/cacheKeys';
+import { formatDateOnly } from '@/libs/date';
 import { SWR_CONFIG } from '@/config/swr';
 import { executeMutation } from "@/libs/api/mutationBuilder";
 
@@ -59,8 +60,8 @@ export const useSportHistory = (startDate?: Date, endDate?: Date) => {
 
   const start = startDate || defaultStart;
   const end = endDate || today;
-  const startStr = start.toISOString().split('T')[0];
-  const endStr = end.toISOString().split('T')[0];
+  const startStr = formatDateOnly(start);
+  const endStr = formatDateOnly(end);
 
   // Fetch workout sessions
   const sessionsKey = CACHE_KEYS.sport.sessions(startStr, endStr);

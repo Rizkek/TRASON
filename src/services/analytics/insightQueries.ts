@@ -10,6 +10,7 @@ import {
   UserPreferences
 } from '../supabase/supabaseClient';
 import { handleQueryError, logError } from '@/libs/apiErrors';
+import { formatDateOnly } from '@/libs/date';
 import type { DailyTask } from '@/types/database';
 import { withAuthQuery } from "@/services/supabase/queryBuilder";
 
@@ -22,8 +23,8 @@ export const insightQueries = {
             .from('insights')
             .select('*')
             .eq('user_id', userId)
-            .gte('date', startDate.toISOString().split('T')[0])
-            .lte('date', endDate.toISOString().split('T')[0]);
+            .gte('date', formatDateOnly(startDate))
+            .lte('date', formatDateOnly(endDate));
     if (type) {
             query = query.eq('type', type);
           }

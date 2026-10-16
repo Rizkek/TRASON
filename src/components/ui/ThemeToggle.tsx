@@ -2,18 +2,23 @@
 
 import React from 'react';
 import { useAuthStore } from '@/store/authStore';
+import { useResolvedTheme } from '@/hooks/useResolvedTheme';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Sun, Moon } from '@phosphor-icons/react';
 
 export function ThemeToggle() {
-  const { activeTheme, setActiveTheme } = useAuthStore();
-  const isDark = activeTheme === 'dark';
+  const setActiveTheme = useAuthStore((s) => s.setActiveTheme);
+  const isDark = useResolvedTheme() === 'dark';
+  const { t } = useTranslation();
+  const label = isDark ? t('nav.switch_to_light') : t('nav.switch_to_dark');
 
   return (
     <button
+      type="button"
       onClick={() => setActiveTheme(isDark ? 'light' : 'dark')}
-      className="p-2 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-gray-medium dark:text-gray-light hover:text-primary dark:hover:text-primary hover:bg-black/10 dark:hover:bg-white/10 transition-all flex items-center justify-center"
-      aria-label="Toggle Theme"
-      title="Toggle Theme"
+      className="flex h-11 w-11 items-center justify-center rounded-full border border-foreground/10 bg-foreground/5 text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-primary"
+      aria-label={label}
+      title={label}
     >
       {isDark ? <Sun size={20} weight="bold" /> : <Moon size={20} weight="bold" />}
     </button>

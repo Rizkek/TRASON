@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/supabaseClient';
 import { withAuthQuery } from '../supabase/queryBuilder';
+import { getProfileToday } from '@/libs/profileDate';
 import type { PersonalRecord } from '@/types/database';
 
 export const personalRecordQueries = {
@@ -52,7 +53,7 @@ export const personalRecordQueries = {
           metric_type: metricType,
           metric_value: metricValue,
           metric_unit: metricUnit,
-          record_date: new Date().toISOString().split('T')[0],
+          record_date: getProfileToday(),
         }])
         .select()
         .single();

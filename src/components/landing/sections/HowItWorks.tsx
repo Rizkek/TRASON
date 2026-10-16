@@ -16,7 +16,7 @@ const STEPS = [
   {
     n: '03',
     title: 'Act',
-    body: 'Reminders arrive as push notifications. Today\u2019s tasks stay on the Dashboard until you tick them off.',
+    body: 'Reminders arrive as push notifications. Today’s tasks stay on the Dashboard until you tick them off.',
   },
   {
     n: '04',
@@ -37,11 +37,11 @@ export function HowItWorks() {
 
         <ol className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
           {STEPS.map((step) => (
-            <li key={step.n} className="flex flex-col gap-4 border-t border-lp-border/15 pt-5">
-              <span className="font-mono text-xs text-lp-muted">{step.n}</span>
+            <li key={step.n} className="flex flex-col gap-4 border-t-2 border-primary pt-5">
+              <span className="font-mono text-sm font-semibold text-primary">{step.n}</span>
               <div>
-                <h3 className="text-2xl text-lp-foreground">{step.title}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-lp-muted">{step.body}</p>
+                <h3 className="text-2xl text-foreground">{step.title}</h3>
+                <p className="mt-2 text-base leading-relaxed text-muted-foreground">{step.body}</p>
               </div>
             </li>
           ))}

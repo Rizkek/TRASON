@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
 import { Card, Button, Badge, Loading, Modal, Input, Alert, ErrorAlert, ConfirmModal, Select, DatePicker } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useInvestment } from '@/hooks/useInvestment';
@@ -49,7 +48,6 @@ const getAssetBadgeVariant = (type: AssetType) => {
 };
 
 export function InvestmentsClient() {
-  const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
   const { currency, locale, timezone } = useUserPreferences();
@@ -92,17 +90,6 @@ export function InvestmentsClient() {
       return true;
     });
   }, [calculatedPositions, activeTab]);
-
-  // =============================================================
-  // 2) AUTH GUARD
-  // Jika user belum login, redirect ke /login.
-  // Bagian ini penting supaya halaman investasi tidak bisa dibuka tanpa session.
-  // =============================================================
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [authLoading, isAuthenticated, router]);
 
   const openNewModal = () => {
     setEditingPosition(null);
@@ -246,7 +233,7 @@ export function InvestmentsClient() {
         <div className="space-y-8 animate-fade-in">
           <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="space-y-2 max-w-2xl">
-            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-soft-cream">{t('investment_page.investment_analyst_title')}</Heading>
+            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-foreground">{t('investment_page.investment_analyst_title')}</Heading>
             <Paragraph className="text-subtext flex items-center gap-2">
               {t('investment_page.investment_analyst_desc')}
             </Paragraph>
@@ -270,38 +257,38 @@ export function InvestmentsClient() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          <Card className="p-8 bg-black/20 border-primary/20 backdrop-blur-md">
+          <Card className="p-8 bg-background/60 border-primary/20 backdrop-blur-md">
             <Paragraph className="text-micro text-primary/80 uppercase tracking-widest font-semibold mb-2">{t('dashboard.netWorth.title')}</Paragraph>
-            <Paragraph className="text-3xl font-sans font-semibold tracking-tight tabular-nums text-white">{formatCurrency(summary?.netWorth || 0, currency, locale)}</Paragraph>
+            <Paragraph className="text-3xl font-sans font-semibold tracking-tight tabular-nums text-foreground">{formatCurrency(summary?.netWorth || 0, currency, locale)}</Paragraph>
           </Card>
-          <Card className="p-8 bg-black/20 border-white/5">
-            <Paragraph className="text-micro text-gray-light mb-2 uppercase tracking-widest">{t('dashboard.netWorth.totalAssets')}</Paragraph>
-            <Paragraph className="text-2xl font-semibold tabular-nums text-white">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</Paragraph>
-            <Paragraph className="text-xs text-gray-light mt-1">{t('investment_page.liquid_property_vehicle')}</Paragraph>
+          <Card className="p-8 bg-background/60 border-foreground/5">
+            <Paragraph className="text-micro text-muted-foreground mb-2 uppercase tracking-widest">{t('dashboard.netWorth.totalAssets')}</Paragraph>
+            <Paragraph className="text-2xl font-semibold tabular-nums text-foreground">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</Paragraph>
+            <Paragraph className="text-xs text-muted-foreground mt-1">{t('investment_page.liquid_property_vehicle')}</Paragraph>
           </Card>
-          <Card className="p-8 bg-black/20 border-white/5">
-            <Paragraph className="text-micro text-gray-light mb-2 uppercase tracking-widest">{t('dashboard.netWorth.totalLiabilities')}</Paragraph>
-            <Paragraph className="text-2xl font-semibold tabular-nums text-white">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</Paragraph>
-            <Paragraph className="text-xs text-gray-light mt-1">{t('investment_page.debt_mortgages')}</Paragraph>
+          <Card className="p-8 bg-background/60 border-foreground/5">
+            <Paragraph className="text-micro text-muted-foreground mb-2 uppercase tracking-widest">{t('dashboard.netWorth.totalLiabilities')}</Paragraph>
+            <Paragraph className="text-2xl font-semibold tabular-nums text-foreground">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</Paragraph>
+            <Paragraph className="text-xs text-muted-foreground mt-1">{t('investment_page.debt_mortgages')}</Paragraph>
           </Card>
         </div>
 
         <Card className="overflow-hidden">
-          <div className="px-6 py-4 border-b border-black/5 dark:border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="px-6 py-4 border-b border-foreground/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <Heading as="h3" size="h3" className="text-sm font-semibold tracking-tight">{t('investment_page.portfolio_tracker')}</Heading>
-              <Paragraph className="text-xs text-gray-light mt-1">{t('investment_page.portfolio_tracker_desc')}</Paragraph>
+              <Paragraph className="text-xs text-muted-foreground mt-1">{t('investment_page.portfolio_tracker_desc')}</Paragraph>
             </div>
             
             {/* Tabs */}
-            <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar w-max">
+            <div className="flex bg-foreground/[0.03] p-1 rounded-full border border-foreground/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar w-max">
               <button
                 onClick={() => setActiveTab('financial')}
                 title={t('investment_page.financial_assets')}
-                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                   activeTab === 'financial'
-                    ? 'bg-primary text-white shadow-md'
-                    : 'text-gray-light hover:text-soft-cream'
+                    ? 'bg-primary text-on-primary '
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <CurrencyDollar size={13} weight="bold" />
@@ -310,10 +297,10 @@ export function InvestmentsClient() {
               <button
                 onClick={() => setActiveTab('physical')}
                 title={t('investment_page.physical_assets')}
-                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                   activeTab === 'physical'
-                    ? 'bg-primary text-white shadow-md'
-                    : 'text-gray-light hover:text-soft-cream'
+                    ? 'bg-primary text-on-primary '
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Buildings size={13} weight="bold" />
@@ -322,10 +309,10 @@ export function InvestmentsClient() {
               <button
                 onClick={() => setActiveTab('liabilities')}
                 title={t('investment_page.liabilities')}
-                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                   activeTab === 'liabilities'
-                    ? 'bg-expense text-white shadow-md'
-                    : 'text-gray-light hover:text-soft-cream'
+                    ? 'bg-expense text-background '
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Warning size={13} weight="bold" />
@@ -340,7 +327,7 @@ export function InvestmentsClient() {
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-black/5 dark:border-white/5 text-[10px] uppercase tracking-widest text-gray-light">
+                  <tr className="border-b border-foreground/5 text-xs uppercase tracking-widest text-muted-foreground">
                     <th className="px-2 py-2">{t('investment_page.asset')}</th>
                     <th className="px-2 py-2">{t('investment_page.amount')}</th>
                     <th className="px-2 py-2">{t('investment_page.avg_cost')}</th>
@@ -355,12 +342,12 @@ export function InvestmentsClient() {
                       ? new Date(position.last_valued_at).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: timezone })
                       : null;
                     return (
-                    <tr key={position.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:bg-white/5 transition-colors">
+                    <tr key={position.id} className="border-b border-foreground/5 hover:bg-foreground/5 transition-colors">
                       <td className="px-2 py-4">
                         <div className="space-y-1">
                           <div className="flex items-center gap-1">
-                            <Paragraph className="font-bold text-white text-xs">{position.symbol}</Paragraph>
-                            <Badge variant={getAssetBadgeVariant(position.asset_type)} size="sm" className="text-[9px] px-1 py-0">
+                            <Paragraph className="font-bold text-foreground text-xs">{position.symbol}</Paragraph>
+                            <Badge variant={getAssetBadgeVariant(position.asset_type)} size="sm" className="text-xs px-1 py-0">
                               {position.asset_type}
                             </Badge>
                             {isLive ? (
@@ -369,16 +356,16 @@ export function InvestmentsClient() {
                               </span>
                             ) : (
                               <span title="Harga belum direfresh">
-                                <WifiOff size={10} className="text-gray-light" />
+                                <WifiOff size={10} className="text-muted-foreground" />
                               </span>
                             )}
                           </div>
-                          <Paragraph className="text-[10px] text-gray-light truncate max-w-[120px]">{position.display_name || t('investment_page.tracked_position')}</Paragraph>
+                          <Paragraph className="text-xs text-muted-foreground truncate max-w-[120px]">{position.display_name || t('investment_page.tracked_position')}</Paragraph>
                         </div>
                       </td>
-                      <td className="px-2 py-4 text-xs text-soft-cream">{formatNumber(position.amount, 4)}</td>
-                      <td className="px-2 py-4 text-xs text-soft-cream">{formatCurrency(position.buy_price, currency, locale)}</td>
-                      <td className="px-2 py-4 text-xs font-bold text-white">
+                      <td className="px-2 py-4 text-xs text-foreground">{formatNumber(position.amount, 4)}</td>
+                      <td className="px-2 py-4 text-xs text-foreground">{formatCurrency(position.buy_price, currency, locale)}</td>
+                      <td className="px-2 py-4 text-xs font-bold text-foreground">
                         {formatCurrency(position.current_value, currency, locale)}
                       </td>
                       <td className="px-2 py-4 text-right">
@@ -388,7 +375,7 @@ export function InvestmentsClient() {
                           </Button>
                           <button
                             onClick={() => setDeleteConfirmId(position.id)}
-                            className="p-1 text-gray-light hover:text-danger hover:bg-danger/10 rounded transition-colors"
+                            className="p-1 text-muted-foreground hover:text-danger hover:bg-danger/10 rounded transition-colors"
                             aria-label={t('investment_page.delete')}
                           >
                             <Trash2 size={16} />
@@ -403,10 +390,10 @@ export function InvestmentsClient() {
             </div>
           ) : (
             <div className="py-12 text-center">
-              <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
+              <div className="w-16 h-16 bg-foreground/5 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
                 <Shield size={28} />
               </div>
-              <Paragraph className="text-sm text-center text-gray-light max-w-lg mx-auto mt-2">
+              <Paragraph className="text-sm text-center text-muted-foreground max-w-lg mx-auto mt-2">
                 {t('investment_page.investment_empty_state_desc')}
               </Paragraph>
               <Button variant="primary" size="md" className="mt-6" onClick={openNewModal}>{t('investment_page.add_first_position')}</Button>
@@ -421,21 +408,21 @@ export function InvestmentsClient() {
                 <Landmark size={16} />
                 <Paragraph className="text-micro">{t('investment_page.stocks_upper')}</Paragraph>
               </div>
-              <Paragraph className="text-lg font-semibold text-white">{formatCurrency(summary?.allocationByType.stock || 0, currency, locale)}</Paragraph>
+              <Paragraph className="text-lg font-semibold text-foreground">{formatCurrency(summary?.allocationByType.stock || 0, currency, locale)}</Paragraph>
             </Card>
             <Card className="p-8">
               <div className="flex items-center gap-2 mb-4 text-primary">
                 <Coins size={16} />
                 <Paragraph className="text-micro">{t('investment_page.crypto_upper')}</Paragraph>
               </div>
-              <Paragraph className="text-lg font-semibold text-white">{formatCurrency(summary?.allocationByType.crypto || 0, currency, locale)}</Paragraph>
+              <Paragraph className="text-lg font-semibold text-foreground">{formatCurrency(summary?.allocationByType.crypto || 0, currency, locale)}</Paragraph>
             </Card>
             <Card className="p-8">
               <div className="flex items-center gap-2 mb-4 text-warning">
                 <Shield size={16} />
                 <Paragraph className="text-micro">{t('investment_page.gold_upper')}</Paragraph>
               </div>
-              <Paragraph className="text-lg font-semibold text-white">{formatCurrency(summary?.allocationByType.gold || 0, currency, locale)}</Paragraph>
+              <Paragraph className="text-lg font-semibold text-foreground">{formatCurrency(summary?.allocationByType.gold || 0, currency, locale)}</Paragraph>
             </Card>
           </div>
         )}
@@ -452,7 +439,7 @@ export function InvestmentsClient() {
           variant="ghost" 
           onClick={() => refreshPortfolio()} 
           disabled={isRefreshing}
-          className="rounded-full w-12 h-12 flex items-center justify-center shadow-lg bg-black/80 dark:bg-white/10 text-white"
+          className="rounded-full w-12 h-12 flex items-center justify-center bg-foreground/10 text-foreground"
           aria-label={t('investment_page.refresh_prices')}
         >
           <ArrowsClockwise size={20} />
@@ -460,7 +447,7 @@ export function InvestmentsClient() {
         <Button 
           variant="primary" 
           onClick={openNewModal} 
-          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(244,201,93,0.4)]"
+          className="rounded-full w-14 h-14 flex items-center justify-center "
           aria-label={t('investment_page.add_position')}
         >
           <Plus size={24} />
@@ -589,9 +576,9 @@ export function InvestmentsClient() {
           />
 
           {/* Investment Journal Section */}
-          <div className="pt-2 border-t border-white/5 space-y-4">
+          <div className="pt-2 border-t border-foreground/5 space-y-4">
             <div>
-              <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase mb-2 block">
+              <label className="text-xs font-bold text-muted-foreground tracking-widest uppercase mb-2 block">
                 {t('investment_page.buy_rationale')}
               </label>
               <div className="flex flex-wrap gap-1">
@@ -610,7 +597,7 @@ export function InvestmentsClient() {
                     className={`px-2 py-1 rounded-full border text-xs transition-colors ${
                       form.rationale_type === option.value
                         ? 'bg-primary/20 border-primary text-primary'
-                        : 'border-white/10 text-gray-light hover:border-white/30'
+                        : 'border-foreground/10 text-muted-foreground hover:border-foreground/30'
                     }`}
                   >
                     {option.label}
@@ -621,13 +608,13 @@ export function InvestmentsClient() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('investment_page.notes_upper')}</label>
+            <label className="text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('investment_page.notes_upper')}</label>
             <textarea
               rows={4}
               value={form.notes}
               onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))}
               placeholder={t('investment_page.notes_placeholder')}
-              className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-surface border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
             />
           </div>
         </div>

@@ -4,7 +4,8 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components';
 import { Heading, Paragraph } from '@/components/ui/typography';
-import { ArrowRight, CalendarBlank, Clock, CheckCircle } from '@phosphor-icons/react';
+import { Placeholder } from '@/components/ui/Placeholder';
+import { ArrowRight } from '@phosphor-icons/react';
 import { Reminder } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 
@@ -13,80 +14,73 @@ interface UpNextCardProps {
   isLoading?: boolean;
 }
 
+const MAX_SHOWN = 4;
+
 export const UpNextCard: React.FC<UpNextCardProps> = ({ reminders, isLoading }) => {
   const { t } = useTranslation();
 
-  const activeReminders = useMemo(() => {
+  const upcoming = useMemo(() => {
     if (!reminders || reminders.length === 0) return [];
-    
+
     return reminders
       .filter((r) => r.status !== 'completed' && r.status !== 'cancelled')
       .sort((a, b) => {
-        // Sort by due_date first, then due_time
         const dateA = a.due_date || '9999-12-31';
         const dateB = b.due_date || '9999-12-31';
         if (dateA !== dateB) return dateA.localeCompare(dateB);
-        const timeA = a.due_time || '23:59';
-        const timeB = b.due_time || '23:59';
-        return timeA.localeCompare(timeB);
+        return (a.due_time || '23:59').localeCompare(b.due_time || '23:59');
       })
-      .slice(0, 4);
+      .slice(0, MAX_SHOWN);
   }, [reminders]);
 
   return (
-    <Card className="p-4 md:p-6 bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05] relative overflow-hidden group">
-      <div className="flex items-center justify-between mb-4 pb-1 border-b border-black/[0.05] dark:border-white/[0.05]">
-        <div className="flex items-center gap-2">
-          <Heading as="h2" size="h6" className="uppercase tracking-widest text-soft-cream">
-            {t('dashboard.up_next')}
-          </Heading>
-        </div>
+    <Card className="p-4 md:p-6">
+      <div className="mb-4 flex items-center justify-between border-b border-foreground/10 pb-2">
+        <Heading as="h2" size="h6" className="uppercase tracking-widest">
+          {t('dashboard.up_next')}
+        </Heading>
         <Link
           href="/reminders"
-          className="text-xs font-medium text-gray-light hover:text-primary transition-colors flex items-center gap-1 group/link"
+          className="-mr-2 inline-flex min-h-11 items-center gap-1 px-2 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
         >
           <span>{t('dashboard.view_schedule')}</span>
-          <ArrowRight size={12} className="group-hover/link:translate-x-0.5 transition-transform" />
+          <ArrowRight size={12} aria-hidden="true" />
         </Link>
       </div>
 
       {isLoading ? (
-        <div className="space-y-2 py-2">
-          <div className="h-9 w-full bg-white/[0.02] rounded-lg" />
-          <div className="h-9 w-full bg-white/[0.02] rounded-lg" />
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <Placeholder className="h-14 w-full" />
+          <Placeholder className="h-14 w-full" />
         </div>
-      ) : activeReminders.length === 0 ? (
-        <div className="py-4 text-center">
-          <Paragraph className="text-xs text-gray-light italic opacity-75">
-            {t('dashboard.up_next_empty')}
-          </Paragraph>
-        </div>
+      ) : upcoming.length === 0 ? (
+        <Paragraph className="py-4 text-center text-body-md text-muted-foreground">{t('dashboard.up_next_empty')}</Paragraph>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-          {activeReminders.map((reminder) => (
-            <div
+        <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {upcoming.map((reminder) => (
+            <li
               key={reminder.id}
-              className="flex items-center gap-2.5 p-2.5 rounded-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03] hover:border-primary/20 transition-all min-w-0"
+              className="flex min-w-0 items-center gap-3 rounded-lg border border-foreground/10 bg-foreground/[0.03] p-3"
             >
-              <div className="flex items-center justify-center shrink-0 px-2 py-1 rounded bg-primary/10 text-primary font-mono text-[11px] font-bold tracking-tight">
+              <span className="shrink-0 rounded bg-primary/15 px-2 py-1 font-mono text-xs font-bold text-primary">
                 {reminder.due_time || t('dashboard.today')}
-              </div>
+              </span>
               <div className="min-w-0 flex-1">
-                <Paragraph className="text-xs font-semibold text-soft-cream truncate" title={reminder.title}>
+                <p className="truncate text-body-md font-medium text-foreground" title={reminder.title}>
                   {reminder.title}
-                </Paragraph>
+                </p>
                 {reminder.description && (
-                  <Paragraph className="text-[10px] text-gray-light truncate opacity-70">
-                    {reminder.description}
-                  </Paragraph>
+                  <p className="truncate text-xs text-muted-foreground">{reminder.description}</p>
                 )}
               </div>
               {reminder.priority === 'high' && (
-                <div className="w-1.5 h-1.5 rounded-full bg-danger shrink-0" title="High priority" />
+                <span className="shrink-0 rounded-full bg-danger/15 px-2 py-0.5 text-xs font-medium text-danger">
+                  {t('dashboard.high_priority')}
+                </span>
               )}
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </Card>
   );

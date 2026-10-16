@@ -33,10 +33,10 @@ export function ProfileSection({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <Card className="glass border-none shadow-2xl relative overflow-hidden">
+    <Card className="glass border-none relative overflow-hidden">
 
       <div className="p-8 space-y-8 relative z-10">
-        <div className="flex flex-col md:flex-row items-center gap-8 pb-8 border-b border-black/[0.05] dark:border-white/[0.05]">
+        <div className="flex flex-col md:flex-row items-center gap-8 pb-8 border-b border-foreground/[0.05]">
           <div className="relative group">
             <input
               type="file"
@@ -50,7 +50,7 @@ export function ProfileSection({
               className="w-24 h-24 rounded-2xl bg-primary p-[2px] cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
             >
-              <div className="w-full h-full rounded-2xl bg-gray-strong flex items-center justify-center text-3xl font-sans font-bold tracking-tight text-white relative overflow-hidden">
+              <div className="w-full h-full rounded-2xl bg-surface flex items-center justify-center text-3xl font-sans font-bold tracking-tight text-foreground relative overflow-hidden">
                 {isUploadingAvatar ? (
                   <Loading />
                 ) : profile.avatar_url ? (
@@ -73,18 +73,18 @@ export function ProfileSection({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploadingAvatar}
-              className="absolute -bottom-2 -right-2 p-2 bg-secondary text-white rounded-md shadow-lg border border-black/20 dark:border-white/20 hover:scale-110 transition-transform disabled:opacity-50"
+              className="absolute -bottom-2 -right-2 p-2 bg-secondary text-on-primary rounded-md border border-foreground/20 transition-transform disabled:opacity-50"
             >
               <Camera size={14} />
             </button>
           </div>
           <div className="text-center md:text-left">
-            <Heading as="h2" size="h2" className="text-xl font-semibold text-soft-cream tracking-tight">
+            <Heading as="h2" size="h2" className="text-xl font-semibold text-foreground tracking-tight">
               {profile.first_name || profile.last_name
                 ? `${profile.first_name} ${profile.last_name}`.trim()
                 : 'Syncing Identity...'}
             </Heading>
-            <Paragraph className="text-sm text-gray-light italic">{user?.email}</Paragraph>
+            <Paragraph className="text-sm text-muted-foreground italic">{user?.email}</Paragraph>
           </div>
         </div>
 

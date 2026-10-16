@@ -1,32 +1,34 @@
 import React from 'react';
 import { Container } from '../primitives/Section';
 import { CtaLink } from '../primitives/CtaLink';
+import { Mark } from '../primitives/SectionHeading';
 import { WindowFrame } from '../primitives/ProductFrame';
 import { DashboardUI } from '../product/DashboardUI';
 
 export function Hero() {
   return (
-    <header
-      aria-labelledby="hero-heading"
-      className="relative overflow-hidden pt-28 sm:pt-36 lg:pt-40"
-    >
+    <header aria-labelledby="hero-heading" className="relative overflow-hidden pt-28 sm:pt-36 lg:pt-40">
       <Container>
         <div className="grid gap-10 lg:grid-cols-12 lg:items-end lg:gap-8">
           <div className="lg:col-span-7">
-            <p className="lp-rise flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-lp-muted">
-              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-lp-accent" />
+            <p className="lp-rise flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-primary" />
               Personal operating system
             </p>
             <h1
               id="hero-heading"
-              className="lp-rise lp-rise-delay-1 mt-6 text-[2.75rem] leading-[1.02] text-lp-foreground sm:text-6xl lg:text-[4.5rem]"
+              className="lp-rise lp-rise-delay-1 mt-6 text-display-md leading-[1.05] text-foreground sm:text-6xl lg:text-display-2xl"
             >
-              Your life, in one clear system.
+              <span className="block">Your life,</span>
+              <span className="block">in one</span>
+              <span className="block">
+                <Mark>clear system.</Mark>
+              </span>
             </h1>
           </div>
 
           <div className="lp-rise lp-rise-delay-2 flex flex-col gap-7 lg:col-span-5 lg:pb-2">
-            <p className="max-w-md text-base leading-relaxed text-lp-muted sm:text-lg">
+            <p className="max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
               TRASON keeps your money, career, workouts, schedule and reminders in one connected place,
               so you always know where things stand without opening six apps.
             </p>
@@ -38,7 +40,7 @@ export function Hero() {
                 See the product
               </CtaLink>
             </div>
-            <p className="text-xs text-lp-muted">
+            <p className="text-xs text-muted-foreground">
               Free to start · English and Indonesian · Installs like an app
             </p>
           </div>
@@ -51,7 +53,7 @@ export function Hero() {
           >
             <DashboardUI />
           </WindowFrame>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-lp-muted">
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
             The Dashboard. Your Life Score, what is due next, the current state of your money and training,
             and today&apos;s tasks, on one screen.
           </p>

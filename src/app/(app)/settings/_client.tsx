@@ -79,7 +79,6 @@ export function SettingsClient() {
     if (authLoading) return;
     if (!isAuthenticated) {
       isFormInitialized.current = false;
-      router.push('/login');
       return;
     }
 
@@ -155,7 +154,7 @@ export function SettingsClient() {
       setPrefs(loaded);
       setOriginalPrefs(loaded);
     }
-  }, [authLoading, isAuthenticated, router, user, setUser]);
+  }, [authLoading, isAuthenticated, user, setUser]);
 
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
@@ -318,10 +317,10 @@ export function SettingsClient() {
         <div className="space-y-8 animate-fade-in max-w-4xl">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
             <div>
-              <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-soft-cream">
+              <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-foreground">
                 {t('settings.title')}
               </Heading>
-              <Paragraph className="text-gray-light mt-1 text-sm">{t('settings.subtitle')}</Paragraph>
+              <Paragraph className="text-muted-foreground mt-1 text-sm">{t('settings.subtitle')}</Paragraph>
             </div>
           </div>
 
@@ -344,10 +343,10 @@ export function SettingsClient() {
                   onClick={() => setActiveTab(tab.id)}
                   title={tab.label}
                   aria-label={tab.label}
-                  className={`flex items-center justify-center p-4 md:px-8 md:py-4 gap-4 text-[10px] font-bold whitespace-nowrap rounded-md border transition-all shrink-0 ${
+                  className={`flex items-center justify-center p-4 md:px-8 md:py-4 gap-4 text-xs font-bold whitespace-nowrap rounded-md border transition-all shrink-0 ${
                     activeTab === tab.id
-                      ? 'bg-primary text-warm-black border-primary'
-                      : 'bg-black/[0.02] dark:bg-white/[0.02] text-gray-light border-black/[0.05] dark:border-white/[0.05] hover:border-black/[0.1] dark:hover:border-white/[0.1] hover:text-soft-cream'
+                      ? 'bg-primary text-on-primary border-primary'
+                      : 'bg-foreground/[0.02] text-muted-foreground border-foreground/[0.05] hover:border-foreground/[0.1] hover:text-foreground'
                   }`}
                 >
                   <Icon size={14} className="shrink-0" />

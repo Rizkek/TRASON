@@ -6,6 +6,7 @@ import { reminderQueries } from '@/services/core/reminderQueries';
 import { Reminder } from '@/services/supabase/supabaseClient';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { CACHE_KEYS } from '@/libs/cacheKeys';
+import { formatDateOnly } from '@/libs/date';
 import { executeMutation } from "@/libs/api/mutationBuilder";
 import { getUserErrorMessage } from "@/libs/apiErrors";
 
@@ -24,8 +25,8 @@ export interface UseReminderReturn {
 export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn => {
   // Generate stable cache key using CACHE_KEYS helper
   const isPendingView = !startDate || !endDate;
-  const startStr = startDate?.toISOString().split('T')[0];
-  const endStr = endDate?.toISOString().split('T')[0];
+  const startStr = startDate && formatDateOnly(startDate);
+  const endStr = endDate && formatDateOnly(endDate);
   const key = isPendingView
     ? CACHE_KEYS.reminders.pending()
     : ['reminders', 'range', startStr, endStr];

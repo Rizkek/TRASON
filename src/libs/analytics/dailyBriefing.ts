@@ -3,6 +3,7 @@ import { StreakData } from './streakEngine';
 import { FinancialHealthScore } from './financialHealth';
 import { CareerAnalytics } from './careerAnalytics';
 import { Reminder } from '@/types/database';
+import { formatDateOnly } from '@/libs/date';
 
 export interface DailyBriefing {
   greetingInsight: string;
@@ -34,7 +35,7 @@ export function generateDailyBriefing(params: {
   const scoreDelta = lifeScore && yesterdayScore ? lifeScore.overall - yesterdayScore : 0;
   
   // Urgent reminders: due today or overdue, not done
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = formatDateOnly(new Date());
   const urgentReminders = reminders.filter(r => r.status === 'pending' && r.due_date && r.due_date <= todayStr).length;
 
   let highlightInsight = '';

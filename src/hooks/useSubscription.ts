@@ -6,6 +6,8 @@ import { Subscription } from '@/types/database';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { executeMutation } from "@/libs/api/mutationBuilder";
 import { transactionQueries } from '@/services/finance/transactionQueries';
+import { addBillingCycle } from '@/libs/date';
+import { getProfileToday } from '@/libs/profileDate';
 
 export const useSubscription = () => {
   const { data, error, isLoading, mutate } = useSWR<Subscription[]>(
@@ -57,24 +59,15 @@ export const useSubscription = () => {
         title: `Subscription: ${subscription.name}`,
         amount: subscription.amount,
         type: 'expense',
-        date: now.toISOString().split('T')[0],
+        date: getProfileToday(now),
         time: now.toTimeString().substring(0, 5),
         category_id: subscription.category_id || null,
         metadata: { is_subscription_auto: true, subscription_id: subscription.id },
       });
 
       // 2. Advance next billing date
-      const currentNextDate = new Date(subscription.next_billing_date);
-      if (subscription.billing_cycle === 'monthly') {
-        currentNextDate.setMonth(currentNextDate.getMonth() + 1);
-      } else if (subscription.billing_cycle === 'yearly') {
-        currentNextDate.setFullYear(currentNextDate.getFullYear() + 1);
-      } else if (subscription.billing_cycle === 'weekly') {
-        currentNextDate.setDate(currentNextDate.getDate() + 7);
-      }
-
       await subscriptionQueries.updateSubscription(subscription.id, {
-        next_billing_date: currentNextDate.toISOString().split('T')[0],
+        next_billing_date: addBillingCycle(subscription.next_billing_date, subscription.billing_cycle),
       });
       await mutate();
     })(), 'useSubscription.markAsPaid');

@@ -22,7 +22,7 @@ export const InlineError: React.FC<InlineErrorProps> = ({ message, onRetry, retr
   >
     <div className="flex items-start gap-3 min-w-0">
       <WarningCircle size={20} weight="fill" className="text-danger shrink-0 mt-0.5" aria-hidden="true" />
-      <p className="text-sm text-soft-cream">{message}</p>
+      <p className="text-sm text-foreground">{message}</p>
     </div>
     {onRetry && (
       <Button variant="secondary" size="sm" onClick={onRetry} className="self-start sm:self-auto shrink-0">

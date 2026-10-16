@@ -43,17 +43,25 @@ export const Modal: React.FC<ModalProps> = ({
   const modalRef = React.useRef<HTMLDivElement>(null);
   const previousFocusRef = React.useRef<HTMLElement | null>(null);
   const [mounted, setMounted] = useState(false);
+  // Callers pass inline handlers. Keeping onClose out of the effect deps stops the focus
+  // setup and cleanup from running on every parent render (every keystroke in a form).
+  const onCloseRef = React.useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
+    let focusTimer: ReturnType<typeof setTimeout> | undefined;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         const modals = Array.from(document.querySelectorAll('.trason-modal'));
         if (modals.length > 0 && modals[modals.length - 1] === modalRef.current) {
-          onClose();
+          onCloseRef.current();
         }
       } else if (e.key === 'Tab') {
         if (!modalRef.current) return;
@@ -90,28 +98,25 @@ export const Modal: React.FC<ModalProps> = ({
       document.body.style.overflow = 'hidden';
       document.body.style.paddingRight = `${scrollbarWidth}px`;
       
-      // Auto-focus first focusable element
-      setTimeout(() => {
+      // Focus the first form field; the close button comes first in the DOM but is the wrong target.
+      focusTimer = setTimeout(() => {
         if (modalRef.current) {
-          const focusable = modalRef.current.querySelector(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-          ) as HTMLElement;
-          if (focusable) focusable.focus();
+          const focusable = (modalRef.current.querySelector('input:not([disabled]), textarea:not([disabled]), select:not([disabled])') ??
+            modalRef.current.querySelector('button, [href], [tabindex]:not([tabindex="-1"])')) as HTMLElement | null;
+          focusable?.focus();
         }
       }, 10);
     }
 
     return () => {
+      clearTimeout(focusTimer);
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
-      
-      // Restore focus
-      if (previousFocusRef.current) {
-        previousFocusRef.current.focus();
-      }
+
+      if (isOpen) previousFocusRef.current?.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen || !mounted) return null;
 
@@ -119,7 +124,7 @@ export const Modal: React.FC<ModalProps> = ({
     <>
       {/* Backdrop with lighter blur for mobile performance */}
       <div
-        className={`fixed inset-0 bg-warm-black/60 backdrop-blur-sm animate-fade-in z-[${baseZIndex}]`}
+        className={`fixed inset-0 bg-black/60 animate-fade-in z-[${baseZIndex}]`}
         style={{ zIndex: baseZIndex }}
         onClick={onClose}
       />
@@ -134,15 +139,15 @@ export const Modal: React.FC<ModalProps> = ({
         style={{ zIndex: baseZIndex + 10 }}
       >
         <div
-          className={`bg-gray-strong border border-black/10 dark:border-white/10 rounded-md shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] ${maxWidthMap[maxWidth]} w-full max-h-[85dvh] flex flex-col pointer-events-auto animate-slide-up relative`}
+          className={`bg-surface border border-foreground/15 rounded-md ${maxWidthMap[maxWidth]} w-full max-h-[85dvh] flex flex-col pointer-events-auto animate-slide-up relative`}
           onClick={(e) => e.stopPropagation()}
         >
           
           {/* Header */}
           {(title || closeButton) && (
-            <div className="flex-none flex items-center justify-between px-4 py-4 sm:px-8 sm:py-8 border-b border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none flex items-center justify-between px-4 py-4 sm:px-8 sm:py-8 border-b border-foreground/10">
               {title && (
-                <h2 id="modal-title" className="text-xl font-semibold tracking-tight text-soft-cream uppercase italic">
+                <h2 id="modal-title" className="text-xl font-semibold tracking-tight text-foreground">
                    {title}
                 </h2>
               )}
@@ -151,7 +156,7 @@ export const Modal: React.FC<ModalProps> = ({
                   onClick={onClose}
                   title="Close modal"
                   aria-label="Close modal"
-                  className="text-gray-light hover:text-white hover:bg-black/5 dark:bg-white/5 p-2 rounded-md transition-all ml-2"
+                  className="text-muted-foreground hover:text-foreground hover:bg-foreground/10 p-2 rounded-md transition-colors ml-2"
                 >
                   <X size={20} />
                 </button>
@@ -162,7 +167,7 @@ export const Modal: React.FC<ModalProps> = ({
           {/* Description */}
           {description && (
             <div className="px-4 pt-4 sm:px-8 sm:pt-8">
-              <p className="text-sm text-gray-light italic opacity-80 leading-relaxed">
+              <p className="text-sm text-muted-foreground italic opacity-80 leading-relaxed">
                 {description}
               </p>
             </div>
@@ -173,7 +178,7 @@ export const Modal: React.FC<ModalProps> = ({
 
           {/* Footer */}
           {footer && (
-            <div className="flex-none px-4 py-4 sm:px-8 sm:py-8 bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none px-4 py-4 sm:px-8 sm:py-8 bg-foreground/[0.03] border-t border-foreground/10">
               {footer}
             </div>
           )}

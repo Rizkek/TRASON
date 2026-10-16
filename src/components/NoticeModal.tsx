@@ -28,7 +28,7 @@ export const NoticeModal: React.FC<NoticeModalProps> = ({ isOpen, onClose, title
       </div>
     }
   >
-    <p className="text-sm text-gray-very-light leading-relaxed" role="alert">
+    <p className="text-sm text-subtle leading-relaxed" role="alert">
       {message}
     </p>
   </Modal>

@@ -3,38 +3,36 @@
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button, Input, Alert, Logo } from '@/components';
+import { Button, Input, Alert } from '@/components';
+import { AuthShell } from '@/components/auth/AuthShell';
+import { PasswordToggle } from '@/components/auth/PasswordToggle';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import { supabase } from '@/services/supabase/supabaseClient';
 import { userQueries } from '@/services/core/userQueries';
 import { validateEmail, validatePassword, sanitizeError } from '@/libs/validation';
-import { Compass, ArrowLeft, Stack, CheckCircle, Warning as AlertTriangle, XCircle, Eye, EyeSlash as EyeOff } from '@phosphor-icons/react';
+import { CheckCircle, Warning, XCircle } from '@phosphor-icons/react';
+
+type DomainStatus = null | 'checking' | 'valid' | 'warning' | 'invalid';
+type Notice = { kind: 'error' | 'success'; message: string };
 
 export default function SignupPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
+  const { t } = useTranslation();
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Email domain check state
-  const [emailDomainStatus, setEmailDomainStatus] = useState<
-    null | 'checking' | 'valid' | 'warning' | 'invalid'
-  >(null);
+  const [emailDomainStatus, setEmailDomainStatus] = useState<DomainStatus>(null);
   const [emailDomainMessage, setEmailDomainMessage] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Reset domain status when email changes
     if (name === 'email') {
       setEmailDomainStatus(null);
       setEmailDomainMessage(null);
@@ -42,9 +40,7 @@ export default function SignupPage() {
   };
 
   const checkEmailDomain = async (email: string) => {
-    // Only check if basic format is valid
-    const formatError = validateEmail(email);
-    if (formatError) return;
+    if (validateEmail(email)) return;
 
     setEmailDomainStatus('checking');
     setEmailDomainMessage(null);
@@ -63,10 +59,9 @@ export default function SignupPage() {
         setEmailDomainMessage(data.warning);
       } else {
         setEmailDomainStatus('valid');
-        setEmailDomainMessage(null);
       }
     } catch {
-      // Network error â€” don't block the user
+      // A network failure must not block signup.
       setEmailDomainStatus(null);
     }
   };
@@ -78,40 +73,30 @@ export default function SignupPage() {
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
-    if (!formData.name) {
-      errors.name = 'Name is required';
-    }
+    if (!formData.name.trim()) errors.name = t('auth.name_required');
 
     const emailError = validateEmail(formData.email);
-    if (emailError) {
-      errors.email = emailError;
-    } else if (emailDomainStatus === 'invalid') {
-      errors.email = emailDomainMessage || 'Email domain is invalid';
-    }
+    if (emailError) errors.email = emailError;
+    else if (emailDomainStatus === 'invalid') errors.email = emailDomainMessage || 'Email domain is invalid';
 
     const passwordErrors = validatePassword(formData.password);
-    if (passwordErrors.length > 0) {
-      errors.password = passwordErrors[0];
-    }
+    if (passwordErrors.length > 0) errors.password = passwordErrors[0];
 
-    if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
-    }
+    if (formData.password !== formData.confirmPassword) errors.confirmPassword = t('auth.passwords_mismatch');
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const getSignUpErrorMessage = (signUpError: any): string => {
+  const signUpErrorMessage = (signUpError: any): string => {
     const message = signUpError?.message ?? 'Unable to register';
-    if (signUpError?.status === 500) {
-      return 'HardDrives error while registering. Check Supabase logs or try again later.';
-    }
+    if (signUpError?.status === 500) return t('auth.server_error');
     if (
       signUpError?.status === 409 ||
       signUpError?.code === 'DUPLICATE' ||
       /duplicate|already exists|users_email_key|email.*exists/i.test(message)
     ) {
-      return 'That email is already registered. If you deleted the account, make sure the Supabase Auth user record is fully removed before signing up again.';
+      return t('auth.email_taken');
     }
     return message;
   };
@@ -120,22 +105,19 @@ export default function SignupPage() {
     e.preventDefault();
     if (!validateForm()) return;
     setIsLoading(true);
-    setError(null);
+    setNotice(null);
 
     try {
       const [firstName, ...lastNameParts] = formData.name.trim().split(/\s+/);
-      const lastName = lastNameParts.join(' ');
-      const email = formData.email.trim();
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
+        email: formData.email.trim(),
         password: formData.password,
-        options: { data: { first_name: firstName, last_name: lastName } },
+        options: { data: { first_name: firstName, last_name: lastNameParts.join(' ') } },
       });
 
-       if (signUpError) {
+      if (signUpError) {
         console.error('Supabase signUp error:', signUpError);
-        setError(getSignUpErrorMessage(signUpError));
-        setIsLoading(false);
+        setNotice({ kind: 'error', message: signUpErrorMessage(signUpError) });
         return;
       }
       if (data.user) {
@@ -143,182 +125,134 @@ export default function SignupPage() {
           await userQueries.ensureUserProfile();
           router.push('/onboarding');
         } else {
-          setError('Success! Please check your email to confirm your account.');
+          setNotice({ kind: 'success', message: t('auth.check_email') });
           setTimeout(() => router.push('/login'), 3000);
         }
       }
     } catch (err) {
-      setError(sanitizeError(err));
+      setNotice({ kind: 'error', message: sanitizeError(err) });
     } finally {
       setIsLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-dvh bg-warm-black flex flex-col md:flex-row overflow-hidden font-sans">
-      {/* Left Side: Aesthetic (Hidden on mobile) */}
-      <div className="hidden md:flex md:w-1/2 bg-gray-strong relative items-center justify-center p-24 overflow-hidden border-r border-black/[0.05] dark:border-white/[0.05]">
-         
-         <div className="relative z-10 max-w-md space-y-8 animate-fade-in">
-            <Stack size={48} className="text-warm-gold opacity-40 mb-6" />
-            <Heading as="h2" size="h2" className="italic text-soft-cream/90">
-              "Build the system, then let the system carry you."
-            </Heading>
-            <div className="space-y-2">
-              <Paragraph size="lg" className="font-medium text-warm-gold">TRASON</Paragraph>
-              <Paragraph size="sm">
-                Start with one private workspace for your money, habits, workouts, reminders, and long-term direction.
-              </Paragraph>
-            </div>
-         </div>
+  const showDomainHint = formData.email && !validationErrors.email && emailDomainStatus;
 
-         <div className="absolute bottom-12 left-12 flex items-center gap-2 opacity-40">
-            <Logo size={32} variant="gold" />
-            <span className="font-serif text-lg tracking-tight">TRASON</span>
-         </div>
+  return (
+    <AuthShell quote={t('auth.signup_quote')} description={t('auth.signup_panel_desc')} busy={isLoading}>
+      <div className="space-y-2">
+        <Heading as="h1" size="h2">
+          {t('auth.signup_heading')}
+        </Heading>
+        <Paragraph className="text-body-md text-muted-foreground">{t('auth.signup_lede')}</Paragraph>
       </div>
 
-      {/* Right Side: Signup Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-24 relative overflow-y-auto">
-        {isLoading && <div className="absolute top-0 left-0 right-0 h-1 bg-warm-gold" />}
-        <Link href="/" className="absolute top-12 z-10 left-16 flex items-center gap-2 text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold transition-colors group">
-          <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Home</span>
-        </Link>
+      {notice && (
+        <Alert
+          type={notice.kind}
+          title={notice.kind === 'success' ? t('auth.register_success_title') : t('auth.register_error_title')}
+          onDismiss={() => setNotice(null)}
+        >
+          {notice.message}
+        </Alert>
+      )}
 
-        <div className="w-full max-w-sm space-y-8 animate-slide-up py-32">
-          <div className="space-y-2 text-center md:text-left">
-            <Heading as="h1" size="h3">Create Your Personal OS</Heading>
-            <Paragraph size="sm">Set up a calm place to capture the day and understand your momentum.</Paragraph>
-          </div>
+      <form onSubmit={handleSubmit} noValidate className="space-y-5">
+        <Input
+          label={t('auth.full_name')}
+          name="name"
+          type="text"
+          autoComplete="name"
+          placeholder={t('auth.full_name_ph')}
+          value={formData.name}
+          onChange={handleInputChange}
+          error={validationErrors.name}
+          required
+        />
 
-          {error && (
-            <Alert 
-              type={error.includes('Success') ? 'success' : 'error'} 
-              title={error.includes('Success') ? 'Account Created' : 'Unable to Register'}
-              className={error.includes('Success') ? 'bg-income/10 border-income/20 text-income' : 'bg-expense/10 border-expense/20 text-expense'}
-            >
-              {error}
-            </Alert>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Input
-              label="Full Name"
-              name="name"
-              type="text"
-              placeholder="Your name"
-              value={formData.name}
-              onChange={handleInputChange}
-              error={validationErrors.name}
-              className="bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.08] dark:border-white/[0.08] focus:border-warm-gold"
-              required
-            />
-            <div className="relative">
-              <Input
-                label="Email Address"
-                name="email"
-                type="email"
-                placeholder="email@example.com"
-                value={formData.email}
-                onChange={handleInputChange}
-                onBlur={handleEmailBlur}
-                error={validationErrors.email}
-                className="bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.08] dark:border-white/[0.08] focus:border-warm-gold"
-                required
-              />
-              {/* Domain validation indicator */}
-              {formData.email && !validationErrors.email && (
-                <div className="mt-1.5 flex items-center gap-1.5">
-                  {emailDomainStatus === 'checking' && (
-                    <span className="text-[10px] text-gray-light">Verifying email domain...</span>
-                  )}
-                  {emailDomainStatus === 'valid' && (
-                    <>
-                      <CheckCircle size={12} className="text-success" />
-                      <span className="text-[10px] text-success">Email domain verified</span>
-                    </>
-                  )}
-                  {emailDomainStatus === 'warning' && (
-                    <>
-                      <AlertTriangle size={12} className="text-primary" />
-                      <span className="text-[10px] text-primary">{emailDomainMessage}</span>
-                    </>
-                  )}
-                  {emailDomainStatus === 'invalid' && (
-                    <>
-                      <XCircle size={12} className="text-danger" />
-                      <span className="text-[10px] text-danger">{emailDomainMessage}</span>
-                    </>
-                  )}
-                </div>
+        <div>
+          <Input
+            label={t('auth.email_address')}
+            name="email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder={t('auth.email_ph')}
+            value={formData.email}
+            onChange={handleInputChange}
+            onBlur={handleEmailBlur}
+            error={validationErrors.email}
+            required
+          />
+          {showDomainHint && (
+            <div className="mt-1.5 flex items-center gap-1.5 text-xs" aria-live="polite">
+              {emailDomainStatus === 'checking' && <span className="text-muted-foreground">{t('auth.domain_checking')}</span>}
+              {emailDomainStatus === 'valid' && (
+                <>
+                  <CheckCircle size={14} aria-hidden="true" className="text-success" />
+                  <span className="text-success">{t('auth.domain_verified')}</span>
+                </>
+              )}
+              {emailDomainStatus === 'warning' && (
+                <>
+                  <Warning size={14} aria-hidden="true" className="text-warning" />
+                  <span className="text-warning">{emailDomainMessage}</span>
+                </>
+              )}
+              {emailDomainStatus === 'invalid' && (
+                <>
+                  <XCircle size={14} aria-hidden="true" className="text-danger" />
+                  <span className="text-danger">{emailDomainMessage}</span>
+                </>
               )}
             </div>
-            <Input
-              label="Password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="********"
-              value={formData.password}
-              onChange={handleInputChange}
-              error={validationErrors.password}
-              className="bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.08] dark:border-white/[0.08] focus:border-warm-gold"
-              required
-              suffix={
-                <button 
-                  type="button" 
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="p-1 hover:text-white transition-colors focus:outline-none"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              }
-            />
-            <Input
-              label="Confirm Password"
-              name="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="********"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              error={validationErrors.confirmPassword}
-              className="bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.08] dark:border-white/[0.08] focus:border-warm-gold"
-              required
-              suffix={
-                <button 
-                  type="button" 
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="p-1 hover:text-white transition-colors focus:outline-none"
-                  aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                >
-                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              }
-            />
-
-            <Button 
-              type="submit" 
-              variant="primary" 
-              fullWidth 
-              isLoading={isLoading}
-              loadingText="Initializing Workspace... (this might take up to a minute)"
-              className="py-6 rounded-full font-bold mt-8"
-            >
-              Create Account
-            </Button>
-          </form>
-
-          <div className="text-center md:text-left">
-            <Paragraph size="sm">
-              Already have your workspace?{' '}
-              <Link href="/login" className="text-warm-gold hover:underline font-medium underline-offset-4 decoration-warm-gold/30">
-                Sign in
-              </Link>
-            </Paragraph>
-          </div>
+          )}
         </div>
-      </div>
-    </div>
+
+        <Input
+          label={t('auth.password')}
+          name="password"
+          type={showPassword ? 'text' : 'password'}
+          autoComplete="new-password"
+          placeholder="********"
+          value={formData.password}
+          onChange={handleInputChange}
+          error={validationErrors.password}
+          required
+          suffix={<PasswordToggle visible={showPassword} onToggle={() => setShowPassword((v) => !v)} />}
+        />
+        <Input
+          label={t('auth.confirm_password')}
+          name="confirmPassword"
+          type={showConfirmPassword ? 'text' : 'password'}
+          autoComplete="new-password"
+          placeholder="********"
+          value={formData.confirmPassword}
+          onChange={handleInputChange}
+          error={validationErrors.confirmPassword}
+          required
+          suffix={<PasswordToggle visible={showConfirmPassword} onToggle={() => setShowConfirmPassword((v) => !v)} />}
+        />
+
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          fullWidth
+          isLoading={isLoading}
+          loadingText={t('auth.creating')}
+          className="mt-2 rounded-full"
+        >
+          {t('auth.create_account')}
+        </Button>
+      </form>
+
+      <Paragraph className="text-center text-body-md text-muted-foreground md:text-left">
+        {t('auth.has_workspace')}{' '}
+        <Link href="/login" className="inline-flex min-h-11 items-center font-medium text-primary underline-offset-4 hover:underline">
+          {t('auth.loginLink')}
+        </Link>
+      </Paragraph>
+    </AuthShell>
   );
 }

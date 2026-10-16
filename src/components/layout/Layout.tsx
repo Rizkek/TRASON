@@ -1,539 +1,114 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { ConfirmModal } from '../ConfirmModal';
-import { Logo } from '../Logo';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { usePushNotification } from '@/hooks/usePushNotification';
-import { ensureSWRegistered, syncPushSubscription } from '@/libs/pushSync';
-import { NavIcon } from '@/components/ui/NavIcon';
-import { ModuleId } from '@/modules/types';
-import { DEFAULT_MODULE_STATUS } from '@/modules/registry';
-import { SYS_ICONS } from '@/config/icons';
-import { TrasonIcon } from '@/components/ui/TrasonIcon';
-
-const PUSH_RESYNC_INTERVAL_MS = 30 * 60 * 1000;
-
-/**
- * Mounted once on authenticated pages. Keeps this device's push endpoint registered in the
- * database: the browser can rotate endpoints silently and the cron retires failing ones.
- * It never asks for notification permission; that only happens from an explicit user action.
- */
-function PushSubscriptionSync() {
-  React.useEffect(() => {
-    let lastSync = Date.now();
-    ensureSWRegistered().then(syncPushSubscription);
-
-    const resyncWhenVisible = () => {
-      if (document.visibilityState !== 'visible' || Date.now() - lastSync < PUSH_RESYNC_INTERVAL_MS) return;
-      lastSync = Date.now();
-      syncPushSubscription();
-    };
-
-    document.addEventListener('visibilitychange', resyncWhenVisible);
-    return () => document.removeEventListener('visibilitychange', resyncWhenVisible);
-  }, []);
-
-  return null;
-}
-
-/**
- * useOnlineStatus — tracks browser online/offline state.
- * Returns { isOnline, justReconnected } for UI feedback.
- */
-function useOnlineStatus() {
-  const [isOnline, setIsOnline] = React.useState(true);
-  const [justReconnected, setJustReconnected] = React.useState(false);
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return;
-    setIsOnline(navigator.onLine);
-
-    const handleOnline = () => {
-      setIsOnline(true);
-      setJustReconnected(true);
-      // Auto-hide "back online" after 3s
-      setTimeout(() => setJustReconnected(false), 3000);
-    };
-    const handleOffline = () => {
-      setIsOnline(false);
-      setJustReconnected(false);
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
-  return { isOnline, justReconnected };
-}
-
-/**
- * OfflineBanner — subtle status bar matching TRASON's glass design.
- * Shows when offline, confirms reconnection, auto-hides.
- */
-function OfflineBanner() {
-  const { isOnline, justReconnected } = useOnlineStatus();
-
-  if (isOnline && !justReconnected) return null;
-
-  return (
-    <div
-      className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-2 px-6 py-2 animate-fade-in backdrop-blur-md border-b text-token-micro uppercase ${
-        justReconnected
-          ? 'bg-success/10 border-success/20 text-soft-cream'
-          : 'bg-warm-gold/[0.08] border-warm-gold/20 text-soft-cream'
-      }`}
-    >
-      {justReconnected ? (
-        <>
-          <span className="w-1.5 h-1.5 rounded-full bg-success" />
-          <span className="text-success/90">Connection restored</span>
-        </>
-      ) : (
-        <>
-          <TrasonIcon icon={SYS_ICONS.offline} size={11} className="text-warm-gold opacity-90" />
-          <span className="text-warm-gold/90">Offline — changes will sync when connected</span>
-        </>
-      )}
-    </div>
-  );
-}
-
-const NotificationToggle = () => {
-  const { notifications_enabled, updatePreferences, isUpdating } = useUserPreferences();
-  const push = usePushNotification();
-
-  const handleToggle = async () => {
-    const newState = !notifications_enabled;
-    
-    await updatePreferences({ 
-      notifications_enabled: newState,
-      push_notifications_enabled: newState 
-    });
-
-    if (newState) {
-      try {
-        await push.subscribe();
-      } catch (err) {
-        console.error('Failed to subscribe to push on toggle:', err);
-      }
-    } else {
-      try {
-        await push.unsubscribe();
-      } catch (err) {
-        console.error('Failed to unsubscribe from push on toggle:', err);
-      }
-    }
-  };
-
-  return (
-    <button
-      disabled={isUpdating || push.isLoading}
-      onClick={handleToggle}
-      className={`p-2.5 rounded-full transition-colors flex items-center justify-center shrink-0 ${
-        notifications_enabled 
-          ? 'text-primary bg-primary/10 hover:bg-primary/20' 
-          : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/10'
-      }`}
-      title={notifications_enabled ? 'Notifications ON' : 'Notifications OFF'}
-      aria-label={notifications_enabled ? 'Disable notifications' : 'Enable notifications'}
-      aria-pressed={notifications_enabled}
-    >
-      {notifications_enabled ? <TrasonIcon icon={SYS_ICONS.notifications} size={18} /> : <TrasonIcon icon={SYS_ICONS.notificationsOff} size={18} />}
-    </button>
-  );
-};
+import { OfflineBanner } from './OfflineBanner';
+import { PushSubscriptionSync } from './PushSubscriptionSync';
+import { Sidebar } from './Sidebar';
+import { MobileHeader } from './MobileHeader';
+import { BottomNav } from './BottomNav';
+import { MoreSheet } from './MoreSheet';
+import { navLabelKey, useNavItems } from './useNavItems';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
+/**
+ * The persistent shell of every authenticated page: sidebar on desktop, header, bottom bar and
+ * "More" sheet on phones. Onboarding is a full-screen flow and renders without it.
+ */
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isAuthReady = useAuthStore((s) => s.isAuthReady);
   const signOut = useAuthStore((s) => s.signOut);
   const pathname = usePathname();
+  const router = useRouter();
+  const { t } = useTranslation();
+  const { visibleItems, barItems, sheetItems, isActive, current } = useNavItems();
+
   const mainRef = React.useRef<HTMLElement>(null);
+  const [moreOpen, setMoreOpen] = React.useState(false);
+  const [logoutOpen, setLogoutOpen] = React.useState(false);
+  const [loggingOut, setLoggingOut] = React.useState(false);
 
   // The shell persists across navigations, so the scroll container must be reset by hand.
   React.useEffect(() => {
     mainRef.current?.scrollTo({ top: 0 });
   }, [pathname]);
-  const router = useRouter();
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = React.useState(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
-  const [isLoggingOut, setIsLoggingOut] = React.useState(false);
-  const [sheetOffset, setSheetOffset] = React.useState(0);
-  const [isDragging, setIsDragging] = React.useState(false);
-  const dragStartY = React.useRef(0);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    dragStartY.current = e.touches[0].clientY;
-    setIsDragging(true);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    const currentY = e.touches[0].clientY;
-    const offset = Math.max(0, currentY - dragStartY.current); // Only allow swiping down
-    setSheetOffset(offset);
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    if (sheetOffset > 100) {
-      setIsBottomSheetOpen(false);
+  // The one client-side auth guard for every authenticated page. It waits for the first session
+  // check because the persisted isAuthenticated flag can be stale in either direction.
+  React.useEffect(() => {
+    if (isAuthReady && !isAuthenticated) {
+      router.replace(`/login?redirect_to=${encodeURIComponent(pathname)}`);
     }
-    setSheetOffset(0); // Reset for next open
-  };
+  }, [isAuthReady, isAuthenticated, pathname, router]);
 
-  const { module_features } = useUserPreferences();
+  const closeMore = React.useCallback(() => setMoreOpen(false), []);
 
-  // Derive enabled modules directly from Supabase-synced preferences (via Zustand)
-  // Falls back to DEFAULT_MODULE_STATUS if a key is absent
-  const enabledModules = useMemo(() => {
-    return (Object.keys(DEFAULT_MODULE_STATUS) as ModuleId[]).filter(
-      (id) => (module_features?.[id] ?? DEFAULT_MODULE_STATUS[id]) !== false
-    );
-  }, [module_features]);
-
-  // Memoized menu items — only recompute when enabled modules change
-  const menuItems: { label: string; href: string; icon: any; moduleId?: ModuleId }[] = useMemo(() => [
-    { label: 'Dashboard', href: '/dashboard', icon: SYS_ICONS.dashboard }, // Core, always visible
-    { label: 'Finance', href: '/finance', icon: SYS_ICONS.finance.main, moduleId: 'finance' as ModuleId },
-    { label: 'Investments', href: '/investments', icon: SYS_ICONS.investments, moduleId: 'investments' as ModuleId },
-    { label: 'Schedule', href: '/schedule', icon: SYS_ICONS.timeline, moduleId: 'timeline' as ModuleId },
-    { label: 'Sport', href: '/sport', icon: SYS_ICONS.sport, moduleId: 'sport' as ModuleId },
-    { label: 'Career', href: '/career', icon: SYS_ICONS.career, moduleId: 'career' as ModuleId },
-    { label: 'Reminders', href: '/reminders', icon: SYS_ICONS.notifications, moduleId: 'reminders' as ModuleId },
-    { label: 'Insights', href: '/insights', icon: SYS_ICONS.insights, moduleId: 'insights' as ModuleId },
-    { label: 'Settings', href: '/settings', icon: SYS_ICONS.settings }, // Core, always visible
-  ], []);
-
-  // Filter items based on enabled modules
-  const visibleMenuItems = useMemo(
-    () => menuItems.filter((item) => !item.moduleId || enabledModules.includes(item.moduleId)),
-    [menuItems, enabledModules]
-  );
-
-  // ── Mobile bottom nav: Dashboard + up to 3 enabled module items (non-Settings)
-  // Priority: order of visibleMenuItems (which respects user's module order)
-  const primaryNavItems = useMemo(() => {
-    const dashboard = visibleMenuItems.find((i) => i.href === '/dashboard')!;
-    const others = visibleMenuItems.filter((i) => i.href !== '/dashboard' && i.href !== '/settings');
-    return [dashboard, ...others.slice(0, 3)].filter(Boolean);
-  }, [visibleMenuItems]);
-
-  // Items that overflow into the bottom sheet
-  const sheetNavItems = useMemo(() => {
-    const primaryHrefs = new Set(primaryNavItems.map((i) => i.href));
-    return visibleMenuItems.filter((i) => !primaryHrefs.has(i.href));
-  }, [visibleMenuItems, primaryNavItems]);
-
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
-
-  const currentMenuItem = menuItems.find((item) => isActive(item.href));
-
-  const { t } = useTranslation();
-
-  // Onboarding is a full-screen flow without navigation.
   if (!isAuthenticated || pathname.startsWith('/onboarding')) {
     return <>{children}</>;
   }
 
   const handleLogout = async () => {
-    setIsLoggingOut(true);
+    setLoggingOut(true);
     await signOut();
-    setIsLogoutModalOpen(false);
-    setIsLoggingOut(false);
+    setLogoutOpen(false);
+    setLoggingOut(false);
     router.push('/login');
   };
 
   return (
-    <div className="flex h-dvh bg-warm-black text-soft-cream font-sans">
+    <div className="flex h-dvh bg-background font-sans text-foreground">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[110] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-on-primary"
+      >
+        {t('nav.skip_to_content')}
+      </a>
       <OfflineBanner />
 
-      {/* ── Desktop Sidebar (md+) — hidden on mobile ─────────────────── */}
-      <aside className="hidden md:flex fixed inset-y-0 left-0 z-50 w-72 shrink-0 bg-gray-strong border-r border-soft-cream/10 flex-col glass h-dvh overflow-y-auto">
-        <div className="px-6 py-8 flex flex-col items-center">
-          <div className="w-12 h-12 flex items-center justify-center mb-4">
-            <Logo size={40} variant="gold" />
-          </div>
-          <h1 className="text-heading-lg font-serif text-primary">
-            TRASON
-          </h1>
-          <p className="text-token-micro uppercase text-gray-light mt-1">Personal Operating System</p>
-        </div>
+      <Sidebar items={visibleItems} isActive={isActive} user={user} onLogout={() => setLogoutOpen(true)} />
 
-        <nav className="flex-1 px-4 py-8 space-y-2">
-          {visibleMenuItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch={false}
-                className={`flex items-center gap-4 px-6 py-4 rounded-xl transition-all duration-300 relative group overflow-hidden ${
-                  isActive(item.href)
-                    ? 'bg-white/5 border border-white/10 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)] text-soft-cream'
-                    : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/5 border border-transparent'
-                  }`}
-              >
-                {isActive(item.href) && (
-                  <div className="absolute left-0 top-[15%] bottom-[15%] w-1 bg-primary rounded-r-full" />
-                )}
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden md:ml-72">
+        <MobileHeader
+          title={current ? t(navLabelKey(current.href)) : 'TRASON'}
+          user={user}
+          menuOpen={moreOpen}
+          onOpenMenu={() => setMoreOpen(true)}
+        />
 
-                <NavIcon icon={Icon} isActive={isActive(item.href)} size={20} />
-                
-                <span className={`text-label-md tracking-wide transition-colors duration-300 ${isActive(item.href) ? 'text-soft-cream' : ''}`}>
-                  {t(`nav.${item.href.replace('/', '')}`)}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="p-4 mt-auto mb-4 space-y-2">
-          {/* User Profile */}
-          <div className="flex items-center gap-4 px-6 py-4 rounded-md bg-soft-cream/5 border border-soft-cream/10">
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs font-medium text-warm-black overflow-hidden shrink-0">
-              {(user as any)?.avatar_url ? (
-                <Image src={(user as any).avatar_url} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
-              ) : (
-                user?.first_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-label-md text-soft-cream truncate">{user?.first_name || user?.name || 'User'}</p>
-              <p className="text-token-micro text-gray-light truncate opacity-80">{user?.email}</p>
-            </div>
-            <NotificationToggle />
-          </div>
-          {/* Logout */}
-          <button
-            onClick={() => setIsLogoutModalOpen(true)}
-            className="w-full flex items-center gap-4 px-6 py-4 rounded-md text-gray-light hover:text-danger hover:bg-danger/10 transition-all duration-300 group"
-          >
-            <TrasonIcon icon={SYS_ICONS.logout} size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="text-label-md tracking-wide">{t('nav.logout')}</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* ── Main content area ─────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative md:ml-72">
-        {/* Mobile top header */}
-        <header className="bg-warm-black/95 backdrop-blur-md border-b border-soft-cream/5 px-4 py-2 pt-[max(env(safe-area-inset-top),16px)] flex items-center justify-between md:hidden relative z-40 transition-colors">
-          <div className="flex items-center gap-2">
-            <Logo size={20} variant="gold" />
-            <h2 className="text-label-md text-soft-cream uppercase">
-              {currentMenuItem ? t(`nav.${currentMenuItem.href.replace('/', '')}`) : 'TRASON'}
-            </h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <NotificationToggle />
-            <button 
-              onClick={() => setIsBottomSheetOpen(true)} 
-              aria-label="Open mobile menu"
-              aria-expanded={isBottomSheetOpen}
-              className="relative w-7 h-7 rounded-full bg-primary flex items-center justify-center text-token-micro text-warm-black overflow-hidden shrink-0"
-            >
-              {(user as any)?.avatar_url ? (
-                <Image src={(user as any).avatar_url} alt="Avatar" fill sizes="28px" className="object-cover" />
-              ) : (
-                user?.first_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'
-              )}
-            </button>
-          </div>
-        </header>
-
-        <main ref={mainRef} className="flex-1 overflow-y-auto relative z-10 pb-24 md:pb-0">
-          <div className="container mx-auto px-4 py-4 md:px-8 md:py-8 lg:px-12 max-w-6xl">
-            {children}
-          </div>
+        <main id="main-content" tabIndex={-1} ref={mainRef} className="relative z-10 flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none md:pb-0">
+          <div className="container mx-auto max-w-6xl px-4 py-4 md:px-8 md:py-8 lg:px-12">{children}</div>
         </main>
 
-        {/* ── Mobile Smart Bottom Nav ───────────────────────────────────── */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-warm-black/95 backdrop-blur-md border-t border-soft-cream/10 z-40 flex justify-around items-center px-2 py-2 safe-area-pb">
-          {primaryNavItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch={false}
-                className={`flex flex-col items-center p-2 rounded-xl min-w-[60px] min-h-[44px] transition-all duration-300 group ${
-                  active
-                    ? 'text-primary'
-                    : 'text-gray-light hover:text-soft-cream'
-                }`}
-              >
-                <div className="relative p-1.5 transition-all duration-300">
-                  <NavIcon icon={Icon} isActive={active} size={22} />
-                  {active && (
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-1 rounded-full bg-primary opacity-80" />
-                  )}
-                </div>
-                <span className={`text-label-sm mt-1 tracking-wide transition-colors ${active ? 'text-soft-cream' : ''}`}>
-                  {t(`nav.${item.href.replace('/', '')}`)}
-                </span>
-              </Link>
-            );
-          })}
-
-          {/* "More" button — opens bottom sheet */}
-          <button
-            onClick={() => setIsBottomSheetOpen(true)}
-            aria-label="More options"
-            aria-expanded={isBottomSheetOpen}
-            className={`flex flex-col items-center p-2 rounded-xl min-w-[60px] transition-all duration-200 ${
-              isBottomSheetOpen ? 'text-primary' : 'text-gray-light hover:text-soft-cream'
-            }`}
-          >
-            <div className={`p-1.5 rounded-lg transition-all duration-200 ${isBottomSheetOpen ? 'bg-primary/15' : ''}`}>
-              <TrasonIcon icon={SYS_ICONS.menu} size={22} />
-            </div>
-            <span className="text-label-sm mt-1 tracking-wide">{t('nav.more') || 'More'}</span>
-          </button>
-        </nav>
+        <BottomNav items={barItems} isActive={isActive} moreOpen={moreOpen} onOpenMore={() => setMoreOpen(true)} />
       </div>
 
-      {/* ── Mobile Bottom Sheet ───────────────────────────────────────── */}
-      {isBottomSheetOpen && (
-        <div className="fixed inset-0 z-[60] md:hidden flex flex-col justify-end">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setIsBottomSheetOpen(false)}
-          />
+      <MoreSheet
+        open={moreOpen}
+        items={sheetItems}
+        isActive={isActive}
+        user={user}
+        onClose={closeMore}
+        onLogout={() => setLogoutOpen(true)}
+      />
 
-          {/* Sheet panel */}
-          <div 
-            className="relative bg-gray-strong rounded-t-3xl border-t border-soft-cream/10 shadow-2xl animate-slide-up"
-            style={{ 
-              transform: `translateY(${sheetOffset}px)`,
-              transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 rounded-full bg-soft-cream/20" />
-            </div>
-
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-soft-cream/5">
-              <span className="text-label-md text-soft-cream tracking-wide">{t('modules.title') || 'All Modules'}</span>
-              <button
-                onClick={() => setIsBottomSheetOpen(false)}
-                aria-label="Close menu"
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-soft-cream/5 hover:bg-soft-cream/10 transition-colors text-gray-light hover:text-soft-cream"
-              >
-                <TrasonIcon icon={SYS_ICONS.close} size={20} />
-              </button>
-            </div>
-
-            {/* Menu grid */}
-            <div className="px-6 pt-6 pb-4">
-              {sheetNavItems.length > 0 ? (
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  {sheetNavItems.map((item) => {
-                    const Icon = item.icon;
-                    const active = isActive(item.href);
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        prefetch={false}
-                        onClick={() => setIsBottomSheetOpen(false)}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all duration-300 group ${
-                          active
-                            ? 'bg-white/5 border-white/10 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)] text-soft-cream'
-                            : 'bg-soft-cream/5 border-soft-cream/5 text-gray-light hover:bg-soft-cream/10 hover:text-soft-cream hover:border-soft-cream/10'
-                        }`}
-                      >
-                        <NavIcon icon={Icon} isActive={active} size={24} />
-                        <span className={`text-label-sm text-center leading-tight transition-colors ${active ? 'text-soft-cream' : ''}`}>
-                          {t(`nav.${item.href.replace('/', '')}`)}
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-label-sm text-gray-light text-center py-4 opacity-60">All modules are in the nav bar.</p>
-              )}
-
-              {/* Settings & User section */}
-              <div className="border-t border-soft-cream/5 pt-4 space-y-2">
-                <Link
-                  href="/settings"
-                  prefetch={false}
-                  onClick={() => setIsBottomSheetOpen(false)}
-                  className={`flex items-center gap-4 px-4 py-2 rounded-xl transition-all duration-200 ${
-                    isActive('/settings')
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-gray-light hover:text-soft-cream hover:bg-soft-cream/5'
-                  }`}
-                >
-                  <TrasonIcon icon={SYS_ICONS.settings} size={20} />
-                  <span className="text-label-md">{t('nav.settings')}</span>
-                </Link>
-
-                {/* User profile row */}
-                <div className="flex items-center gap-4 px-4 py-2 rounded-xl bg-soft-cream/5 border border-soft-cream/5">
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs font-medium text-warm-black flex-shrink-0 overflow-hidden">
-                    {(user as any)?.avatar_url ? (
-                      <Image src={(user as any).avatar_url} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
-                    ) : (
-                      user?.first_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-label-md text-soft-cream truncate">{user?.first_name || user?.name || 'User'}</p>
-                    <p className="text-label-sm text-gray-light truncate opacity-80">{user?.email}</p>
-                  </div>
-                  <NotificationToggle />
-                  <button
-                    onClick={() => { setIsBottomSheetOpen(false); setIsLogoutModalOpen(true); }}
-                    className="flex items-center gap-1 text-gray-light hover:text-danger transition-colors text-label-sm px-2 py-1 rounded-lg hover:bg-danger/10"
-                  >
-                    <TrasonIcon icon={SYS_ICONS.logout} size={16} />
-                    <span>{t('nav.logout')}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Safe area padding for iOS */}
-            <div className="h-6" />
-          </div>
-        </div>
-      )}
-
-      {/* Logout Confirmation */}
       <ConfirmModal
-        isOpen={isLogoutModalOpen}
-        onClose={() => !isLoggingOut && setIsLogoutModalOpen(false)}
+        isOpen={logoutOpen}
+        onClose={() => !loggingOut && setLogoutOpen(false)}
         onConfirm={handleLogout}
         title={t('nav.logoutConfirmTitle')}
         description={t('nav.logoutConfirmDesc')}
         confirmText={t('nav.logoutConfirmBtn')}
         cancelText={t('nav.cancel')}
         isDangerous={true}
-        isLoading={isLoggingOut}
+        isLoading={loggingOut}
       />
 
       <PushSubscriptionSync />

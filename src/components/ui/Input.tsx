@@ -45,7 +45,7 @@ export const Input = memo(
           {label && (
             <label
               htmlFor={inputId}
-              className="block text-xs font-semibold text-soft-cream/80 uppercase tracking-wider mb-1.5"
+              className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5"
             >
               {label}
             </label>
@@ -53,7 +53,7 @@ export const Input = memo(
 
           <div className="relative flex items-center">
             {effectiveLeft && (
-              <div className="absolute left-3 flex items-center pointer-events-none text-gray-light">
+              <div className="absolute left-3 flex items-center pointer-events-none text-muted-foreground">
                 {effectiveLeft}
               </div>
             )}
@@ -64,18 +64,18 @@ export const Input = memo(
               disabled={disabled}
               aria-invalid={!!error}
               aria-describedby={ariaDescribedBy}
-              className={`w-full bg-black/30 border text-soft-cream placeholder:text-gray-light/50 text-sm rounded-lg px-3.5 py-2.5 transition-all duration-200 outline-none ${
+              className={`w-full bg-foreground/[0.04] border text-foreground placeholder:text-muted-foreground/70 text-sm rounded-lg px-3.5 py-2.5 transition-colors duration-200 outline-none ${
                 effectiveLeft ? 'pl-10' : ''
               } ${effectiveRight ? 'pr-10' : ''} ${
                 error
                   ? 'border-danger focus:border-danger focus:ring-1 focus:ring-danger'
-                  : 'border-white/10 hover:border-white/20 focus:border-warm-gold focus:ring-1 focus:ring-warm-gold/50'
-              } ${disabled ? 'opacity-50 cursor-not-allowed bg-black/40' : ''} ${className}`}
+                  : 'border-foreground/15 hover:border-foreground/30 focus:border-primary focus:ring-1 focus:ring-primary/50'
+              } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
               {...props}
             />
 
             {effectiveRight && (
-              <div className={`absolute right-3 flex items-center text-gray-light ${!suffix ? 'pointer-events-none' : ''}`}>
+              <div className={`absolute right-3 flex items-center text-muted-foreground ${!suffix ? 'pointer-events-none' : ''}`}>
                 {effectiveRight}
               </div>
             )}
@@ -86,7 +86,7 @@ export const Input = memo(
           )}
 
           {!error && effectiveHelp && (
-            <p id={helpId} className="mt-1 text-xs text-gray-light">{effectiveHelp}</p>
+            <p id={helpId} className="mt-1 text-xs text-muted-foreground">{effectiveHelp}</p>
           )}
         </div>
       );

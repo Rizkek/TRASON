@@ -17,7 +17,7 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body>
-        <div className="flex items-center justify-center min-h-dvh bg-warm-black">
+        <div className="flex items-center justify-center min-h-dvh bg-background">
           <div className="text-center max-w-md mx-auto p-6 space-y-6">
             <div className="flex justify-center">
               <div className="w-16 h-16 bg-danger/10 rounded-full flex items-center justify-center">
@@ -25,22 +25,22 @@ export default function GlobalError({
               </div>
             </div>
             <div className="space-y-4">
-              <h1 className="text-2xl font-serif font-bold text-white">
+              <h1 className="text-heading-lg text-foreground">
                 Something Went Wrong
               </h1>
-              <p className="text-gray-light text-sm">
+              <p className="text-muted-foreground text-sm">
                 {error.message || 'A critical error occurred. Please try refreshing the page.'}
               </p>
             </div>
             <button
               onClick={() => reset()}
-              className="w-full px-6 py-4 bg-primary hover:bg-primary/90 text-warm-black rounded-md font-bold transition-colors"
+              className="w-full px-6 py-4 bg-primary hover:bg-primary/90 text-on-primary rounded-md font-bold transition-colors"
             >
               Try Again
             </button>
             <button
               onClick={() => window.location.reload()}
-              className="w-full px-6 py-4 bg-gray-strong hover:bg-gray-medium text-soft-cream rounded-md font-bold transition-colors"
+              className="w-full px-6 py-4 bg-surface hover:bg-surface-hover text-foreground rounded-md font-bold transition-colors"
             >
               Reload Page
             </button>

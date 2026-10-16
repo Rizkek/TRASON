@@ -40,6 +40,23 @@ export function getDueNotifications(
     });
 }
 
+/**
+ * False when every notify time already lies in the past, so no push will ever be sent. A reminder
+ * due in under an hour with the default 1h/3h/6h lead times is the common case. Empty notifyTimes
+ * fall back to the defaults, matching getDueNotifications.
+ */
+export function hasUpcomingNotification(
+  now: Date,
+  dueDatetime: string | Date,
+  notifyTimes: number[] = [],
+): boolean {
+  const due = new Date(dueDatetime).getTime();
+  if (Number.isNaN(due)) return true;
+
+  const minutesList = notifyTimes.length > 0 ? notifyTimes : DEFAULT_NOTIFY_MINUTES;
+  return minutesList.some((minutes) => due - minutes * 60_000 > now.getTime());
+}
+
 export function isReminderPastDue(
   now: Date,
   reminder: { due_datetime?: string | null; due_date?: string | null; due_time?: string | null },

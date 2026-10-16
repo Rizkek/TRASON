@@ -69,7 +69,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
         {label && (
           <label
             htmlFor={id}
-            className="block text-xs font-medium text-gray-light uppercase tracking-wider select-none"
+            className="block text-xs font-medium text-muted-foreground uppercase tracking-wider select-none"
           >
             {label}
           </label>
@@ -85,19 +85,19 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
           <SelectPrimitive.Trigger
             ref={ref}
             id={id}
-            className={`w-full bg-gray-strong/80 hover:bg-gray-strong/95 border ${
+            className={`w-full bg-surface/80 hover:bg-surface/95 border ${
               error
                 ? 'border-danger/70 focus:border-danger focus:ring-danger/30'
-                : 'border-white/10 hover:border-white/20 focus:border-primary focus:ring-primary/30'
-            } transition-all duration-200 text-soft-cream flex items-center justify-between gap-2 shadow-sm focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
+                : 'border-foreground/10 hover:border-foreground/20 focus:border-primary focus:ring-primary/30'
+            } transition-all duration-200 text-foreground flex items-center justify-between gap-2 shadow-sm focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
               sizeClasses[size]
             } ${triggerClassName}`}
           >
             <span className="truncate">
-              <SelectPrimitive.Value placeholder={<span className="text-gray-light/60">{placeholder}</span>} />
+              <SelectPrimitive.Value placeholder={<span className="text-muted-foreground/60">{placeholder}</span>} />
             </span>
             <SelectPrimitive.Icon asChild>
-              <CaretDown size={14} weight="bold" className="text-gray-light/70 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+              <CaretDown size={14} weight="bold" className="text-muted-foreground/70 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
             </SelectPrimitive.Icon>
           </SelectPrimitive.Trigger>
 
@@ -105,9 +105,9 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             <SelectPrimitive.Content
               position="popper"
               sideOffset={5}
-              className="z-[200] max-h-80 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl border border-white/10 bg-warm-black/95 backdrop-blur-2xl p-1.5 text-soft-cream shadow-[0_20px_50px_rgba(0,0,0,0.7)] animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
+              className="z-[200] max-h-80 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl border border-foreground/10 bg-background p-1.5 text-foreground animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
             >
-              <SelectPrimitive.ScrollUpButton className="flex items-center justify-center h-6 bg-white/5 text-gray-light cursor-default">
+              <SelectPrimitive.ScrollUpButton className="flex items-center justify-center h-6 bg-foreground/5 text-muted-foreground cursor-default">
                 <CaretUp size={14} />
               </SelectPrimitive.ScrollUpButton>
 
@@ -120,7 +120,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                       return (
                         <SelectPrimitive.Group key={opt.label || idx}>
                           {opt.label && (
-                            <SelectPrimitive.Label className="px-2.5 py-1.5 text-xs font-medium uppercase tracking-wider text-gray-light/50">
+                            <SelectPrimitive.Label className="px-2.5 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground/50">
                               {opt.label}
                             </SelectPrimitive.Label>
                           )}
@@ -130,7 +130,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                                 {subOpt.icon}
                                 <span>{subOpt.label}</span>
                                 {subOpt.badge && (
-                                  <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-white/10 text-gray-light font-mono">
+                                  <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-foreground/10 text-muted-foreground font-mono">
                                     {subOpt.badge}
                                   </span>
                                 )}
@@ -147,7 +147,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                           {opt.icon}
                           <span>{opt.label}</span>
                           {opt.badge && (
-                            <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-white/10 text-gray-light font-mono">
+                            <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-foreground/10 text-muted-foreground font-mono">
                               {opt.badge}
                             </span>
                           )}
@@ -158,7 +158,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 ) : null}
               </SelectPrimitive.Viewport>
 
-              <SelectPrimitive.ScrollDownButton className="flex items-center justify-center h-6 bg-white/5 text-gray-light cursor-default">
+              <SelectPrimitive.ScrollDownButton className="flex items-center justify-center h-6 bg-foreground/5 text-muted-foreground cursor-default">
                 <CaretDown size={14} />
               </SelectPrimitive.ScrollDownButton>
             </SelectPrimitive.Content>
@@ -179,12 +179,12 @@ export const SelectItem = React.forwardRef<
 >(({ className = '', children, ...props }, ref) => (
   <SelectPrimitive.Item
     ref={ref}
-    className={`relative flex w-full cursor-pointer select-none items-center rounded-lg py-2 pl-7 pr-3 text-sm outline-none transition-colors duration-150 data-[disabled]:pointer-events-none data-[disabled]:opacity-40 data-[highlighted]:bg-warm-gold/15 data-[highlighted]:text-warm-gold data-[state=checked]:font-semibold text-soft-cream ${className}`}
+    className={`relative flex w-full cursor-pointer select-none items-center rounded-lg py-2 pl-7 pr-3 text-sm outline-none transition-colors duration-150 data-[disabled]:pointer-events-none data-[disabled]:opacity-40 data-[highlighted]:bg-primary/15 data-[highlighted]:text-primary data-[state=checked]:font-semibold text-foreground ${className}`}
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check size={14} weight="bold" className="text-warm-gold" />
+        <Check size={14} weight="bold" className="text-primary" />
       </SelectPrimitive.ItemIndicator>
     </span>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -200,7 +200,7 @@ export const SelectLabel = React.forwardRef<
 >(({ className = '', ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={`px-2.5 py-1.5 text-xs font-medium uppercase tracking-wider text-gray-light/50 ${className}`}
+    className={`px-2.5 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground/50 ${className}`}
     {...props}
   />
 ));
@@ -212,7 +212,7 @@ export const SelectSeparator = React.forwardRef<
 >(({ className = '', ...props }, ref) => (
   <SelectPrimitive.Separator
     ref={ref}
-    className={`-mx-1 my-1 h-px bg-white/10 ${className}`}
+    className={`-mx-1 my-1 h-px bg-foreground/10 ${className}`}
     {...props}
   />
 ));

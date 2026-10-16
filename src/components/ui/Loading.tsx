@@ -11,8 +11,8 @@ interface LoadingProps {
 
 const textSizeClasses = {
   sm: 'text-xs',
-  md: 'text-sm',
-  lg: 'text-base',
+  md: 'text-body-md',
+  lg: 'text-body-lg',
 };
 
 export const Loading: React.FC<LoadingProps> = ({
@@ -23,14 +23,14 @@ export const Loading: React.FC<LoadingProps> = ({
 }) => {
   const content = (
     <div className="flex flex-col items-center justify-center gap-1" role="status" aria-live="polite">
-      {text && <p className={`text-gray-very-light font-medium ${textSizeClasses[size]}`}>{text}</p>}
-      {showTip && <p className="text-gray-light text-xs">This usually takes a few seconds.</p>}
+      {text && <p className={`font-medium text-subtle ${textSizeClasses[size]}`}>{text}</p>}
+      {showTip && <p className="text-xs text-muted-foreground">This usually takes a few seconds.</p>}
     </div>
   );
 
   if (fullPage) {
     return (
-      <div className="fixed inset-0 bg-warm-black/85 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-background/90 flex items-center justify-center z-50">
         {content}
       </div>
     );

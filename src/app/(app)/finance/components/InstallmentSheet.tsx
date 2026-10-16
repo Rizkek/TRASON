@@ -141,7 +141,7 @@ export function InstallmentSheet({ isOpen, onClose }: InstallmentSheetProps) {
         {form.monthly_amount && form.total_months && (
           <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 text-center mt-4">
             <p className="text-xs text-primary mb-1">Total yang akan dibayarkan (di luar DP):</p>
-            <p className="text-lg font-bold text-soft-cream">
+            <p className="text-lg font-bold text-foreground">
               {(Number(form.monthly_amount) * Number(form.total_months)).toLocaleString(locale)}
             </p>
           </div>

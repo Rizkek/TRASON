@@ -1,6 +1,5 @@
-import React from 'react';
-import { InvestmentGoalsClient } from './_client';
+import { redirect } from 'next/navigation';
 
 export default function InvestmentGoalsPage() {
-  return <InvestmentGoalsClient />;
+  redirect('/investments');
 }

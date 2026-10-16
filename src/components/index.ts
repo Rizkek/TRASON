@@ -5,6 +5,7 @@ export * from './ui/Input';
 export * from './ui/Badge';
 export * from './ui/Card';
 export * from './ui/Loading';
+export * from './ui/Placeholder';
 export * from './ui/Calendar';
 export * from './ui/Select';
 export * from './ui/DatePicker';

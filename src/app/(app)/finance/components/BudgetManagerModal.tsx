@@ -119,8 +119,8 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
               <Wallet size={20} />
             </div>
             <div>
-              <Heading as="h4" size="h4" className="text-sm font-bold text-soft-cream">{t('finance.budget.globalMonthly')}</Heading>
-              <Paragraph className="text-xs text-gray-light mt-1">
+              <Heading as="h4" size="h4" className="text-sm font-bold text-foreground">{t('finance.budget.globalMonthly')}</Heading>
+              <Paragraph className="text-xs text-muted-foreground mt-1">
                 {t('finance.budget.global_desc')}
               </Paragraph>
             </div>
@@ -134,29 +134,29 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
           />
         </div>
 
-        <div className="w-full h-px bg-white/10"></div>
+        <div className="w-full h-px bg-foreground/10"></div>
 
         {/* Category Budgets */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-2">
             <Target size={18} className="text-secondary" />
-            <Heading as="h4" size="h4" className="text-sm font-bold text-soft-cream">{t('finance.budget.predictiveBlueprint')}</Heading>
+            <Heading as="h4" size="h4" className="text-sm font-bold text-foreground">{t('finance.budget.predictiveBlueprint')}</Heading>
           </div>
-          <Paragraph className="text-xs text-gray-light">
+          <Paragraph className="text-xs text-muted-foreground">
             {t('finance.budget.category_desc')}
           </Paragraph>
           
           <div className="space-y-2 mt-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
             {categories.length === 0 ? (
-              <Paragraph className="text-xs text-center text-gray-light py-4">{t('finance.budget.noCategories')}</Paragraph>
+              <Paragraph className="text-xs text-center text-muted-foreground py-4">{t('finance.budget.noCategories')}</Paragraph>
             ) : (
               categories.map(cat => (
-                <div key={cat.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-black/[0.02] dark:bg-white/[0.02] p-2 rounded-lg border border-black/5 dark:border-white/5">
+                <div key={cat.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-foreground/[0.02] p-2 rounded-lg border border-foreground/5">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-md bg-gray-strong/40 flex items-center justify-center text-xs text-soft-cream">
+                    <div className="w-8 h-8 rounded-md bg-surface/40 flex items-center justify-center text-xs text-foreground">
                       <CategoryIcon name={cat.icon || 'Box'} />
                     </div>
-                    <span className="text-sm font-medium text-soft-cream">{cat.name}</span>
+                    <span className="text-sm font-medium text-foreground">{cat.name}</span>
                   </div>
                   <div className="w-full sm:w-[150px]">
                     <Input

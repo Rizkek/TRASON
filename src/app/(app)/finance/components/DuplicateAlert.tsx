@@ -23,16 +23,16 @@ export function DuplicateAlert({ matches, currency = 'USD', locale = 'en-US', on
         <WarningCircle size={20} className="text-warning shrink-0 mt-0.5" weight="fill" />
         <div className="flex-1">
           <h4 className="text-sm font-semibold text-warning mb-1">Possible Duplicate Detected</h4>
-          <p className="text-xs text-gray-light mb-3">
+          <p className="text-xs text-muted-foreground mb-3">
             {topMatch.reason}
           </p>
           
-          <div className="bg-black/20 rounded-lg p-3 mb-3 flex items-center justify-between border border-black/10 dark:border-white/5">
+          <div className="bg-background/60 rounded-lg p-3 mb-3 flex items-center justify-between border border-foreground/5">
             <div>
-              <p className="text-xs font-medium text-soft-cream">{topMatch.transaction.title}</p>
-              <p className="text-[10px] text-gray-light">{formatDate(topMatch.transaction.date)}</p>
+              <p className="text-xs font-medium text-foreground">{topMatch.transaction.title}</p>
+              <p className="text-xs text-muted-foreground">{formatDate(topMatch.transaction.date)}</p>
             </div>
-            <p className="text-sm font-bold text-soft-cream">
+            <p className="text-sm font-bold text-foreground">
               {formatCurrency(topMatch.transaction.amount, topMatch.transaction.original_currency || currency, locale)}
             </p>
           </div>
@@ -41,14 +41,14 @@ export function DuplicateAlert({ matches, currency = 'USD', locale = 'en-US', on
             <button
               type="button"
               onClick={onIgnore}
-              className="text-xs font-semibold text-warning hover:text-white transition-colors"
+              className="text-xs font-semibold text-warning hover:text-foreground transition-colors"
             >
               Ignore & Save Anyway
             </button>
             <button
               type="button"
               onClick={() => onViewDuplicate(topMatch.transaction.id)}
-              className="text-xs font-semibold text-gray-light hover:text-white flex items-center gap-1 transition-colors"
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
             >
               View Existing <ArrowRight size={12} />
             </button>

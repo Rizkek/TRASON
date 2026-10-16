@@ -9,6 +9,7 @@ import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
 import { executeMutation } from "@/libs/api/mutationBuilder";
 import { getUserErrorMessage } from "@/libs/apiErrors";
 import { invalidateKeys } from '@/libs/cacheInvalidation';
+import { formatDateOnly } from '@/libs/date';
 
 const invalidateActivities = (date: string) => invalidateKeys(INVALIDATION_PATTERNS.onActivityChange(date), 'activities');
 
@@ -28,8 +29,8 @@ export const useActivity = (startDate?: Date, endDate?: Date): UseActivityReturn
   // Generate stable cache key using CACHE_KEYS helper
   const targetStartDate = startDate || new Date();
   const targetEndDate = endDate || targetStartDate;
-  const startStr = targetStartDate.toISOString().split('T')[0];
-  const endStr = targetEndDate.toISOString().split('T')[0];
+  const startStr = formatDateOnly(targetStartDate);
+  const endStr = formatDateOnly(targetEndDate);
   const key = startDate && endDate 
     ? CACHE_KEYS.activities.list(startStr, endStr)
     : CACHE_KEYS.activities.byDate(startStr);

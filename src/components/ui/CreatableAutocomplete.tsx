@@ -237,19 +237,19 @@ export function CreatableAutocomplete({
   return (
     <div ref={containerRef} className={`relative w-full space-y-2 ${className}`}>
       {label && (
-        <label className="block text-xs font-semibold text-gray-very-light tracking-wide flex items-center justify-between">
+        <label className="block text-xs font-semibold text-subtle tracking-wide flex items-center justify-between">
           <span>
             {label}
             {required && <span className="text-danger ml-1">*</span>}
           </span>
-          <span className="text-[10px] text-gray-light/60 font-normal">
+          <span className="text-xs text-muted-foreground/60 font-normal">
             {type === 'company' ? 'Ketik nama / pilih dari daftar' : 'Pilih posisi standar'}
           </span>
         </label>
       )}
 
       <div className="relative group">
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-light group-focus-within:text-primary transition-colors z-10 pointer-events-none">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors z-10 pointer-events-none">
           {type === 'company' ? <Buildings size={18} /> : <Briefcase size={18} />}
         </div>
 
@@ -278,16 +278,16 @@ export function CreatableAutocomplete({
           }
           disabled={disabled}
           autoFocus={autoFocus}
-          className={`w-full h-12 pl-12 pr-16 bg-gray-strong/70 border transition-all duration-300 rounded-md focus:ring-2 focus:ring-secondary/40 text-soft-cream placeholder:text-gray-light/60 disabled:opacity-50 disabled:cursor-not-allowed text-sm ${
+          className={`w-full h-12 pl-12 pr-16 bg-surface/70 border transition-all duration-300 rounded-md focus:ring-2 focus:ring-secondary/40 text-foreground placeholder:text-muted-foreground/60 disabled:opacity-50 disabled:cursor-not-allowed text-sm ${
             error
               ? 'border-danger focus:border-danger'
-              : 'border-gray-light/25 focus:border-secondary hover:border-white/20'
+              : 'border-muted-foreground/25 focus:border-secondary hover:border-foreground/20'
           }`}
         />
 
         <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {isLoadingApi && (
-            <span className="text-xs text-gray-light">Loading</span>
+            <span className="text-xs text-muted-foreground">Loading</span>
           )}
 
           {inputValue && (
@@ -299,7 +299,7 @@ export function CreatableAutocomplete({
                 setIsOpen(true);
                 inputRef.current?.focus();
               }}
-              className="p-1.5 text-gray-light hover:text-white rounded-md hover:bg-white/5 transition-colors"
+              className="p-1.5 text-muted-foreground hover:text-foreground rounded-md hover:bg-foreground/5 transition-colors"
               title="Hapus input"
             >
               <X size={14} />
@@ -312,9 +312,9 @@ export function CreatableAutocomplete({
 
       {/* Autocomplete Dropdown */}
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full mt-1 z-[300] max-h-72 overflow-y-auto rounded-xl border border-white/10 bg-warm-black/95 backdrop-blur-2xl p-1.5 text-soft-cream shadow-[0_20px_50px_rgba(0,0,0,0.8)] animate-in fade-in-0 zoom-in-95">
+        <div className="absolute left-0 right-0 top-full mt-1 z-[300] max-h-72 overflow-y-auto rounded-xl border border-foreground/10 bg-background p-1.5 text-foreground animate-in fade-in-0 zoom-in-95">
           {/* Header indicator */}
-          <div className="px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-gray-light/50 flex items-center justify-between border-b border-white/5 mb-1 pb-1">
+          <div className="px-2.5 py-1 text-xs font-medium uppercase tracking-wider text-muted-foreground/50 flex items-center justify-between border-b border-foreground/5 mb-1 pb-1">
             <span>
               {type === 'company' ? 'Rekomendasi Perusahaan Indonesia & Global' : 'Rekomendasi Posisi & Peran'}
             </span>
@@ -341,11 +341,11 @@ export function CreatableAutocomplete({
                   <span className="text-xs font-medium truncate">
                     + Tambah &ldquo;{inputValue.trim()}&rdquo;
                   </span>
-                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-primary/25 text-primary uppercase font-medium tracking-wider">
+                  <span className="text-xs px-1.5 py-0.2 rounded bg-primary/25 text-primary uppercase font-medium tracking-wider">
                     Baru
                   </span>
                 </div>
-                <p className="text-[10px] text-gray-light/80 font-light truncate">
+                <p className="text-xs text-muted-foreground/80 font-light truncate">
                   Simpan ke daftar pilihan pribadi Anda
                 </p>
               </div>
@@ -367,10 +367,10 @@ export function CreatableAutocomplete({
                   onMouseEnter={() => setHighlightedIndex(actualHighlightIndex)}
                   className={`w-full text-left flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs md:text-sm transition-colors duration-150 ${
                     isHighlighted
-                      ? 'bg-warm-gold/15 text-warm-gold font-medium'
+                      ? 'bg-primary/15 text-primary font-medium'
                       : isSelected
-                      ? 'bg-white/10 text-white font-medium'
-                      : 'text-soft-cream hover:bg-white/5'
+                      ? 'bg-foreground/10 text-foreground font-medium'
+                      : 'text-foreground hover:bg-foreground/5'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
@@ -389,15 +389,15 @@ export function CreatableAutocomplete({
                     ) : item.badgeType === 'api' ? (
                       <Globe size={14} className="text-info shrink-0" />
                     ) : type === 'company' ? (
-                      <Buildings size={14} className="text-gray-light/60 shrink-0" />
+                      <Buildings size={14} className="text-muted-foreground/60 shrink-0" />
                     ) : (
-                      <Briefcase size={14} className="text-gray-light/60 shrink-0" />
+                      <Briefcase size={14} className="text-muted-foreground/60 shrink-0" />
                     )}
 
                     <div className="min-w-0">
                       <p className="truncate font-medium">{item.title}</p>
                       {item.subtitle && (
-                        <p className="text-[10px] text-gray-light/60 truncate font-mono">
+                        <p className="text-xs text-muted-foreground/60 truncate font-mono">
                           {item.subtitle}
                         </p>
                       )}
@@ -407,25 +407,25 @@ export function CreatableAutocomplete({
                   <div className="flex items-center gap-1.5 shrink-0">
                     {item.badge && (
                       <span
-                        className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
+                        className={`text-xs px-1.5 py-0.5 rounded font-mono ${
                           item.badgeType === 'saved'
                             ? 'bg-warning/15 text-warning border border-warning/20'
                             : item.badgeType === 'api'
                             ? 'bg-info/15 text-info border border-info/20'
-                            : 'bg-white/5 text-gray-light border border-white/10'
+                            : 'bg-foreground/5 text-muted-foreground border border-foreground/10'
                         }`}
                       >
                         {item.badge}
                       </span>
                     )}
-                    {isSelected && <Check size={14} weight="bold" className="text-warm-gold" />}
+                    {isSelected && <Check size={14} weight="bold" className="text-primary" />}
                   </div>
                 </button>
               );
             })}
 
             {suggestions.length === 0 && !showCreatable && (
-              <div className="p-4 text-center text-xs text-gray-light/70 italic">
+              <div className="p-4 text-center text-xs text-muted-foreground/70 italic">
                 {isLoadingApi ? 'Mencari...' : 'Tidak ada rekomendasi ditemukan.'}
               </div>
             )}

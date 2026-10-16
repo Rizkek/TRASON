@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '@/types/index';
 import { supabase } from '@/services/supabase/supabaseClient';
+import { AUTH_STORAGE_KEY, DEFAULT_THEME_PREFERENCE } from '@/libs/theme';
 
 // Helper to extract language from a user object (handles array or single pref)
 const extractLanguage = (user: any): string | undefined => {
@@ -25,6 +26,9 @@ interface AuthState {
   refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  /** True once the first session check has finished. Not persisted: the persisted
+   *  isAuthenticated can be stale, so route guards must wait for this before redirecting. */
+  isAuthReady: boolean;
   error: string | null;
   /** Dedicated string primitive for the active UI language.
    *  Kept separate from user.user_preferences so Zustand's strict-equality
@@ -41,6 +45,7 @@ interface AuthState {
   signOut: () => Promise<void>;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
+  setAuthReady: () => void;
   setError: (error: string | null) => void;
 }
 
@@ -52,16 +57,17 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
+      isAuthReady: false,
       error: null,
       activeLanguage: 'en',
-      activeTheme: 'light',
+      activeTheme: DEFAULT_THEME_PREFERENCE,
 
       setUser: (user) =>
         set((state) => {
           const extractedLang = extractLanguage(user);
           const newLang = extractedLang || state.activeLanguage || 'en';
           const extractedTheme = extractTheme(user);
-          const newTheme = extractedTheme || state.activeTheme || 'light';
+          const newTheme = extractedTheme || state.activeTheme || DEFAULT_THEME_PREFERENCE;
           return {
             user,
             isAuthenticated: true,
@@ -90,7 +96,7 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isLoading: false,
           activeLanguage: 'en',
-          activeTheme: 'light',
+          activeTheme: DEFAULT_THEME_PREFERENCE,
         }),
 
       // Full sign-out: tells Supabase to invalidate the token, then clears local state
@@ -110,17 +116,18 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             isLoading: false,
             activeLanguage: 'en',
-            activeTheme: 'light',
+            activeTheme: DEFAULT_THEME_PREFERENCE,
           });
         }
       },
 
       clearError: () => set({ error: null }),
       setLoading: (loading) => set({ isLoading: loading }),
+      setAuthReady: () => set({ isAuthReady: true }),
       setError: (error) => set({ error }),
     }),
     {
-      name: 'auth-storage',
+      name: AUTH_STORAGE_KEY,
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
@@ -141,6 +148,7 @@ export const useAuthStore = create<AuthState>()(
         signOut: currentState.signOut,
         clearError: currentState.clearError,
         setLoading: currentState.setLoading,
+        setAuthReady: currentState.setAuthReady,
         setError: currentState.setError,
       }),
     }

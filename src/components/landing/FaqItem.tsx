@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { CaretDown as ChevronDown } from '@phosphor-icons/react';
+import React, { useId, useState } from 'react';
+import { CaretDown } from '@phosphor-icons/react';
 
 export interface FaqItemProps {
   q: string;
@@ -10,38 +10,35 @@ export interface FaqItemProps {
 
 export function FaqItem({ q, a }: FaqItemProps) {
   const [open, setOpen] = useState(false);
+  const panelId = useId();
 
   return (
     <div
-      className={`border rounded-xl bg-black/20 backdrop-blur-sm transition-all duration-300 overflow-hidden ${
-        open ? 'border-warm-gold/40 shadow-[0_0_20px_rgba(244,201,93,0.06)]' : 'border-white/5 hover:border-white/10'
+      className={`overflow-hidden rounded-xl border bg-surface transition-colors ${
+        open ? 'border-primary' : 'border-foreground/15 hover:border-foreground/30'
       }`}
     >
-      <button
-        type="button"
-        className="w-full text-left px-6 py-4 flex justify-between items-center font-bold text-soft-cream/90 hover:text-white transition-colors gap-4"
-        onClick={() => setOpen(!open)}
-        aria-expanded={open}
-      >
-        <span>{q}</span>
-        <div
-          className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 ${
-            open ? 'bg-warm-gold/15 text-warm-gold rotate-180' : 'bg-white/5 text-gray-light'
-          }`}
+      <h3 className="font-sans text-base">
+        <button
+          type="button"
+          className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-3 text-left font-semibold text-foreground"
+          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          aria-controls={panelId}
         >
-          <ChevronDown size={16} weight="bold" />
-        </div>
-      </button>
-      <div
-        className={`grid transition-all duration-300 ease-in-out ${
-          open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-        }`}
-      >
-        <div className="overflow-hidden">
-          <div className="px-6 pb-4 text-gray-light leading-relaxed text-sm pt-1 border-t border-white/5">
-            {a}
-          </div>
-        </div>
+          <span>{q}</span>
+          <span
+            aria-hidden="true"
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+              open ? 'bg-primary text-on-primary' : 'bg-foreground/5 text-muted-foreground'
+            }`}
+          >
+            <CaretDown size={16} weight="bold" className={open ? 'rotate-180' : ''} />
+          </span>
+        </button>
+      </h3>
+      <div id={panelId} role="region" hidden={!open}>
+        <p className="border-t border-foreground/10 px-5 py-4 text-sm leading-relaxed text-muted-foreground">{a}</p>
       </div>
     </div>
   );

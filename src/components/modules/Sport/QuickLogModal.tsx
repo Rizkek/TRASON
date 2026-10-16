@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Input, Button } from '@/components';
-import { Barbell as Dumbbell, Plus, Trash as Trash2, Sparkle, Fire, Heartbeat } from '@phosphor-icons/react';
+import { Barbell as Dumbbell, Plus, Trash as Trash2, Fire, Heartbeat } from '@phosphor-icons/react';
 import type { SportType } from '@/types/database';
 import { SportExercise } from '@/data/sportExercisesData';
+import { getProfileToday } from '@/libs/profileDate';
 
 interface Props {
   isOpen: boolean;
@@ -87,7 +88,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
     }
 
     await onSubmit({
-      session_date: new Date().toISOString().split('T')[0],
+      session_date: getProfileToday(),
       duration_minutes: parseInt(durationMinutes) || 0,
       rating: parseInt(rating),
       notes: notes.trim() ? notes : (exerciseQuery ? `Gerakan: ${exerciseQuery}` : ''),
@@ -102,7 +103,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Sport Type */}
         <div>
-          <label className="block text-xs font-semibold text-gray-very-light tracking-wide mb-2">
+          <label className="block text-xs font-semibold text-subtle tracking-wide mb-2">
             Kategori Olahraga
           </label>
           <div className="flex flex-wrap gap-2">
@@ -124,8 +125,8 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold tracking-wide transition-all ${
                   sportType === item.id
-                    ? 'bg-primary text-warm-black'
-                    : 'bg-black/5 dark:bg-white/5 text-gray-light hover:bg-black/10 dark:bg-white/10'
+                    ? 'bg-primary text-on-primary'
+                    : 'bg-foreground/5 text-muted-foreground hover:bg-foreground/10'
                 }`}
               >
                 {item.label}
@@ -136,9 +137,9 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
 
         {/* Exercise Autocomplete / Name */}
         <div ref={dropdownRef} className="relative">
-          <label className="block text-xs font-semibold text-gray-very-light tracking-wide mb-1 flex items-center justify-between">
+          <label className="block text-xs font-semibold text-subtle tracking-wide mb-1 flex items-center justify-between">
             <span>Nama Gerakan / Olahraga (Opsional)</span>
-            <span className="text-[10px] text-gray-light/60">WGER Open Exercise DB</span>
+            <span className="text-xs text-muted-foreground/60">WGER Open Exercise DB</span>
           </label>
           <div className="relative">
             <input
@@ -156,17 +157,17 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
                   ? 'Contoh: 5K Morning Run, Interval Sprint...'
                   : 'Contoh: Badminton, Futsal, Sepeda Santai...'
               }
-              className="w-full h-11 px-6 bg-gray-strong/70 border border-gray-light/25 rounded-md focus:ring-2 focus:ring-secondary/40 text-soft-cream text-sm outline-none transition-all placeholder:text-gray-light/50"
+              className="w-full h-11 px-6 bg-surface/70 border border-muted-foreground/25 rounded-md focus:ring-2 focus:ring-secondary/40 text-foreground text-sm outline-none transition-all placeholder:text-muted-foreground/50"
             />
             {isSearchingExercises && (
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-light">Searching</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">Searching</span>
             )}
           </div>
 
           {/* Autocomplete Dropdown */}
           {isExerciseDropdownOpen && exerciseSuggestions.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-1 z-[300] max-h-56 overflow-y-auto rounded-xl border border-white/10 bg-warm-black/95 backdrop-blur-2xl p-1 text-soft-cream shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
-              <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-light/50 border-b border-white/5 mb-1">
+            <div className="absolute left-0 right-0 top-full mt-1 z-[300] max-h-56 overflow-y-auto rounded-xl border border-foreground/10 bg-background p-1 text-foreground ">
+              <div className="px-2 py-1 text-xs font-bold uppercase tracking-wider text-muted-foreground/50 border-b border-foreground/5 mb-1">
                 Katalog Gerakan Latihan Terverifikasi
               </div>
               {exerciseSuggestions.map((ex) => (
@@ -174,15 +175,15 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
                   key={ex.id}
                   type="button"
                   onClick={() => handleSelectExercise(ex)}
-                  className="w-full text-left flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs hover:bg-white/10 transition-colors"
+                  className="w-full text-left flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs hover:bg-foreground/10 transition-colors"
                 >
-                  <span className="font-medium text-soft-cream">{ex.name}</span>
+                  <span className="font-medium text-foreground">{ex.name}</span>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-gray-light border border-white/10">
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-foreground/5 text-muted-foreground border border-foreground/10">
                       {ex.category}
                     </span>
                     {ex.equipment && (
-                      <span className="text-[9px] text-gray-light/60 font-mono">
+                      <span className="text-xs text-muted-foreground/60 font-mono">
                         {ex.equipment}
                       </span>
                     )}
@@ -195,7 +196,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
 
         {/* Dynamic Metrics */}
         {sportType === 'lift' ? (
-          <div className="grid grid-cols-3 gap-2 p-3 rounded-lg bg-white/[0.02] border border-white/5">
+          <div className="grid grid-cols-3 gap-2 p-3 rounded-lg bg-foreground/[0.02] border border-foreground/5">
             <Input
               label="Sets"
               type="number"
@@ -220,7 +221,7 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
             />
           </div>
         ) : ['run', 'cycle', 'swim'].includes(sportType) ? (
-          <div className="grid grid-cols-1 gap-2 p-3 rounded-lg bg-white/[0.02] border border-white/5">
+          <div className="grid grid-cols-1 gap-2 p-3 rounded-lg bg-foreground/[0.02] border border-foreground/5">
             <Input
               label="Jarak (Km)"
               type="number"
@@ -254,19 +255,19 @@ export const QuickLogModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLo
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-very-light tracking-wide mb-1">
+          <label className="block text-xs font-semibold text-subtle tracking-wide mb-1">
             Catatan / Evaluasi Sesi
           </label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full bg-gray-strong/50 border border-gray-light/20 rounded-md p-3 text-soft-cream text-sm focus:outline-none focus:border-secondary/50 transition-colors"
+            className="w-full bg-surface/50 border border-muted-foreground/20 rounded-md p-3 text-foreground text-sm focus:outline-none focus:border-secondary/50 transition-colors"
             rows={2}
             placeholder="Bagaimana rasanya latihan hari ini?"
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+        <div className="flex justify-end gap-3 pt-4 border-t border-foreground/10">
           <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading}>
             Batal
           </Button>

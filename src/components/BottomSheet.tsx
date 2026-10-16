@@ -60,7 +60,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-warm-black/60 backdrop-blur-sm z-[60] animate-fade-in"
+        className="fixed inset-0 bg-black/60 z-[60] animate-fade-in"
         onClick={onClose}
       />
 
@@ -70,24 +70,24 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         className="fixed inset-0 z-[70] flex items-end md:items-center justify-center pointer-events-none trason-bottom-sheet"
       >
         <div
-          className="bg-gray-strong border-t border-x md:border border-black/10 dark:border-white/10 shadow-[0_-8px_32px_rgba(0,0,0,0.5)] md:shadow-[0_32px_128px_-16px_rgba(0,0,0,0.7)] 
+          className="bg-surface border-t border-x md:border border-foreground/15
             w-full md:max-w-lg md:rounded-md rounded-t-xl 
             max-h-[90dvh] md:max-h-[85dvh] flex flex-col pointer-events-auto 
-            animate-slide-up-sheet md:animate-slide-up relative
+            animate-slide-up relative
             pb-[env(safe-area-inset-bottom)] overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Mobile pull indicator */}
           <div className="md:hidden flex justify-center pt-3 pb-1 w-full" onClick={onClose}>
-            <div className="w-12 h-1.5 bg-gray-light/30 rounded-full" />
+            <div className="w-12 h-1.5 bg-muted-foreground/40 rounded-full" />
           </div>
 
           
           {/* Header */}
           {(title || closeButton) && (
-            <div className="flex-none flex items-center justify-between px-4 sm:px-8 pb-4 pt-2 md:py-8 border-b border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none flex items-center justify-between px-4 sm:px-8 pb-4 pt-2 md:py-8 border-b border-foreground/10">
               {title && (
-                <h2 className="text-xl font-bold tracking-tight text-white uppercase italic">
+                <h2 className="text-xl font-bold tracking-tight text-foreground">
                    {title}
                 </h2>
               )}
@@ -96,7 +96,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
                   onClick={onClose}
                   title="Close"
                   aria-label="Close"
-                  className="text-gray-light hover:text-white hover:bg-black/5 dark:bg-white/5 p-2 rounded-md transition-all ml-2"
+                  className="text-muted-foreground hover:text-foreground hover:bg-foreground/10 p-2 rounded-md transition-colors ml-2"
                 >
                   <X size={20} />
                 </button>
@@ -107,7 +107,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           {/* Description */}
           {description && (
             <div className="px-4 pt-4 sm:px-8 sm:pt-8">
-              <p className="text-sm text-gray-light italic opacity-80 leading-relaxed">
+              <p className="text-sm text-muted-foreground italic opacity-80 leading-relaxed">
                 {description}
               </p>
             </div>
@@ -118,7 +118,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 
           {/* Footer */}
           {footer && (
-            <div className="flex-none px-4 py-4 sm:px-8 sm:py-8 bg-black/[0.02] dark:bg-white/[0.02] border-t border-black/[0.05] dark:border-white/[0.05]">
+            <div className="flex-none px-4 py-4 sm:px-8 sm:py-8 bg-foreground/[0.03] border-t border-foreground/10">
               {footer}
             </div>
           )}

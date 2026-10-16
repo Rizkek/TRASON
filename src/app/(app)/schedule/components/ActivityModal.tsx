@@ -59,10 +59,10 @@ export function ActivityModal({
           <div className="flex items-center gap-2.5">
             <Repeat size={18} className="text-accent-purple shrink-0" />
             <div>
-              <label htmlFor="routine-checkbox" className="text-xs font-bold text-soft-cream cursor-pointer block">
+              <label htmlFor="routine-checkbox" className="text-xs font-bold text-foreground cursor-pointer block">
                 Jadwal Rutin Mingguan (Template)
               </label>
-              <Paragraph className="text-[10px] text-gray-light">
+              <Paragraph className="text-xs text-muted-foreground">
                 Aktivitas berulang tiap minggu (misal: jam kerja, kuliah, olahraga, standup).
               </Paragraph>
             </div>
@@ -72,7 +72,7 @@ export function ActivityModal({
             id="routine-checkbox"
             checked={form.isWeeklyRoutine}
             onChange={(e) => setForm((f) => ({ ...f, isWeeklyRoutine: e.target.checked }))}
-            className="w-4 h-4 rounded border-accent-purple text-accent-purple focus:ring-accent-purple bg-black/20"
+            className="w-4 h-4 rounded border-accent-purple text-accent-purple focus:ring-accent-purple bg-background/60"
           />
         </div>
 
@@ -161,7 +161,7 @@ export function ActivityModal({
         </div>
 
         <div>
-          <label className="text-[10px] font-bold text-gray-light mb-2 block">
+          <label className="text-xs font-bold text-muted-foreground mb-2 block">
             {t('timeline_page.form.rating')} <span className="font-normal opacity-70">({t('common.optional')})</span>
           </label>
           <div className="flex gap-4" role="group" aria-label="Rating">
@@ -173,8 +173,8 @@ export function ActivityModal({
                 aria-label={`${s} star${s > 1 ? 's' : ''}`}
                 className={`transition-all ${
                   s <= form.rating
-                    ? 'text-primary scale-125'
-                    : 'text-gray-light opacity-20 hover:opacity-100 hover:text-primary'
+                    ? 'text-primary '
+                    : 'text-muted-foreground opacity-20 hover:opacity-100 hover:text-primary'
                 }`}
               >
                 <Star fill={s <= form.rating ? 'currentColor' : 'none'} size={22} />
@@ -190,7 +190,7 @@ export function ActivityModal({
             value={form.location}
             onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
             aria-label="Location"
-            className="w-full pl-8 pr-4 py-4 bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md text-sm focus:border-primary focus:outline-none transition-all"
+            className="w-full pl-8 pr-4 py-4 bg-surface/40 border border-foreground/5 rounded-md text-sm focus:border-primary focus:outline-none transition-all"
           />
         </div>
 
@@ -200,7 +200,7 @@ export function ActivityModal({
           placeholder={`${t('timeline_page.form.notes')} (${t('common.optional')})`}
           rows={3}
           aria-label="Notes"
-          className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+          className="w-full bg-surface border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
         />
       </div>
     </Modal>

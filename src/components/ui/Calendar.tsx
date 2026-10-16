@@ -42,7 +42,7 @@ export const Calendar: React.FC<CalendarProps> = ({
 
   // Padding for start of month
   for (let i = 0; i < startOffset; i++) {
-    days.push(<div key={`pad-${i}`} className="h-16 md:h-32 border border-black/[0.03] dark:border-white/[0.03] bg-transparent opacity-20" />);
+    days.push(<div key={`pad-${i}`} className="h-16 md:h-32 border border-foreground/[0.03] bg-transparent opacity-20" />);
   }
 
   for (let d = 1; d <= totalDays; d++) {
@@ -69,9 +69,9 @@ export const Calendar: React.FC<CalendarProps> = ({
         key={d}
         onClick={() => onDateSelect?.(date)}
         title={holiday ? `${holiday.name} (${holiday.is_cuti_bersama ? 'Cuti Bersama' : 'Libur Nasional'})` : undefined}
-        className={`h-16 md:h-32 border border-black/[0.03] dark:border-white/[0.03] p-1.5 md:p-2 transition-all cursor-pointer group hover:bg-black/[0.02] dark:bg-white/[0.02] relative ${
+        className={`h-16 md:h-32 border border-foreground/[0.03] p-1.5 md:p-2 transition-all cursor-pointer group hover:bg-foreground/[0.02] relative ${
           isSelected 
-            ? 'bg-warm-gold/10 border-warm-gold/40 shadow-inner' 
+            ? 'bg-primary/10 border-primary/40 shadow-inner' 
             : isHolidayRed 
             ? 'bg-danger/[0.07] hover:bg-danger/[0.12]' 
             : isCutiAmber 
@@ -82,20 +82,20 @@ export const Calendar: React.FC<CalendarProps> = ({
         <div className="flex justify-between items-start">
           <span className={`text-xs font-sans transition-colors ${
             isToday 
-              ? 'bg-warm-gold text-warm-black w-6 h-6 flex items-center justify-center rounded-full font-semibold' 
+              ? 'bg-primary text-on-primary w-6 h-6 flex items-center justify-center rounded-full font-semibold' 
               : isSelected 
-              ? 'text-warm-gold font-semibold' 
+              ? 'text-primary font-semibold' 
               : isHolidayRed || isSunday 
               ? 'text-danger font-extrabold' 
               : isCutiAmber 
               ? 'text-warning font-semibold' 
-              : 'text-gray-light'
+              : 'text-muted-foreground'
           }`}>
             {d}
           </span>
           <div className="flex items-center gap-1">
             {dateEvents.some(e => e.status !== 'completed') && (
-              <div className="w-1.5 h-1.5 bg-warm-gold rounded-full" />
+              <div className="w-1.5 h-1.5 bg-primary rounded-full" />
             )}
           </div>
         </div>
@@ -103,7 +103,7 @@ export const Calendar: React.FC<CalendarProps> = ({
         {/* Holiday Banner in Cell (Desktop) */}
         {holiday && (
           <div className="mt-1 hidden md:block">
-            <div className={`text-[9px] px-1.5 py-0.5 rounded border truncate font-medium ${
+            <div className={`text-xs px-1.5 py-0.5 rounded border truncate font-medium ${
               holiday.is_cuti_bersama
                 ? 'bg-warning/15 text-warning border-warning/30'
                 : 'bg-danger/15 text-danger border-danger/30'
@@ -116,16 +116,16 @@ export const Calendar: React.FC<CalendarProps> = ({
         {/* Events list */}
         <div className="mt-1 space-y-1 overflow-hidden hidden md:block">
           {dateEvents.slice(0, 2).map((e, i) => (
-            <div key={i} className={`text-[10px] truncate px-1.5 py-0.5 rounded border font-light ${
+            <div key={i} className={`text-xs truncate px-1.5 py-0.5 rounded border font-light ${
               e.status === 'completed'
-                ? 'bg-black/5 dark:bg-white/5 text-gray-light border-black/10 dark:border-white/10 line-through opacity-60'
-                : 'bg-deep-sage/10 text-soft-cream border-deep-sage/20'
+                ? 'bg-foreground/5 text-muted-foreground border-foreground/10 line-through opacity-60'
+                : 'bg-deep-sage/10 text-foreground border-deep-sage/20'
             }`}>
               {e.title}
             </div>
           ))}
           {dateEvents.length > 2 && (
-            <div className="text-[9px] text-gray-light italic pl-1">+{dateEvents.length - 2} more</div>
+            <div className="text-xs text-muted-foreground italic pl-1">+{dateEvents.length - 2} more</div>
           )}
         </div>
       </div>
@@ -139,24 +139,24 @@ export const Calendar: React.FC<CalendarProps> = ({
   });
 
   return (
-    <div className="glass-card overflow-hidden border-black/[0.03] dark:border-white/[0.03]">
+    <div className="glass-card overflow-hidden border-foreground/[0.03]">
       {/* Calendar Header */}
-      <div className="flex items-center justify-between p-6 border-b border-black/[0.03] dark:border-white/[0.03]">
-        <h3 className="font-serif text-2xl flex items-center gap-2">
-          <span className="text-warm-gold">{monthName}</span> <span className="text-soft-cream/40 font-light">{year}</span>
+      <div className="flex items-center justify-between p-6 border-b border-foreground/[0.03]">
+        <h3 className="text-heading-lg flex items-center gap-2">
+          <span className="text-primary">{monthName}</span> <span className="text-foreground/40 font-light">{year}</span>
         </h3>
         <div className="flex gap-2">
-          <button onClick={handlePrevMonth} aria-label="Previous month" className="p-2 hover:bg-black/5 dark:bg-white/5 rounded-full transition-colors text-soft-cream">
+          <button onClick={handlePrevMonth} aria-label="Previous month" className="p-2 hover:bg-foreground/5 rounded-full transition-colors text-foreground">
             <ChevronLeft size={20} />
           </button>
-          <button onClick={handleNextMonth} aria-label="Next month" className="p-2 hover:bg-black/5 dark:bg-white/5 rounded-full transition-colors text-soft-cream">
+          <button onClick={handleNextMonth} aria-label="Next month" className="p-2 hover:bg-foreground/5 rounded-full transition-colors text-foreground">
             <ChevronRight size={20} />
           </button>
         </div>
       </div>
 
       {/* Days of week (Sunday is red / tanggal merah) */}
-      <div className="grid grid-cols-7 border-b border-black/[0.03] dark:border-white/[0.03] bg-black/[0.01] dark:bg-white/[0.01]">
+      <div className="grid grid-cols-7 border-b border-foreground/[0.03] bg-foreground/[0.01]">
         {Array.from({ length: 7 }, (_, i) => {
           // 2024-01-07 was a Sunday (0)
           const d = new Date(2024, 0, 7 + i);
@@ -164,8 +164,8 @@ export const Calendar: React.FC<CalendarProps> = ({
         }).map((day, i) => (
           <div 
             key={day} 
-            className={`py-2 text-center text-[10px] uppercase tracking-[0.2em] font-medium ${
-              i === 0 ? 'text-danger font-extrabold' : 'text-gray-light/60'
+            className={`py-2 text-center text-xs uppercase tracking-[0.2em] font-medium ${
+              i === 0 ? 'text-danger font-extrabold' : 'text-muted-foreground/60'
             }`}
           >
             {day}
@@ -180,8 +180,8 @@ export const Calendar: React.FC<CalendarProps> = ({
 
       {/* Month Holiday Footer Summary */}
       {currentMonthHolidays.length > 0 && (
-        <div className="p-4 md:px-6 border-t border-black/[0.05] dark:border-white/[0.05] bg-gray-strong/30 flex items-start gap-4 flex-wrap">
-          <div className="flex items-center gap-1.5 text-[11px] font-medium text-gray-light uppercase tracking-wider shrink-0 pt-0.5">
+        <div className="p-4 md:px-6 border-t border-foreground/[0.05] bg-surface/30 flex items-start gap-4 flex-wrap">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider shrink-0 pt-0.5">
             <CalendarCheck size={14} className="text-primary" />
             <span>Hari Libur Bulan Ini:</span>
           </div>
@@ -191,7 +191,7 @@ export const Calendar: React.FC<CalendarProps> = ({
               return (
                 <div
                   key={h.date}
-                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium border ${
+                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium border ${
                     h.is_cuti_bersama
                       ? 'bg-warning/10 text-warning border-warning/20'
                       : 'bg-danger/10 text-danger border-danger/20'

@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button, Loading, Modal, NoticeModal, InlineError, Input, ErrorAlert, Calendar as CalendarUI, DatePicker } from '@/components';
+import { Button, Loading, Placeholder, Modal, NoticeModal, InlineError, Input, ErrorAlert, Calendar as CalendarUI, DatePicker } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useReminder } from '@/hooks/useReminder';
 
@@ -11,17 +10,15 @@ import { ApiError } from '@/libs/apiErrors';
 import { Reminder } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Bell, BellSlash as BellOff, Clock, Plus, Trash as Trash2, PencilSimple as Edit2, List, Calendar as CalendarIcon } from '@phosphor-icons/react';
+import { Bell, BellSlash as BellOff, Clock, Plus, Trash as Trash2, PencilSimple as Edit2, List, Calendar as CalendarIcon, Check } from '@phosphor-icons/react';
 import { getLocalISODate } from '@/libs/format';
 import { formatDateOnly } from '@/libs/date';
 import { useHolidays } from '@/hooks/useHolidays';
 import { Heading, Paragraph } from '@/components/ui/typography';
-import { isReminderPastDue } from '@/libs/notificationLogic';
+import { hasUpcomingNotification, isReminderPastDue } from '@/libs/notificationLogic';
 
 
 export function RemindersClient() {
-  const router = useRouter();
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
   const { reminders = [], isLoading: isRemindersLoading, userErrorMessage: loadError, refresh: refreshReminders, createReminder, updateReminder, deleteReminder } = useReminder();
   const { t } = useTranslation();
@@ -88,6 +85,15 @@ export function RemindersClient() {
     { value: 60,   label: t('reminders_page.form.notify_options.h1') },
   ];
 
+  // Past due times already get their own error, so the warning only covers a future due time.
+  const formDueAt = form.dueDate && form.dueTime ? new Date(`${form.dueDate}T${form.dueTime}`) : null;
+  const noUpcomingNotification =
+    isModalOpen &&
+    formDueAt !== null &&
+    !Number.isNaN(formDueAt.getTime()) &&
+    formDueAt.getTime() > now.getTime() &&
+    !hasUpcomingNotification(now, formDueAt, form.notifyTimes);
+
   const toggleNotifyTime = (value: number) => {
     setForm(prev => ({
       ...prev,
@@ -97,26 +103,19 @@ export function RemindersClient() {
     }));
   };
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [authLoading, isAuthenticated, router]);
-
+  // Tapping a day goes straight to the form for that day. Past days only select, since a reminder
+  // in the past is refused; their reminders stay readable in the side panel.
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
-    setForm(prev => ({
-      ...prev,
-      dueDate: formatDateOnly(date) // timezone-safe: gunakan local date, bukan UTC
-    }));
+    if (formatDateOnly(date) >= formatDateOnly(new Date())) openAddModal(date);
   };
 
-  const openAddModal = () => {
+  const openAddModal = (date: Date = selectedDate) => {
     setEditingReminder(null);
     setForm({
       title: '',
       description: '',
-      dueDate: formatDateOnly(selectedDate),
+      dueDate: formatDateOnly(date),
       dueTime: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
       priority: 'medium',
       notifyTimes: [60, 180, 360],
@@ -237,7 +236,7 @@ export function RemindersClient() {
     });
   };
 
-  if (authLoading || isRemindersLoading) return (
+  if (authLoading) return (
     <>
       <div className="flex justify-center py-12"><Loading text={t('dashboard.checking_session')} /></div>
     </>
@@ -261,28 +260,28 @@ export function RemindersClient() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <Heading as="h1" size="h2" weight="semibold" className="tracking-tight">{t('reminders_page.title')}</Heading>
-            <Paragraph className="text-gray-light font-light">{t('reminders_page.desc')}</Paragraph>
+            <Paragraph className="text-muted-foreground font-light">{t('reminders_page.desc')}</Paragraph>
           </div>
           <div className="flex items-center gap-4">
             {/* Only show calendar/list toggle when active reminders is enabled */}
             {remindersActiveEnabled && (
-              <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05]">
+              <div className="flex bg-foreground/[0.03] p-1 rounded-full border border-foreground/[0.05]">
                 <button 
                   onClick={() => setView('calendar')}
-                  className={`p-2 rounded-full transition-all ${view === 'calendar' ? 'bg-warm-gold text-warm-black shadow-lg' : 'text-gray-light hover:text-soft-cream'}`}
+                  className={`p-2 rounded-full transition-all ${view === 'calendar' ? 'bg-primary text-on-primary ' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   <CalendarIcon size={18} />
                 </button>
                 <button 
                   onClick={() => setView('list')}
-                  className={`p-2 rounded-full transition-all ${view === 'list' ? 'bg-warm-gold text-warm-black shadow-lg' : 'text-gray-light hover:text-soft-cream'}`}
+                  className={`p-2 rounded-full transition-all ${view === 'list' ? 'bg-primary text-on-primary ' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   <List size={18} />
                 </button>
               </div>
             )}
             <div className="hidden md:block">
-              <Button variant="primary" onClick={openAddModal} className="rounded-full px-8">
+              <Button variant="primary" onClick={() => openAddModal()} className="rounded-full px-8">
                 <Plus size={18} className="mr-2" />
                 {t('reminders_page.new_reminder')}
               </Button>
@@ -307,11 +306,11 @@ export function RemindersClient() {
             ) : (
               <div className="space-y-4">
                 {/* Tabs */}
-                <div className="flex items-center gap-4 mb-8 pb-4 border-b border-black/[0.05] dark:border-white/[0.05]">
+                <div className="flex items-center gap-4 mb-8 pb-4 border-b border-foreground/[0.05]">
                   {remindersActiveEnabled && (
                     <button
                       onClick={() => setFilter('active')}
-                      className={`pb-2 px-1 border-b-2 transition-all ${filter === 'active' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
+                      className={`pb-2 px-1 border-b-2 transition-all ${filter === 'active' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                     >
                       {t('reminders_page.filter_active')}
                     </button>
@@ -319,7 +318,7 @@ export function RemindersClient() {
                   {remindersHistoryEnabled && (
                     <button
                       onClick={() => setFilter('history')}
-                      className={`pb-2 px-1 border-b-2 transition-all ${filter === 'history' ? 'border-warm-gold text-warm-gold' : 'border-transparent text-gray-light hover:text-soft-cream'}`}
+                      className={`pb-2 px-1 border-b-2 transition-all ${filter === 'history' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                     >
                       {t('reminders_page.filter_history')}
                     </button>
@@ -327,15 +326,20 @@ export function RemindersClient() {
                 </div>
 
                 {!remindersActiveEnabled && !remindersHistoryEnabled ? (
-                  <div className="glass-card p-24 text-center space-y-4">
-                    <BellOff size={48} className="mx-auto text-gray-light opacity-20" />
-                    <Paragraph className="text-gray-light font-light italic">{t('reminders_page.disabled_in_settings')}</Paragraph>
+                  <div className="glass-card p-10 sm:p-16 text-center space-y-4">
+                    <BellOff size={48} className="mx-auto text-muted-foreground opacity-20" />
+                    <Paragraph className="text-muted-foreground font-light italic">{t('reminders_page.disabled_in_settings')}</Paragraph>
+                  </div>
+                ) : isRemindersLoading ? (
+                  <div className="space-y-3">
+                    <Placeholder className="h-24 w-full" />
+                    <Placeholder className="h-24 w-full" />
                   </div>
                 ) : ((filter === 'active' && remindersActiveEnabled) || (filter === 'history' && remindersHistoryEnabled)) && (
                   reminders.filter(r => filter === 'active' ? isReminderActive(r) : isReminderInHistory(r)).length === 0 ? (
-                    <div className="glass-card p-24 text-center space-y-4">
+                    <div className="glass-card p-10 sm:p-16 text-center space-y-4">
                       <Bell size={48} className="mx-auto text-deep-sage opacity-20" />
-                      <Paragraph className="text-gray-light font-light italic">
+                      <Paragraph className="text-muted-foreground font-light italic">
                         {filter === 'active' ? t('reminders_page.empty_reminders') : t('reminders_page.empty_history')}
                       </Paragraph>
                     </div>
@@ -347,9 +351,9 @@ export function RemindersClient() {
                         <div className="min-w-0 space-y-1">
                           <Heading as="h4" size="h4" className="text-lg font-medium break-words">{reminder.title}</Heading>
                           {filter === 'history' && reminder.description && (
-                            <Paragraph className="text-sm text-gray-light font-light break-words">{reminder.description}</Paragraph>
+                            <Paragraph className="text-sm text-muted-foreground font-light break-words">{reminder.description}</Paragraph>
                           )}
-                          <div className="flex items-center gap-3 text-micro text-gray-light uppercase tracking-widest">
+                          <div className="flex items-center gap-3 text-micro text-muted-foreground uppercase tracking-widest">
                             <Clock size={12} />
                             <span>{formatReminderTime(reminder, filter === 'history')}</span>
                             {filter === 'active' && (
@@ -362,10 +366,10 @@ export function RemindersClient() {
                         </div>
                         {filter === 'active' && (
                           <div className="flex items-center gap-1 flex-shrink-0">
-                            <button onClick={() => openEditModal(reminder)} aria-label={t('common.edit')} className="text-gray-light hover:text-warm-gold p-3">
+                            <button onClick={() => openEditModal(reminder)} aria-label={t('common.edit')} className="text-muted-foreground hover:text-primary p-3">
                               <Edit2 size={18} />
                             </button>
-                            <button onClick={() => deleteReminder(reminder.id)} aria-label={t('common.delete')} className="text-gray-light hover:text-expense p-3">
+                            <button onClick={() => deleteReminder(reminder.id)} aria-label={t('common.delete')} className="text-muted-foreground hover:text-expense p-3">
                               <Trash2 size={18} />
                             </button>
                           </div>
@@ -380,24 +384,26 @@ export function RemindersClient() {
 
           {/* Side Panel: Selected Date Details */}
           <div className="lg:col-span-4 space-y-8">
-             <div className="glass-card p-8 border-warm-gold/10">
+             <div className="glass-card p-8 border-primary/10">
                 <Heading as="h3" size="h3" className="font-sans font-bold tracking-tight text-xl mb-8">
                   {selectedDate.toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' })}
                 </Heading>
                 
                 <div className="space-y-4">
-                  {selectedDateReminders.length === 0 ? (
-                    <Paragraph className="text-sm text-gray-light font-light italic opacity-60">{t('reminders_page.empty_date')}</Paragraph>
+                  {isRemindersLoading ? (
+                    <Placeholder className="h-16 w-full" />
+                  ) : selectedDateReminders.length === 0 ? (
+                    <Paragraph className="text-sm text-muted-foreground font-light italic opacity-60">{t('reminders_page.empty_date')}</Paragraph>
                   ) : (
                     selectedDateReminders.map(r => (
-                      <div key={r.id} className="p-4 rounded-lg bg-black/[0.02] dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03] space-y-2">
+                      <div key={r.id} className="p-4 rounded-lg bg-foreground/[0.02] border border-foreground/[0.03] space-y-2">
                         <div className="flex justify-between items-start">
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-tighter font-bold ${
+                          <span className={`text-xs px-2 py-0.5 rounded-full uppercase tracking-tighter font-bold ${
                             r.priority === 'high' ? 'bg-expense/20 text-expense' : 'bg-deep-sage/20 text-deep-sage'
                           }`}>
                             {t(`career_page.form.options.${r.priority}`)}
                           </span>
-                          <span className="text-micro text-gray-light">{r.due_time}</span>
+                          <span className="text-micro text-muted-foreground">{r.due_time}</span>
                         </div>
                         <Paragraph className="text-sm font-medium">{r.title}</Paragraph>
                       </div>
@@ -405,8 +411,8 @@ export function RemindersClient() {
                   )}
                   
                   <button 
-                    onClick={openAddModal}
-                    className="w-full py-4 mt-4 border border-dashed border-black/10 dark:border-white/10 rounded-lg text-micro uppercase tracking-widest text-gray-light hover:text-warm-gold hover:border-warm-gold/40 transition-all"
+                    onClick={() => openAddModal()}
+                    className="w-full py-4 mt-4 border border-dashed border-foreground/10 rounded-lg text-micro uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40 transition-all"
                   >
                     {t('reminders_page.add_to_day')}
                   </button>
@@ -414,11 +420,11 @@ export function RemindersClient() {
              </div>
              
              {/* Weekly Context - Small Summary */}
-             <div className="glass-card p-8 bg-gray-strong">
+             <div className="glass-card p-8 bg-surface">
                 <Heading as="h4" size="h4" className="text-micro uppercase tracking-[0.3em] text-deep-sage font-bold mb-4">{t('reminders_page.weekly_focus')}</Heading>
-                <Paragraph className="text-sm font-light text-gray-very-light leading-relaxed">
+                <Paragraph className="text-sm font-light text-subtle leading-relaxed">
                   {t('reminders_page.weekly_focus_desc').split('{count}').map((part, i, arr) => 
-                    i === arr.length - 1 ? part : <React.Fragment key={i}>{part}<span className="text-warm-gold font-bold">{reminders.filter(isReminderActive).length}</span></React.Fragment>
+                    i === arr.length - 1 ? part : <React.Fragment key={i}>{part}<span className="text-primary font-bold">{reminders.filter(isReminderActive).length}</span></React.Fragment>
                   )}
                 </Paragraph>
              </div>
@@ -441,7 +447,7 @@ export function RemindersClient() {
         onClose={() => setIsModalOpen(false)} 
         title={editingReminder ? t('reminders_page.edit_reminder') : t('reminders_page.new_reminder_modal')}
         footer={
-          <div className="pt-8 border-t border-black/5 dark:border-white/5 flex gap-4">
+          <div className="pt-8 border-t border-foreground/5 flex gap-4">
             <Button variant="ghost" fullWidth onClick={() => setIsModalOpen(false)} disabled={isSaving}>{t('investment_page.cancel_upper')}</Button>
             <Button variant="primary" fullWidth onClick={handleSave} isLoading={isSaving} disabled={isSaving}>{t('reminders_page.save_reminder')}</Button>
           </div>
@@ -456,7 +462,7 @@ export function RemindersClient() {
             placeholder={t('reminders_page.form.title_placeholder')}
             error={formErrors.title}
             required
-            className="bg-black/[0.03] dark:bg-white/[0.03]"
+            className="bg-foreground/[0.03]"
           />
           <div className="grid grid-cols-2 gap-4">
             <DatePicker 
@@ -472,18 +478,18 @@ export function RemindersClient() {
               value={form.dueTime} 
               onChange={e => setForm({...form, dueTime: e.target.value})}
               error={formErrors.dueTime}
-              className="bg-black/[0.03] dark:bg-white/[0.03]"
+              className="bg-foreground/[0.03]"
             />
           </div>
           <div>
-            <label className="text-micro uppercase tracking-widest text-gray-light mb-2 block">{t('reminders_page.form.priority')}</label>
+            <label className="text-micro uppercase tracking-widest text-muted-foreground mb-2 block">{t('reminders_page.form.priority')}</label>
             <div className="flex gap-4">
               {['low', 'medium', 'high'].map(p => (
                 <button
                   key={p}
                   onClick={() => setForm({...form, priority: p as any})}
                   className={`flex-1 py-2 rounded-md text-xs uppercase tracking-widest font-bold border transition-all ${
-                    form.priority === p ? 'bg-warm-gold text-warm-black border-warm-gold' : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/10 dark:border-white/10 text-gray-light'
+                    form.priority === p ? 'bg-primary text-on-primary border-primary' : 'bg-foreground/[0.02] border-foreground/10 text-muted-foreground'
                   }`}
                 >
                   {t(`career_page.form.options.${p}`)}
@@ -494,33 +500,36 @@ export function RemindersClient() {
 
           {/* Pilihan waktu notifikasi */}
           <div>
-            <label className="text-micro uppercase tracking-widest text-gray-light mb-2 block">{t('reminders_page.form.notify_label')}</label>
+            <label className="text-micro uppercase tracking-widest text-muted-foreground mb-2 block">{t('reminders_page.form.notify_label')}</label>
             <div className="flex flex-wrap gap-2">
               {NOTIFY_OPTIONS.map(opt => (
                 <button
                   key={opt.value}
                   type="button"
                   onClick={() => toggleNotifyTime(opt.value)}
-                  className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${
+                  className={`inline-flex min-h-11 items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest border transition-colors ${
                     form.notifyTimes.includes(opt.value)
-                      ? 'bg-warm-gold/20 text-warm-gold border-warm-gold/50'
-                      : 'bg-black/[0.02] dark:bg-white/[0.02] border-black/10 dark:border-white/10 text-gray-light hover:border-black/30 dark:border-white/30'
+                      ? 'bg-primary/20 text-primary border-primary/50'
+                      : 'bg-foreground/[0.02] border-foreground/10 text-muted-foreground hover:border-foreground/30'
                   }`}
                 >
-                  {form.notifyTimes.includes(opt.value) ? '✓ ' : ''}{opt.label}
+                  {form.notifyTimes.includes(opt.value) && <Check size={12} weight="bold" aria-hidden="true" />}{opt.label}
                 </button>
               ))}
             </div>
-            <Paragraph className="text-[9px] text-gray-light mt-2 opacity-60">{t('reminders_page.form.notify_help')}</Paragraph>
+            <Paragraph className="text-xs text-muted-foreground mt-2 opacity-60">{t('reminders_page.form.notify_help')}</Paragraph>
+            {noUpcomingNotification && (
+              <Paragraph className="text-label-sm text-warning mt-2" role="status">{t('reminders_page.form.notify_none')}</Paragraph>
+            )}
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-light tracking-widest uppercase">{t('reminders_page.form.notes_label')}</label>
+            <label className="text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('reminders_page.form.notes_label')}</label>
             <textarea
               placeholder={t('reminders_page.form.notes_placeholder')}
               rows={4}
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-              className="w-full bg-gray-strong/40 border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+              className="w-full bg-surface/40 border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
             />
           </div>
         </div>
@@ -531,8 +540,8 @@ export function RemindersClient() {
       <div className="md:hidden fixed bottom-24 right-4 z-40">
         <Button 
           variant="primary" 
-          onClick={openAddModal} 
-          className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(244,201,93,0.4)]"
+          onClick={() => openAddModal()}
+          className="rounded-full w-14 h-14 flex items-center justify-center "
           aria-label={t('reminders_page.new_reminder')}
         >
           <Plus size={24} />

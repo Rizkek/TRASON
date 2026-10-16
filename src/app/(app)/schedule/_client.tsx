@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { Loading, ErrorAlert, ConfirmModal } from '@/components';
+import { Loading, ErrorAlert, InlineError, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useActivity } from '@/hooks/useActivity';
 import { useDailyTasks } from '@/hooks/useDailyTasks';
@@ -24,7 +23,6 @@ import {
 } from './components';
 
 export function TimelineClient() {
-  const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
   const { module_features, locale } = useUserPreferences();
@@ -33,7 +31,7 @@ export function TimelineClient() {
   const { start: weekStart, end: weekEnd } = getCurrentWeekBounds();
   const daysOfWeek = getDaysOfWeek(weekStart);
 
-  const { activities, isLoading, createActivity, updateActivity, deleteActivity } = useActivity(
+  const { activities, isLoading, userErrorMessage: activitiesError, refresh: refreshActivities, createActivity, updateActivity, deleteActivity } = useActivity(
     weekStart,
     weekEnd
   );
@@ -80,10 +78,6 @@ export function TimelineClient() {
       }
     }
   }, [module_features, activeTab]);
-
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) router.push('/login');
-  }, [authLoading, isAuthenticated, router]);
 
   const openAddModal = useCallback((date?: Date, hour?: number) => {
     setEditingActivity(null);
@@ -305,6 +299,9 @@ export function TimelineClient() {
   return (
     <>
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
+      {activitiesError && (
+        <InlineError message={activitiesError} retryLabel={t('common.try_again')} onRetry={() => refreshActivities()} className="mb-4" />
+      )}
       <>
         <div className="space-y-8 animate-fade-in">
           {/* Header & Overview Stats */}
@@ -321,15 +318,15 @@ export function TimelineClient() {
           />
 
           {/* Tab Switcher */}
-          <div className="flex items-center gap-2 bg-black/[0.02] dark:bg-white/[0.02] p-4 rounded-lg mb-8 w-max border border-black/[0.05] dark:border-white/[0.05]">
+          <div className="flex items-center gap-2 bg-foreground/[0.02] p-4 rounded-lg mb-8 w-max border border-foreground/[0.05]">
             {module_features?.['timeline_weekly_log'] !== false && (
               <button
                 onClick={() => setActiveTab('weekly-log')}
                 title={t('timeline_page.weekly_log')}
                 className={`flex items-center gap-2 px-6 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
                   activeTab === 'weekly-log'
-                    ? 'bg-primary text-white shadow-lg'
-                    : 'text-gray-light hover:text-soft-cream'
+                    ? 'bg-primary text-on-primary '
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Calendar size={14} />
@@ -342,18 +339,18 @@ export function TimelineClient() {
                 title={t('timeline_page.daily_checklist')}
                 className={`flex items-center gap-2 px-6 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
                   activeTab === 'daily-checklist'
-                    ? 'bg-primary text-white shadow-lg'
-                    : 'text-gray-light hover:text-soft-cream'
+                    ? 'bg-primary text-on-primary '
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <ListChecks size={14} />
                 <span className="hidden md:inline">{t('timeline_page.daily_checklist')}</span>
                 {totalCount > 0 && (
                   <span
-                    className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
+                    className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold ${
                       completedCount === totalCount
                         ? 'bg-income/20 text-income'
-                        : 'bg-black/10 dark:bg-white/10 text-gray-light'
+                        : 'bg-foreground/10 text-muted-foreground'
                     }`}
                   >
                     {completedCount}

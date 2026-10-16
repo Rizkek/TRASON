@@ -1,97 +1,97 @@
-# 🧭 TRASON
+# TRASON
 
-> **Your Sovereign Personal Life OS for Intentional Growth**
+Track & Sync OS. A personal operating system that keeps money, investments, schedule, reminders, workouts and job applications in one connected place. Installable as a PWA, English and Indonesian first (Japanese and Spanish dictionaries included).
 
-TRASON is a beautiful, unified Personal OS designed as a calm, editorial digital sanctuary. It consolidates your finances, physical vitality, career pipelines, task schedules, and habits into a secure, private, and offline-first digital living space.
+## Modules
 
----
+| Module | What it does |
+|---|---|
+| Dashboard | Life Score, what is due next, current state of money, training and career, today's tasks |
+| Finance | Income and expenses, budgets, subscriptions, installments, receipt and driver payout capture |
+| Investments | Positions for stocks, crypto, gold, property, debt and vehicles with live price refresh |
+| Schedule | Weekly activity log and a daily checklist that resets by the user's timezone |
+| Reminders | Due-time reminders delivered as web push, with Active and History views |
+| Sport | Workout plans, sessions and personal records |
+| Career | Application pipeline, interview journal and resume match |
+| Insights | On-demand summaries; scores and streaks are computed with plain rules, not an LLM |
 
-## 🎨 Visual Philosophy & Design System
+## Visual language
 
-TRASON avoids generic corporate SaaS layouts, opting instead for a minimalist, premium editorial aesthetic built on a warm, high-contrast dark theme.
+Flat and solid. No gradients, glow, shadows, emoji or loading animations in the product UI; loading is shown as static text. Colors are CSS variables in `src/app/globals.css`, mapped by role in `tailwind.config.js` (`background`, `surface`, `foreground`, `primary`, `success|danger|warning|info`, ...) and checked against WCAG AA in both themes by a test. Fonts: Geist (UI), Geist Mono (numbers), DM Serif Display (wordmark and landing titles). Dark and light themes are supported through the `dark` / `light` class on `<html>`, and a system preference follows the device; the light theme is still being completed screen by screen.
 
-*   **Warm Black (`#0B0F14`)**: The interface foundation, offering a surgical-clean surface that minimizes cognitive strain.
-*   **Warm Gold (`#F4C95D`)**: The primary signal color, utilized surgically for active states, CTAs, and milestone achievements.
-*   **Soft Cream (`#F8FAFC`)**: A calm, high-contrast typography color that provides sharp legibility without standard pure-white screen fatigue.
-*   **Glassmorphism**: low-opacity card elements (`bg-white/3`) with high-level blurs (`backdrop-blur-xl`) and hairline borders (`border-white/5`) to present tactile hierarchy and clean physical depth.
-*   **Tactile Typography**: Editorial headers rendered in a serif typeface (**Cormorant Garamond**) paired with high-precision sans-serif controls (**Inter** / **Instrument Sans**).
+## Tech stack
 
----
+- Next.js 15 (App Router), React 18, TypeScript strict
+- Tailwind CSS 3.4, Phosphor icons, Chart.js
+- Supabase (Postgres, Auth, Storage) with Row Level Security, accessed through `@supabase/ssr`
+- SWR for client data, Zustand for auth state
+- Vercel AI SDK with Google Gemini for capture and insights
+- Serwist service worker and `web-push` for PWA and notifications, Resend for email digest
+- Jest, ts-jest and Testing Library
 
-## ⚡ Tech Stack & Architecture
+## Getting started
 
-TRASON is engineered with speed, security, and portability in mind:
+Requires Node.js 20 or newer. Use npm unless you deliberately use Bun (both lockfiles exist).
 
-*   **Core**: Next.js 15+ (App Router) & React 18
-*   **Styling**: Tailwind CSS & Vanilla Custom CSS Tokens
-*   **Database & Auth**: Supabase SSR (`@supabase/ssr` & standard RLS policies)
-*   **State Management**: Zustand (fully persistent via `localStorage`)
-*   **PWA Integrations**: Standard Service Workers for offline notification queuing
-*   **Engine**: Bun (fully compliant, rapid dependency loading)
-
----
-
-## ⚙️ Setup & Installation
-
-### Prerequisites
-Make sure you have [Bun](https://bun.sh) (recommended) or [NodeJS](https://nodejs.org) installed on your machine.
-
-### 1. Clone the project and install dependencies:
 ```bash
-# Using Bun (Highly recommended)
-bun install
-
-# Or using NPM
 npm install
-```
-
-### 2. Configure Environment Variables
-Create a `.env.local` file at the root of the project:
-```env
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-OPENAI_API_KEY=your-openai-key-for-ai-insights
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=your-vapid-key-for-push-notifications
-```
-
-### 3. Run Development Server
-```bash
-# Using Bun
-bun dev
-
-# Or using NPM
 npm run dev
 ```
-Open `http://localhost:3000` to begin.
 
----
+Create `.env.local` at the project root. Variable names only; get the values from your own Supabase, Google AI, VAPID and Resend accounts:
 
-## 📂 Codebase Directory Structure
-
-```yaml
-src/
-  ├── app/                  # Next.js App Router (pages & API endpoints)
-  │     ├── api/            # Secured API routes (LLM, parse, validation)
-  │     ├── dashboard/      # Primary Life OS Dashboard
-  │     ├── finance/        # Capital cash-flow tracking module
-  │     ├── insights/       # Cross-module AI strategist panel
-  │     ├── investments/    # Long-term assets & allocations module
-  │     ├── reminders/      # Task scheduler & mindful push alerts
-  │     ├── sport/          # Workout & vitality history tracking
-  │     └── timeline/       # Life log & memory spine
-  ├── components/           # Reusable UI & modular layout components
-  ├── hooks/                # Core hooks (Auth, SWR queries, notifications)
-  ├── libs/                 # Localizations (i18n), formatting & helper utils
-  ├── providers/            # React context providers (Auth initializer)
-  ├── services/             # Supabase queries & external APIs (OpenAI, DNS)
-  ├── store/                # Zustand global state persistence models
-  └── utils/                # Standard Supabase middleware & server actions
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+GOOGLE_GENERATIVE_AI_API_KEY=
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
+VAPID_EMAIL=
+CRON_SECRET=
+RESEND_API_KEY=
+ALPHA_VANTAGE_API_KEY=
+COINGECKO_DEMO_API_KEY=
 ```
 
----
+`SUPABASE_SERVICE_ROLE_KEY`, `VAPID_PRIVATE_KEY`, `CRON_SECRET` and the API keys are server-only. Never prefix them with `NEXT_PUBLIC_`.
 
-## 📖 Deep Dives & Specifications
-For more architectural and database-level specifications, refer to our dedicated documentation folder:
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build` | Production build (TypeScript errors block it; ESLint does not) |
+| `npm run type-check` | `tsc --noEmit` |
+| `npm run lint` | ESLint over `src`, with autofix |
+| `npm test` | Jest |
 
-*   **[Database Schema & Security RLS Rules](file:///d:/coding/TRASON/docs/DATABASE_SCHEMA.md)**: Deep-dive into our Supabase schema, table constraints, triggers, and Row-Level Security parameters.
-*   **[API Endpoint Specification & JWT Auth](file:///d:/coding/TRASON/docs/API_DOCUMENTATION.md)**: Details on the REST route handlers, payloads, and the middleware JWT verification flow.
+## Project structure
+
+```
+src/
+  app/
+    (app)/       authenticated pages: dashboard, finance, investments, schedule, reminders,
+                 insights, sport, career, settings, onboarding
+    (auth)/      login, signup
+    (landing)/   public pages: about, pricing, vision, roadmap, legal
+    api/         route handlers (AI capture, prices, push, cron, validation)
+    sw.ts        service worker source
+  components/    ui primitives, layout shell, landing, module components
+  hooks/         one SWR hook per domain
+  services/      data access per domain; the only place that calls supabase.from()
+  libs/          pure utilities: date, format, validation, i18n, analytics, cron
+  store/         Zustand auth store
+  types/         database.ts is the source of truth for table types
+  modules/       module registry and toggles
+  utils/supabase/ server client and session middleware
+docs/            product, API and database documentation
+```
+
+## Documentation
+
+- `CLAUDE.md`: architecture patterns, UI rules and working rules. The most current reference.
+- `docs/DATABASE_SCHEMA.md`: tables, soft delete and RLS rules.
+- `docs/api-database.md` and `docs/API_DOCUMENTATION.md`: data access and API routes.
+- `docs/setup-environment.md` and `docs/deployment-maintenance.md`: setup, release and manual migrations.
+- `docs/product-language.md` and `docs/strategic-vision.md`: product vocabulary and direction.
+
+The code is the final source of truth when a document disagrees with it.

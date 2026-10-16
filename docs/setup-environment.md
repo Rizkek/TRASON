@@ -1,48 +1,53 @@
 # Setup & Environment Guide
 
-## 1. Prasyarat Sistem (Tech Stack)
-Sebelum melakukan proses instalasi dan pengembangan aplikasi TRASON, pastikan sistem operasi komputer Anda sudah memenuhi prasyarat *stack* modern berikut:
-- **Runtime Environment**: Node.js versi `18.x.x` (Disarankan menggunakan LTS versi `20.x.x` ke atas).
-- **Package Manager**: Standar menggunakan `npm` (atau alternatif seperti `bun` dan `yarn` sesuai preferensi).
-- **Frontend Framework**: Next.js (App Router API) dengan React versi 19 (atau 18 bergantung *package.json* terkait).
-- **Styling**: Tailwind CSS versi `3.x` untuk kompilasi utilitas CSS.
-- **Backend/Database**: Supabase (PostgreSQL 15+ dan layanan SDK Auth).
+## 1. Prasyarat
 
-## 2. Panduan Instalasi Lokal
+- Node.js 20 atau lebih baru.
+- Package manager: npm secara default. `package-lock.json` dan `bun.lock` sama-sama ada; pakai bun hanya bila sengaja, dan jangan biarkan salah satunya usang.
+- Akun Supabase (Postgres 15+, Auth, Storage), kunci Google Generative AI, pasangan kunci VAPID, akun Resend, dan kunci Alpha Vantage serta CoinGecko bila fitur harga investasi dipakai.
 
-Langkah demi langkah ini memastikan proyek bisa berjalan sepenuhnya di tahap _development_ (menggunakan Antigravity IDE atau editor lainnya).
+## 2. Instalasi lokal
 
-**Langkah 1: Kloning *Repository***  
-Gunakan command-line / terminal Anda untuk mengambil rilis terakhir TRASON:
 ```bash
 git clone <repository_url_trason>
 cd TRASON
-```
-
-**Langkah 2: Instalasi Dependensi**  
-Lakukan instalasi paket eksternal (termasuk *library* Lucide-React, Recharts, Zustand, SWR, dan Supabase JS):
-```bash
 npm install
-```
-*(Atau `bun install` / `yarn install` jika Anda menggunakan *package manager* yang berbeda).*
-
-**Langkah 3: Menjalankan Local Server**  
-Jika seluruh instalasi sukses dan tidak ada masalah *dependency tree*, eksekusi server pengembangan:
-```bash
 npm run dev
 ```
-Perintah ini otomatis membangun aset halaman dan berjalan secara bawaan di port 3000. Anda bisa membuka *browser* melalui URL: `http://localhost:3000`
 
-## 3. Environment Variables (.env)
-Aplikasi TRASON mengandalkan ekosistem Supabase untuk autentikasi dan integrasi *database*. Oleh karena itu, aplikasi mewajibkan keberadaan variabel *environment*. Buatlah file dengan nama `.env.local` pada folder struktur utama proyek.
+Server berjalan di `http://localhost:3000`. Skrip `dev` memakai `--dns-result-order=ipv4first` lewat `cross-env`. `npm run dev:turbo` menjalankan Turbopack, dan `npm run clean` menghapus `.next` serta cache.
 
-Berikut adalah daftar variabel yang perlu dikonfigurasi (Hanya **Nama Variabel**, *jangan sertakan value/kata sandi/kunci privat Anda jika hendak menyalinnya ke repositori publik*):
+Stack terpasang: Next.js 15.5 (App Router), React 18.3, TypeScript 5.9 strict, Tailwind CSS 3.4, ikon Phosphor, chart.js, SWR, Zustand, Supabase, Vercel AI SDK, Serwist. Versi pasti ada di `package.json`.
 
-```env
-# Koneksi Basis Data dan Autentikasi Supabase
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+## 3. Environment variables
 
-# (Opsional) Jika sewaktu-waktu ada endpoint khusus:
-NEXT_PUBLIC_API_BASE_URL=
+Buat `.env.local` di root proyek. File ini di-gitignore. Berikut nama variabel saja; nilai tidak pernah ditulis ke dokumen, kode, log, atau pesan commit.
+
+| Variabel | Dipakai di | Sisi |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | semua klien Supabase | publik |
+| `SUPABASE_SERVICE_ROLE_KEY` | `cron/*` | rahasia, hanya server |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | `services/ai/provider.ts` | rahasia |
+| `AI_PROVIDER`, `NARA_API_KEY` | provider NaraRouter (saat ini tidak aktif) | rahasia |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_EMAIL` | web-push | publik / rahasia |
+| `CRON_SECRET` | `cron/*` | rahasia |
+| `RESEND_API_KEY` | `cron/digest` | rahasia |
+| `ALPHA_VANTAGE_API_KEY`, `COINGECKO_DEMO_API_KEY` | `investments/prices` | rahasia |
+| `NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_APP_VERSION`, `NEXT_PUBLIC_API_URL` | konfigurasi umum | publik |
+
+Aturan: variabel tanpa awalan `NEXT_PUBLIC_` tidak boleh disentuh dari kode klien. Service role key hanya dipakai di route handler server, dan route yang memakainya harus lebih dulu memverifikasi pemanggil. Bila menambah variabel, tambahkan namanya ke tabel ini dan ke tabel di `CLAUDE.md`.
+
+`CRON_SECRET` kosong berarti semua panggilan `cron/*` ditolak.
+
+## 4. Skema database
+
+Skema SQL tidak dijalankan otomatis. File di `docs/migrations/` dijalankan manual di Supabase SQL editor sebelum men-deploy kode yang memakainya. Folder `docs/` di-gitignore, jadi simpan salinan di luar mesin ini atau ubah aturan `.gitignore`.
+
+## 5. Perintah harian
+
+```bash
+npm run type-check   # tsc --noEmit
+npm test             # jest; satu file: npx jest path/ke/file.test.ts
+npm run lint         # eslint src --fix (mengubah file)
+npm run build        # TypeScript error memblokir build, ESLint tidak
 ```

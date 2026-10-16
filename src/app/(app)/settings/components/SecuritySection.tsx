@@ -109,7 +109,7 @@ export function SecuritySection({
               <Heading as="h3" size="h3" className="text-lg font-semibold text-danger flex items-center gap-2">
                 <AlertTriangle size={20} /> {t('settings.security.deleteAccount')}
               </Heading>
-              <Paragraph className="text-sm text-gray-light mt-1">{t('settings.security.deleteDesc')}</Paragraph>
+              <Paragraph className="text-sm text-muted-foreground mt-1">{t('settings.security.deleteDesc')}</Paragraph>
             </div>
             <Button variant="danger" size="md" onClick={() => setDeleteConfirmOpen(true)}>
               {t('settings.security.deleteBtn')}

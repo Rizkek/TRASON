@@ -33,9 +33,12 @@ export async function extractTextFromFile(file: File): Promise<string> {
       // Dynamic import to avoid SSR issues
       const pdfjsLib = await import('pdfjs-dist');
       
-      // Set worker source to CDN matching version if not set
+      // Bundled with the app so the worker always matches the installed pdfjs-dist version.
       if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version || '4.0.379'}/build/pdf.worker.min.mjs`;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+          'pdfjs-dist/build/pdf.worker.min.mjs',
+          import.meta.url
+        ).toString();
       }
 
       const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });

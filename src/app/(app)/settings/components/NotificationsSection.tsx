@@ -49,14 +49,14 @@ export function NotificationsSection({
   return (
     <Card className="glass border-none" title={t('settings.alerts.sectionTitle')}>
       <div className="space-y-8">
-        <div className="flex items-center justify-between p-6 rounded-md border bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+        <div className="flex items-center justify-between p-6 rounded-md border bg-foreground/[0.02] border-foreground/[0.05]">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
               <BellRinging size={20} className="text-secondary" />
             </div>
             <div>
-              <Heading as="h4" size="h4" className="text-sm font-medium text-soft-cream">{t('settings.alerts.push')}</Heading>
-              <Paragraph className="text-[10px] text-gray-light">{t('settings.alerts.pushDesc')}</Paragraph>
+              <Heading as="h4" size="h4" className="text-sm font-medium text-foreground">{t('settings.alerts.push')}</Heading>
+              <Paragraph className="text-xs text-muted-foreground">{t('settings.alerts.pushDesc')}</Paragraph>
             </div>
           </div>
           {/* Toggle Switch */}
@@ -72,7 +72,7 @@ export function NotificationsSection({
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
               prefs.push_notifications_enabled
                 ? 'bg-primary'
-                : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
+                : 'bg-surface border border-foreground/[0.1]'
             }`}
           >
             <span
@@ -85,10 +85,10 @@ export function NotificationsSection({
 
         <div className="rounded-md border border-secondary/20 bg-secondary/5 p-4">
           <details>
-            <summary className="cursor-pointer text-sm font-medium text-soft-cream">
+            <summary className="cursor-pointer text-sm font-medium text-foreground">
               {t('settings.alerts.dndTitle')}
             </summary>
-            <Paragraph className="mt-3 text-xs text-gray-light">
+            <Paragraph className="mt-3 text-xs text-muted-foreground">
               {t('settings.alerts.dndDescription')}
             </Paragraph>
           </details>
@@ -103,21 +103,21 @@ export function NotificationsSection({
               {t('settings.alerts.testButton')}
             </Button>
             {testNotificationStatus && (
-              <Paragraph role="status" className="text-xs text-gray-light">
+              <Paragraph role="status" className="text-xs text-muted-foreground">
                 {testNotificationStatus}
               </Paragraph>
             )}
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-6 rounded-md border bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+        <div className="flex items-center justify-between p-6 rounded-md border bg-foreground/[0.02] border-foreground/[0.05]">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
               <Globe size={20} className="text-primary" />
             </div>
             <div>
-              <Heading as="h4" size="h4" className="text-sm font-medium text-soft-cream">{t('settings.alerts.email')}</Heading>
-              <Paragraph className="text-[10px] text-gray-light">{t('settings.alerts.emailDesc')}</Paragraph>
+              <Heading as="h4" size="h4" className="text-sm font-medium text-foreground">{t('settings.alerts.email')}</Heading>
+              <Paragraph className="text-xs text-muted-foreground">{t('settings.alerts.emailDesc')}</Paragraph>
             </div>
           </div>
           <button
@@ -131,7 +131,7 @@ export function NotificationsSection({
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
               prefs.email_digest_enabled
                 ? 'bg-primary'
-                : 'bg-gray-strong border border-black/[0.1] dark:border-white/[0.1]'
+                : 'bg-surface border border-foreground/[0.1]'
             }`}
           >
             <span

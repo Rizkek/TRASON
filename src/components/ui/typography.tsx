@@ -2,24 +2,29 @@ import React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+// Sizes use the semantic scale from tailwind.config.js (nothing below 12px). The weight prop
+// wins over the weight carried by a size token because font-* utilities come after text-*.
+// text-primary and text-secondary resolve to the text variants of the gold, so they are safe
+// as text in both themes.
+
 // Heading Component
 const headingVariants = cva("font-sans leading-tight tracking-tight", {
     variants: {
         variant: {
-            default: "text-warm-black dark:text-soft-cream",
+            default: "text-foreground",
             primary: "text-primary",
             secondary: "text-secondary",
-            accent: "text-secondary dark:text-primary",
-            inverse: "text-white dark:text-warm-black",
+            accent: "text-primary",
+            inverse: "text-background",
         },
         size: {
-            display: "text-4xl md:text-5xl",
-            h1: "text-2xl md:text-3xl",
-            h2: "text-xl md:text-2xl",
-            h3: "text-lg md:text-xl",
-            h4: "text-base md:text-lg",
-            h5: "text-sm md:text-base",
-            h6: "text-sm",
+            display: "text-display-lg md:text-display-xl",
+            h1: "text-heading-lg md:text-heading-xl",
+            h2: "text-heading-md md:text-heading-lg",
+            h3: "text-title-lg md:text-heading-md",
+            h4: "text-title-md md:text-title-lg",
+            h5: "text-body-md md:text-body-lg",
+            h6: "text-body-md",
         },
         alignment: {
             left: "text-left",
@@ -63,19 +68,19 @@ Heading.displayName = "Heading";
 const paragraphVariants = cva("font-sans", {
     variants: {
         variant: {
-            default: "text-gray-medium dark:text-gray-light",
-            dark: "text-warm-black dark:text-soft-cream",
+            default: "text-muted-foreground",
+            dark: "text-foreground",
             primary: "text-primary",
             secondary: "text-secondary",
-            accent: "text-secondary dark:text-primary",
+            accent: "text-primary",
         },
         size: {
-            xxs: "text-[8px] md:text-[10px]",
-            xs: "text-[10px] md:text-xs",
-            sm: "text-xs md:text-sm",
-            base: "text-sm md:text-base",
-            lg: "text-base md:text-lg",
-            xl: "text-lg md:text-xl",
+            xxs: "text-xs",
+            xs: "text-xs",
+            sm: "text-xs md:text-body-md",
+            base: "text-body-md md:text-body-lg",
+            lg: "text-body-lg md:text-title-lg",
+            xl: "text-title-lg md:text-heading-md",
         },
         alignment: {
             left: "text-left",
@@ -138,18 +143,18 @@ Paragraph.displayName = "Paragraph";
 const monoVariants = cva("font-mono", {
     variants: {
         variant: {
-            default: "text-warm-black dark:text-soft-cream",
-            muted: "text-gray-medium",
+            default: "text-foreground",
+            muted: "text-muted-foreground",
             primary: "text-primary",
             secondary: "text-secondary",
-            accent: "text-secondary dark:text-primary",
+            accent: "text-primary",
         },
         size: {
-            xs: "text-[0.675rem]",
+            xs: "text-xs",
             sm: "text-xs",
-            base: "text-sm",
-            lg: "text-base",
-            xl: "text-lg",
+            base: "text-body-md",
+            lg: "text-body-lg",
+            xl: "text-title-lg",
         },
         weight: {
             normal: "font-normal",

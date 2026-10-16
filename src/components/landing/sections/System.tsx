@@ -17,7 +17,7 @@ const MODULES = [
   { name: 'Investments', icon: ChartLineUp, desc: 'Stock, crypto and gold positions, priced daily.' },
   { name: 'Career', icon: Briefcase, desc: 'Applications from Applied to Offer, plus resume match.' },
   { name: 'Vitality', icon: Heartbeat, desc: 'Workout sessions, weekly consistency, personal records.' },
-  { name: 'Schedule', icon: CalendarBlank, desc: 'A weekly log of activities and today\u2019s tasks.' },
+  { name: 'Schedule', icon: CalendarBlank, desc: 'A weekly log of activities and today’s tasks.' },
   { name: 'Reminders', icon: Bell, desc: 'Time-based, delivered as push notifications.' },
 ];
 
@@ -35,29 +35,24 @@ export function System() {
 
         <ul className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-6" aria-label="TRASON modules">
           {MODULES.map(({ name, icon: Icon, desc }) => (
-            <li
-              key={name}
-              className="flex flex-col gap-3 rounded-xl border border-lp-border/[0.08] bg-lp-surface p-4"
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-lp-foreground text-lp-background">
-                <Icon size={15} weight="regular" aria-hidden="true" />
+            <li key={name} className="flex flex-col gap-3 rounded-xl border border-foreground/10 bg-surface p-4">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-on-primary">
+                <Icon size={18} weight="regular" aria-hidden="true" />
               </span>
               <div>
-                <p className="text-sm font-medium text-lp-foreground">{name}</p>
-                <p className="mt-1 text-[13px] leading-snug text-lp-muted">{desc}</p>
+                <p className="text-sm font-semibold text-foreground">{name}</p>
+                <p className="mt-1 text-body-sm leading-snug text-muted-foreground">{desc}</p>
               </div>
             </li>
           ))}
         </ul>
 
-        {/* Convergence */}
         <div aria-hidden="true" className="mx-auto flex w-full max-w-4xl flex-col items-center">
-          <div className="h-10 w-px bg-lp-border/20" />
-          <div className="flex items-center gap-2 rounded-full border border-lp-border/10 bg-lp-surface px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-lp-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-lp-accent" />
+          <div className="h-10 w-px bg-foreground/25" />
+          <div className="flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-on-primary">
             TRASON
           </div>
-          <div className="h-10 w-px bg-lp-border/20" />
+          <div className="h-10 w-px bg-foreground/25" />
         </div>
 
         <div className="mx-auto max-w-4xl">
@@ -67,7 +62,7 @@ export function System() {
           >
             <DashboardUI compact />
           </WindowFrame>
-          <p className="mt-4 text-center text-sm text-lp-muted">
+          <p className="mt-4 text-center text-sm text-muted-foreground">
             One personal overview. Not one giant interface.
           </p>
         </div>

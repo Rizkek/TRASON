@@ -13,7 +13,39 @@ export const en = {
     "signupBtn": "Sign up",
     "signupLink": "Create account",
     "signupSubtitle": "It only takes a minute.",
-    "signupTitle": "Create your account."
+    "signupTitle": "Create your account.",
+    "back_home": "Back to home",
+    "email_address": "Email address",
+    "email_ph": "email@example.com",
+    "password_required": "Password is required",
+    "name_required": "Name is required",
+    "passwords_mismatch": "Passwords do not match",
+    "show_password": "Show password",
+    "hide_password": "Hide password",
+    "login_quote": "Return to the signal. Leave the noise outside.",
+    "login_panel_desc": "Your dashboard is ready to show what matters next: money, movement, reminders, and momentum.",
+    "login_error_title": "Sign-in error",
+    "open_dashboard": "Open dashboard",
+    "authenticating": "Authenticating...",
+    "new_to_trason": "New to TRASON?",
+    "begin_here": "Begin here",
+    "signup_heading": "Create your personal OS",
+    "signup_lede": "Set up a calm place to capture the day and understand your momentum.",
+    "signup_quote": "Build the system, then let the system carry you.",
+    "signup_panel_desc": "Start with one private workspace for your money, habits, workouts, reminders, and long-term direction.",
+    "full_name": "Full name",
+    "full_name_ph": "Your name",
+    "confirm_password": "Confirm password",
+    "domain_checking": "Verifying email domain...",
+    "domain_verified": "Email domain verified",
+    "register_error_title": "Unable to register",
+    "register_success_title": "Account created",
+    "check_email": "Check your email to confirm your account.",
+    "create_account": "Create account",
+    "creating": "Setting up your workspace...",
+    "has_workspace": "Already have a workspace?",
+    "server_error": "Server error while registering. Try again in a moment.",
+    "email_taken": "That email is already registered. Sign in instead, or use a different email."
   },
   "career_page": {
     "applied_on": "Applied",
@@ -176,7 +208,9 @@ export const en = {
     "save": "Save",
     "saving": "Saving...",
     "success": "Success",
-    "try_again": "Try again"
+    "try_again": "Try again",
+    "user": "User",
+    "loading_section": "Loading"
   },
   "dailyTasks": {
     "empty": "No tasks yet. Add your first daily task."
@@ -283,7 +317,17 @@ export const en = {
     "view_all_tasks": "View all {count} tasks",
     "view_schedule": "View schedule",
     "vitality_this_week": "Vitality this week",
-    "welcome_back": "Welcome back"
+    "welcome_back": "Welcome back",
+    "load_failed": "Some dashboard sections could not be loaded.",
+    "section_load_failed": "Could not load this section.",
+    "insights_title": "Insights",
+    "prev_month": "Previous month",
+    "next_month": "Next month",
+    "high_priority": "High priority",
+    "max_budget": "max {amount}",
+    "tasks_empty_cta": "Add tasks in Schedule",
+    "sport_empty": "No sessions logged this week.",
+    "career_empty": "No applications yet."
   },
   "finance": {
     "driverPayout": {
@@ -630,7 +674,20 @@ export const en = {
     "schedule": "Schedule",
     "settings": "Settings",
     "sport": "Sport",
-    "timeline": "Schedule"
+    "timeline": "Schedule",
+    "offline_banner": "Offline. Changes will sync when you reconnect.",
+    "back_online": "Connection restored",
+    "open_menu": "Open menu",
+    "close_menu": "Close menu",
+    "notifications_on": "Notifications on",
+    "notifications_off": "Notifications off",
+    "enable_notifications": "Turn on notifications",
+    "disable_notifications": "Turn off notifications",
+    "all_in_bar": "All modules are in the navigation bar.",
+    "tagline": "Personal Operating System",
+    "skip_to_content": "Skip to content",
+    "switch_to_light": "Switch to light theme",
+    "switch_to_dark": "Switch to dark theme"
   },
   "onboarding": {
     "back": "Back",
@@ -648,7 +705,14 @@ export const en = {
     "step3_desc": "Select the modules you want to activate. You can always change this later in settings.",
     "theme": "Theme",
     "timezone": "Timezone",
-    "welcome": "Welcome to TRASON"
+    "welcome": "Welcome to TRASON",
+    "preparing": "Preparing your space...",
+    "step_of": "Step {current} of {total}",
+    "name_required": "Enter your first name to continue.",
+    "theme_dark": "Dark",
+    "theme_light": "Light",
+    "error_failed": "Failed to complete onboarding. Please try again.",
+    "modules_selected": "{count} selected"
   },
   "reminders_page": {
     "add_to_day": "+ Add to this day",
@@ -667,6 +731,7 @@ export const en = {
       "notes_placeholder": "Add context...",
       "notify_help": "Choose when you want to be reminded before the due time",
       "notify_label": "Notify me",
+      "notify_none": "No notification will be sent: every selected lead time is already in the past. Pick a later due time or a shorter lead time.",
       "notify_options": {
         "d1": "1 day before",
         "d2": "2 days before",

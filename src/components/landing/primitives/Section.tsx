@@ -1,6 +1,6 @@
 import React from 'react';
 
-type Tone = 'default' | 'tinted' | 'dark';
+type Tone = 'default' | 'tinted';
 
 interface SectionProps extends React.HTMLAttributes<HTMLElement> {
   id?: string;
@@ -14,8 +14,7 @@ interface SectionProps extends React.HTMLAttributes<HTMLElement> {
 
 const TONE_CLASS: Record<Tone, string> = {
   default: '',
-  tinted: 'bg-lp-foreground/[0.025] border-y border-lp-border/[0.06]',
-  dark: 'bg-ui-bg text-ui-fg',
+  tinted: 'border-y border-foreground/10 bg-foreground/[0.03]',
 };
 
 /**
@@ -36,7 +35,7 @@ export function Section({
     <section
       id={id}
       aria-labelledby={labelledBy}
-      className={`relative ${bare ? '' : 'py-20 sm:py-24 lg:py-32'} ${TONE_CLASS[tone]} ${className}`}
+      className={`relative scroll-mt-20 ${bare ? '' : 'py-20 sm:py-24 lg:py-32'} ${TONE_CLASS[tone]} ${className}`}
       {...rest}
     >
       {children}

@@ -208,6 +208,7 @@ export const useAuth = () => {
         } finally {
           authInitialized = true;
           authInitPromise = null;
+          useAuthStore.getState().setAuthReady();
           if (isMountedRef.current) {
             getActions().setLoading(false);
           }
@@ -345,6 +346,7 @@ export const useAuth = () => {
         authLog('safetyTimeout', '⚠ isLoading still true after 12s — force-clearing', undefined, 'warn');
         useAuthStore.getState().setLoading(false);
       }
+      useAuthStore.getState().setAuthReady();
     }, 12000);
 
     return () => {

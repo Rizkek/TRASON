@@ -1,14 +1,27 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, Button, Input, Loading, ErrorAlert, Select } from '@/components';
+import { Card, Button, Input, ErrorAlert, Select } from '@/components';
+import { Placeholder } from '@/components/ui/Placeholder';
 import { useAuthStore } from '@/store/authStore';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useResolvedTheme } from '@/hooks/useResolvedTheme';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { DEFAULT_FINANCE_CATEGORIES } from '@/libs/defaultCategories';
 import { ModuleSelectionCard } from './components/ModuleSelectionCard';
-import { Globe, Clock, Wallet, TrendUp as TrendingUp, BellRinging, Briefcase, Heartbeat, Sparkle, CaretRight as ChevronRight, Check, PaintBrush, User as UserIcon } from '@phosphor-icons/react';
+import {
+  Globe,
+  Clock,
+  Wallet,
+  TrendUp as TrendingUp,
+  BellRinging,
+  Briefcase,
+  Heartbeat,
+  Lightbulb,
+  CaretRight as ChevronRight,
+  Check,
+} from '@phosphor-icons/react';
 import { supabase } from '@/services/supabase/supabaseClient';
 import { DEFAULT_MODULE_STATUS, getAllModules } from '@/modules/registry';
 import { Heading, Paragraph } from '@/components/ui/typography';
@@ -27,24 +40,47 @@ const TIMEZONE_OPTIONS = [
 
 const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'IDR', 'JPY', 'SGD', 'AUD', 'CAD'];
 
+const MODULE_ICONS: Record<string, React.ElementType> = {
+  Wallet,
+  TrendingUp,
+  Heartbeat,
+  Briefcase,
+  Clock,
+  BellRinging,
+  Lightbulb,
+  Dumbbell: Heartbeat,
+  Bell: BellRinging,
+};
+
+const TOTAL_STEPS = 3;
+type Step = 1 | 2 | 3;
+
+const CHOICE_BASE = 'min-h-11 rounded-lg border px-4 py-2 text-body-md font-semibold transition-colors';
+const CHOICE_ON = 'border-primary bg-primary text-on-primary';
+const CHOICE_OFF = 'border-foreground/20 bg-foreground/[0.03] text-muted-foreground hover:border-foreground/40 hover:text-foreground';
+const FIELD_LABEL = 'mb-2 block text-label-sm uppercase text-muted-foreground';
 
 export function OnboardingClient() {
   const router = useRouter();
   const { user, setUser } = useAuthStore();
+  const setActiveTheme = useAuthStore((s) => s.setActiveTheme);
+  const setActiveLanguage = useAuthStore((s) => s.setActiveLanguage);
+  const resolvedTheme = useResolvedTheme();
   const { updatePreferences, isUpdating: prefsLoading, ...preferences } = useUserPreferences();
   const { t } = useTranslation();
 
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<Step>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form State
   const [firstName, setFirstName] = useState(user?.first_name || '');
   const [lastName, setLastName] = useState(user?.last_name || '');
   const [language, setLanguage] = useState('en');
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC');
   const [currency, setCurrency] = useState('USD');
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  // Until the user picks one, the theme on screen (the device theme for a new account) is the choice.
+  const [pickedTheme, setPickedTheme] = useState<'dark' | 'light' | null>(null);
+  const theme = pickedTheme ?? resolvedTheme;
   const [selectedModules, setSelectedModules] = useState<Record<string, boolean>>(DEFAULT_MODULE_STATUS);
 
   const initialized = React.useRef(false);
@@ -54,31 +90,48 @@ export function OnboardingClient() {
       if (preferences.language) setLanguage(preferences.language);
       if (preferences.timezone) setTimezone(preferences.timezone);
       if (preferences.currency) setCurrency(preferences.currency);
-      if (preferences.theme) setTheme(preferences.theme as 'dark' | 'light');
+      // A new account has the database default, not a choice: start from the device theme instead.
+      if ((preferences as { onboarding_done?: boolean }).onboarding_done === true) {
+        if (preferences.theme === 'light' || preferences.theme === 'dark') setPickedTheme(preferences.theme);
+      } else {
+        setActiveTheme('system');
+      }
       if (preferences.module_features) setSelectedModules({ ...DEFAULT_MODULE_STATUS, ...preferences.module_features });
       initialized.current = true;
     }
-  }, [preferences]);
+  }, [preferences, setActiveTheme]);
+
+  // The detected timezone may not be in the short list; keep it selectable.
+  const timezoneOptions = useMemo(
+    () => (TIMEZONE_OPTIONS.includes(timezone) ? TIMEZONE_OPTIONS : [timezone, ...TIMEZONE_OPTIONS]),
+    [timezone]
+  );
+
+  const selectedCount = getAllModules().filter((m) => selectedModules[m.id] !== false).length;
+  const nameMissing = !firstName.trim();
+
+  // Language and theme apply as soon as they are picked, so the rest of the flow shows the result.
+  const chooseLanguage = (value: string) => {
+    setLanguage(value);
+    setActiveLanguage(value);
+  };
+  const chooseTheme = (value: 'dark' | 'light') => {
+    setPickedTheme(value);
+    setActiveTheme(value);
+  };
 
   const handleToggleModule = (id: string) => {
-    setSelectedModules((prev) => {
-      const isCurrentlyEnabled = prev[id] ?? true;
-      return { ...prev, [id]: !isCurrentlyEnabled };
-    });
+    setSelectedModules((prev) => ({ ...prev, [id]: !(prev[id] ?? true) }));
   };
 
   const handleComplete = async () => {
     setIsSubmitting(true);
     setError(null);
     try {
-      // 1. Save Profile Data
       if (firstName || lastName) {
-        await supabase.auth.updateUser({
-          data: { first_name: firstName, last_name: lastName }
-        });
+        await supabase.auth.updateUser({ data: { first_name: firstName, last_name: lastName } });
       }
 
-      // 2. Save Preferences
       const updatedPrefs = await updatePreferences({
         language,
         timezone,
@@ -91,22 +144,18 @@ export function OnboardingClient() {
       // Sync Zustand immediately so other pages know we're onboarded
       if (user && updatedPrefs) {
         useAuthStore.setState({ activeLanguage: language });
-        const currentUserPrefs = Array.isArray((user as any).user_preferences) 
-          ? (user as any).user_preferences[0] 
+        const currentUserPrefs = Array.isArray((user as any).user_preferences)
+          ? (user as any).user_preferences[0]
           : (user as any).user_preferences;
-        
+
         setUser({
           ...user,
           first_name: firstName,
           last_name: lastName,
-          user_preferences: [{
-            ...currentUserPrefs,
-            ...updatedPrefs
-          }]
+          user_preferences: [{ ...currentUserPrefs, ...updatedPrefs }],
         } as any);
       }
 
-      // Seed default categories if finance module is enabled
       if (selectedModules['finance']) {
         try {
           const { categoryQueries } = await import('@/services/activity/categoryQueries');
@@ -121,7 +170,7 @@ export function OnboardingClient() {
 
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Failed to complete onboarding. Please try again.');
+      setError(err.message || t('onboarding.error_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -129,118 +178,118 @@ export function OnboardingClient() {
 
   if (prefsLoading) {
     return (
-      <div className="min-h-dvh bg-warm-black flex items-center justify-center">
-        <Loading text="Preparing your space..." />
+      <div className="flex min-h-dvh items-center justify-center bg-background p-6">
+        <div className="w-full max-w-sm space-y-3 text-center">
+          <Placeholder className="h-3 w-full" label={t('onboarding.preparing')} />
+          <p className="text-body-md text-muted-foreground">{t('onboarding.preparing')}</p>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-dvh bg-warm-black flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden">
-      {/* Background Ornaments */}
+  const description =
+    step === 1 ? t('onboarding.step1_desc') : step === 2 ? t('onboarding.step2_desc') : t('onboarding.step3_desc');
 
-      <div className="w-full max-w-2xl relative z-10 space-y-6 animate-fade-in">
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(2rem,env(safe-area-inset-top))] text-foreground sm:px-8">
+      <div className="w-full max-w-2xl animate-fade-in space-y-6">
         <ErrorAlert error={error} onDismiss={() => setError(null)} />
 
-        <div className="text-center space-y-2 mb-8">
-          <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-white">
+        <header className="space-y-2 text-center">
+          <Heading as="h1" size="h2" weight="semibold">
             {t('onboarding.welcome')}
           </Heading>
-          <Paragraph className="text-gray-light text-sm md:text-base max-w-md mx-auto">
-            {step === 1 
-              ? "Let's set up your persona so TRASON knows what to call you." 
-              : step === 2
-              ? "Let's personalize your digital space. Start by setting your region and language."
-              : "Select the modules you want to activate. You can always change this later in settings."}
-          </Paragraph>
-        </div>
+          <Paragraph className="mx-auto max-w-md text-body-md text-muted-foreground">{description}</Paragraph>
+        </header>
 
-        <Card className="glass border-white/5 p-8 md:p-12 shadow-2xl relative overflow-hidden transition-all duration-500">
-          {/* Progress Bar */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-black/20">
-            <div 
-              className="h-full bg-primary transition-all duration-500" 
-              style={{ width: step === 1 ? '33%' : step === 2 ? '66%' : '100%' }} 
-            />
+        <Card className="p-5 sm:p-8 md:p-10">
+          <div className="mb-6 space-y-2">
+            <div className="flex items-center justify-between text-label-sm text-muted-foreground">
+              <span>{t('onboarding.step_of').replace('{current}', String(step)).replace('{total}', String(TOTAL_STEPS))}</span>
+              {step === 3 && (
+                <span>{t('onboarding.modules_selected').replace('{count}', String(selectedCount))}</span>
+              )}
+            </div>
+            <div
+              role="progressbar"
+              aria-valuemin={1}
+              aria-valuemax={TOTAL_STEPS}
+              aria-valuenow={step}
+              className="flex gap-1.5"
+            >
+              {Array.from({ length: TOTAL_STEPS }, (_, i) => (
+                <span key={i} className={`h-1.5 flex-1 rounded-full ${i < step ? 'bg-primary' : 'bg-foreground/15'}`} />
+              ))}
+            </div>
           </div>
 
           {step === 1 && (
-            <div className="space-y-8 animate-fade-in">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <label className="text-xs font-medium text-gray-light tracking-widest uppercase flex items-center gap-2">
-                    <UserIcon size={14} className="text-primary" /> {t("onboarding.first_name")}
-                  </label>
-                  <input
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder={t("onboarding.first_name_ph")}
-                    className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-6 text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
-                  />
-                </div>
-                <div className="space-y-4">
-                  <label className="text-xs font-medium text-gray-light tracking-widest uppercase flex items-center gap-2">
-                    {t("onboarding.last_name")}
-                  </label>
-                  <input
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder={t("onboarding.last_name_ph")}
-                    className="w-full h-12 bg-black/20 border border-white/10 rounded-lg px-6 text-sm text-soft-cream focus:border-primary focus:outline-none transition-colors"
-                  />
-                </div>
+            <div className="space-y-6 animate-fade-in">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Input
+                  label={t('onboarding.first_name')}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder={t('onboarding.first_name_ph')}
+                  autoComplete="given-name"
+                />
+                <Input
+                  label={t('onboarding.last_name')}
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder={t('onboarding.last_name_ph')}
+                  autoComplete="family-name"
+                />
               </div>
-              <div className="flex justify-end pt-6 border-t border-white/5">
-                <Button 
-                  variant="primary" 
-                  size="lg" 
+              <div className="flex flex-col gap-3 border-t border-foreground/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-body-md text-muted-foreground" aria-live="polite">
+                  {nameMissing ? t('onboarding.name_required') : ''}
+                </p>
+                <Button
+                  variant="primary"
+                  size="lg"
                   onClick={() => setStep(2)}
                   rightIcon={<ChevronRight size={18} />}
-                  disabled={!firstName.trim()}
-                >{t("onboarding.continue")}</Button>
+                  disabled={nameMissing}
+                  className="w-full sm:w-auto"
+                >
+                  {t('onboarding.continue')}
+                </Button>
               </div>
             </div>
           )}
 
           {step === 2 && (
-            <div className="space-y-8 animate-fade-in">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-6 animate-fade-in">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Select
-                  label={t("onboarding.language")}
+                  label={t('onboarding.language')}
                   value={language}
-                  onValueChange={(val) => setLanguage(val)}
-                  options={LANGUAGE_OPTIONS.map((l) => ({
-                    value: l.value,
-                    label: l.label,
-                  }))}
+                  onValueChange={chooseLanguage}
+                  options={LANGUAGE_OPTIONS}
                 />
-                
                 <Select
-                  label={t("onboarding.timezone")}
+                  label={t('onboarding.timezone')}
                   value={timezone}
-                  onValueChange={(val) => setTimezone(val)}
-                  options={TIMEZONE_OPTIONS.map((t) => ({
-                    value: t,
-                    label: t,
-                  }))}
+                  onValueChange={setTimezone}
+                  options={timezoneOptions.map((tz) => ({ value: tz, label: tz }))}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-white/5">
-                <div className="space-y-4">
-                  <label className="text-xs font-medium text-gray-light tracking-widest uppercase flex items-center gap-2">
-                    <Wallet size={14} className="text-warm-gold" /> {t("onboarding.currency")}
-                  </label>
-                  <div className="flex flex-wrap gap-2">
+              <div className="space-y-5 border-t border-foreground/10 pt-5">
+                <div>
+                  <span id="currency-label" className={FIELD_LABEL}>
+                    {t('onboarding.currency')}
+                  </span>
+                  <div role="radiogroup" aria-labelledby="currency-label" className="flex flex-wrap gap-2">
                     {CURRENCY_OPTIONS.map((c) => (
                       <button
                         key={c}
+                        type="button"
+                        role="radio"
+                        aria-checked={currency === c}
                         onClick={() => setCurrency(c)}
-                        className={`px-6 py-2 rounded-lg border text-sm font-bold transition-all ${
-                          currency === c 
-                            ? 'bg-primary text-warm-black border-primary scale-105' 
-                            : 'bg-black/10 border-white/5 text-gray-light hover:bg-black/20 hover:border-white/10'
-                        }`}
+                        className={`${CHOICE_BASE} ${currency === c ? CHOICE_ON : CHOICE_OFF}`}
                       >
                         {c}
                       </button>
@@ -248,78 +297,71 @@ export function OnboardingClient() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <label className="text-xs font-medium text-gray-light tracking-widest uppercase flex items-center gap-2">
-                    <PaintBrush size={14} className="text-primary" /> {t("onboarding.theme")}
-                  </label>
-                  <div className="flex gap-2">
-                    {['dark', 'light'].map((th) => (
+                <div>
+                  <span id="theme-label" className={FIELD_LABEL}>
+                    {t('onboarding.theme')}
+                  </span>
+                  <div role="radiogroup" aria-labelledby="theme-label" className="grid grid-cols-2 gap-2">
+                    {(['light', 'dark'] as const).map((value) => (
                       <button
-                        key={th}
-                        onClick={() => setTheme(th as 'dark' | 'light')}
-                        className={`px-6 py-2 rounded-lg border text-sm font-bold uppercase transition-all ${
-                          theme === th 
-                            ? 'bg-primary text-warm-black border-primary scale-105' 
-                            : 'bg-black/10 border-white/5 text-gray-light hover:bg-black/20 hover:border-white/10'
-                        }`}
+                        key={value}
+                        type="button"
+                        role="radio"
+                        aria-checked={theme === value}
+                        onClick={() => chooseTheme(value)}
+                        className={`${CHOICE_BASE} ${theme === value ? CHOICE_ON : CHOICE_OFF}`}
                       >
-                        {th}
+                        {value === 'light' ? t('onboarding.theme_light') : t('onboarding.theme_dark')}
                       </button>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-between pt-6 border-t border-white/5">
-                <Button 
-                  variant="ghost" 
-                  size="lg" 
-                  onClick={() => setStep(1)}
-                  className="text-gray-light"
-                >{t("onboarding.back")}</Button>
-                <Button 
-                  variant="primary" 
-                  size="lg" 
+              <div className="flex flex-col-reverse gap-3 border-t border-foreground/10 pt-5 sm:flex-row sm:justify-between">
+                <Button variant="ghost" size="lg" onClick={() => setStep(1)} className="w-full sm:w-auto">
+                  {t('onboarding.back')}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="lg"
                   onClick={() => setStep(3)}
                   rightIcon={<ChevronRight size={18} />}
-                >{t("onboarding.continue")}</Button>
+                  className="w-full sm:w-auto"
+                >
+                  {t('onboarding.continue')}
+                </Button>
               </div>
             </div>
           )}
 
           {step === 3 && (
-            <div className="space-y-8 animate-fade-in">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-                {getAllModules().map((module) => {
-                  const Icon = { Wallet, TrendingUp, Heartbeat, Briefcase, Clock, BellRinging, Sparkle, Dumbbell: Heartbeat, Bell: BellRinging, Lightbulb: Sparkle }[module.icon] || Globe;
-                  return (
-                    <ModuleSelectionCard
-                      key={module.id}
-                      id={module.id}
-                      title={t(`nav.${module.id}`)}
-                      description={t(`modules.${module.id}_desc`)}
-                      icon={Icon}
-                      color={module.color}
-                      isSelected={selectedModules[module.id] !== false}
-                      onToggle={handleToggleModule}
-                    />
-                  );
-                })}
+            <div className="space-y-6 animate-fade-in">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {getAllModules().map((module) => (
+                  <ModuleSelectionCard
+                    key={module.id}
+                    id={module.id}
+                    title={t(`nav.${module.id}`)}
+                    description={t(`modules.${module.id}_desc`)}
+                    icon={MODULE_ICONS[module.icon] || Globe}
+                    isSelected={selectedModules[module.id] !== false}
+                    onToggle={handleToggleModule}
+                  />
+                ))}
               </div>
 
-              <div className="flex justify-between items-center pt-6 border-t border-white/5">
-                <Button 
-                  variant="ghost" 
-                  size="md" 
-                  onClick={() => setStep(2)}
-                  className="text-gray-light hover:text-white"
-                >{t("onboarding.back")}</Button>
-                <Button 
-                  variant="primary" 
-                  size="lg" 
+              <div className="flex flex-col-reverse gap-3 border-t border-foreground/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <Button variant="ghost" size="lg" onClick={() => setStep(2)} disabled={isSubmitting} className="w-full sm:w-auto">
+                  {t('onboarding.back')}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="lg"
                   onClick={handleComplete}
                   disabled={isSubmitting}
                   rightIcon={<Check size={18} />}
+                  className="w-full sm:w-auto"
                 >
                   {isSubmitting ? t('onboarding.finalizing') : t('onboarding.complete')}
                 </Button>

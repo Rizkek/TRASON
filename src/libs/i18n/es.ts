@@ -13,7 +13,39 @@ export const es = {
     "signupBtn": "Registro",
     "signupLink": "Crear cuenta",
     "signupSubtitle": "Solo toma un minuto.",
-    "signupTitle": "Crea tu cuenta."
+    "signupTitle": "Crea tu cuenta.",
+    "back_home": "Volver al inicio",
+    "email_address": "Correo electrónico",
+    "email_ph": "correo@ejemplo.com",
+    "password_required": "La contraseña es obligatoria",
+    "name_required": "El nombre es obligatorio",
+    "passwords_mismatch": "Las contraseñas no coinciden",
+    "show_password": "Mostrar contraseña",
+    "hide_password": "Ocultar contraseña",
+    "login_quote": "Vuelve a lo esencial. Deja el ruido fuera.",
+    "login_panel_desc": "Tu panel está listo para mostrar lo siguiente: dinero, movimiento, recordatorios y ritmo.",
+    "login_error_title": "Error al iniciar sesión",
+    "open_dashboard": "Abrir panel",
+    "authenticating": "Autenticando...",
+    "new_to_trason": "¿Nuevo en TRASON?",
+    "begin_here": "Empieza aquí",
+    "signup_heading": "Crea tu sistema personal",
+    "signup_lede": "Crea un lugar tranquilo para registrar el día y entender tu ritmo.",
+    "signup_quote": "Construye el sistema y deja que el sistema te lleve.",
+    "signup_panel_desc": "Empieza con un espacio privado para tu dinero, hábitos, entrenamientos, recordatorios y rumbo a largo plazo.",
+    "full_name": "Nombre completo",
+    "full_name_ph": "Tu nombre",
+    "confirm_password": "Confirmar contraseña",
+    "domain_checking": "Verificando el dominio del correo...",
+    "domain_verified": "Dominio de correo verificado",
+    "register_error_title": "No se pudo registrar",
+    "register_success_title": "Cuenta creada",
+    "check_email": "Revisa tu correo para confirmar tu cuenta.",
+    "create_account": "Crear cuenta",
+    "creating": "Preparando tu espacio de trabajo...",
+    "has_workspace": "¿Ya tienes un espacio de trabajo?",
+    "server_error": "Error del servidor al registrarte. Inténtalo de nuevo en un momento.",
+    "email_taken": "Ese correo ya está registrado. Inicia sesión o usa otro correo."
   },
   "career_page": {
     "applied_on": "Aplicado",
@@ -176,7 +208,9 @@ export const es = {
     "save": "Guardar",
     "saving": "Guardando...",
     "success": "Éxito",
-    "try_again": "Reintentar"
+    "try_again": "Reintentar",
+    "user": "Usuario",
+    "loading_section": "Cargando"
   },
   "dailyTasks": {
     "empty": "Aún no hay tareas. Agrega tu primera tarea diaria."
@@ -283,7 +317,17 @@ export const es = {
     "view_all_tasks": "Ver las {count} tareas",
     "view_schedule": "Ver horario",
     "vitality_this_week": "Vitalidad esta semana",
-    "welcome_back": "Bienvenido de nuevo"
+    "welcome_back": "Bienvenido de nuevo",
+    "load_failed": "No se pudieron cargar algunas secciones del panel.",
+    "section_load_failed": "No se pudo cargar esta sección.",
+    "insights_title": "Perspectivas",
+    "prev_month": "Mes anterior",
+    "next_month": "Mes siguiente",
+    "high_priority": "Prioridad alta",
+    "max_budget": "máx. {amount}",
+    "tasks_empty_cta": "Añade tareas en Agenda",
+    "sport_empty": "Sin sesiones esta semana.",
+    "career_empty": "Aún no hay solicitudes."
   },
   "finance": {
     "driverPayout": {
@@ -630,7 +674,20 @@ export const es = {
     "schedule": "Horario",
     "settings": "Ajustes",
     "sport": "Deporte",
-    "timeline": "Horario"
+    "timeline": "Horario",
+    "offline_banner": "Sin conexión. Los cambios se sincronizarán al reconectar.",
+    "back_online": "Conexión restablecida",
+    "open_menu": "Abrir menú",
+    "close_menu": "Cerrar menú",
+    "notifications_on": "Notificaciones activadas",
+    "notifications_off": "Notificaciones desactivadas",
+    "enable_notifications": "Activar notificaciones",
+    "disable_notifications": "Desactivar notificaciones",
+    "all_in_bar": "Todos los módulos están en la barra de navegación.",
+    "tagline": "Sistema operativo personal",
+    "skip_to_content": "Saltar al contenido",
+    "switch_to_light": "Cambiar al tema claro",
+    "switch_to_dark": "Cambiar al tema oscuro"
   },
   "onboarding": {
     "back": "Back",
@@ -648,7 +705,14 @@ export const es = {
     "step3_desc": "Select the modules you want to activate. You can always change this later in settings.",
     "theme": "Theme",
     "timezone": "Timezone",
-    "welcome": "Welcome to TRASON"
+    "welcome": "Welcome to TRASON",
+    "preparing": "Preparando tu espacio...",
+    "step_of": "Paso {current} de {total}",
+    "name_required": "Escribe tu nombre para continuar.",
+    "theme_dark": "Oscuro",
+    "theme_light": "Claro",
+    "error_failed": "No se pudo completar la configuración. Inténtalo de nuevo.",
+    "modules_selected": "{count} seleccionados"
   },
   "reminders_page": {
     "add_to_day": "+ Añadir a este día",
@@ -667,6 +731,7 @@ export const es = {
       "notes_placeholder": "Añade contexto...",
       "notify_help": "Elige cuándo quieres que se te recuerde antes de la hora de vencimiento",
       "notify_label": "Notifícame",
+      "notify_none": "No se enviará ninguna notificación: todos los avisos seleccionados ya pasaron. Elige una hora de vencimiento posterior o un aviso con menos antelación.",
       "notify_options": {
         "d1": "1 Día antes",
         "d2": "2 Días antes",

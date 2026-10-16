@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, Button, Badge, Loading, Modal, Input, ErrorAlert, ConfirmModal, Select, DatePicker, CreatableAutocomplete } from '@/components';
+import React, { useCallback, useState } from 'react';
+import { Card, Button, Badge, Loading, Modal, Input, ErrorAlert, InlineError, ConfirmModal, Select, DatePicker, CreatableAutocomplete } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useCareer } from '@/hooks/useCareer';
 import { useCareerAnalytics } from '@/hooks/useCareerAnalytics';
@@ -12,7 +11,7 @@ import { getLocalISODate } from '@/libs/format';
 import { sanitizeError } from '@/libs/validation';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare, FunnelSimple, CheckCircle, Users, XCircle, Newspaper, Robot, Bell, Money } from '@phosphor-icons/react';
+import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare, FunnelSimple, CheckCircle, Users, XCircle, Newspaper, Bell, Money } from '@phosphor-icons/react';
 import { useInterviewJournal } from '@/hooks/useInterviewJournal';
 import { useReminder } from '@/hooks/useReminder';
 import { useHolidays } from '@/hooks/useHolidays';
@@ -80,13 +79,12 @@ interface Props {
 }
 
 export default function CareerClient({ initialApplications }: Props) {
-  const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
   const { t } = useTranslation();
   const { locale } = useUserPreferences();
 
-  const { applications, stats, isLoading, error, createApplication, updateApplication, deleteApplication } = useCareer(initialApplications);
+  const { applications, stats, isLoading, error, mutate: refreshCareer, createApplication, updateApplication, deleteApplication } = useCareer(initialApplications);
   const { analytics } = useCareerAnalytics();
   const { createReminder } = useReminder();
   const { holidays } = useHolidays();
@@ -127,7 +125,7 @@ export default function CareerClient({ initialApplications }: Props) {
     offer:      { label: t('career_page.form.options.status_offer'),      color: 'text-income', badgeVariant: 'income' },
     accepted:   { label: t('career_page.form.options.status_accepted'),   color: 'text-income', badgeVariant: 'success' },
     rejected:   { label: t('career_page.form.options.status_rejected'),   color: 'text-expense', badgeVariant: 'expense' },
-    withdrawn:  { label: t('career_page.form.options.status_withdrawn'),  color: 'text-gray-light', badgeVariant: 'default' },
+    withdrawn:  { label: t('career_page.form.options.status_withdrawn'),  color: 'text-muted-foreground', badgeVariant: 'default' },
   };
 
   const TYPE_CONFIG: Record<CareerApplication['application_type'], { label: string; icon: React.ReactNode }> = {
@@ -152,10 +150,6 @@ export default function CareerClient({ initialApplications }: Props) {
       ...journals.map((j: any) => j.role_title),
     ])
   ).filter(Boolean);
-
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) router.push('/login');
-  }, [authLoading, isAuthenticated, router]);
 
   const filteredApps = applications.filter((app) => {
     if (activeFilter === 'all') return true;
@@ -372,16 +366,17 @@ export default function CareerClient({ initialApplications }: Props) {
 
   return (
     <>
-      <ErrorAlert error={pageError || error} onDismiss={() => setPageError(null)} />
+      <ErrorAlert error={pageError} onDismiss={() => setPageError(null)} />
+      {error && <InlineError message={error} retryLabel={t('common.try_again')} onRetry={() => refreshCareer()} className="mb-4" />}
       <>
         <div className="space-y-8 animate-fade-in pb-24">
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-1">
               <Heading as="h1" size="h2" weight="semibold" className="tracking-tight">
-                {t('career_page.title')} <span className="text-warm-gold italic">{t('career_page.title_highlight')}</span>
+                {t('career_page.title')} <span className="text-primary italic">{t('career_page.title_highlight')}</span>
               </Heading>
-              <Paragraph className="text-gray-light font-light">{t('career_page.desc')}</Paragraph>
+              <Paragraph className="text-muted-foreground font-light">{t('career_page.desc')}</Paragraph>
             </div>
             <div className="hidden md:block">
               <Button 
@@ -408,39 +403,39 @@ export default function CareerClient({ initialApplications }: Props) {
               ].map((s) => (
                 <Card key={s.label} className="glass border-none p-2 md:p-8 text-center flex-1 min-w-[70px] snap-center">
                   <Paragraph className={`text-xl md:text-3xl font-semibold ${s.color}`}>{s.value}</Paragraph>
-                  <Paragraph className="text-[8px] md:text-xs text-gray-light uppercase tracking-widest mt-1 md:mt-1">{s.label}</Paragraph>
+                  <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest mt-1 md:mt-1">{s.label}</Paragraph>
                 </Card>
               ))}
             </div>
           )}
 
           {!isLoading && analytics && analytics.totalApplications > 0 && (
-            <Card className="p-2 md:p-6 border border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02]">
+            <Card className="p-2 md:p-6 border border-foreground/[0.05] bg-foreground/[0.03]">
               <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto snap-x no-scrollbar flex-nowrap pb-1">
                 <div className="text-center shrink-0 snap-center">
-                  <Paragraph className="text-md md:text-lg font-medium text-white">{analytics.responseRate.toFixed(0)}%</Paragraph>
-                  <Paragraph className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.responseRate')}</Paragraph>
-                  <Paragraph className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.resp')}</Paragraph>
+                  <Paragraph className="text-md md:text-lg font-medium text-foreground">{analytics.responseRate.toFixed(0)}%</Paragraph>
+                  <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.responseRate')}</Paragraph>
+                  <Paragraph className="text-xs md:hidden text-muted-foreground uppercase tracking-widest">{t('career_page.stats_labels.resp')}</Paragraph>
                 </div>
-                <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
+                <div className="w-px h-6 md:h-8 bg-foreground/10 hidden sm:block" />
                 <div className="text-center shrink-0 snap-center">
-                  <Paragraph className="text-md md:text-lg font-bold text-white">{analytics.interviewRate.toFixed(0)}%</Paragraph>
-                  <Paragraph className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.interviewRate')}</Paragraph>
-                  <Paragraph className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.intv')}</Paragraph>
+                  <Paragraph className="text-md md:text-lg font-bold text-foreground">{analytics.interviewRate.toFixed(0)}%</Paragraph>
+                  <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.interviewRate')}</Paragraph>
+                  <Paragraph className="text-xs md:hidden text-muted-foreground uppercase tracking-widest">{t('career_page.stats_labels.intv')}</Paragraph>
                 </div>
-                <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
+                <div className="w-px h-6 md:h-8 bg-foreground/10 hidden sm:block" />
                 <div className="text-center shrink-0 snap-center">
-                  <Paragraph className="text-md md:text-lg font-bold text-white">{analytics.offerRate.toFixed(0)}%</Paragraph>
-                  <Paragraph className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.offerRate')}</Paragraph>
-                  <Paragraph className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.offer')}</Paragraph>
+                  <Paragraph className="text-md md:text-lg font-bold text-foreground">{analytics.offerRate.toFixed(0)}%</Paragraph>
+                  <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.offerRate')}</Paragraph>
+                  <Paragraph className="text-xs md:hidden text-muted-foreground uppercase tracking-widest">{t('career_page.stats_labels.offer')}</Paragraph>
                 </div>
                 {analytics.avgDaysToInterview !== null && (
                   <>
-                    <div className="w-px h-6 md:h-8 bg-white/10 hidden sm:block" />
+                    <div className="w-px h-6 md:h-8 bg-foreground/10 hidden sm:block" />
                     <div className="text-center shrink-0 snap-center">
-                      <Paragraph className="text-md md:text-lg font-semibold text-white">{analytics.avgDaysToInterview}d</Paragraph>
-                      <Paragraph className="text-[8px] md:text-[10px] text-gray-light uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.avgToInterview')}</Paragraph>
-                      <Paragraph className="text-[8px] md:hidden text-gray-light uppercase tracking-widest">{t('career_page.stats_labels.avg')}</Paragraph>
+                      <Paragraph className="text-md md:text-lg font-semibold text-foreground">{analytics.avgDaysToInterview}d</Paragraph>
+                      <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.avgToInterview')}</Paragraph>
+                      <Paragraph className="text-xs md:hidden text-muted-foreground uppercase tracking-widest">{t('career_page.stats_labels.avg')}</Paragraph>
                     </div>
                   </>
                 )}
@@ -457,14 +452,14 @@ export default function CareerClient({ initialApplications }: Props) {
             </Card>
           )}
 
-          <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-fit gap-0.5">
+          <div className="flex bg-foreground/[0.03] p-1 rounded-full border border-foreground/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-fit gap-0.5">
             <button
               onClick={() => setMainTab('applications')}
               title={t('career_page.tabs.all').replace('All', 'Applications').replace('Semua', 'Lamaran')}
               className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                 mainTab === 'applications'
-                  ? 'bg-warm-gold text-warm-black shadow-md'
-                  : 'text-gray-light hover:text-soft-cream'
+                  ? 'bg-primary text-on-primary '
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Briefcase size={14} weight="bold" />
@@ -475,8 +470,8 @@ export default function CareerClient({ initialApplications }: Props) {
               title={t('career_page.interview_journal.tab')}
               className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                 mainTab === 'journal'
-                  ? 'bg-warm-gold text-warm-black shadow-md'
-                  : 'text-gray-light hover:text-soft-cream'
+                  ? 'bg-primary text-on-primary '
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Newspaper size={14} weight="bold" />
@@ -487,18 +482,18 @@ export default function CareerClient({ initialApplications }: Props) {
               title={t('career_page.ats_matcher.title')}
               className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                 mainTab === 'ats_matcher'
-                  ? 'bg-warm-gold text-warm-black shadow-md'
-                  : 'text-gray-light hover:text-soft-cream'
+                  ? 'bg-primary text-on-primary '
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Robot size={14} weight="bold" />
+              <Target size={14} weight="bold" />
               <span className="hidden md:inline">{t('career_page.ats_matcher.title')}</span>
             </button>
           </div>
 
           {mainTab === 'applications' ? (
             <>
-          <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-full gap-0.5" role="tablist" aria-label="Application filter">
+          <div className="flex bg-foreground/[0.03] p-1 rounded-full border border-foreground/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-full gap-0.5" role="tablist" aria-label="Application filter">
             {FILTER_TABS.map((tab) => {
               const TabIcon = tab.icon;
               return (
@@ -510,8 +505,8 @@ export default function CareerClient({ initialApplications }: Props) {
                   title={t(`career_page.tabs.${tab.labelKey}`)}
                   className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                     activeFilter === tab.id
-                      ? 'bg-warm-gold text-warm-black shadow-md'
-                      : 'text-gray-light hover:text-soft-cream'
+                      ? 'bg-primary text-on-primary '
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <TabIcon size={14} weight="bold" />
@@ -526,7 +521,7 @@ export default function CareerClient({ initialApplications }: Props) {
           ) : filteredApps.length === 0 ? (
             <div className="glass-card p-24 text-center space-y-4">
               <Briefcase size={48} className="mx-auto text-deep-sage opacity-20" />
-              <Paragraph className="text-gray-light font-light italic">
+              <Paragraph className="text-muted-foreground font-light italic">
                 {activeFilter === 'all' ? t('career_page.empty_all') : t('career_page.empty_filter').replace('{filter}', t(`career_page.tabs.${activeFilter}`))}
               </Paragraph>
             </div>
@@ -540,7 +535,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 return (
                   <div
                     key={app.id}
-                    className="glass-card p-8 flex flex-col sm:flex-row sm:items-center gap-6 group transition-all hover:border-black/10 dark:border-white/10"
+                    className="glass-card p-8 flex flex-col sm:flex-row sm:items-center gap-6 group transition-all hover:border-foreground/10"
                     role="article"
                     aria-label={`${app.company_name} — ${app.role_title}`}
                   >
@@ -552,22 +547,22 @@ export default function CareerClient({ initialApplications }: Props) {
                         >
                           {status.label}
                         </Badge>
-                        <span className="text-[10px] text-gray-light uppercase tracking-widest flex items-center">
+                        <span className="text-xs text-muted-foreground uppercase tracking-widest flex items-center">
                           {type.icon} {type.label}
                         </span>
                         {app.priority === 'high' && (
-                          <span className="text-[9px] text-expense font-bold uppercase tracking-widest">
+                          <span className="text-xs text-expense font-bold uppercase tracking-widest">
                             {t('career_page.high_priority')}
                           </span>
                         )}
                       </div>
 
                       <div>
-                        <Heading as="h3" size="h3" className="text-lg font-semibold text-soft-cream">{app.company_name}</Heading>
-                        <Paragraph className="text-sm text-gray-light">{app.role_title}</Paragraph>
+                        <Heading as="h3" size="h3" className="text-lg font-semibold text-foreground">{app.company_name}</Heading>
+                        <Paragraph className="text-sm text-muted-foreground">{app.role_title}</Paragraph>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-4 text-[10px] text-gray-light opacity-80">
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground opacity-80">
                         <span className="flex items-center gap-1">
                           <Calendar size={10} />
                           {t('career_page.applied_on')} {new Date(app.applied_date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
@@ -585,7 +580,7 @@ export default function CareerClient({ initialApplications }: Props) {
                           </span>
                         )}
                         {app.salary_range && (
-                          <span className="inline-flex items-center gap-1 text-success font-mono text-[11px] bg-success/10 px-2 py-0.5 rounded border border-success/20 font-bold">
+                          <span className="inline-flex items-center gap-1 text-success font-mono text-xs bg-success/10 px-2 py-0.5 rounded border border-success/20 font-bold">
                             <Money size={12} className="shrink-0 text-success" />
                             {app.salary_range}
                           </span>
@@ -593,7 +588,7 @@ export default function CareerClient({ initialApplications }: Props) {
                       </div>
 
                       {app.notes && (
-                        <Paragraph className="text-xs text-gray-light italic line-clamp-1 opacity-80">
+                        <Paragraph className="text-xs text-muted-foreground italic line-clamp-1 opacity-80">
                           {app.notes}
                         </Paragraph>
                       )}
@@ -605,7 +600,7 @@ export default function CareerClient({ initialApplications }: Props) {
                           href={app.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-light hover:text-primary transition-colors rounded-md hover:bg-black/5 dark:bg-white/5"
+                          className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-foreground/5"
                           aria-label={`Open ${app.company_name} job posting`}
                         >
                           <ExternalLink size={16} />
@@ -613,14 +608,14 @@ export default function CareerClient({ initialApplications }: Props) {
                       )}
                       <button
                         onClick={() => openEditModal(app)}
-                        className="px-4 py-3 min-h-[44px] flex items-center justify-center text-xs font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 rounded-md transition-all"
+                        className="px-4 py-3 min-h-[44px] flex items-center justify-center text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground border border-foreground/10 hover:border-foreground/20 rounded-md transition-all"
                         aria-label={`Edit ${app.company_name} application`}
                       >
                         {t('career_page.edit')}
                       </button>
                       <button
                         onClick={() => setDeleteConfirmId(app.id)}
-                        className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-light hover:text-expense transition-colors rounded-md hover:bg-black/5 dark:bg-white/5"
+                        className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground hover:text-expense transition-colors rounded-md hover:bg-foreground/5"
                         aria-label={`Delete ${app.company_name} application`}
                       >
                         <Trash2 size={16} />
@@ -639,7 +634,7 @@ export default function CareerClient({ initialApplications }: Props) {
             ) : journals.length === 0 ? (
               <div className="glass-card p-24 text-center space-y-4">
                 <BookOpen size={48} className="mx-auto text-deep-sage opacity-20" />
-                <Paragraph className="text-gray-light font-light italic">
+                <Paragraph className="text-muted-foreground font-light italic">
                   {(t('career_page.interview_journal.empty') as string) || 'No interview notes yet.'}
                 </Paragraph>
               </div>
@@ -653,13 +648,13 @@ export default function CareerClient({ initialApplications }: Props) {
                   return (
                     <div
                       key={journal.id}
-                      className="glass-card p-8 flex flex-col gap-4 group transition-all hover:border-black/10 dark:border-white/10"
+                      className="glass-card p-8 flex flex-col gap-4 group transition-all hover:border-foreground/10"
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <Heading as="h3" size="h3" className="text-lg font-semibold text-soft-cream">{journal.company_name}</Heading>
-                          <Paragraph className="text-sm text-gray-light">{journal.role_title}</Paragraph>
-                          <div className="flex flex-wrap items-center gap-4 text-[10px] text-gray-light opacity-80 mt-1">
+                          <Heading as="h3" size="h3" className="text-lg font-semibold text-foreground">{journal.company_name}</Heading>
+                          <Paragraph className="text-sm text-muted-foreground">{journal.role_title}</Paragraph>
+                          <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground opacity-80 mt-1">
                             <span className="flex items-center gap-1">
                               <Calendar size={10} />
                               {new Date(journal.interview_date).toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })}
@@ -680,14 +675,14 @@ export default function CareerClient({ initialApplications }: Props) {
                         <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => openEditJournalModal(journal)}
-                            className="px-4 py-2 flex items-center justify-center text-xs font-bold uppercase tracking-widest text-gray-light hover:text-soft-cream border border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 rounded-md transition-all"
+                            className="px-4 py-2 flex items-center justify-center text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground border border-foreground/10 hover:border-foreground/20 rounded-md transition-all"
                             aria-label={`Edit journal entry`}
                           >
                             {t('career_page.edit')}
                           </button>
                           <button
                             onClick={() => setDeleteJournalConfirmId(journal.id)}
-                            className="p-2 flex items-center justify-center text-gray-light hover:text-expense transition-colors rounded-md hover:bg-black/5 dark:bg-white/5"
+                            className="p-2 flex items-center justify-center text-muted-foreground hover:text-expense transition-colors rounded-md hover:bg-foreground/5"
                             aria-label={`Delete journal entry`}
                           >
                             <Trash2 size={16} />
@@ -696,28 +691,28 @@ export default function CareerClient({ initialApplications }: Props) {
                       </div>
 
                       {journal.questions_asked && (
-                        <div className="bg-black/5 dark:bg-white/5 p-4 rounded-md">
-                          <Paragraph className="text-[10px] font-bold text-gray-light mb-1 flex items-center gap-1">
+                        <div className="bg-foreground/5 p-4 rounded-md">
+                          <Paragraph className="text-xs font-bold text-muted-foreground mb-1 flex items-center gap-1">
                             <MessageSquare size={10} />
                             {(t('career_page.interview_journal.questions') as string) || 'Questions Asked'}
                           </Paragraph>
-                          <Paragraph className="text-sm text-soft-cream whitespace-pre-wrap font-light">{journal.questions_asked}</Paragraph>
+                          <Paragraph className="text-sm text-foreground whitespace-pre-wrap font-light">{journal.questions_asked}</Paragraph>
                         </div>
                       )}
 
                       {journal.lessons_learned && (
                         <div className="bg-primary/5 p-4 rounded-md border border-primary/10">
-                          <Paragraph className="text-[10px] font-bold text-primary mb-1 flex items-center gap-1">
+                          <Paragraph className="text-xs font-bold text-primary mb-1 flex items-center gap-1">
                             <Star size={10} />
                             {(t('career_page.interview_journal.lessons') as string) || 'Lessons Learned'}
                           </Paragraph>
-                          <Paragraph className="text-sm text-soft-cream whitespace-pre-wrap font-light">{journal.lessons_learned}</Paragraph>
+                          <Paragraph className="text-sm text-foreground whitespace-pre-wrap font-light">{journal.lessons_learned}</Paragraph>
                         </div>
                       )}
                       
                       {journal.notes && (
                         <div>
-                          <Paragraph className="text-xs text-gray-light italic opacity-80 whitespace-pre-wrap">
+                          <Paragraph className="text-xs text-muted-foreground italic opacity-80 whitespace-pre-wrap">
                             {journal.notes}
                           </Paragraph>
                         </div>
@@ -737,7 +732,7 @@ export default function CareerClient({ initialApplications }: Props) {
           <Button 
             variant="primary" 
             onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal} 
-            className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(244,201,93,0.4)]"
+            className="rounded-full w-14 h-14 flex items-center justify-center "
             aria-label={mainTab === 'applications' ? "Add new application" : "Add new journal entry"}
           >
             <Plus size={24} />
@@ -853,9 +848,9 @@ export default function CareerClient({ initialApplications }: Props) {
                     id="sync-reminder-cb"
                     checked={form.sync_to_reminder ?? true}
                     onChange={(e) => setForm((f) => ({ ...f, sync_to_reminder: e.target.checked }))}
-                    className="w-4 h-4 rounded border-primary/40 text-primary focus:ring-primary bg-black/20"
+                    className="w-4 h-4 rounded border-primary/40 text-primary focus:ring-primary bg-background/60"
                   />
-                  <label htmlFor="sync-reminder-cb" className="text-xs text-soft-cream font-medium cursor-pointer flex items-center gap-1.5">
+                  <label htmlFor="sync-reminder-cb" className="text-xs text-foreground font-medium cursor-pointer flex items-center gap-1.5">
                     <Bell size={14} className="text-primary" />
                     <span>{t('career_page.form.sync_reminder_label') as string || 'Auto-add to Reminders / Calendar (notify 1 hour & 1 day before)'}</span>
                   </label>
@@ -892,7 +887,7 @@ export default function CareerClient({ initialApplications }: Props) {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">
+                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider select-none">
                   {t('career_page.form.salary')} <span className="font-normal opacity-70 normal-case">({t('common.optional')})</span>
                 </label>
                 {(form.salary_min.trim() || form.salary_max.trim()) && (
@@ -926,21 +921,21 @@ export default function CareerClient({ initialApplications }: Props) {
                   value={form.salary_min}
                   onChange={(e) => setForm((f) => ({ ...f, salary_min: e.target.value }))}
                   placeholder={t('career_page.form.salary_min_placeholder') || 'Min'}
-                  className="w-full h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
+                  className="w-full h-10 bg-surface/80 hover:bg-surface border border-foreground/10 hover:border-foreground/20 focus:border-primary rounded-lg text-sm px-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
                 />
-                <span className="text-gray-light/50 font-bold select-none text-xs px-1">—</span>
+                <span className="text-muted-foreground/50 font-bold select-none text-xs px-1">—</span>
                 <input
                   type="text"
                   value={form.salary_max}
                   onChange={(e) => setForm((f) => ({ ...f, salary_max: e.target.value }))}
                   placeholder={t('career_page.form.salary_max_placeholder') || 'Max'}
-                  className="w-full h-10 bg-gray-strong/80 hover:bg-gray-strong border border-white/10 hover:border-white/20 focus:border-primary rounded-lg text-sm px-3 text-soft-cream focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
+                  className="w-full h-10 bg-surface/80 hover:bg-surface border border-foreground/10 hover:border-foreground/20 focus:border-primary rounded-lg text-sm px-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
                 />
               </div>
 
               {/* Quick Salary Presets */}
               <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                <span className="text-[10px] text-gray-light/60 font-medium">{t('career_page.form.salary_presets') as string || 'Quick presets:'}</span>
+                <span className="text-xs text-muted-foreground/60 font-medium">{t('career_page.form.salary_presets') as string || 'Quick presets:'}</span>
                 {form.salary_currency === 'IDR' ? (
                   [
                     { label: '5-10 Jt', min: '5.000.000', max: '10.000.000' },
@@ -952,7 +947,7 @@ export default function CareerClient({ initialApplications }: Props) {
                       key={p.label}
                       type="button"
                       onClick={() => setForm((f) => ({ ...f, salary_min: p.min, salary_max: p.max }))}
-                      className="text-[10px] px-2 py-0.5 rounded bg-white/5 hover:bg-primary/20 hover:text-primary text-gray-light border border-white/10 transition-colors font-mono"
+                      className="text-xs px-2 py-0.5 rounded bg-foreground/5 hover:bg-primary/20 hover:text-primary text-muted-foreground border border-foreground/10 transition-colors font-mono"
                     >
                       {p.label}
                     </button>
@@ -968,7 +963,7 @@ export default function CareerClient({ initialApplications }: Props) {
                       key={p.label}
                       type="button"
                       onClick={() => setForm((f) => ({ ...f, salary_min: p.min, salary_max: p.max }))}
-                      className="text-[10px] px-2 py-0.5 rounded bg-white/5 hover:bg-primary/20 hover:text-primary text-gray-light border border-white/10 transition-colors font-mono"
+                      className="text-xs px-2 py-0.5 rounded bg-foreground/5 hover:bg-primary/20 hover:text-primary text-muted-foreground border border-foreground/10 transition-colors font-mono"
                     >
                       {p.label}
                     </button>
@@ -978,7 +973,7 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
 
             <div className="space-y-1">
-              <label className="block text-[11px] font-bold text-gray-light uppercase tracking-wider select-none">
+              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider select-none">
                 {t('career_page.form.notes_label') as string || 'Notes'} <span className="font-normal opacity-70 normal-case">({t('common.optional')})</span>
               </label>
               <textarea
@@ -987,7 +982,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 placeholder={t('career_page.form.notes_placeholder')}
                 rows={3}
                 aria-label="Notes"
-                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+                className="w-full bg-surface border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
               />
             </div>
           </div>
@@ -1070,7 +1065,7 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
 
             <div>
-              <label className="text-[10px] font-bold text-gray-light mb-1 block">
+              <label className="text-xs font-bold text-muted-foreground mb-1 block">
                 {(t('career_page.interview_journal.questions') as string) || 'Questions Asked'}
               </label>
               <textarea
@@ -1078,12 +1073,12 @@ export default function CareerClient({ initialApplications }: Props) {
                 onChange={(e) => setJournalForm((f: any) => ({ ...f, questions_asked: e.target.value }))}
                 placeholder={(t('career_page.interview_journal.questions_placeholder') as string) || 'What did they ask?'}
                 rows={4}
-                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+                className="w-full bg-surface border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
               />
             </div>
 
             <div>
-              <label className="text-[10px] font-bold text-gray-light mb-1 block">
+              <label className="text-xs font-bold text-muted-foreground mb-1 block">
                 {(t('career_page.interview_journal.lessons') as string) || 'Lessons Learned'}
               </label>
               <textarea
@@ -1091,12 +1086,12 @@ export default function CareerClient({ initialApplications }: Props) {
                 onChange={(e) => setJournalForm((f: any) => ({ ...f, lessons_learned: e.target.value }))}
                 placeholder={(t('career_page.interview_journal.lessons_placeholder') as string) || 'What would you do differently?'}
                 rows={3}
-                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+                className="w-full bg-surface border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
               />
             </div>
 
             <div>
-              <label className="text-[10px] font-bold text-gray-light mb-1 block">
+              <label className="text-xs font-bold text-muted-foreground mb-1 block">
                 {(t('career_page.interview_journal.notes') as string) || 'Notes'}
               </label>
               <textarea
@@ -1104,7 +1099,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 onChange={(e) => setJournalForm((f: any) => ({ ...f, notes: e.target.value }))}
                 placeholder={(t('career_page.interview_journal.notes_placeholder') as string) || 'Additional context...'}
                 rows={2}
-                className="w-full bg-gray-strong border border-black/5 dark:border-white/5 rounded-md p-6 text-sm text-soft-cream focus:border-primary focus:outline-none resize-none"
+                className="w-full bg-surface border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
               />
             </div>
           </div>
@@ -1126,7 +1121,7 @@ export default function CareerClient({ initialApplications }: Props) {
           <Button 
             variant="primary" 
             onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal} 
-            className="rounded-full w-14 h-14 flex items-center justify-center shadow-[0_4px_20px_rgba(244,201,93,0.4)]"
+            className="rounded-full w-14 h-14 flex items-center justify-center "
             aria-label={mainTab === 'applications' ? t('career_page.new_application') : 'New Journal Entry'}
           >
             <Plus size={24} />

@@ -57,7 +57,7 @@ src/
     (landing)/    halaman publik: about, pricing, vision, roadmap, legal, dll
     api/          route handler (lihat bagian 5)
     sw.ts         source service worker
-  components/     ui/ (primitif: Button, Card, Input, Modal), layout/, landing/, modules/Sport/
+  components/     ui/ (primitif: Button, Card, Input, Placeholder, typography), layout/ (shell: Layout, Sidebar, MobileHeader, BottomNav, MoreSheet, ThemeSync), auth/ (AuthShell), landing/ (sections, page/ untuk halaman publik), modules/Sport/
   hooks/          satu hook SWR per domain (useReminder, useTransaction, ...)
   services/       akses data per domain; satu-satunya tempat memanggil supabase.from()
     supabase/     supabaseClient.ts (browser client + tipe), queryBuilder.ts (withAuthQuery)
@@ -85,7 +85,7 @@ docs/             dokumentasi produk, API, skema DB (sebagian usang, lihat bagia
 
 **Halaman:** server component (`page.tsx`) mengambil data awal dengan `createServerClient` dan mengoper ke `*Client.tsx` / `_client.tsx` sebagai props; interaksi dan SWR ada di komponen klien. Halaman yang membaca cookie (contoh `finance`, `career`) memakai `export const dynamic = 'force-dynamic'`; halaman lain hanya merender shell klien. Halaman di `(app)` tidak boleh membungkus diri dengan `<Layout>`: shell persisten ada di `(app)/layout.tsx` (onboarding dikecualikan di dalam `Layout`).
 
-**Auth:** `middleware.ts` memanggil `updateSession` yang me-redirect rute terproteksi ke `/login?redirect_to=...` dan `/login`, `/signup`, `/` ke `/dashboard` bila sudah login. Daftar rute terproteksi hardcoded di `utils/supabase/middleware.ts`; modul baru harus ditambahkan ke sana dan ke `NETWORK_ONLY_ROUTES` di `app/sw.ts`. `AuthProvider` memanggil `useAuth()` sekali sebagai satu-satunya subscription `onAuthStateChange`; komponen lain membaca `useAuthStore`.
+**Auth:** `middleware.ts` memanggil `updateSession` yang me-redirect rute terproteksi ke `/login?redirect_to=...` dan `/login`, `/signup`, `/` ke `/dashboard` bila sudah login. Daftar rute terproteksi hardcoded di `utils/supabase/middleware.ts`; modul baru harus ditambahkan ke sana dan ke `NETWORK_ONLY_ROUTES` di `app/sw.ts`. `AuthProvider` memanggil `useAuth()` sekali sebagai satu-satunya subscription `onAuthStateChange`; komponen lain membaca `useAuthStore`. Guard klien tunggal ada di `components/layout/Layout.tsx` dan baru meredirect setelah `isAuthReady` true (pemeriksaan sesi pertama selesai), karena `isAuthenticated` yang dipersist bisa usang. Halaman tidak boleh punya efek `router.push('/login')` sendiri.
 
 **API route (`src/app/api`):** middleware tidak melindungi `/api`, jadi tiap route wajib memverifikasi sendiri dengan `getAuthenticatedUser()` dan mengembalikan 401. Pengecualian: `validate-email` (publik) dan `cron/*` (memakai `CRON_SECRET` dan Supabase service role). Route AI memakai `maxDuration` bila perlu.
 
@@ -112,7 +112,7 @@ docs/             dokumentasi produk, API, skema DB (sebagian usang, lihat bagia
 
 **Tipe:** definisi tabel ada di `types/database.ts`. Soft delete lewat kolom `deleted_at`; query selalu menyertakan `.is('deleted_at', null)`.
 
-**Waktu:** reset harian dan notifikasi bergantung pada timezone pengguna. Gunakan helper di `libs/date.ts`, jangan `toISOString().split('T')` untuk tanggal lokal.
+**Waktu:** reset harian dan notifikasi bergantung pada timezone pengguna. Gunakan helper, jangan `toISOString().split('T')` untuk tanggal lokal: `formatDateOnly` dan `addBillingCycle` di `libs/date.ts` (tanggal dari objek `Date` lokal, aritmetika siklus tagihan), `getLocalISODate(date, timezone)` di `libs/format.ts`, dan `getProfileToday()` di `libs/profileDate.ts` untuk "hari ini" menurut timezone profil (sama dengan yang dipakai cron). Fungsi di `libs/analytics` tetap murni dan tidak boleh mengimpor store.
 
 **Tes:** ada di `src/libs/__tests__`, `src/services/__tests__`, dan `src/services/finance/**/__tests__`. Logika baru di `libs/` atau `services/finance` sebaiknya disertai tes.
 
@@ -123,7 +123,7 @@ Hanya nama; nilai ada di `.env.local` (di-gitignore, jangan dibaca).
 | Variabel | Dipakai di | Sisi |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | semua klien Supabase | publik |
-| `SUPABASE_SERVICE_ROLE_KEY` | `cron/*`, `push/send-reminder` | rahasia, hanya server |
+| `SUPABASE_SERVICE_ROLE_KEY` | `cron/*` | rahasia, hanya server |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | `services/ai/provider.ts` | rahasia |
 | `AI_PROVIDER`, `NARA_API_KEY` | provider NaraRouter (saat ini tidak aktif) | rahasia |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_EMAIL` | web-push | publik / rahasia |
@@ -138,29 +138,29 @@ Aturan: variabel tanpa awalan `NEXT_PUBLIC_` tidak boleh disentuh dari kode klie
 
 Aturan untuk semua kode UI baru:
 
-* Warna solid dan flat dari token proyek. Dilarang gradient, glow (shadow berwarna, blob blur, drop-shadow), emoji, spinner/animasi loading (termasuk `animate-pulse`), dan pewarnaan teks tanpa alasan fungsional. State loading ditampilkan sebagai teks statis. Aturan ini ditegakkan ESLint (`no-restricted-syntax` di `.eslintrc.json`) untuk `(app)`, `(auth)`, dan `components/` di luar `landing/`.
-* Gunakan token Tailwind di `tailwind.config.js`: `primary`, `secondary`, `warm-black`, `soft-cream`, `gray-strong|medium|light|very-light`, `success|danger|warning|info`, `income|expense` (alias success/danger untuk uang), `accent-purple`, `deep-sage`, `insight-taupe`. Token `lp-*` hanya untuk landing page, `ui-*` untuk frame produk di landing. Jangan memakai warna palet mentah seperti `bg-red-500`.
-* Kode yang tidak bisa memakai class (opsi Chart.js, inline style) mengambil warna dari `src/config/colors.ts` (`TOKEN_COLORS`, `CATEGORY_PALETTE`, `withAlpha`), bukan hex baru.
+* Warna solid dan flat dari token proyek. Dilarang gradient, glow dan shadow (termasuk `shadow-lg|xl|2xl`, shadow berwarna, blob blur, drop-shadow), efek membesar (`scale-105`, `hover:scale-*`), `backdrop-blur-xl|2xl`, emoji, ikon bernuansa AI (`Sparkle`, `Robot`, `MagicWand`), spinner/animasi loading (termasuk `animate-pulse`), dan pewarnaan teks tanpa alasan fungsional. State loading ditampilkan sebagai teks statis. ESLint (`no-restricted-syntax` di `.eslintrc.json`) menegakkan gradient, animasi loading, warna palet mentah, glow, ukuran teks arbitrer, dan `font-serif|display` untuk `(app)`, `(auth)`, dan `components/` di luar `landing/`; landing hanya terkena aturan ukuran teks dan font.
+* Warna adalah variabel CSS di `app/globals.css` (dasar gelap, `html.light` menimpa), dipetakan di `tailwind.config.js`. Pakai nama peran: `background`, `surface`, `surface-hover`, `foreground`, `muted-foreground`, `subtle`, `primary`, `secondary`, `on-primary`, `success|danger|warning|info`, `income|expense`, `accent-purple`, `deep-sage`, `insight-taupe`. Nama lama (`warm-black`, `soft-cream`, `gray-*`, `warm-gold`) dan token `lp-*` serta `ui-*` sudah dihapus; jangan dipakai lagi. Landing memakai token yang sama dengan app. Emas punya dua peran: `bg-primary` adalah isian dan teks di atasnya `text-on-primary`; `text-primary`, `border-primary`, `ring-primary` otomatis memakai varian teks yang lebih tua di mode terang. Jangan menulis `text-white`, `text-black`, atau `text-background` di atas isian emas. Jangan memakai warna palet mentah seperti `bg-red-500`, dan jangan `bg-white/*`, `border-black/*`, `text-white` untuk elemen yang harus mengikuti tema; pakai `bg-foreground/5`, `border-foreground/10`, `text-foreground`. Kecuali di atas foto atau scrim `bg-black/*`, teks putih boleh.
+* Setiap perubahan nilai token wajib lolos `src/libs/__tests__/themeContrast.test.ts` (WCAG AA 4,5:1 untuk teks, 3:1 untuk ring dan border).
+* Kode yang tidak bisa memakai class (opsi Chart.js, inline style) memakai hook `useChartTheme()` (`colors`, `palette`, `chrome`) yang membaca `src/config/colors.ts` untuk tema yang sedang tampil, bukan hex baru. CSS inline boleh memakai `rgb(var(--color-foreground) / 0.1)`.
 * Sebelum memakai class kustom, pastikan class itu benar-benar ada di `tailwind.config.js` atau `globals.css`; class yang tidak terdefinisi tidak memberi error, hanya tidak berefek.
-* Ukuran teks lewat token semantik (`text-heading-lg`, `text-body-md`, `text-label-sm`, dst) atau komponen di `components/ui/typography.tsx`. Font: Geist (`font-sans`), Geist Mono, DM Serif Display (`font-brand`, judul), Plus Jakarta Sans (`font-display`).
-* Mode tema lewat class `dark` / `light` pada `<html>` (`darkMode: 'class'`), variabel warna di `app/globals.css`.
+* Ukuran teks: skala tunggal tanpa ukuran di bawah 12px. Token semantik (`text-display-2xl|xl|lg|md`, `text-heading-xl|lg|md`, `text-title-lg|md`, `text-body-lg|md|sm`, `text-label-md|sm`) atau `text-xs|sm|base|lg|xl|2xl` bawaan Tailwind (12, 14, 16, 18, 20, 24px); `text-[Npx]` dilarang lint. Komponen `Heading`, `Paragraph`, `Mono` di `components/ui/typography.tsx` memakai skala yang sama. `cn()` (`lib/utils.ts`) mengenal token ukuran; kalau menambah token ukuran baru, tambahkan juga ke daftar `theme.text` di sana, kalau tidak `tailwind-merge` menganggapnya warna teks dan menghapusnya.
+* Font: Geist (`font-sans`) untuk semua UI dan judul, Geist Mono (`font-mono`) untuk angka, DM Serif Display (`font-brand`, hanya berat 400) untuk wordmark dan judul landing. Plus Jakarta Sans dan `font-serif` sudah dihapus.
+* Mode tema lewat class `dark` / `light` pada `<html>` (`darkMode: 'class'`). Pemilik tunggalnya `components/layout/ThemeSync.tsx`, dengan skrip anti-flash di `<head>` (`NO_FLASH_THEME_SCRIPT` di `libs/theme.ts`). Default adalah `system` (`DEFAULT_THEME_PREFERENCE`): pengunjung dan akun baru mengikuti perangkat, onboarding memilih tema perangkat lebih dulu, dan pilihan yang tersimpan di preferensi menang. Nilai `system` hanya hidup di store lokal; tipe `UserPreferences.theme` hanya `light|dark`, dan belum diverifikasi apakah kolom database menerima nilai lain, jadi jangan menyimpannya sebelum itu dicek. `useResolvedTheme()` memberi tema yang sedang tampil.
 * Pakai komponen `components/ui` (`Button`, `Card`, `Input`, `Select`, `Badge`, `DatePicker`, `Toast`) dan `components/Modal`, `BottomSheet`, `ConfirmModal`. Jangan menulis elemen tombol mentah bila `Button` cukup.
 * Teks bersih: hindari bullet hyphen berlebihan dan kalimat hiperbolis. Ikuti `docs/product-language.md` untuk istilah.
 * Mobile-first (PWA, `BottomSheet` dipakai untuk form di layar kecil).
 
 ## 8. Dokumentasi: Mana yang Bisa Dipercaya
 
-`docs/product-language.md` dan `docs/strategic-vision.md` masih relevan. Sisanya sebagian usang; kode adalah sumber kebenaran.
+Dokumen di `docs/` dan `README.md` disinkronkan dengan kode pada 2026-10-16. Kode tetap sumber kebenaran bila ada selisih.
 
-| Dokumen | Yang sudah tidak cocok dengan kode |
+| Dokumen | Status |
 |---|---|
-| `README.md` | Menyebut `OPENAI_API_KEY` (kode memakai Gemini), font Cormorant/Inter (layout memakai Geist/DM Serif/Plus Jakarta), folder `timeline/`, dan link `file:///d:/...` |
-| `docs/project-overview.md` | Menyebut Recharts; kenyataannya chart.js. Investment ditulis mockup padahal sudah ada modul penuh |
-| `docs/setup-environment.md` | Menyebut Lucide-React dan Recharts; env var yang tercantum tidak lengkap |
-| `docs/component-ui-architecture.md` | Menyebut `tailwind.config.ts`, `queries.ts`, `index.css`, dan efek glow/blur tebal |
-| `docs/api-database.md` | Mengklaim tidak ada API internal; kenyataannya ada banyak route di `src/app/api` |
-| `docs/deployment-maintenance.md` | Merujuk `docs/migrations/` yang tidak ada di repo |
-| `docs/DATABASE_SCHEMA.md` | Hanya sebagian tabel; tidak memuat budgets, goals, installments, subscriptions, receipt_metadata, push_subscriptions, workout_*, career_applications, dll. Untuk skema lengkap lihat `src/types/database.ts` |
+| `docs/product-language.md`, `docs/strategic-vision.md` | Relevan |
+| `README.md`, `docs/project-overview.md`, `docs/setup-environment.md`, `docs/api-database.md`, `docs/deployment-maintenance.md`, `docs/DATABASE_SCHEMA.md` | Sinkron |
+| `docs/API_DOCUMENTATION.md` | Hanya merinci 4 dari 16 route; daftar lengkap ada di `docs/api-database.md` |
+| `docs/component-ui-architecture.md` | Sinkron dengan kode saat ini, tetapi akan ditulis ulang setelah perombakan token, tipografi, dan tema |
+| `docs/ui-audit.md`, `docs/migrations/` | Catatan kerja dan SQL manual; keduanya di-gitignore (aturan `/docs`) |
 
 Bila mengubah perilaku yang tercakup dokumen di atas, perbarui dokumennya sekalian.
 
@@ -169,6 +169,6 @@ Bila mengubah perilaku yang tercakup dokumen di atas, perbarui dokumennya sekali
 * CSP di `next.config.js` hanya mengatur `script-src` dengan `'unsafe-inline'` dan `'unsafe-eval'`.
 * Server tidak boleh mem-fetch URL yang dikirim klien. Route receipt hanya menerima path storage milik user (`libs/receiptStorage.ts`), dan `GeminiReceiptExtractor` hanya menerima data URL.
 * Reminder baru ditolak bila waktunya sudah lewat. Aturannya ada di `reminderQueries.createReminder` (`ApiError` kode `REMINDER_PAST_DUE`) dan `validateReminder({ rejectPastDue: true })`; form menampilkan `NoticeModal`.
-* `useGoal` dan `useInvestmentJournal` masih hook mock berisi data contoh (lihat `docs/ui-audit.md`).
+* `/investments/goals` dan `/investments/journal` hanya me-redirect ke `/investments`. Hook mock dan halamannya dihapus; tipe `Goal`, `InvestmentGoalAllocation`, `InvestmentTransaction` belum punya tabel atau query. Bangun skema dan query nyata sebelum membuat halamannya lagi.
 * `getCurrentUser()` membaca sesi lokal tanpa validasi server; keamanan data bergantung penuh pada RLS. Setiap tabel baru wajib punya RLS aktif dan policy `auth.uid() = user_id`.
 * `eslint.ignoreDuringBuilds: true`: lint tidak memblokir build, jalankan `npm run lint` sendiri.

@@ -114,10 +114,10 @@ export function ReceiptReviewSheet({ transactionId, isOpen, onClose, onConfirmSu
                 />
                 
                 {metadata.storage_path && (
-                  <div className="w-full h-32 md:h-48 bg-black/20 rounded-xl overflow-hidden relative border border-white/5 flex items-center justify-center">
+                  <div className="w-full h-32 md:h-48 bg-background/60 rounded-xl overflow-hidden relative border border-foreground/5 flex items-center justify-center">
                     {/* Ideally we'd use a signed URL to show the image here. For now, a placeholder icon */}
-                    <Receipt size={48} className="text-white/10" />
-                    <span className="absolute bottom-2 right-2 text-[10px] text-gray-light bg-black/60 px-2 py-1 rounded">
+                    <Receipt size={48} className="text-foreground/10" />
+                    <span className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-black/60 px-2 py-1 rounded">
                       Receipt Image Attached
                     </span>
                   </div>

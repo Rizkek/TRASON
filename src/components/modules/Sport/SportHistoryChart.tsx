@@ -13,7 +13,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 import type { WorkoutSession } from '@/types/database';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { TOKEN_COLORS } from '@/config/colors';
+import { useChartTheme } from '@/hooks/useChartTheme';
 
 ChartJS.register(
   CategoryScale,
@@ -31,6 +31,7 @@ interface Props {
 export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
   const [isMounted, setIsMounted] = useState(false);
   const { locale } = useUserPreferences();
+  const { colors, chrome } = useChartTheme();
 
   useEffect(() => {
     setIsMounted(true);
@@ -76,7 +77,7 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
     datasets: [
       {
         data: chartData.map(d => d.minutes),
-        backgroundColor: chartData.map(d => d.hasWorkout ? TOKEN_COLORS.primary : 'rgba(255,255,255,0.05)'),
+        backgroundColor: chartData.map(d => d.hasWorkout ? colors.primary : chrome.track),
         borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
         borderSkipped: false,
         maxBarThickness: 40
@@ -92,16 +93,16 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
         display: false
       },
       tooltip: {
-        backgroundColor: 'rgba(11, 15, 20, 0.9)',
-        titleColor: TOKEN_COLORS.softCream,
+        backgroundColor: chrome.tooltipBg,
+        titleColor: colors.foreground,
         titleFont: { size: 14, weight: 'bold' as const },
-        bodyColor: TOKEN_COLORS.primary,
+        bodyColor: colors.primary,
         bodyFont: { size: 14 },
         padding: 12,
         cornerRadius: 6,
         boxPadding: 4,
         displayColors: false,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: chrome.tooltipBorder,
         borderWidth: 1,
         callbacks: {
           title: (context: any) => {
@@ -119,8 +120,8 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
           labelTextColor: (context: any) => {
             const index = context.dataIndex;
             const dataItem = chartData[index];
-            if (!dataItem.hasWorkout) return TOKEN_COLORS.grayLight;
-            return TOKEN_COLORS.primary;
+            if (!dataItem.hasWorkout) return colors.grayLight;
+            return colors.primary;
           }
         }
       }
@@ -134,8 +135,8 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
           display: false,
         },
         ticks: {
-          color: 'rgba(255,255,255,0.4)',
-          font: { size: 11 },
+          color: chrome.tick,
+          font: { size: 12 },
           callback: function(this: any, val: any, index: number) {
             // Only show every 3rd label
             return index % 3 === 0 ? this.getLabelForValue(val) : '';
@@ -153,21 +154,21 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
 
   if (!isMounted) {
     return (
-      <Card className="p-8 bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+      <Card className="p-8 bg-foreground/[0.02] border-foreground/[0.05]">
         <div className="mb-6">
-          <h3 className="text-lg font-serif font-semibold text-white">Activity ClockCounterClockwise</h3>
-          <p className="text-sm text-gray-light">Last {days} days of training</p>
+          <h3 className="text-lg font-semibold text-foreground">Activity history</h3>
+          <p className="text-sm text-muted-foreground">Last {days} days of training</p>
         </div>
-        <div className="h-[250px] w-full bg-black/[0.01] dark:bg-white/[0.01] rounded-lg" />
+        <div className="h-[250px] w-full bg-foreground/[0.01] rounded-lg" />
       </Card>
     );
   }
 
   return (
-    <Card className="p-8 bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.05] dark:border-white/[0.05]">
+    <Card className="p-8 bg-foreground/[0.02] border-foreground/[0.05]">
       <div className="mb-6">
-        <h3 className="text-lg font-serif font-semibold text-white">Activity ClockCounterClockwise</h3>
-        <p className="text-sm text-gray-light">Last {days} days of training</p>
+        <h3 className="text-lg font-semibold text-foreground">Activity history</h3>
+        <p className="text-sm text-muted-foreground">Last {days} days of training</p>
       </div>
       <div className="h-[250px] w-full" style={{ minWidth: 0 }}>
         <Bar data={barChartData} options={options} />

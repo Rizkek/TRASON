@@ -2,112 +2,109 @@
 @tailwind components;
 @tailwind utilities;
 
-/* CSS Variables for fonts and colors.
-   --font-sans, --font-mono, --font-brand and --font-display are set on <html>
-   by next/font in app/layout.tsx (self-hosted, preloaded). */
+/* Design tokens. Values are space-separated RGB so Tailwind opacity modifiers work.
+   Dark is the base; html.light overrides it. Components use the role names (background,
+   surface, foreground, muted-foreground, primary, ...), so a theme change is only a change of
+   these variables. The landing page uses the same tokens. Contrast pairs are enforced by
+   src/libs/__tests__/themeContrast.test.ts.
+   --font-sans, --font-mono and --font-brand are set on <html> by next/font in app/layout.tsx. */
 :root {
-  /* Landing page semantic tokens (light editorial canvas). Scoped by usage in
-     the landing components only; the authenticated app keeps its own palette. */
-  --lp-background: 250 250 247;      /* #FAFAF7 warm paper */
-  --lp-surface: 255 255 255;         /* #FFFFFF */
-  --lp-foreground: 11 15 20;         /* #0B0F14 */
-  --lp-muted: 91 100 114;            /* #5B6472 — 6.1:1 on paper */
-  --lp-border: 11 15 20;             /* used with alpha, e.g. border-border/10 */
-  --lp-accent: 244 201 93;           /* #F4C95D brand gold, fills only */
-  --lp-accent-foreground: 11 15 20;
-  --lp-accent-text: 138 100 16;      /* #8A6410 — gold that passes AA on paper */
-  --lp-success: 22 130 93;           /* #16825D */
-  --lp-warning: 180 96 20;           /* #B46014 */
-  --lp-destructive: 190 48 48;       /* #BE3030 */
+  color-scheme: dark;
 
-  /* Product interface tokens (always dark, regardless of page theme) */
-  --ui-bg: 11 15 20;                 /* #0B0F14 */
-  --ui-surface: 17 24 39;            /* #111827 */
-  --ui-fg: 244 245 247;
-  --ui-muted: 148 163 184;
-  --ui-border: 255 255 255;
-  --ui-accent: 244 201 93;
+  --color-background: 11 15 20;          /* #0B0F14 */
+  --color-surface: 17 24 39;             /* #111827 */
+  --color-surface-hover: 55 65 81;       /* #374151 */
+  --color-foreground: 252 252 253;       /* #FCFCFD */
+  --color-muted: 148 163 184;            /* #94A3B8 secondary text */
+  --color-subtle: 203 213 225;           /* #CBD5E1 text on tinted surfaces */
+  --color-gray-medium-text: 148 163 184;
 
-  /* TRASON New Color Palette - WCAG Compliant */
-  /* Using RGB format (R G B) for Tailwind opacity modifiers to work */
-  
-  --color-primary: 244 201 93;     /* #F4C95D */
-  --color-secondary: 227 184 77;   /* #E3B84D */
-  --color-warm-black: 11 15 20;    /* #0B0F14 */
-  --color-soft-cream: 252 252 253; /* #FCFCFD — near white, no yellowish cast */
-  --color-gray-strong: 17 24 39;   /* #111827 */
-  --color-gray-medium: 55 65 81;   /* #374151 */
-  --color-gray-light: 148 163 184; /* #94A3B8 */
-  --color-gray-very-light: 203 213 225; /* #CBD5E1 */
+  /* Brand gold. Fill is for backgrounds; the -text variants are for text, icons, borders and focus rings. */
+  --color-primary: 244 201 93;           /* #F4C95D */
+  --color-primary-text: 244 201 93;
+  --color-secondary: 227 184 77;         /* #E3B84D hover and pressed fill */
+  --color-secondary-text: 227 184 77;
+  --color-on-primary: 11 15 20;          /* text on a primary fill */
 
-  /* Glass/card overrides */
-  --glass-bg: rgba(0, 0, 0, 0.4);
-  --glass-border: rgba(255, 255, 255, 0.05);
-  --card-bg: rgba(17, 24, 39, 0.4);
-  --card-border: rgba(255, 255, 255, 0.05);
+  --color-success: 74 222 128;           /* #4ADE80 */
+  --color-danger: 248 113 113;           /* #F87171 */
+  --color-warning: 251 146 60;           /* #FB923C */
+  --color-info: 96 165 250;              /* #60A5FA */
+  --color-accent-purple: 167 139 250;    /* #A78BFA */
+  --color-deep-sage: 141 163 153;        /* #8DA399 */
+  --color-insight-taupe: 163 148 130;    /* #A39482 */
+
+  --card-alpha: 0.4;
+  --card-border-alpha: 0.05;
+  --focus-ring: var(--color-primary-text);
 }
 
-.light {
-  /* LIGHT MODE VARIABLES (For future proper theming) */
-  --color-primary: 154 91 34;         /* #9A5B22 */
-  --color-secondary: 173 108 43;      /* #AD6C2B */
-  /* We do NOT invert warm-black or soft-cream to avoid breaking hardcoded components.
-     Instead, components that need to be light should use specific classes (e.g. bg-white text-black). */
-  
-  /* Redefining some background bases if necessary, but leaving semantic names intact */
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(0, 0, 0, 0.05);
-  --card-bg: rgba(255, 255, 255, 1);
-  --card-border: rgba(0, 0, 0, 0.05);
+html.light {
+  color-scheme: light;
+
+  --color-background: 246 247 249;       /* #F6F7F9 */
+  --color-surface: 255 255 255;          /* #FFFFFF */
+  --color-surface-hover: 229 231 235;    /* #E5E7EB */
+  --color-foreground: 11 15 20;          /* #0B0F14 */
+  --color-muted: 91 100 114;             /* #5B6472 */
+  --color-subtle: 51 65 85;              /* #334155 */
+  --color-gray-medium-text: 55 65 81;    /* #374151 */
+
+  --color-primary: 227 184 77;           /* #E3B84D fill, dark text on top */
+  --color-primary-text: 122 88 0;        /* #7A5800 */
+  --color-secondary: 200 155 35;         /* #C89B23 hover and pressed fill */
+  --color-secondary-text: 107 76 6;      /* #6B4C06 */
+  --color-on-primary: 11 15 20;
+
+  --color-success: 22 101 52;            /* #166534 */
+  --color-danger: 185 28 28;             /* #B91C1C */
+  --color-warning: 146 64 14;            /* #92400E */
+  --color-info: 29 78 216;               /* #1D4ED8 */
+  --color-accent-purple: 109 40 217;     /* #6D28D9 */
+  --color-deep-sage: 63 98 82;           /* #3F6252 */
+  --color-insight-taupe: 107 94 76;      /* #6B5E4C */
+
+  --card-alpha: 1;
+  --card-border-alpha: 0.1;
 }
 
 html {
   scroll-behavior: smooth;
   font-family: var(--font-sans);
-  @apply bg-soft-cream dark:bg-warm-black;
+  @apply bg-background;
 }
 
 body {
-  @apply bg-soft-cream text-warm-black dark:bg-warm-black dark:text-soft-cream;
+  @apply bg-background text-foreground;
   line-height: 1.6;
 }
 
 /* Keep keyboard navigation visible across the app */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid rgb(var(--focus-ring));
   outline-offset: 2px;
 }
 
-/* Base Typography */
+/* Base typography. One heading family (Geist) with the semantic scale; DM Serif Display is
+   reserved for the wordmark and landing titles (font-brand). */
 h1, .h1 {
-  @apply text-3xl font-serif font-normal;
-  font-family: var(--font-brand);
-  letter-spacing: -0.01em;
-  line-height: 1.1;
+  @apply font-sans text-heading-xl;
 }
 
 h2, .h2 {
-  @apply text-2xl font-serif font-normal;
-  font-family: var(--font-brand);
-  letter-spacing: -0.005em;
-  line-height: 1.2;
+  @apply font-sans text-heading-lg;
 }
 
 h3, .h3 {
-  @apply text-xl font-serif font-normal;
-  font-family: var(--font-brand);
-  line-height: 1.3;
+  @apply font-sans text-heading-md;
 }
 
 h4, .h4 {
-  @apply text-lg font-semibold;
-  font-family: var(--font-sans);
+  @apply font-sans text-title-lg;
 }
 
-p, body {
-  @apply text-sm font-normal;
-  font-family: var(--font-sans);
-  line-height: 1.6;
+p {
+  @apply font-sans text-body-md;
 }
 
 /* iOS Safari zooms the page when a focused field is under 16px. Pinch-zoom stays enabled for
@@ -156,29 +153,25 @@ p, body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-very-light dark:bg-warm-black;
+  @apply bg-background;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #aaa;
+  background: rgb(var(--color-muted) / 0.5);
   border-radius: 10px;
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: #333;
-}
-
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--color-primary));
+  background: rgb(var(--color-primary-text));
 }
 
-/* Link utilities — intentionally weak to avoid overriding landing page nav/CTAs */
-/* Only apply to prose/content links, not nav or button-style links */
+/* Link utilities, intentionally weak to avoid overriding landing page nav/CTAs.
+   Only apply to prose/content links, not nav or button-style links */
 .prose a {
-  @apply text-secondary hover:text-primary transition-all duration-300;
+  @apply text-secondary hover:text-primary transition-colors duration-300;
 }
 
-/* Reduced motion — disable all animations and transitions */
+/* Reduced motion: disable all animations and transitions */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -191,20 +184,19 @@ p, body {
 }
 
 /* ── Landing page scope ──────────────────────────────────────────────────────
-   The public landing renders on a fixed light editorial canvas with dark
-   product frames. Everything inside .landing opts out of the app's
-   element-level typography rules and theme class. */
+   The public pages share the app tokens and follow the same light and dark theme. The only
+   difference is typography: titles use the serif brand face and copy gets better wrapping. */
 .landing {
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  color: rgb(var(--lp-foreground));
-  background-color: rgb(var(--lp-background));
+  color: rgb(var(--color-foreground));
+  background-color: rgb(var(--color-background));
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* The app's global `p` rule points at an unloaded font; landing copy uses Geist. */
 .landing p {
   font-family: inherit;
+  text-wrap: pretty;
 }
 
 .landing :is(h1, h2, h3) {
@@ -214,18 +206,9 @@ p, body {
   text-wrap: balance;
 }
 
-.landing p {
-  text-wrap: pretty;
-}
-
-.landing :focus-visible {
-  outline: 2px solid rgb(var(--lp-foreground));
-  outline-offset: 3px;
-}
-
 .landing ::selection {
-  background: rgb(var(--lp-accent) / 0.45);
-  color: rgb(var(--lp-foreground));
+  background: rgb(var(--color-primary) / 0.45);
+  color: rgb(var(--color-foreground));
 }
 
 /* Motion system: one entrance (hero), one emphasis (accent dot), one
@@ -274,59 +257,63 @@ p, body {
   }
 }
 
-/* Card/Box utilities */
+/* Surfaces. Written after the utilities on purpose: they win over same-specificity utility
+   classes on the element, which the current screens rely on. Flat: no blur, no shadow, no lift. */
 .card {
-  @apply bg-gray-strong bg-opacity-40 backdrop-blur-md rounded-md;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply rounded-md;
+  background-color: rgb(var(--color-surface) / var(--card-alpha));
+  border: 1px solid rgb(var(--color-foreground) / var(--card-border-alpha));
+  transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 .card:hover {
-  border-color: rgba(244, 201, 93, 0.3);
-  background-color: rgba(42, 42, 42, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  border-color: rgb(var(--color-primary-text) / 0.3);
+  background-color: rgb(var(--color-surface-hover) / 0.5);
 }
 
 .glass {
-  @apply bg-white bg-opacity-[0.03] backdrop-blur-xl border border-white border-opacity-[0.05];
+  background-color: rgb(var(--color-foreground) / 0.03);
+  border: 1px solid rgb(var(--color-foreground) / var(--card-border-alpha));
 }
 
 .glass-card {
-  @apply bg-white/[0.03] backdrop-blur-xl border border-white/5 rounded-md;
+  @apply rounded-md;
+  background-color: rgb(var(--color-foreground) / 0.03);
+  border: 1px solid rgb(var(--color-foreground) / var(--card-border-alpha));
 }
 
 /* Text utilities */
-.text-display {
-  @apply text-3xl md:text-4xl lg:text-[40px] font-serif font-semibold;
-  letter-spacing: -0.02em;
-}
-
-.text-heading {
-  @apply text-xl lg:text-[24px] font-serif;
-}
-
 .text-subtext {
-  @apply text-caption text-gray-very-light opacity-80;
+  @apply text-body-md text-subtle opacity-80;
 }
 
 .text-micro {
-  font-size: 12px;
-  @apply font-sans font-medium uppercase tracking-wider;
+  @apply font-sans text-xs font-medium uppercase tracking-wider;
 }
 
 /* Remove autocomplete background for Chrome/Webkit */
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active{
-    transition: background-color 5000s ease-in-out 0s;
-    -webkit-text-fill-color: rgba(31, 26, 23, 1) !important; /* soft-cream for light mode (dark text) */
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: rgb(var(--color-foreground)) !important;
 }
 
-.dark input:-webkit-autofill,
-.dark input:-webkit-autofill:hover, 
-.dark input:-webkit-autofill:focus, 
-.dark input:-webkit-autofill:active{
-    -webkit-text-fill-color: rgba(248, 250, 252, 1) !important; /* soft-cream for dark mode */
+/* Respect the notch and home indicator. Needs viewport-fit=cover (set in app/layout.tsx). */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Touch screens: a button that holds only an icon gets a 44px target without changing its look
+   on a mouse. Buttons with text keep their own height. */
+@media (pointer: coarse) {
+  button:has(> svg:only-child),
+  [role='button']:has(> svg:only-child) {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

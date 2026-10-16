@@ -84,25 +84,25 @@ export function PwaInstallPrompt() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-gray-strong border border-white/10 dark:border-white/5 rounded-xl p-4 shadow-2xl z-[80] flex items-start gap-4 animate-fade-in">
-      <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-black/20 border border-white/5">
+    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-surface border border-foreground/10 dark:border-foreground/5 rounded-xl p-4 z-[80] flex items-start gap-4 animate-fade-in">
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-background/60 border border-foreground/5">
         <Logo size={36} variant="gold" />
       </div>
       <div className="flex-1">
-        <h3 className="text-soft-cream font-medium text-sm">Install TRASON App</h3>
-        <p className="text-soft-cream/60 text-xs mt-1 leading-relaxed">
+        <h3 className="text-foreground font-medium text-sm">Install TRASON App</h3>
+        <p className="text-foreground/60 text-xs mt-1 leading-relaxed">
           Install TRASON on your home screen for a faster, full-screen experience.
         </p>
         <div className="flex items-center gap-3 mt-3">
           <button
             onClick={handleInstallClick}
-            className="text-xs bg-primary text-black font-medium px-4 py-1.5 rounded-full hover:bg-primary/90 transition-colors"
+            className="text-xs bg-primary text-on-primary font-medium px-4 py-1.5 rounded-full hover:bg-primary/90 transition-colors"
           >
             Install Now
           </button>
           <button
             onClick={handleDismiss}
-            className="text-xs text-soft-cream/60 hover:text-soft-cream transition-colors"
+            className="text-xs text-foreground/60 hover:text-foreground transition-colors"
           >
             Not Now
           </button>

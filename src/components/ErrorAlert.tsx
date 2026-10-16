@@ -25,20 +25,21 @@ export function ErrorAlert({
 
   if (!error) return null;
 
-  const positionClass = position === 'top' ? 'top-4' : 'bottom-4';
+  const positionClass = position === 'top' ? 'top-[max(1rem,env(safe-area-inset-top))]' : 'bottom-[max(1rem,env(safe-area-inset-bottom))]';
 
   return (
     <div
-      className={`fixed ${positionClass} right-4 left-4 md:left-auto md:w-96 z-50 animate-slide-in`}
+      role="alert"
+      className={`fixed ${positionClass} right-4 left-4 md:left-auto md:w-96 z-50 animate-slide-up`}
     >
-      <div className="bg-danger text-white px-6 py-4 rounded-md shadow-lg flex items-start gap-4">
+      <div className="flex items-start gap-3 rounded-md bg-danger py-3 pl-4 pr-1 text-background">
         <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="text-sm font-medium">{error}</p>
+          <p className="py-2 text-body-md font-medium">{error}</p>
         </div>
         <button
           onClick={onDismiss}
-          className="flex-shrink-0 text-white/80 hover:text-white transition-colors"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md opacity-80 transition-opacity hover:opacity-100"
           aria-label="Dismiss error"
         >
           <X size={16} />

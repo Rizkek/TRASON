@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, WarningCircle, XCircle, Clock, Robot } from '@phosphor-icons/react';
+import { CheckCircle, WarningCircle, XCircle, Clock, Receipt } from '@phosphor-icons/react';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 
 interface Props {
@@ -42,10 +42,10 @@ export function ExtractionStatus({ status, confidence = 0 }: Props) {
         };
       default:
         return {
-          icon: <Robot size={16} className="text-gray-light" />,
+          icon: <Receipt size={16} className="text-muted-foreground" />,
           text: 'Waiting for receipt',
-          bg: 'bg-gray-strong/50',
-          textColor: 'text-gray-light'
+          bg: 'bg-surface/50',
+          textColor: 'text-muted-foreground'
         };
     }
   };
@@ -53,13 +53,13 @@ export function ExtractionStatus({ status, confidence = 0 }: Props) {
   const config = getStatusConfig();
 
   return (
-    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${config.bg} border border-white/5 w-fit`}>
+    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${config.bg} border border-foreground/5 w-fit`}>
       {config.icon}
-      <span className={`text-[10px] font-semibold tracking-wide ${config.textColor}`}>
+      <span className={`text-xs font-semibold tracking-wide ${config.textColor}`}>
         {config.text}
       </span>
       {status === 'verified' && confidence > 0 && (
-        <span className="text-[10px] text-success/50 ml-1">
+        <span className="text-xs text-success/50 ml-1">
           {Math.round(confidence * 100)}%
         </span>
       )}
