@@ -53,12 +53,12 @@ const TABS: Tab[] = [
   },
   {
     id: 'vitality',
-    label: 'Vitality',
+    label: 'Sport',
     path: 'trason.web.id/sport',
     what: 'Consistency you can see.',
     how: 'Log sessions with type, duration and intensity. Watch the week fill in, keep personal records, and let it count toward your Life Score.',
     why: 'Showing up gets noticed.',
-    frameLabel: 'Vitality page with weekly session totals, a consistency tracker, recent workouts and personal records.',
+    frameLabel: 'Sport page with weekly session totals, a consistency tracker, recent workouts and personal records.',
     render: () => <VitalityUI />,
   },
   {

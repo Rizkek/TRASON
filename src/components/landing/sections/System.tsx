@@ -16,7 +16,7 @@ const MODULES = [
   { name: 'Finance', icon: CurrencyCircleDollar, desc: 'Income, expenses, subscriptions, budgets and receipts.' },
   { name: 'Investments', icon: ChartLineUp, desc: 'Stock, crypto and gold positions, priced daily.' },
   { name: 'Career', icon: Briefcase, desc: 'Applications from Applied to Offer, plus resume match.' },
-  { name: 'Vitality', icon: Heartbeat, desc: 'Workout sessions, weekly consistency, personal records.' },
+  { name: 'Sport', icon: Heartbeat, desc: 'Workout sessions, weekly consistency, personal records.' },
   { name: 'Schedule', icon: CalendarBlank, desc: 'A weekly log of activities and today’s tasks.' },
   { name: 'Reminders', icon: Bell, desc: 'Time-based, delivered as push notifications.' },
 ];

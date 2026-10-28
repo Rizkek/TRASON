@@ -198,9 +198,9 @@ export function VitalityUI() {
   const active = [true, false, true, true, false, false, false];
   return (
     <div className="flex min-h-[420px] text-left">
-      <UiSidebar active="Vitality" />
+      <UiSidebar active="Sport" />
       <div className="flex-1 space-y-4 p-4 sm:p-6">
-        <UiPageHeader title="Vitality" meta="This week" />
+        <UiPageHeader title="Sport" meta="This week" />
 
         <div className="grid grid-cols-3 gap-3">
           <UiCard>
@@ -287,7 +287,7 @@ const DAYS = [
 ];
 
 const ACTIVITIES = [
-  { time: '06:30', title: 'Morning run', cat: 'Vitality', dur: '35m', mood: 'Energized' },
+  { time: '06:30', title: 'Morning run', cat: 'Sport', dur: '35m', mood: 'Energized' },
   { time: '09:00', title: 'Deep work — portfolio case study', cat: 'Work', dur: '2h', mood: 'Focused' },
   { time: '12:30', title: 'Lunch with Dimas', cat: 'Social', dur: '1h', mood: 'Good' },
   { time: '19:00', title: 'Indonesian class', cat: 'Learning', dur: '1h', mood: '' },

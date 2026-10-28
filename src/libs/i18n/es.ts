@@ -385,7 +385,7 @@ export const es = {
     "view_all": "Ver todo",
     "view_all_tasks": "Ver las {count} tareas",
     "view_schedule": "Ver horario",
-    "vitality_this_week": "Vitalidad esta semana",
+    "vitality_this_week": "Deporte esta semana",
     "welcome_back": "Bienvenido de nuevo",
     "load_failed": "No se pudieron cargar algunas secciones del panel.",
     "section_load_failed": "No se pudo cargar esta sección.",

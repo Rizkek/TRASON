@@ -100,7 +100,7 @@ export function UiTag({
   );
 }
 
-const NAV = ['Dashboard', 'Finance', 'Investments', 'Schedule', 'Vitality', 'Career', 'Reminders', 'Insights'];
+const NAV = ['Dashboard', 'Finance', 'Investments', 'Schedule', 'Sport', 'Career', 'Reminders', 'Insights'];
 
 export function UiSidebar({ active }: { active: string }) {
   return (

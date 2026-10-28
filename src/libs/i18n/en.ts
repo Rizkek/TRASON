@@ -385,7 +385,7 @@ export const en = {
     "view_all": "View all",
     "view_all_tasks": "View all {count} tasks",
     "view_schedule": "View schedule",
-    "vitality_this_week": "Vitality this week",
+    "vitality_this_week": "Sport this week",
     "welcome_back": "Welcome back",
     "load_failed": "Some dashboard sections could not be loaded.",
     "section_load_failed": "Could not load this section.",

@@ -385,7 +385,7 @@ export const ja = {
     "view_all": "すべて見る",
     "view_all_tasks": "すべてのタスクを見る ({count}件)",
     "view_schedule": "スケジュールを見る",
-    "vitality_this_week": "今週のバイタリティ",
+    "vitality_this_week": "今週のスポーツ",
     "welcome_back": "お帰りなさい",
     "load_failed": "ダッシュボードの一部を読み込めませんでした。",
     "section_load_failed": "このセクションを読み込めませんでした。",

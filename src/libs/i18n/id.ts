@@ -386,7 +386,7 @@ export const id = {
     "view_all": "Lihat semua",
     "view_all_tasks": "Lihat semua {count} tugas",
     "view_schedule": "Lihat jadwal",
-    "vitality_this_week": "Vitalitas minggu ini",
+    "vitality_this_week": "Olahraga minggu ini",
     "welcome_back": "Selamat datang kembali",
     "load_failed": "Beberapa bagian dashboard tidak dapat dimuat.",
     "section_load_failed": "Bagian ini tidak dapat dimuat.",
