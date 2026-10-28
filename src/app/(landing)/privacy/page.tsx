@@ -18,7 +18,7 @@ const LAST_UPDATED = 'October 28, 2026';
 const PROCESSORS = [
   { name: 'Supabase', role: 'Database, sign-in and file storage', data: 'Everything in your account, including uploaded images' },
   { name: 'Vercel', role: 'Hosting and performance measurement (Speed Insights)', data: 'Requests to the site, IP address, page load timings' },
-  { name: 'Google (Gemini API)', role: 'Drafts from Smart Input, receipt and payout scans, and weekly summaries', data: 'Only the text or image you submit to that feature, plus the records a summary is written from' },
+  { name: 'Google (Gemini API)', role: 'Drafts from Smart Input, receipt and payout scans, and weekly summaries', data: 'Only the text or image you submit to that feature, plus the records a summary is written from. Google may use it to improve its products' },
   { name: 'Cloudflare', role: 'Bot check on sign-in pages, and a check that your email domain exists', data: 'Browser signals for the bot check; the domain part of your email at sign-up' },
   { name: 'Resend', role: 'Email digest and account emails', data: 'Your email address and the content of the email' },
   { name: 'Your browser’s push service (Google, Mozilla or Apple)', role: 'Delivering notifications', data: 'A device address and the encrypted notification' },
@@ -85,10 +85,10 @@ export default function PrivacyPolicyPage() {
         <p>
           Smart Input, receipt scanning, driver payout import and the summary on the Insights page send what you submit
           to Google&apos;s Gemini API, which returns a draft. You review and correct the draft before anything is saved,
-          and totals are checked by our own code, not by the AI. Google processes this content under the Gemini API
-          terms. Google may keep it for a limited time to detect abuse, and when the API is used without paid billing,
-          Google may also use it to improve its products. If you would rather not send something, enter it by hand
-          instead; every AI feature is optional.
+          and totals are checked by our own code, not by the AI. TRASON uses the Gemini API without paid billing. Under
+          Google&apos;s terms for that tier, Google may keep what you submit, use it to improve its products, and have
+          people review it. Do not use these features for anything you would not want handled that way: enter it by
+          hand instead. Every AI feature is optional, and nothing is sent to Google until you use one.
         </p>
 
         <h2>4. Who processes your data</h2>
