@@ -5,67 +5,62 @@ import { PageHeader } from '@/components/landing/page/PageHeader';
 
 export const metadata: Metadata = {
   title: 'Changelog',
-  description: 'New updates and improvements to TRASON.',
+  description: 'What changed in TRASON, month by month.',
   alternates: { canonical: '/changelog' },
 };
 
+// Written for people using the app: what they can now do or will notice, not how it was built.
 const CHANGES = [
   {
-    version: 'v1.1.0',
-    date: 'June 17, 2026',
-    title: 'The Professional Update',
+    month: 'October 2026',
     items: [
-      'Refactored UI to remove casual emojis for a more professional, polished look.',
-      'Completely redesigned the Landing Footer with comprehensive SaaS links.',
-      'Introduced a highly realistic Interactive Preview on the landing page.',
-      'Added Contact, Pricing, Changelog, and Legal pages.',
+      'Reset a forgotten password from the sign-in page.',
+      'Email confirmation links now work on any device, not only the one you signed up on.',
+      'Sign-in and sign-up pages show clearer messages and list the password requirements as you type.',
+      'Light and dark theme follow your device until you pick one in Settings.',
+      'Reminders arrive once on every device where you turned them on, instead of only the last one.',
+      'A reminder can no longer be set for a time that has already passed.',
+      'Import a driver payout statement into Finance, and give reminders a priority.',
+      'Career rates no longer count applications you withdrew.',
     ],
   },
   {
-    version: 'v1.0.0',
-    date: 'June 10, 2026',
-    title: 'Initial MVP Release',
+    month: 'September 2026',
     items: [
-      'Launched the TRASON Core Operating System.',
-      'Financial Tracking: Income, Expenses, and Saving Rate.',
-      'Vitality Tracking: Habit 30-day heatmaps.',
-      'Career Pipeline: Job application tracking with stages.',
+      'Scan a receipt into a draft transaction and correct it before saving.',
+      'Track instalment plans alongside regular transactions.',
+      'A new landing page that shows the real product.',
     ],
   },
   {
-    version: 'Beta',
-    date: 'May 2026',
-    title: 'Closed Beta',
-    items: ['Invited first 100 power users to test the platform.', 'Iterated on the Life Score algorithm.'],
+    month: 'August 2026',
+    items: [
+      'Insights: ask for a plain-language summary of your week.',
+      'Timeline is now Schedule, with public holidays marked on the calendar.',
+      'After signing in you return to the page you were on.',
+      'Completed reminders are kept in a History tab.',
+      'Light mode across the whole app.',
+      'Every screen is translated into English, Indonesian, Japanese and Spanish.',
+    ],
   },
 ];
 
 export default function ChangelogPage() {
   return (
     <PageShell>
-      <PageHeader eyebrow="Changelog" title="What changed" lede="New updates and improvements to TRASON." />
+      <PageHeader title="Changelog" lede="What changed in TRASON, newest first." />
 
-      <ol className="mt-16 space-y-14">
+      <ol className="mt-14 space-y-12">
         {CHANGES.map((release) => (
-          <li key={release.version} className="grid gap-4 md:grid-cols-[12rem_1fr] md:gap-10">
-            <div>
-              <p className="text-sm font-semibold text-foreground">{release.date}</p>
-              <p className="mt-1 inline-block rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-on-primary">
-                {release.version}
-              </p>
-            </div>
-
-            <div className="space-y-4 border-l-2 border-primary pl-5 md:pl-6">
-              <h2 className="text-heading-lg text-foreground">{release.title}</h2>
-              <ul className="space-y-2.5">
-                {release.items.map((item) => (
-                  <li key={item} className="flex gap-3 text-sm leading-relaxed text-muted-foreground">
-                    <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <li key={release.month} className="grid gap-4 md:grid-cols-[10rem_1fr] md:gap-10">
+            <h2 className="text-base font-semibold text-foreground">{release.month}</h2>
+            <ul className="space-y-2.5 border-l-2 border-primary pl-5 md:pl-6">
+              {release.items.map((item) => (
+                <li key={item} className="text-sm leading-relaxed text-muted-foreground">
+                  {item}
+                </li>
+              ))}
+            </ul>
           </li>
         ))}
       </ol>

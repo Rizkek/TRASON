@@ -27,7 +27,6 @@ export function System() {
       <Container>
         <SectionHeading
           id="system-heading"
-          eyebrow="The system"
           align="center"
           title="Six parts of one life, on one Dashboard."
           lede="Each module keeps its own page. All of them feed the same Dashboard and one Life Score. Turn off what you don't need in Settings."

@@ -111,7 +111,6 @@ export function ProductExperience() {
       <Container>
         <SectionHeading
           id="product-heading"
-          eyebrow="Product preview"
           title="See it, page by page."
           lede="Each module is a page you will actually use. Pick one."
         />

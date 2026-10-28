@@ -50,6 +50,12 @@ const nextConfig = {
         destination: '/schedule',
         permanent: true,
       },
+      {
+        // Support and Contact were merged into one help page.
+        source: '/support',
+        destination: '/contact',
+        permanent: true,
+      },
     ];
   },
   async headers() {

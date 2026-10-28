@@ -36,7 +36,6 @@ export default function VisionPage() {
     <PageShell width="article">
       <article className="space-y-24">
         <PageHeader
-          eyebrow="Vision"
           title={
             <>
               App fatigue
@@ -63,19 +62,19 @@ export default function VisionPage() {
           <p>We believe your personal data should live in one place. It should compound. It should correlate.</p>
           <p className="!text-foreground !font-semibold">TRASON is not another app. It is a personal operating system.</p>
           <p>
-            Imagine a system that knows you spent $200 on an online course, tags it to your Career Pipeline, and reminds
-            you to study during your deep work block, all without disrupting your sleep schedule.
+            When the fee for an online course, the study sessions it needs and the job applications it is meant to help
+            all sit in one place, you can see whether the spending is paying off.
           </p>
           <p>
-            When your financial capital, professional capital, and physical vitality are tracked in one environment, you
-            stop reacting to notifications and start orchestrating your life.
+            When your money, your career and your training are recorded together, you can see how one affects the
+            others instead of guessing.
           </p>
         </Chapter>
 
         <section aria-label="Closing statement" className="border-t border-foreground/15 pt-16">
           <blockquote className="font-brand text-3xl leading-tight text-foreground md:text-5xl">
-            &ldquo;We are building TRASON for the ambitious. For those who want to design their lives with the same rigor
-            a CEO designs a company.&rdquo;
+            &ldquo;We are building TRASON for people who want to see their week clearly, in one place, without keeping
+            five apps in sync to do it.&rdquo;
           </blockquote>
           <div className="mt-10 flex items-center gap-4">
             <Logo size={48} variant="gold" />

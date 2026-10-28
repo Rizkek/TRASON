@@ -2,7 +2,6 @@ import React from 'react';
 
 interface SectionHeadingProps {
   id: string;
-  eyebrow?: string;
   title: React.ReactNode;
   lede?: React.ReactNode;
   align?: 'left' | 'center';
@@ -16,12 +15,11 @@ export function Mark({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Primary + secondary message for a section. The eyebrow names the section,
- * the title carries the point, the lede adds context only when needed.
+ * Primary + secondary message for a section: the title carries the point,
+ * the lede adds context only when needed. No eyebrow label above the title.
  */
 export function SectionHeading({
   id,
-  eyebrow,
   title,
   lede,
   align = 'left',
@@ -32,12 +30,6 @@ export function SectionHeading({
 
   return (
     <div className={`flex max-w-2xl flex-col gap-4 ${alignClass} ${className}`}>
-      {eyebrow && (
-        <p className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-primary" />
-          {eyebrow}
-        </p>
-      )}
       <Tag id={id} className="text-heading-xl leading-[1.08] text-foreground sm:text-4xl lg:text-display-md">
         {title}
       </Tag>

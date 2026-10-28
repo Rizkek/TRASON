@@ -5,23 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: [
-          '/',
-          '/about',
-          '/about-os',
-          '/vision',
-          '/roadmap',
-          '/pricing',
-          '/contact',
-          '/changelog',
-          '/features/',
-          '/showcase/',
-          '/login',
-          '/signup',
-          '/privacy',
-          '/terms',
-          '/cookies',
-        ],
+        allow: '/',
+        // Signed-in areas, one-time auth links and the API have nothing to index.
         disallow: [
           '/dashboard',
           '/finance',
@@ -34,6 +19,9 @@ export default function robots(): MetadataRoute.Robots {
           '/sport',
           '/career',
           '/onboarding',
+          '/auth/',
+          '/forgot-password',
+          '/reset-password',
           '/api/',
         ],
       },

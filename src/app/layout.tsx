@@ -8,6 +8,7 @@ import { ThemeSync } from '@/components/layout/ThemeSync';
 import { NO_FLASH_THEME_SCRIPT, THEME_META_COLOR } from '@/libs/theme';
 import NextTopLoader from 'nextjs-toploader';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { SITE_CONTACT } from '@/config/site';
 
 const BASE_URL = 'https://www.trason.web.id';
 
@@ -150,7 +151,7 @@ const jsonLd = {
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'customer support',
-        email: 'hello@trason.app',
+        email: SITE_CONTACT.email,
         areaServed: 'ID',
         availableLanguage: ['Indonesian', 'English'],
       },

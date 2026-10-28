@@ -13,7 +13,6 @@ export function Intelligence() {
           <div className="lg:col-span-5">
             <SectionHeading
               id="intelligence-heading"
-              eyebrow="Intelligence"
               title="Structure from a sentence. A summary when you ask."
               lede="TRASON doesn't push advice at you. It turns what you type into records, and writes a plain-language summary of your week when you request one."
             />
