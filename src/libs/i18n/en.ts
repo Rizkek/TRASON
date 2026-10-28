@@ -245,23 +245,27 @@ export const en = {
       "reviewing": "Reviewing"
     },
     "stats_labels": {
-      "avg": "Avg.",
       "avgToInterview": "Avg. to interview",
       "interviewRate": "Interview rate",
-      "intv": "Intv.",
-      "offer": "Offer",
       "offerRate": "Offer rate",
-      "resp": "Resp.",
-      "responseRate": "Response rate"
+      "responseRate": "Response rate",
+      "closed": "Closed"
     },
     "tabs": {
       "active": "Active",
       "all": "All",
       "closed": "Closed",
-      "interview": "Interview"
+      "interview": "Interview",
+      "applications": "Applications"
     },
     "title": "Career",
-    "title_highlight": ""
+    "insights": {
+      "stale": "No new application in {days} days.",
+      "no_active": "No application is in progress. Add a new one to keep the pipeline moving.",
+      "low_response": "Only {rate}% of applications got a reply. Consider updating your resume or cover letter.",
+      "low_interview": "{rate}% of applications reached an interview. Try roles that match your skills more closely.",
+      "offers": "You have {count} offer(s) waiting for a decision."
+    }
   },
   "common": {
     "cancel": "Cancel",
@@ -573,8 +577,6 @@ export const en = {
   "insights_page": {
     "ai_generic_error": "Failed to generate insights.",
     "ai_timeout_error": "Request timeout. Generation is taking too long — please try again.",
-    "architect_perspective_desc": "Keep logging to see long-term patterns.",
-    "architect_perspective_title": "Summary",
     "ask_ai": "Generate insights",
     "delete_insight": "Delete insight",
     "desc": "Discover patterns and signals in your data.",
@@ -583,9 +585,10 @@ export const en = {
     "reset_insights": "Clear all",
     "reset_insights_confirm": "Are you sure you want to permanently clear all previous insights?",
     "resetting": "Clearing...",
-    "system_idle": "Ready",
     "thinking": "Thinking...",
-    "title": "Insights"
+    "title": "Insights",
+    "footer_note": "Keep logging to see long-term patterns.",
+    "load_failed": "Saved insights could not be loaded."
   },
   "investment_page": {
     "add_first_position": "Add first position",
@@ -668,7 +671,8 @@ export const en = {
     "unrealized_pl": "P/L",
     "update_label": "update",
     "update_position_upper": "Save",
-    "value": "Value"
+    "value": "Value",
+    "price_stale": "Price not synced yet"
   },
   "life_score": {
     "dimensions": {
@@ -709,8 +713,6 @@ export const en = {
     "all_sub_off_warning": "All sub-features are turned off — module has no visible content",
     "career_desc": "Track job applications, interviews, and opportunities",
     "description": "Enable or disable modules to customize your experience. Disabled modules will not appear in the navigation or dashboard.",
-    "disabled_count": "Disabled modules",
-    "enabled_count": "Enabled modules",
     "finance_desc": "Track income and expenses, manage budgets",
     "insights_desc": "AI-powered analytics and recommendations",
     "investments_desc": "Portfolio tracking and investment insights",
@@ -721,7 +723,8 @@ export const en = {
     "timeline_daily_checklist": "Tasks",
     "timeline_desc": "Daily activities and schedule management",
     "timeline_weekly_log": "Weekly log",
-    "title": "Active modules"
+    "title": "Active modules",
+    "count_summary": "{on} of {total} modules on"
   },
   "nav": {
     "cancel": "Cancel",
@@ -825,7 +828,10 @@ export const en = {
     "title_highlight": "",
     "title_required": "Title is required",
     "weekly_focus": "Weekly focus",
-    "weekly_focus_desc": "You have {count} pending reminders this week."
+    "weekly_focus_desc": "You have {count} pending reminders this week.",
+    "view_label": "View",
+    "view_calendar": "Calendar view",
+    "view_list": "List view"
   },
   "settings": {
     "alerts": {

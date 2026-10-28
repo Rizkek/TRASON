@@ -4,7 +4,7 @@ import React from 'react';
 import { Button } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Plus } from '@phosphor-icons/react';
-import { Heading, Paragraph } from '@/components/ui/typography';
+import { AppPageHeader } from '@/components/layout/AppPageHeader';
 
 interface TimelineHeaderProps {
   activeTab: 'weekly-log' | 'daily-checklist';
@@ -31,54 +31,39 @@ export function TimelineHeader({
 }: TimelineHeaderProps) {
   const { t } = useTranslation();
 
+  const showWeekly = activeTab === 'weekly-log' && hasWeeklyLogFeature;
+  const showDaily = activeTab === 'daily-checklist' && hasDailyChecklistFeature && totalCount > 0;
+  const stats = showWeekly && activitiesCount > 0
+    ? [
+        { label: t('timeline_page.logs_upper'), value: String(activitiesCount) },
+        { label: t('timeline_page.logged_upper'), value: totalHours > 0 ? `${totalHours}h` : `${remMinutes}m` },
+      ]
+    : showDaily
+      ? [{ label: t('timeline_page.done_today'), value: `${completedCount}/${totalCount}` }]
+      : [];
+
   return (
-    <div className="flex items-start justify-between flex-wrap gap-4">
-      <div className="space-y-1">
-        <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-foreground">
-          {t('timeline_page.title')}
-        </Heading>
-        <Paragraph className="text-subtext flex items-center gap-2">
-          {t('timeline_page.desc')}
-        </Paragraph>
-      </div>
-      <div className="flex items-center gap-4">
-        {activeTab === 'weekly-log' && hasWeeklyLogFeature && activitiesCount > 0 && (
-          <div className="flex items-center gap-8 text-center">
-            <div>
-              <Paragraph className="text-2xl font-semibold text-primary">{activitiesCount}</Paragraph>
-              <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest">
-                {t('timeline_page.logs_upper')}
-              </Paragraph>
-            </div>
-            <div>
-              <Paragraph className="text-2xl font-semibold text-secondary">
-                {totalHours > 0 ? `${totalHours}h` : `${remMinutes}m`}
-              </Paragraph>
-              <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest">
-                {t('timeline_page.logged_upper')}
-              </Paragraph>
-            </div>
-          </div>
-        )}
-        {activeTab === 'daily-checklist' && hasDailyChecklistFeature && totalCount > 0 && (
-          <div className="flex items-center gap-2">
-            <div className="text-center">
-              <Paragraph className="text-2xl font-semibold text-primary">
-                {completedCount}
-                <span className="text-muted-foreground opacity-50 text-lg">/{totalCount}</span>
-              </Paragraph>
-              <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest">
-                {t('timeline_page.done_today')}
-              </Paragraph>
-            </div>
-          </div>
-        )}
-        {activeTab === 'weekly-log' && hasWeeklyLogFeature && (
-          <Button variant="primary" size="md" onClick={onOpenAddModal} leftIcon={<Plus size={18} />}>
+    <AppPageHeader
+      title={t('timeline_page.title')}
+      description={t('timeline_page.desc')}
+      actions={
+        showWeekly && (
+          <Button variant="primary" size="sm" onClick={onOpenAddModal} leftIcon={<Plus size={16} />}>
             {t('timeline_page.log_activity_btn')}
           </Button>
-        )}
-      </div>
-    </div>
+        )
+      }
+    >
+      {stats.length > 0 && (
+        <dl className="flex items-baseline gap-6">
+          {stats.map((stat) => (
+            <div key={stat.label} className="flex flex-row-reverse items-baseline gap-1.5">
+              <dt className="text-label-sm text-muted-foreground">{stat.label}</dt>
+              <dd className="font-mono text-title-md text-foreground">{stat.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+    </AppPageHeader>
   );
 }

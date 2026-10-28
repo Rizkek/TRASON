@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { Card, Button, Select } from '@/components';
+import { Card, Button, Select, Switch } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { PreferenceData } from './types';
 import { BellRinging, Globe, FloppyDisk as Save } from '@phosphor-icons/react';
-import { Heading, Paragraph } from '@/components/ui/typography';
+import { Paragraph } from '@/components/ui/typography';
 
 interface NotificationsSectionProps {
   prefs: PreferenceData;
@@ -48,39 +48,26 @@ export function NotificationsSection({
 
   return (
     <Card className="glass border-none" title={t('settings.alerts.sectionTitle')}>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between p-6 rounded-md border bg-foreground/[0.02] border-foreground/[0.05]">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
-              <BellRinging size={20} className="text-secondary" />
-            </div>
-            <div>
-              <Heading as="h4" size="h4" className="text-sm font-medium text-foreground">{t('settings.alerts.push')}</Heading>
-              <Paragraph className="text-xs text-muted-foreground">{t('settings.alerts.pushDesc')}</Paragraph>
-            </div>
+      <div className="space-y-4">
+        <div className="flex items-start gap-3 rounded-lg border border-foreground/10 bg-foreground/[0.02] p-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary/10">
+            <BellRinging size={20} aria-hidden="true" className="text-secondary" />
           </div>
-          {/* Toggle Switch */}
-          <button
-            type="button"
-            onClick={() =>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-label-md text-foreground">{t('settings.alerts.push')}</h4>
+            <p className="mt-0.5 text-body-sm text-muted-foreground">{t('settings.alerts.pushDesc')}</p>
+          </div>
+          <Switch
+            checked={prefs.push_notifications_enabled}
+            label={t('settings.alerts.push')}
+            onChange={() =>
               setPrefs((p) => ({
                 ...p,
                 push_notifications_enabled: !p.push_notifications_enabled,
                 notifications_enabled: !p.notifications_enabled,
               }))
             }
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              prefs.push_notifications_enabled
-                ? 'bg-primary'
-                : 'bg-surface border border-foreground/[0.1]'
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                prefs.push_notifications_enabled ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </button>
+          />
         </div>
 
         <div className="rounded-md border border-secondary/20 bg-secondary/5 p-4">
@@ -110,40 +97,28 @@ export function NotificationsSection({
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-6 rounded-md border bg-foreground/[0.02] border-foreground/[0.05]">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Globe size={20} className="text-primary" />
-            </div>
-            <div>
-              <Heading as="h4" size="h4" className="text-sm font-medium text-foreground">{t('settings.alerts.email')}</Heading>
-              <Paragraph className="text-xs text-muted-foreground">{t('settings.alerts.emailDesc')}</Paragraph>
-            </div>
+        <div className="flex items-start gap-3 rounded-lg border border-foreground/10 bg-foreground/[0.02] p-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+            <Globe size={20} aria-hidden="true" className="text-primary" />
           </div>
-          <button
-            type="button"
-            onClick={() =>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-label-md text-foreground">{t('settings.alerts.email')}</h4>
+            <p className="mt-0.5 text-body-sm text-muted-foreground">{t('settings.alerts.emailDesc')}</p>
+          </div>
+          <Switch
+            checked={prefs.email_digest_enabled}
+            label={t('settings.alerts.email')}
+            onChange={() =>
               setPrefs((p) => ({
                 ...p,
                 email_digest_enabled: !p.email_digest_enabled,
               }))
             }
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              prefs.email_digest_enabled
-                ? 'bg-primary'
-                : 'bg-surface border border-foreground/[0.1]'
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                prefs.email_digest_enabled ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </button>
+          />
         </div>
 
         {prefs.email_digest_enabled && (
-          <div className="animate-fade-in pl-14 max-w-xs">
+          <div className="animate-fade-in max-w-xs sm:pl-[3.25rem]">
             <Select
               label={t('settings.alerts.frequency')}
               value={prefs.digest_frequency}

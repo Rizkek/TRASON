@@ -21,7 +21,7 @@ export const WorkoutPlanCard: React.FC<Props> = ({ plan, onSelect, onActivate })
       }`}
       onClick={() => onSelect?.(plan)}
     >
-      <div className="p-8 space-y-6 relative z-10">
+      <div className="p-5 md:p-8 space-y-6 relative z-10">
         <div className="flex justify-between items-start gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">

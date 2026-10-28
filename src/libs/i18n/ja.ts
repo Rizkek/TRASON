@@ -245,23 +245,27 @@ export const ja = {
       "reviewing": "選考中"
     },
     "stats_labels": {
-      "avg": "平均",
       "avgToInterview": "面接までの平均",
       "interviewRate": "面接率",
-      "intv": "面接",
-      "offer": "内定",
       "offerRate": "内定率",
-      "resp": "返答",
-      "responseRate": "返答率"
+      "responseRate": "返答率",
+      "closed": "終了"
     },
     "tabs": {
       "active": "進行中",
       "all": "すべて",
       "closed": "完了",
-      "interview": "面接"
+      "interview": "面接",
+      "applications": "応募"
     },
     "title": "キャリア",
-    "title_highlight": ""
+    "insights": {
+      "stale": "{days}日間、新しい応募がありません。",
+      "no_active": "進行中の応募はありません。新しい応募を追加しましょう。",
+      "low_response": "返信があった応募は{rate}%だけです。履歴書やカバーレターの見直しを検討してください。",
+      "low_interview": "面接に進んだ応募は{rate}%です。スキルにより合う職種を探してみてください。",
+      "offers": "回答待ちのオファーが{count}件あります。"
+    }
   },
   "common": {
     "cancel": "キャンセル",
@@ -573,8 +577,6 @@ export const ja = {
   "insights_page": {
     "ai_generic_error": "インサイトの生成に失敗しました。",
     "ai_timeout_error": "リクエストがタイムアウトしました。生成に時間がかかりすぎています。もう一度お試しください。",
-    "architect_perspective_desc": "記録を続けて長期的なパターンを見つけましょう。",
-    "architect_perspective_title": "概要",
     "ask_ai": "インサイトを生成",
     "delete_insight": "インサイトを削除",
     "desc": "記録されたデータから傾向を要約します。",
@@ -583,9 +585,10 @@ export const ja = {
     "reset_insights": "すべてクリア",
     "reset_insights_confirm": "以前のすべてのインサイト履歴を完全に消去してもよろしいですか？",
     "resetting": "消去中...",
-    "system_idle": "待機中",
     "thinking": "考え中...",
-    "title": "インサイト"
+    "title": "インサイト",
+    "footer_note": "記録を続けて長期的なパターンを見つけましょう。",
+    "load_failed": "保存されたインサイトを読み込めませんでした。"
   },
   "investment_page": {
     "add_first_position": "最初のポジションを追加",
@@ -650,7 +653,7 @@ export const ja = {
     "portfolio_tracker_desc": "価格更新を伴うシンプルな取得原価追跡。",
     "portfolio_value": "ポートフォリオ価値",
     "portfolio_worth": "現在のポートフォリオは、追跡されている{count}個のポジションで{value}の価値があります。",
-    "price_live": "ライブ価格、{time}に更新",
+    "price_live": "リアルタイム価格（{time} 更新）",
     "price_not_refreshed": "価格はまだ更新されていません",
     "refresh_prices": "価格を更新",
     "remaining_amount": "残額",
@@ -668,7 +671,8 @@ export const ja = {
     "unrealized_pl": "損益",
     "update_label": "更新",
     "update_position_upper": "更新",
-    "value": "評価額"
+    "value": "評価額",
+    "price_stale": "価格はまだ同期されていません"
   },
   "life_score": {
     "dimensions": {
@@ -709,8 +713,6 @@ export const ja = {
     "all_sub_off_warning": "すべてのサブ機能がオフです — モジュールに表示されるコンテンツがありません",
     "career_desc": "Track job applications, interviews, and opportunities",
     "description": "モジュールを有効または無効にして、エクスペリエンスをカスタマイズしてください。無効化されたモジュールはナビゲーションやダッシュボードに表示されません。",
-    "disabled_count": "無効なモジュール",
-    "enabled_count": "有効なモジュール",
     "finance_desc": "Track income and expenses, manage budgets",
     "insights_desc": "AI-powered analytics and recommendations",
     "investments_desc": "Portfolio tracking and investment insights",
@@ -721,7 +723,8 @@ export const ja = {
     "timeline_daily_checklist": "タスク",
     "timeline_desc": "Daily activities and schedule management",
     "timeline_weekly_log": "週次ログ",
-    "title": "アクティブモジュール"
+    "title": "アクティブモジュール",
+    "count_summary": "{total}個中{on}個のモジュールがオン"
   },
   "nav": {
     "cancel": "キャンセル",
@@ -825,7 +828,10 @@ export const ja = {
     "title_highlight": "",
     "title_required": "タイトルは必須です",
     "weekly_focus": "今週のフォーカス",
-    "weekly_focus_desc": "今週は{count}個の保留中のリマインダーがあります。"
+    "weekly_focus_desc": "今週は{count}個の保留中のリマインダーがあります。",
+    "view_label": "表示",
+    "view_calendar": "カレンダー表示",
+    "view_list": "リスト表示"
   },
   "settings": {
     "alerts": {

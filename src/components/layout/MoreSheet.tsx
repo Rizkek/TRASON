@@ -54,7 +54,7 @@ export function MoreSheet({ open, items, isActive, user, onClose, onLogout }: Mo
   const settingsActive = isActive('/settings');
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col justify-end md:hidden">
+    <div className="fixed inset-0 z-[60] flex flex-col justify-end lg:hidden">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
 
       <div

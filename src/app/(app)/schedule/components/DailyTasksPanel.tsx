@@ -56,7 +56,7 @@ export function DailyTasksPanel({
   return (
     <div className="glass rounded-xl border border-foreground/[0.05] overflow-hidden">
       {/* Checklist Header */}
-      <div className="flex items-center justify-between px-8 py-6 border-b border-foreground/[0.05] bg-surface/40">
+      <div className="flex items-center justify-between px-4 py-4 md:px-8 md:py-6 border-b border-foreground/[0.05] bg-surface/40">
         <div className="space-y-1">
           <Heading as="h2" size="h2" className="text-sm font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
             <ListChecks size={15} className="text-primary" />
@@ -85,7 +85,7 @@ export function DailyTasksPanel({
       </div>
 
       {/* Add Task Input */}
-      <div className="px-8 py-6 border-b border-foreground/[0.05]">
+      <div className="px-4 py-4 md:px-8 md:py-6 border-b border-foreground/[0.05]">
         <form onSubmit={handleAddTask} className="flex gap-2">
           <input
             value={newTaskInput}

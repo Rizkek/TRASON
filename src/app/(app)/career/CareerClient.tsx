@@ -16,6 +16,7 @@ import { useInterviewJournal } from '@/hooks/useInterviewJournal';
 import { useReminder } from '@/hooks/useReminder';
 import { useHolidays } from '@/hooks/useHolidays';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { AppPageHeader } from '@/components/layout/AppPageHeader';
 
 const FILTER_TABS = [
   { id: 'all',       labelKey: 'all',       icon: FunnelSimple },
@@ -371,104 +372,88 @@ export default function CareerClient({ initialApplications }: Props) {
       <>
         <div className="space-y-8 animate-fade-in pb-24">
 
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-1">
-              <Heading as="h1" size="h2" weight="semibold" className="tracking-tight">
-                {t('career_page.title')} <span className="text-primary italic">{t('career_page.title_highlight')}</span>
-              </Heading>
-              <Paragraph className="text-muted-foreground font-light">{t('career_page.desc')}</Paragraph>
-            </div>
-            <div className="hidden md:block">
-              <Button 
-                variant="primary" 
-                onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal} 
-                className="rounded-full px-8" 
-                aria-label={mainTab === 'applications' ? "Add new application" : "Add new journal entry"}
+          <AppPageHeader
+            title={t('career_page.title')}
+            description={t('career_page.desc')}
+            actions={
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal}
+                leftIcon={<Plus size={16} />}
+                className="hidden md:inline-flex"
               >
-                <Plus size={18} className="mr-2" />
-                {mainTab === 'applications' 
-                  ? t('career_page.new_application') 
-                  : t('career_page.interview_journal.new_entry')}
+                {mainTab === 'applications' ? t('career_page.new_application') : t('career_page.interview_journal.new_entry')}
               </Button>
-            </div>
-          </div>
+            }
+          />
 
           {!isLoading && (
-            <div className="flex flex-row justify-between gap-2 md:gap-4 overflow-x-auto snap-x no-scrollbar pb-2">
+            <div className="grid grid-cols-4 gap-2 md:gap-3">
               {[
                 { label: t('career_page.stats.applied'), value: stats.applied, color: 'text-primary' },
                 { label: t('career_page.stats.reviewing'), value: stats.reviewing, color: 'text-warning' },
                 { label: t('career_page.stats.interview'), value: stats.interview, color: 'text-accent-purple' },
                 { label: t('career_page.stats.offer'), value: stats.offer, color: 'text-income' },
               ].map((s) => (
-                <Card key={s.label} className="glass border-none p-2 md:p-8 text-center flex-1 min-w-[70px] snap-center">
-                  <Paragraph className={`text-xl md:text-3xl font-semibold ${s.color}`}>{s.value}</Paragraph>
-                  <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest mt-1 md:mt-1">{s.label}</Paragraph>
+                <Card key={s.label} className="glass border-none p-3 md:p-4">
+                  <p className={`font-mono text-title-lg md:text-heading-md ${s.color}`}>{s.value}</p>
+                  <p className="mt-0.5 truncate text-label-sm text-muted-foreground">{s.label}</p>
                 </Card>
               ))}
             </div>
           )}
 
           {!isLoading && analytics && analytics.totalApplications > 0 && (
-            <Card className="p-2 md:p-6 border border-foreground/[0.05] bg-foreground/[0.03]">
-              <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto snap-x no-scrollbar flex-nowrap pb-1">
-                <div className="text-center shrink-0 snap-center">
-                  <Paragraph className="text-md md:text-lg font-medium text-foreground">{analytics.responseRate.toFixed(0)}%</Paragraph>
-                  <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.responseRate')}</Paragraph>
-                  <Paragraph className="text-xs md:hidden text-muted-foreground uppercase tracking-widest">{t('career_page.stats_labels.resp')}</Paragraph>
-                </div>
-                <div className="w-px h-6 md:h-8 bg-foreground/10 hidden sm:block" />
-                <div className="text-center shrink-0 snap-center">
-                  <Paragraph className="text-md md:text-lg font-bold text-foreground">{analytics.interviewRate.toFixed(0)}%</Paragraph>
-                  <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.interviewRate')}</Paragraph>
-                  <Paragraph className="text-xs md:hidden text-muted-foreground uppercase tracking-widest">{t('career_page.stats_labels.intv')}</Paragraph>
-                </div>
-                <div className="w-px h-6 md:h-8 bg-foreground/10 hidden sm:block" />
-                <div className="text-center shrink-0 snap-center">
-                  <Paragraph className="text-md md:text-lg font-bold text-foreground">{analytics.offerRate.toFixed(0)}%</Paragraph>
-                  <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.offerRate')}</Paragraph>
-                  <Paragraph className="text-xs md:hidden text-muted-foreground uppercase tracking-widest">{t('career_page.stats_labels.offer')}</Paragraph>
-                </div>
-                {analytics.avgDaysToInterview !== null && (
-                  <>
-                    <div className="w-px h-6 md:h-8 bg-foreground/10 hidden sm:block" />
-                    <div className="text-center shrink-0 snap-center">
-                      <Paragraph className="text-md md:text-lg font-semibold text-foreground">{analytics.avgDaysToInterview}d</Paragraph>
-                      <Paragraph className="text-xs text-muted-foreground uppercase tracking-widest hidden md:block">{t('career_page.stats_labels.avgToInterview')}</Paragraph>
-                      <Paragraph className="text-xs md:hidden text-muted-foreground uppercase tracking-widest">{t('career_page.stats_labels.avg')}</Paragraph>
-                    </div>
-                  </>
-                )}
-                {analytics.insights.length > 0 && (
-                  <div className="flex-1 min-w-[200px] shrink-0 ml-auto snap-center">
-                    <div className="space-y-1">
-                      {analytics.insights.slice(0, 2).map((insight, i) => (
-                        <Paragraph key={i} className="text-xs text-warning truncate">{insight}</Paragraph>
-                      ))}
-                    </div>
+            <Card className="space-y-3 border border-foreground/[0.05] bg-foreground/[0.03] p-4">
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap sm:gap-x-8">
+                {[
+                  { label: t('career_page.stats_labels.closed'), value: String(analytics.closedApplications) },
+                  { label: t('career_page.stats_labels.responseRate'), value: `${analytics.responseRate.toFixed(0)}%` },
+                  { label: t('career_page.stats_labels.interviewRate'), value: `${analytics.interviewRate.toFixed(0)}%` },
+                  { label: t('career_page.stats_labels.offerRate'), value: `${analytics.offerRate.toFixed(0)}%` },
+                  ...(analytics.avgDaysToInterview !== null
+                    ? [{ label: t('career_page.stats_labels.avgToInterview'), value: `${analytics.avgDaysToInterview}d` }]
+                    : []),
+                ].map((m) => (
+                  <div key={m.label} className="flex flex-col-reverse">
+                    <dt className="text-label-sm text-muted-foreground">{m.label}</dt>
+                    <dd className="font-mono text-title-md text-foreground">{m.value}</dd>
                   </div>
-                )}
-              </div>
+                ))}
+              </dl>
+              {analytics.insights.length > 0 && (
+                <ul className="space-y-1 border-t border-foreground/[0.06] pt-3">
+                  {analytics.insights.map((insight) => (
+                    <li key={insight.key} className={`text-body-sm ${insight.key === 'offers' ? 'text-success' : 'text-warning'}`}>
+                      {Object.entries(insight.params).reduce(
+                        (text, [name, value]) => text.replace(`{${name}}`, String(value)),
+                        t(`career_page.insights.${insight.key}`)
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </Card>
           )}
 
           <div className="flex bg-foreground/[0.03] p-1 rounded-full border border-foreground/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-fit gap-0.5">
             <button
               onClick={() => setMainTab('applications')}
-              title={t('career_page.tabs.all').replace('All', 'Applications').replace('Semua', 'Lamaran')}
-              className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+              title={t('career_page.tabs.applications')}
+              className={`flex min-h-11 items-center gap-1.5 rounded-full px-4 text-label-md transition-colors ${
                 mainTab === 'applications'
                   ? 'bg-primary text-on-primary '
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Briefcase size={14} weight="bold" />
-              <span className="hidden md:inline">{t('career_page.tabs.all').replace('All', 'Applications').replace('Semua', 'Lamaran')}</span>
+              <span className="hidden md:inline">{t('career_page.tabs.applications')}</span>
             </button>
             <button
               onClick={() => setMainTab('journal')}
               title={t('career_page.interview_journal.tab')}
-              className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+              className={`flex min-h-11 items-center gap-1.5 rounded-full px-4 text-label-md transition-colors ${
                 mainTab === 'journal'
                   ? 'bg-primary text-on-primary '
                   : 'text-muted-foreground hover:text-foreground'
@@ -480,7 +465,7 @@ export default function CareerClient({ initialApplications }: Props) {
             <button
               onClick={() => setMainTab('ats_matcher')}
               title={t('career_page.ats_matcher.title')}
-              className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+              className={`flex min-h-11 items-center gap-1.5 rounded-full px-4 text-label-md transition-colors ${
                 mainTab === 'ats_matcher'
                   ? 'bg-primary text-on-primary '
                   : 'text-muted-foreground hover:text-foreground'
@@ -503,7 +488,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   role="tab"
                   aria-selected={activeFilter === tab.id}
                   title={t(`career_page.tabs.${tab.labelKey}`)}
-                  className={`flex items-center gap-1.5 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                  className={`flex min-h-11 items-center gap-1.5 rounded-full px-4 text-label-md transition-colors ${
                     activeFilter === tab.id
                       ? 'bg-primary text-on-primary '
                       : 'text-muted-foreground hover:text-foreground'
@@ -535,7 +520,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 return (
                   <div
                     key={app.id}
-                    className="glass-card p-8 flex flex-col sm:flex-row sm:items-center gap-6 group transition-all hover:border-foreground/10"
+                    className="glass-card p-5 md:p-8 flex flex-col sm:flex-row sm:items-center gap-6 group transition-all hover:border-foreground/10"
                     role="article"
                     aria-label={`${app.company_name} — ${app.role_title}`}
                   >
@@ -648,7 +633,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   return (
                     <div
                       key={journal.id}
-                      className="glass-card p-8 flex flex-col gap-4 group transition-all hover:border-foreground/10"
+                      className="glass-card p-5 md:p-8 flex flex-col gap-4 group transition-all hover:border-foreground/10"
                     >
                       <div className="flex justify-between items-start">
                         <div>

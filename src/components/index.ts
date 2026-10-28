@@ -1,6 +1,7 @@
 'use client';
 
 export * from './ui/Button';
+export * from './ui/Switch';
 export * from './ui/Input';
 export * from './ui/Badge';
 export * from './ui/Card';

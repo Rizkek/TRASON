@@ -16,6 +16,15 @@ export const formatDateOnly = (value: Date | string): string => {
   return `${year}-${month}-${day}`;
 };
 
+/** Whole calendar days from one YYYY-MM-DD date to another; negative when `to` is earlier. */
+export const daysBetweenDates = (from: string, to: string): number => {
+  const toUtc = (d: string) => {
+    const [y, m, day] = d.slice(0, 10).split('-').map(Number);
+    return Date.UTC(y, m - 1, day);
+  };
+  return Math.round((toUtc(to) - toUtc(from)) / 86_400_000);
+};
+
 export type BillingCycle = 'monthly' | 'yearly' | 'weekly';
 
 // Works on the calendar date in UTC: a date-only string parses as UTC midnight, so local setters

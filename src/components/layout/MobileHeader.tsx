@@ -17,7 +17,7 @@ export function MobileHeader({ title, user, menuOpen, onOpenMenu }: MobileHeader
   const { t } = useTranslation();
 
   return (
-    <header className="relative z-40 flex items-center justify-between border-b border-foreground/10 bg-background pb-1 pl-4 pr-2 pt-[max(env(safe-area-inset-top),0.5rem)] md:hidden">
+    <header className="relative z-40 flex items-center justify-between border-b border-foreground/10 bg-background pb-1 pl-4 pr-2 pt-[max(env(safe-area-inset-top),0.5rem)] lg:hidden">
       <div className="flex min-w-0 items-center gap-2">
         <Logo size={24} variant="gold" />
         <h2 className="truncate text-label-md uppercase text-foreground">{title}</h2>

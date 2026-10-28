@@ -18,6 +18,7 @@ const SportHistoryChart = dynamic(() => import('@/components/modules/Sport/Sport
 });
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { AppPageHeader } from '@/components/layout/AppPageHeader';
 
 export const SportPageClient: React.FC = () => {
   const { user } = useAuthStore();
@@ -81,23 +82,15 @@ export const SportPageClient: React.FC = () => {
       <>
         <div className="space-y-8 animate-fade-in pb-12">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-            <div>
-              <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-foreground mb-2">{t('sport_page.sport_fitness_title')}</Heading>
-              <Paragraph className="text-muted-foreground text-sm tracking-wide">
-                {t('sport_page.sport_fitness_desc')}
-              </Paragraph>
-            </div>
-            <div className="hidden md:block">
-              <Button
-                variant="primary"
-                onClick={() => setIsLogModalOpen(true)}
-                className="w-full sm:w-auto"
-              >
-                <Dumbbell size={18} className="mr-2" /> {t('sport_page.quick_log_workout')}
+          <AppPageHeader
+            title={t('sport_page.sport_fitness_title')}
+            description={t('sport_page.sport_fitness_desc')}
+            actions={
+              <Button variant="primary" size="sm" onClick={() => setIsLogModalOpen(true)} leftIcon={<Dumbbell size={16} />} className="hidden md:inline-flex">
+                {t('sport_page.quick_log_workout')}
               </Button>
-            </div>
-          </div>
+            }
+          />
 
           {isLoading ? (
             <div className="h-64 flex items-center justify-center">
@@ -115,7 +108,7 @@ export const SportPageClient: React.FC = () => {
                 </div>
 
                 {plans.length === 0 ? (
-                  <div className="text-center p-8 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl">
+                  <div className="text-center p-5 md:p-8 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl">
                     <Dumbbell size={32} className="mx-auto text-muted-foreground mb-4 opacity-50" />
                     <Heading as="h4" size="h4" className="text-foreground font-bold mb-1">{t('sport_page.no_active_plans')}</Heading>
                     <Paragraph className="text-sm text-muted-foreground mb-4">{t('sport_page.create_workout_desc')}</Paragraph>

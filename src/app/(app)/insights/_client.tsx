@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Card, Badge, Loading, ConfirmModal } from '@/components';
+import { Card, Badge, Button, Alert, Loading, ConfirmModal, InlineError } from '@/components';
+import { AppPageHeader } from '@/components/layout/AppPageHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/authStore';
 import { insightQueries } from '@/services/analytics/insightQueries';
@@ -11,13 +12,11 @@ import { useWeeklySportSummary } from '@/hooks/useWeeklySportSummary';
 import { useCareer } from '@/hooks/useCareer';
 import { useReminder } from '@/hooks/useReminder';
 import { useActivity } from '@/hooks/useActivity';
-import { Lightbulb, TrendUp as TrendingUp, TrendDown as TrendingDown, Lightning as Zap, Target, ChartBar, Calendar, Stack, Trash as Trash2, ArrowCounterClockwise } from '@phosphor-icons/react';
-import { ArrowsClockwise } from '@phosphor-icons/react';
+import { Lightbulb, Target, ChartBar, Calendar, Stack, Trash as Trash2, ArrowCounterClockwise, ArrowsClockwise } from '@phosphor-icons/react';
 import { formatDate } from '@/libs/format';
 import { getProfileToday } from '@/libs/profileDate';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Heading, Paragraph } from '@/components/ui/typography';
 
 export function InsightsClient() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -33,6 +32,7 @@ export function InsightsClient() {
   const [isResetting, setIsResetting] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   // Active module hooks to collect complete life context
   const { calculatedPositions, insights: investmentInsight, summary: investmentSummary } = useInvestment();
@@ -50,27 +50,29 @@ export function InsightsClient() {
 
   const fetchStarted = useRef(false);
 
+  const loadInsights = async () => {
+    setIsFetching(true);
+    setLoadFailed(false);
+    try {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const data = await insightQueries.getInsights(start, end);
+      setDbInsights(data || []);
+    } catch (err) {
+      console.error('Failed to fetch insights:', err);
+      setLoadFailed(true);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   useEffect(() => {
     if (authLoading || !isAuthenticated) return;
     if (fetchStarted.current) return;
     fetchStarted.current = true;
-
-    const fetchInsights = async () => {
-      setIsFetching(true);
-      try {
-        const now = new Date();
-        const start = new Date(now.getFullYear(), now.getMonth(), 1);
-        const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const data = await insightQueries.getInsights(start, end);
-        setDbInsights(data || []);
-      } catch (err) {
-        console.error('Failed to fetch insights:', err);
-      } finally {
-        setIsFetching(false);
-      }
-    };
-
-    fetchInsights();
+    loadInsights();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per mount; fetchStarted guards repeats
   }, [authLoading, isAuthenticated]);
 
   const handleGenerateAI = async () => {
@@ -313,168 +315,116 @@ User Context Profile (TRASON Unified Life OS):
 
   if (!isAuthenticated) return null;
 
+  const busy = isGenerating || isResetting;
+
   return (
     <>
-      <div className="space-y-8 animate-fade-in">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-foreground">{t('insights_page.title')}</Heading>
-            <Paragraph className="text-subtext flex items-center gap-2">
-              {t('insights_page.desc')}
-            </Paragraph>
-          </div>
-          <div className="hidden md:flex items-center gap-2">
-            {dbInsights.length > 0 && (
-              <button 
-                onClick={handleResetAll}
-                disabled={isResetting || isGenerating}
-                className="px-4 py-4 bg-foreground/5 hover:bg-danger/10 text-muted-foreground hover:text-danger border border-foreground/10 hover:border-danger/30 font-bold rounded-lg flex items-center gap-2 disabled:opacity-50 transition-all text-xs"
+      <div className="space-y-6 animate-fade-in">
+        <AppPageHeader
+          title={t('insights_page.title')}
+          description={t('insights_page.desc')}
+          actions={
+            <>
+              {dbInsights.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  iconOnlyOnMobile
+                  onClick={handleResetAll}
+                  disabled={busy}
+                  leftIcon={<ArrowCounterClockwise size={16} />}
+                >
+                  {isResetting ? t('insights_page.resetting') : t('insights_page.reset_insights')}
+                </Button>
+              )}
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleGenerateAI}
+                disabled={isResetting}
+                isLoading={isGenerating}
+                loadingText={t('insights_page.thinking')}
+                leftIcon={<ArrowsClockwise size={16} />}
               >
-                <ArrowCounterClockwise size={16} />
-                <span>{isResetting ? t('insights_page.resetting') : t('insights_page.reset_insights')}</span>
-              </button>
-            )}
-            <button 
-              onClick={handleGenerateAI}
-              disabled={isGenerating || isResetting}
-              className="px-6 py-4 bg-primary text-on-primary font-bold rounded-lg flex items-center gap-2 hover:opacity-90 disabled:opacity-50 transition-all"
-            >
-              {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><ArrowsClockwise size={16} /> {t('insights_page.ask_ai')}</>}
-            </button>
-          </div>
-        </div>
+                {t('insights_page.ask_ai')}
+              </Button>
+            </>
+          }
+        />
 
-        {/* Error banner jika AI gagal */}
         {aiError && (
-          <div className="flex items-center gap-4 p-4 rounded-md bg-danger/10 border border-danger/20">
-            <Zap size={16} className="text-danger shrink-0" />
-            <Paragraph className="text-xs text-danger">{aiError}</Paragraph>
-            <button onClick={() => setAiError(null)} className="ml-auto text-danger/60 hover:text-danger text-lg leading-none">&times;</button>
-          </div>
+          <Alert type="error" onDismiss={() => setAiError(null)}>
+            {aiError}
+          </Alert>
+        )}
+
+        {loadFailed && (
+          <InlineError message={t('insights_page.load_failed')} retryLabel={t('common.try_again')} onRetry={loadInsights} />
         )}
 
         {isFetching ? (
-          <div className="flex justify-center py-12"><Loading /></div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ minHeight: '200px' }}>
-            {insights.length > 0 ? (
-              insights.map((insight) => (
-                <Card 
-                  key={insight.id} 
-                  className="p-8 relative overflow-hidden group transition-transform"
-                >
-                  
-                  <div className="flex items-start gap-8 relative z-10">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                      insight.type === 'finance' || insight.type === 'investment' ? 'bg-success/10 text-success' : 
-                      insight.type === 'productivity' || insight.type === 'career' ? 'bg-secondary/10 text-secondary' : 
-                      'bg-primary/10 text-primary'
-                    }`}>
-                      {insight.type === 'finance' || insight.type === 'investment' ? <ChartBar size={24} /> : 
-                       insight.type === 'productivity' || insight.type === 'career' ? <Target size={24} /> : 
-                       <Lightbulb size={24} />}
-                    </div>
-                    
-                    <div className="space-y-4 flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <Badge variant={insight.type === 'finance' || insight.type === 'investment' ? 'success' : insight.type === 'productivity' || insight.type === 'career' ? 'insight' : 'activity'} size="sm">
-                            {insight.type.toUpperCase()}
-                          </Badge>
-                          <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                            <Calendar size={10} /> {formatDate(insight.date)}
-                          </span>
-                        </div>
-                        {insight.id && !insight.id.startsWith('live-') && (
-                          <button
-                            onClick={(e) => handleDeleteInsight(insight.id, e)}
-                            className="p-2 text-muted-foreground hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
-                            title={t('insights_page.delete_insight')}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        )}
-                      </div>
-                      
-                      <Heading as="h3" size="h3" className="text-xl font-semibold text-foreground leading-tight truncate">
-                        {insight.title}
-                      </Heading>
-                      
-                      <Paragraph className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap break-words">
-                        {insight.description}
-                      </Paragraph>
-                      
-                      {insight.content && (
-                         <div className="p-6 bg-foreground/[0.02] border border-foreground/[0.05] rounded-md mt-4">
-                            <Paragraph className="text-xs text-foreground opacity-90 group-hover:opacity-100 transition-opacity whitespace-pre-wrap break-words">
-                               {insight.content}
-                            </Paragraph>
-                         </div>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              ))
-            ) : (
-              // Empty state with some placeholder premium cards
-              <>
-                <Card className="p-8 flex flex-col justify-center items-center text-center space-y-4 opacity-60">
-                  <div className="w-16 h-16 bg-foreground/5 rounded-full flex items-center justify-center text-muted-foreground">
-                    <Stack size={32} />
-                  </div>
-                  <Heading as="h3" size="h3" className="text-lg font-semibold">{t('insights_page.no_insights_title')}</Heading>
-                  <Paragraph className="text-xs text-muted-foreground max-w-xs">
-                    {t('insights_page.no_insights_desc')}
-                  </Paragraph>
-                </Card>
-                
-                <Card className="p-8 border-dashed border-foreground/10 bg-transparent flex flex-col justify-center items-center text-center space-y-4 opacity-40">
-                  <div className="w-12 h-12 border border-foreground/10 rounded-full flex items-center justify-center">
-                    <Target size={20} />
-                  </div>
-                  <Paragraph className="text-xs font-medium tracking-[0.2em] uppercase">{t('insights_page.system_idle')}</Paragraph>
-                </Card>
-              </>
-            )}
+          <div className="py-12">
+            <Loading text={t('common.loading')} />
           </div>
+        ) : (
+          !loadFailed && (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {insights.length > 0 ? (
+                insights.map((insight) => {
+                  const tone = insightTone(insight.type);
+                  const Icon = tone.icon;
+                  return (
+                    <Card key={insight.id} className="p-5 md:p-6">
+                      <div className="flex items-start gap-4">
+                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${tone.box}`}>
+                          <Icon size={20} aria-hidden="true" />
+                        </div>
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex min-w-0 flex-wrap items-center gap-2">
+                              <Badge variant={tone.badge} size="sm">
+                                {insight.type.toUpperCase()}
+                              </Badge>
+                              <span className="flex items-center gap-1 text-label-sm text-muted-foreground">
+                                <Calendar size={12} aria-hidden="true" /> {formatDate(insight.date)}
+                              </span>
+                            </div>
+                            {insight.id && !insight.id.startsWith('live-') && (
+                              <button
+                                type="button"
+                                onClick={(e) => handleDeleteInsight(insight.id, e)}
+                                aria-label={t('insights_page.delete_insight')}
+                                title={t('insights_page.delete_insight')}
+                                className="-m-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-danger/10 hover:text-danger"
+                              >
+                                <Trash2 size={16} aria-hidden="true" />
+                              </button>
+                            )}
+                          </div>
+                          <h3 className="break-words text-title-md text-foreground">{insight.title}</h3>
+                          <p className="whitespace-pre-wrap break-words text-body-md text-muted-foreground">{insight.description}</p>
+                          {insight.content && (
+                            <p className="whitespace-pre-wrap break-words rounded-md border border-foreground/[0.05] bg-foreground/[0.02] p-4 text-body-sm text-foreground">
+                              {insight.content}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })
+              ) : (
+                <Card className="col-span-full flex flex-col items-center p-5 md:p-8 text-center">
+                  <Stack size={28} aria-hidden="true" className="text-muted-foreground" />
+                  <h3 className="mt-3 text-title-md text-foreground">{t('insights_page.no_insights_title')}</h3>
+                  <p className="mt-1 max-w-sm text-body-sm text-muted-foreground">{t('insights_page.no_insights_desc')}</p>
+                </Card>
+              )}
+            </div>
+          )
         )}
 
-        <div className="pt-8">
-           <Card className="p-8 glass overflow-hidden relative">
-              <div className="flex items-center gap-8 relative z-10">
-                 <div className="p-4 bg-primary/20 rounded-full">
-                    <Lightbulb size={24} className="text-primary" />
-                 </div>
-                 <div>
-                    <Heading as="h4" size="h4" className="text-md font-semibold text-foreground uppercase tracking-wider mb-1">{t('insights_page.architect_perspective_title')}</Heading>
-                    <Paragraph className="text-sm text-muted-foreground">
-                      {t('insights_page.architect_perspective_desc')}
-                    </Paragraph>
-                 </div>
-              </div>
-           </Card>
-        </div>
-      </div>
-
-      {/* Mobile-only Action Floating Buttons */}
-      <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 flex items-center gap-2">
-        {dbInsights.length > 0 && (
-          <button 
-            onClick={handleResetAll}
-            disabled={isResetting || isGenerating}
-            className="p-3 bg-background/90 backdrop-blur-md text-muted-foreground hover:text-danger border border-foreground/10 rounded-xl flex items-center justify-center shrink-0 disabled:opacity-50 transition-all "
-            title={t('insights_page.reset_insights')}
-          >
-            <ArrowCounterClockwise size={18} />
-          </button>
-        )}
-        <button 
-          onClick={handleGenerateAI}
-          disabled={isGenerating || isResetting}
-          className="flex-1 py-2 bg-primary text-on-primary font-bold rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
-        >
-          {isGenerating ? <Loading text={t('insights_page.thinking')} /> : <><ArrowsClockwise size={18} /> <span className="text-sm">{t('insights_page.ask_ai')}</span></>}
-        </button>
+        <p className="text-body-sm text-muted-foreground">{t('insights_page.footer_note')}</p>
       </div>
 
       <ConfirmModal
@@ -483,8 +433,18 @@ User Context Profile (TRASON Unified Life OS):
         onConfirm={confirmResetAll}
         title={t('insights_page.reset_insights')}
         description={t('insights_page.reset_insights_confirm')}
-        isDangerous={false} // Use primary color as requested
+        isDangerous={false}
       />
     </>
   );
+}
+
+function insightTone(type: string) {
+  if (type === 'finance' || type === 'investment') {
+    return { icon: ChartBar, box: 'bg-success/10 text-success', badge: 'success' as const };
+  }
+  if (type === 'productivity' || type === 'career') {
+    return { icon: Target, box: 'bg-secondary/10 text-secondary', badge: 'insight' as const };
+  }
+  return { icon: Lightbulb, box: 'bg-primary/10 text-primary', badge: 'activity' as const };
 }

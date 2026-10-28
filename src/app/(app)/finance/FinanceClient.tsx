@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { Card, Button, Badge, Loading, Modal, Input, ErrorAlert, InlineError, ConfirmModal, CategoryIcon, BottomSheet, DatePicker } from '@/components';
+import { Card, Button, buttonClassName, Badge, Loading, Modal, Input, ErrorAlert, InlineError, ConfirmModal, CategoryIcon, BottomSheet, DatePicker } from '@/components';
+import { AppPageHeader } from '@/components/layout/AppPageHeader';
 import { CategoryManagerModal } from './components/CategoryManagerModal';
 import { BudgetManagerModal } from './components/BudgetManagerModal';
 import { TransactionFeed } from './components/TransactionFeed';
@@ -418,45 +419,37 @@ export default function FinanceClient({ initialTransactions }: Props) {
       )}
       <>
       <div className="space-y-8 animate-fade-in">
-        <div className="flex items-start justify-between flex-wrap gap-4">
-          <div className="space-y-2 w-full md:w-auto flex-1">
-            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-foreground">{t('finance.title')}</Heading>
-            <div className="flex items-center gap-4">
-              <Paragraph className="text-subtext flex items-center gap-2">
-                {t('finance.subtitle')}
-              </Paragraph>
-              <div className="w-px h-4 bg-foreground/10 hidden md:block"></div>
-              <div className="flex items-center gap-2 bg-foreground/[0.02] px-3 py-1.5 rounded-full border border-foreground/5">
-                <button onClick={handlePrevMonth} aria-label={t('dashboard.prev_month')} className="flex h-11 w-11 items-center justify-center text-muted-foreground hover:text-foreground rounded-full hover:bg-foreground/5 transition-colors">
-                  <ChevronLeft size={16} />
-                </button>
-                <span className="text-xs font-medium text-foreground w-[140px] text-center">
-                  {monthName} {selectedYear}
-                </span>
-                <button onClick={handleNextMonth} aria-label={t('dashboard.next_month')} className="flex h-11 w-11 items-center justify-center text-muted-foreground hover:text-foreground rounded-full hover:bg-foreground/5 transition-colors">
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
-            <div className="md:hidden pt-2">
-              <Link href="/finance/subscriptions">
-                <Button variant="outline" size="sm" leftIcon={<Calendar size={14} />} className="w-full justify-center">
-                  {t('finance.activeSubscriptions') || 'Subscriptions'}
-                </Button>
+        <AppPageHeader
+          title={t('finance.title')}
+          description={t('finance.subtitle')}
+          actions={
+            <>
+              <Link
+                href="/finance/subscriptions"
+                aria-label={t('finance.activeSubscriptions')}
+                className={buttonClassName({ variant: 'outline', size: 'sm', iconOnlyOnMobile: true })}
+              >
+                <Calendar size={16} aria-hidden="true" />
+                <span className="hidden sm:inline">{t('finance.activeSubscriptions')}</span>
               </Link>
-            </div>
-          </div>
-          <div className="hidden md:flex gap-4">
-            <Link href="/finance/subscriptions">
-              <Button variant="outline" size="md" leftIcon={<Calendar size={18} />}>
-                {t('finance.activeSubscriptions') || 'Subscriptions'}
+              <Button variant="primary" size="sm" onClick={openAddModal} leftIcon={<Plus size={16} />} className="hidden md:inline-flex">
+                {t('finance.newEntry')}
               </Button>
-            </Link>
-            <Button variant="primary" size="md" onClick={openAddModal} leftIcon={<Plus size={18} />}>
-              {t('finance.newEntry')}
-            </Button>
+            </>
+          }
+        >
+          <div className="inline-flex items-center rounded-full border border-foreground/5 bg-foreground/[0.02]">
+            <button onClick={handlePrevMonth} aria-label={t('dashboard.prev_month')} className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground">
+              <ChevronLeft size={16} aria-hidden="true" />
+            </button>
+            <span className="min-w-32 text-center text-label-md text-foreground" aria-live="polite">
+              {monthName} {selectedYear}
+            </span>
+            <button onClick={handleNextMonth} aria-label={t('dashboard.next_month')} className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground">
+              <ChevronRight size={16} aria-hidden="true" />
+            </button>
           </div>
-        </div>
+        </AppPageHeader>
 
         {/* --- GLOBAL OVERVIEW CARDS --- */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 w-full">
@@ -687,11 +680,11 @@ export default function FinanceClient({ initialTransactions }: Props) {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-foreground/[0.02] border-b border-foreground/[0.05]">
-                  <th className="px-8 py-6 text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.transaction')}</th>
-                  <th className="px-8 py-6 text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.date')}</th>
-                  <th className="px-8 py-6 text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.category')}</th>
-                  <th className="px-8 py-6 text-right text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.amount')}</th>
-                  <th className="px-8 py-6 text-right text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.actions')}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-6 text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.transaction')}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-6 text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.date')}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-6 text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.category')}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-6 text-right text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.amount')}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-6 text-right text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-foreground/5">
@@ -706,7 +699,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                       className="group hover:bg-foreground/[0.02] transition-colors cursor-pointer"
                       onClick={() => openEditModal(t)}
                     >
-                      <td className="px-8 py-8">
+                      <td className="px-4 py-4 md:px-8 md:py-8">
                         <div className="flex items-center gap-4">
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                             t.type === 'income' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
@@ -718,23 +711,23 @@ export default function FinanceClient({ initialTransactions }: Props) {
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-8">
+                      <td className="px-4 py-4 md:px-8 md:py-8">
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <Calendar size={12} />
                           <span className="text-xs font-medium">{formatDate(t.date)}</span>
                         </div>
                       </td>
-                      <td className="px-8 py-8">
+                      <td className="px-4 py-4 md:px-8 md:py-8">
                         <Badge variant={t.type === 'income' ? 'success' : 'danger'} size="sm">
                           {resolveCategory(t.categories)?.name || 'Uncategorized'}
                         </Badge>
                       </td>
-                      <td className="px-8 py-8 text-right">
+                      <td className="px-4 py-4 md:px-8 md:py-8 text-right">
                         <Paragraph className={`text-sm font-semibold ${t.type === 'income' ? 'text-success' : 'text-foreground'}`}>
                           {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount, t.original_currency || currency, locale)}
                         </Paragraph>
                       </td>
-                      <td className="px-8 py-8 text-right">
+                      <td className="px-4 py-4 md:px-8 md:py-8 text-right">
                         <div className="flex justify-end gap-2">
                           {(t.source === 'receipt' || t.source === 'text') && (
                             <button 
@@ -773,7 +766,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
             </table>
           </div>
           {totalPages > 1 && (
-            <div className="px-8 py-6 border-t border-foreground/[0.05] flex items-center justify-between bg-foreground/[0.01]">
+            <div className="px-4 py-4 md:px-8 md:py-6 border-t border-foreground/[0.05] flex items-center justify-between bg-foreground/[0.01]">
               <Paragraph className="text-xs text-muted-foreground">
                 {t('moduleCommon.showing')} {((page - 1) * limit) + 1} {t('moduleCommon.to')} {Math.min(page * limit, filteredTransactions.length)} {t('moduleCommon.of')} {filteredTransactions.length}
               </Paragraph>

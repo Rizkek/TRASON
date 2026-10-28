@@ -245,23 +245,27 @@ export const es = {
       "reviewing": "Revisando"
     },
     "stats_labels": {
-      "avg": "Prom.",
       "avgToInterview": "Prom. a Entrevista",
       "interviewRate": "Tasa de entrevista",
-      "intv": "Entr.",
-      "offer": "Ofer.",
       "offerRate": "Tasa de oferta",
-      "resp": "Resp.",
-      "responseRate": "Tasa de respuesta"
+      "responseRate": "Tasa de respuesta",
+      "closed": "Cerradas"
     },
     "tabs": {
       "active": "Activo",
       "all": "Todo",
       "closed": "Cerrado",
-      "interview": "Entrevista"
+      "interview": "Entrevista",
+      "applications": "Solicitudes"
     },
     "title": "Carrera",
-    "title_highlight": ""
+    "insights": {
+      "stale": "Ninguna solicitud nueva en {days} días.",
+      "no_active": "No hay solicitudes en curso. Añade una nueva para mantener el proceso activo.",
+      "low_response": "Solo el {rate}% de las solicitudes recibió respuesta. Considera actualizar tu CV o carta de presentación.",
+      "low_interview": "El {rate}% de las solicitudes llegó a entrevista. Prueba puestos más acordes a tus habilidades.",
+      "offers": "Tienes {count} oferta(s) pendientes de decisión."
+    }
   },
   "common": {
     "cancel": "Cancelar",
@@ -573,8 +577,6 @@ export const es = {
   "insights_page": {
     "ai_generic_error": "Error al generar perspectivas.",
     "ai_timeout_error": "Tiempo de espera de la solicitud agotado. La generación está tardando demasiado — inténtalo de nuevo.",
-    "architect_perspective_desc": "Sigue registrando para ver patrones a largo plazo.",
-    "architect_perspective_title": "Resumen",
     "ask_ai": "Generar perspectivas",
     "delete_insight": "Eliminar perspectiva",
     "desc": "Resumen de patrones en tus datos registrados.",
@@ -583,9 +585,10 @@ export const es = {
     "reset_insights": "Borrar todo",
     "reset_insights_confirm": "¿Estás seguro de que deseas borrar permanentemente todo el historial de perspectivas?",
     "resetting": "Borrando...",
-    "system_idle": "Listo",
     "thinking": "Pensando...",
-    "title": "Perspectivas"
+    "title": "Perspectivas",
+    "footer_note": "Sigue registrando para ver patrones a largo plazo.",
+    "load_failed": "No se pudieron cargar las perspectivas guardadas."
   },
   "investment_page": {
     "add_first_position": "Añadir primera posición",
@@ -650,7 +653,7 @@ export const es = {
     "portfolio_tracker_desc": "Seguimiento simple de base de costos con precios actualizados.",
     "portfolio_value": "Valor de cartera",
     "portfolio_worth": "Tu cartera actualmente vale {value} en {count} posiciones rastreadas.",
-    "price_live": "Precio en vivo, actualizado a las {time}",
+    "price_live": "Precio en vivo, actualizado {time}",
     "price_not_refreshed": "El precio aún no se ha actualizado",
     "refresh_prices": "Actualizar precios",
     "remaining_amount": "Monto Restante",
@@ -668,7 +671,8 @@ export const es = {
     "unrealized_pl": "P/G",
     "update_label": "actualizado",
     "update_position_upper": "Actualizar",
-    "value": "Valor"
+    "value": "Valor",
+    "price_stale": "Precio aún sin sincronizar"
   },
   "life_score": {
     "dimensions": {
@@ -709,8 +713,6 @@ export const es = {
     "all_sub_off_warning": "Todas las sub-funciones están desactivadas — el módulo no tiene contenido visible",
     "career_desc": "Track job applications, interviews, and opportunities",
     "description": "Activa o desactiva módulos para personalizar tu experiencia. Los módulos desactivados no aparecerán en la navegación ni en el panel.",
-    "disabled_count": "Módulos inactivos",
-    "enabled_count": "Módulos activos",
     "finance_desc": "Track income and expenses, manage budgets",
     "insights_desc": "AI-powered analytics and recommendations",
     "investments_desc": "Portfolio tracking and investment insights",
@@ -721,7 +723,8 @@ export const es = {
     "timeline_daily_checklist": "Tareas",
     "timeline_desc": "Daily activities and schedule management",
     "timeline_weekly_log": "Registro semanal",
-    "title": "Módulos activos"
+    "title": "Módulos activos",
+    "count_summary": "{on} de {total} módulos activos"
   },
   "nav": {
     "cancel": "Cancelar",
@@ -825,7 +828,10 @@ export const es = {
     "title_highlight": "",
     "title_required": "El título es obligatorio",
     "weekly_focus": "Enfoque semanal",
-    "weekly_focus_desc": "Tienes {count} recordatorios pendientes esta semana."
+    "weekly_focus_desc": "Tienes {count} recordatorios pendientes esta semana.",
+    "view_label": "Vista",
+    "view_calendar": "Vista de calendario",
+    "view_list": "Vista de lista"
   },
   "settings": {
     "alerts": {

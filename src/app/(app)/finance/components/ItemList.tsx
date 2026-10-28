@@ -72,7 +72,7 @@ export function ItemList({ items, onChange, currency = 'USD', locale = 'en-US' }
       </div>
 
       {items.length === 0 ? (
-        <div className="bg-background/60 rounded-xl p-8 border border-foreground/5 border-dashed text-center">
+        <div className="bg-background/60 rounded-xl p-5 md:p-8 border border-foreground/5 border-dashed text-center">
           <p className="text-xs text-muted-foreground">No items extracted. You can add them manually.</p>
         </div>
       ) : (

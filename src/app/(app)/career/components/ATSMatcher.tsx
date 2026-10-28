@@ -167,7 +167,7 @@ export function ATSMatcher({ applications = [] }: Props) {
 
   return (
     <div className="space-y-6 animate-fade-in pb-8">
-      <div className="glass-card p-8 border-t-4 border-t-primary">
+      <div className="glass-card p-5 md:p-8 border-t-4 border-t-primary">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-4">
           <div className="flex items-start gap-4">
@@ -353,7 +353,7 @@ export function ATSMatcher({ applications = [] }: Props) {
       {result && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up">
           {/* Score Card */}
-          <div className="glass-card p-8 flex flex-col items-center justify-center text-center">
+          <div className="glass-card p-5 md:p-8 flex flex-col items-center justify-center text-center">
             <Heading as="h3" size="h3" className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
               {t('career_page.ats_matcher.score_title')}
             </Heading>
@@ -392,7 +392,7 @@ export function ATSMatcher({ applications = [] }: Props) {
           </div>
 
           {/* Keywords Breakdown */}
-          <div className="glass-card p-8 md:col-span-2 space-y-6">
+          <div className="glass-card p-5 md:p-8 md:col-span-2 space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 h-full">
               {/* Matched Keywords */}
               <div className="space-y-2">

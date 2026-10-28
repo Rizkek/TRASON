@@ -245,23 +245,27 @@ export const id = {
       "reviewing": "Ditinjau"
     },
     "stats_labels": {
-      "avg": "Rata-rata",
       "avgToInterview": "Rata-rata ke wawancara",
       "interviewRate": "Tingkat wawancara",
-      "intv": "Wawn.",
-      "offer": "Tawaran",
       "offerRate": "Tingkat tawaran",
-      "resp": "Resp.",
-      "responseRate": "Tingkat respon"
+      "responseRate": "Tingkat respon",
+      "closed": "Selesai"
     },
     "tabs": {
       "active": "Aktif",
       "all": "Semua",
       "closed": "Tutup",
-      "interview": "Wawancara"
+      "interview": "Wawancara",
+      "applications": "Lamaran"
     },
     "title": "Karier",
-    "title_highlight": ""
+    "insights": {
+      "stale": "Belum ada lamaran baru selama {days} hari.",
+      "no_active": "Tidak ada lamaran yang sedang berjalan. Tambahkan lamaran baru agar prosesnya tetap bergerak.",
+      "low_response": "Hanya {rate}% lamaran yang mendapat balasan. Pertimbangkan memperbarui resume atau cover letter.",
+      "low_interview": "{rate}% lamaran sampai tahap interview. Coba posisi yang lebih sesuai dengan keahlian Anda.",
+      "offers": "Ada {count} tawaran kerja yang menunggu keputusan Anda."
+    }
   },
   "common": {
     "cancel": "Batal",
@@ -574,8 +578,6 @@ export const id = {
   "insights_page": {
     "ai_generic_error": "Gagal membuat wawasan.",
     "ai_timeout_error": "Batas waktu permintaan habis. Pembuatan memakan waktu terlalu lama — silakan coba lagi.",
-    "architect_perspective_desc": "Terus catat untuk melihat pola jangka panjang.",
-    "architect_perspective_title": "Ringkasan",
     "ask_ai": "Buat wawasan",
     "delete_insight": "Hapus wawasan",
     "desc": "Ringkasan pola dari data aktivitas Anda.",
@@ -584,9 +586,10 @@ export const id = {
     "reset_insights": "Hapus semua",
     "reset_insights_confirm": "Apakah Anda yakin ingin menghapus permanen semua riwayat wawasan?",
     "resetting": "Menghapus...",
-    "system_idle": "Siap",
     "thinking": "Berpikir...",
-    "title": "Wawasan"
+    "title": "Wawasan",
+    "footer_note": "Terus catat untuk melihat pola jangka panjang.",
+    "load_failed": "Wawasan yang tersimpan gagal dimuat."
   },
   "investment_page": {
     "add_first_position": "Tambah posisi pertama",
@@ -669,7 +672,8 @@ export const id = {
     "unrealized_pl": "P/L",
     "update_label": "diperbarui",
     "update_position_upper": "Simpan",
-    "value": "Nilai"
+    "value": "Nilai",
+    "price_stale": "Harga belum disinkronkan"
   },
   "life_score": {
     "dimensions": {
@@ -710,8 +714,6 @@ export const id = {
     "all_sub_off_warning": "Semua sub-fitur dimatikan — modul tidak memiliki konten yang terlihat",
     "career_desc": "Lacak lamaran kerja, wawancara, dan peluang",
     "description": "Aktifkan atau nonaktifkan modul untuk menyesuaikan pengalaman Anda. Modul yang dinonaktifkan tidak akan muncul di navigasi atau dasbor.",
-    "disabled_count": "Modul nonaktif",
-    "enabled_count": "Modul aktif",
     "finance_desc": "Lacak pendapatan dan pengeluaran, kelola anggaran",
     "insights_desc": "Analitik dan rekomendasi berbasis AI",
     "investments_desc": "Pelacakan portofolio dan wawasan investasi",
@@ -722,7 +724,8 @@ export const id = {
     "timeline_daily_checklist": "Tugas",
     "timeline_desc": "Aktivitas harian dan manajemen jadwal",
     "timeline_weekly_log": "Log mingguan",
-    "title": "Modul Aktif"
+    "title": "Modul Aktif",
+    "count_summary": "{on} dari {total} modul aktif"
   },
   "nav": {
     "cancel": "Batal",
@@ -826,7 +829,10 @@ export const id = {
     "title_highlight": "",
     "title_required": "Judul pengingat wajib diisi",
     "weekly_focus": "Fokus mingguan",
-    "weekly_focus_desc": "Anda memiliki {count} pengingat tertunda minggu ini."
+    "weekly_focus_desc": "Anda memiliki {count} pengingat tertunda minggu ini.",
+    "view_label": "Tampilan",
+    "view_calendar": "Tampilan kalender",
+    "view_list": "Tampilan daftar"
   },
   "settings": {
     "alerts": {

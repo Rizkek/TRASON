@@ -4,104 +4,91 @@
  */
 
 import { CareerApplication } from '@/types/database';
+import { daysBetweenDates, formatDateOnly } from '@/libs/date';
 
 const ACTIVE_STATUSES: CareerApplication['status'][] = ['applied', 'reviewing', 'interview', 'offer'];
-const CLOSED_STATUSES: CareerApplication['status'][] = ['accepted', 'rejected', 'withdrawn'];
+const INTERVIEW_STATUSES: CareerApplication['status'][] = ['interview', 'offer', 'accepted'];
+const OFFER_STATUSES: CareerApplication['status'][] = ['offer', 'accepted'];
+
+/** Keys under `career_page.insights` in the i18n dictionaries; params fill `{name}` placeholders. */
+export type CareerInsightKey = 'stale' | 'low_response' | 'low_interview' | 'no_active' | 'offers';
+
+export interface CareerInsight {
+  key: CareerInsightKey;
+  params: Record<string, number>;
+}
 
 export interface CareerAnalytics {
   totalApplications: number;
   activeApplications: number;
   closedApplications: number;
-  responseRate: number;        // % that moved beyond 'applied'
-  interviewRate: number;       // % that reached interview/offer
-  offerRate: number;           // % that got offer/accepted
+  responseRate: number;        // % of non-withdrawn applications the company answered
+  interviewRate: number;       // % of non-withdrawn applications that reached an interview
+  offerRate: number;           // % of non-withdrawn applications that got an offer
   daysSinceLastApplication: number | null;
   avgDaysToInterview: number | null;
-  insights: string[];
+  insights: CareerInsight[];
   statusBreakdown: Record<string, number>;
 }
 
-export function calculateCareerAnalytics(applications: CareerApplication[]): CareerAnalytics {
+const percent = (part: number, whole: number) => (whole > 0 ? (part / whole) * 100 : 0);
+
+/**
+ * Only the current status is stored, so an application rejected after an interview would look
+ * like it never got one; a recorded interview_date counts as reaching the interview stage.
+ * Withdrawn applications are left out of every rate: the user ended them, not the company.
+ */
+export function calculateCareerAnalytics(applications: CareerApplication[], today: Date = new Date()): CareerAnalytics {
   const total = applications.length;
+  const todayStr = formatDateOnly(today);
 
-  if (total === 0) {
-    return {
-      totalApplications: 0,
-      activeApplications: 0,
-      closedApplications: 0,
-      responseRate: 0,
-      interviewRate: 0,
-      offerRate: 0,
-      daysSinceLastApplication: null,
-      avgDaysToInterview: null,
-      insights: ['Belum ada lamaran. Mulai rekam proses pencarian kerja Anda!'],
-      statusBreakdown: {},
-    };
-  }
+  const active = applications.filter((a) => ACTIVE_STATUSES.includes(a.status)).length;
+  const considered = applications.filter((a) => a.status !== 'withdrawn');
+  const reachedInterview = (a: CareerApplication) => INTERVIEW_STATUSES.includes(a.status) || Boolean(a.interview_date);
+  const responded = considered.filter((a) => a.status !== 'applied' || reachedInterview(a)).length;
+  const interviewed = considered.filter(reachedInterview).length;
+  const offered = considered.filter((a) => OFFER_STATUSES.includes(a.status)).length;
 
-  const active = applications.filter(a => ACTIVE_STATUSES.includes(a.status)).length;
-  const responded = applications.filter(a => a.status !== 'applied').length;
-  const interviewed = applications.filter(a => ['interview', 'offer', 'accepted'].includes(a.status)).length;
-  const offered = applications.filter(a => ['offer', 'accepted'].includes(a.status)).length;
-
-  // Status breakdown
   const statusBreakdown: Record<string, number> = {};
-  applications.forEach(a => {
+  applications.forEach((a) => {
     statusBreakdown[a.status] = (statusBreakdown[a.status] || 0) + 1;
   });
 
-  // Days since last application
-  const sortedByDate = [...applications].sort(
-    (a, b) => new Date(b.applied_date).getTime() - new Date(a.applied_date).getTime()
-  );
-  const lastApp = sortedByDate[0];
-  const daysSinceLastApplication = lastApp
-    ? Math.floor((Date.now() - new Date(lastApp.applied_date).getTime()) / 86_400_000)
-    : null;
+  const appliedDates = applications.map((a) => formatDateOnly(a.applied_date)).sort();
+  const lastApplied = appliedDates[appliedDates.length - 1];
+  const daysSinceLastApplication = lastApplied ? Math.max(0, daysBetweenDates(lastApplied, todayStr)) : null;
 
-  // Avg days to interview (rough calculation)
-  const withInterviewDate = applications.filter(a => a.interview_date && a.applied_date);
-  const avgDaysToInterview = withInterviewDate.length > 0
-    ? Math.round(
-        withInterviewDate.reduce((sum, a) => {
-          const days = (new Date(a.interview_date!).getTime() - new Date(a.applied_date).getTime()) / 86_400_000;
-          return sum + days;
-        }, 0) / withInterviewDate.length
-      )
-    : null;
+  const interviewGaps = applications
+    .filter((a) => a.interview_date && a.applied_date)
+    .map((a) => daysBetweenDates(formatDateOnly(a.applied_date), formatDateOnly(a.interview_date!)))
+    .filter((days) => days >= 0);
+  const avgDaysToInterview =
+    interviewGaps.length > 0 ? Math.round(interviewGaps.reduce((sum, d) => sum + d, 0) / interviewGaps.length) : null;
 
-  // Rule-based insights
-  const insights: string[] = [];
+  const responseRate = percent(responded, considered.length);
+  const interviewRate = percent(interviewed, considered.length);
 
+  const insights: CareerInsight[] = [];
+  const pendingOffers = applications.filter((a) => a.status === 'offer').length;
+  if (pendingOffers > 0) insights.push({ key: 'offers', params: { count: pendingOffers } });
+  if (total > 0 && active === 0) insights.push({ key: 'no_active', params: {} });
   if (daysSinceLastApplication !== null && daysSinceLastApplication > 14) {
-    insights.push(`Sudah ${daysSinceLastApplication} hari tidak ada lamaran baru. Saatnya aktif kembali.`);
+    insights.push({ key: 'stale', params: { days: daysSinceLastApplication } });
   }
-
-  const responseRateVal = total > 0 ? (responded / total) * 100 : 0;
-  if (total >= 5 && responseRateVal < 15) {
-    insights.push(`Response rate hanya ${responseRateVal.toFixed(0)}%. Pertimbangkan untuk memperbarui resume atau cover letter.`);
+  if (considered.length >= 5 && responseRate < 15) {
+    insights.push({ key: 'low_response', params: { rate: Math.round(responseRate) } });
   }
-
-  const interviewRateVal = total > 0 ? (interviewed / total) * 100 : 0;
-  if (total >= 10 && interviewRateVal < 10) {
-    insights.push(`Interview rate ${interviewRateVal.toFixed(0)}% — coba fokus pada posisi yang lebih sesuai dengan skillset Anda.`);
-  }
-
-  if (active === 0 && total > 0) {
-    insights.push('Tidak ada lamaran yang sedang aktif. Mulai lagi dengan posisi baru.');
-  }
-
-  if (offered > 0) {
-    insights.push(`Selamat! Anda memiliki ${offered} penawaran kerja yang perlu ditindaklanjuti.`);
+  if (considered.length >= 10 && interviewRate < 10) {
+    insights.push({ key: 'low_interview', params: { rate: Math.round(interviewRate) } });
   }
 
   return {
     totalApplications: total,
     activeApplications: active,
     closedApplications: total - active,
-    responseRate: responseRateVal,
-    interviewRate: interviewRateVal,
-    offerRate: total > 0 ? (offered / total) * 100 : 0,
+    responseRate,
+    interviewRate,
+    offerRate: percent(offered, considered.length),
     daysSinceLastApplication,
     avgDaysToInterview,
     insights,
