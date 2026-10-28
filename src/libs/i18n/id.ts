@@ -995,5 +995,11 @@ export const id = {
     "title": "Jadwal",
     "today_timeline": "Jadwal hari ini",
     "weekly_log": "Log mingguan"
+  },
+  "pwa": {
+    "install_title": "Pasang TRASON",
+    "install_desc": "Tambahkan ke layar utama. Terbuka layar penuh seperti aplikasi lain.",
+    "install": "Pasang",
+    "not_now": "Nanti saja"
   }
 };

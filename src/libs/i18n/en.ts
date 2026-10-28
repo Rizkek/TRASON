@@ -994,5 +994,11 @@ export const en = {
     "title": "Schedule",
     "today_timeline": "Today's schedule",
     "weekly_log": "Weekly log"
+  },
+  "pwa": {
+    "install_title": "Install TRASON",
+    "install_desc": "Add it to your home screen. It opens full-screen, like any other app.",
+    "install": "Install",
+    "not_now": "Not now"
   }
 };

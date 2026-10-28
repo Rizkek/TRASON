@@ -994,5 +994,11 @@ export const ja = {
     "title": "スケジュール",
     "today_timeline": "今日のスケジュール",
     "weekly_log": "ウィークリーログ"
+  },
+  "pwa": {
+    "install_title": "TRASONをインストール",
+    "install_desc": "ホーム画面に追加すると、他のアプリと同じように全画面で開きます。",
+    "install": "インストール",
+    "not_now": "後で"
   }
 };

@@ -994,5 +994,11 @@ export const es = {
     "title": "Horario",
     "today_timeline": "Horario de hoy",
     "weekly_log": "Registro semanal"
+  },
+  "pwa": {
+    "install_title": "Instala TRASON",
+    "install_desc": "Añádelo a tu pantalla de inicio. Se abre a pantalla completa, como cualquier otra app.",
+    "install": "Instalar",
+    "not_now": "Ahora no"
   }
 };

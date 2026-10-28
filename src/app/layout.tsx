@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, DM_Serif_Display } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import { ThemeSync } from '@/components/layout/ThemeSync';
 import { NO_FLASH_THEME_SCRIPT, THEME_META_COLOR } from '@/libs/theme';
 import NextTopLoader from 'nextjs-toploader';
@@ -242,7 +241,6 @@ export default function RootLayout({
           <AuthProvider>
             <ThemeSync />
             {children}
-            <PwaInstallPrompt />
             <SpeedInsights />
           </AuthProvider>
         </ErrorBoundary>
