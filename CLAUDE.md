@@ -111,7 +111,7 @@ docs/             dokumentasi produk, API, skema DB (sebagian usang, lihat bagia
 
 **Modul:** `ModuleId` = finance, investments, timeline, insights, reminders, sport, career. Modul baru didaftarkan di `modules/registry.ts` dan `modules/types.ts`. Route `/timeline` di-redirect permanen ke `/schedule`. Toggle modul per pengguna tersimpan di preferensi.
 
-**i18n:** `useTranslation()` dengan kamus `en`, `id`, `ja`, `es` di `libs/i18n`; key dot-notation, fallback ke English. Setiap string UI baru ditambahkan ke keempat kamus. Istilah produk mengikuti `docs/product-language.md` (misalnya "Activity", "Application", "Dashboard", "Finance"; hindari "Financial Flow", "Command Center", "Career Architect").
+**i18n:** `useTranslation()` dengan kamus `en`, `id`, `ja`, `es` di `libs/i18n`; key dot-notation, fallback ke English. Setiap string UI baru ditambahkan ke keempat kamus. Istilah produk mengikuti `docs/product-language.md` (misalnya "Activity", "Application", "Dashboard", "Finance", "Sport"; hindari "Financial Flow", "Command Center", "Career Architect", dan "Vitality", label lama modul Sport).
 
 **Tipe:** definisi tabel ada di `types/database.ts`. Soft delete lewat kolom `deleted_at`; query selalu menyertakan `.is('deleted_at', null)`.
 
@@ -182,5 +182,5 @@ Bila mengubah perilaku yang tercakup dokumen di atas, perbarui dokumennya sekali
 * `getCurrentUser()` membaca sesi lokal tanpa validasi server; keamanan data bergantung penuh pada RLS. Setiap tabel baru wajib punya RLS aktif dan policy `auth.uid() = user_id`.
 * `eslint.ignoreDuringBuilds: true`: lint tidak memblokir build, jalankan `npm run lint` sendiri.
 * Halaman legal mendaftar fakta dari kode: `PROCESSORS` di `(landing)/privacy/page.tsx` (setiap layanan eksternal dan data yang diterimanya) dan tabel di `(landing)/cookies/page.tsx` (cookie Supabase dan setiap key localStorage). Menambah integrasi, layanan eksternal, atau key `localStorage` berarti memperbarui tabel itu dan tanggal `LAST_UPDATED`.
-* Foto struk (`receipts`) dan avatar (`avatar`) diambil dengan `getPublicUrl`. Bila bucket berstatus public, siapa pun yang memegang URL bisa membukanya. Belum diverifikasi; bucket `receipts` sebaiknya private dengan signed URL.
+* Bucket `receipts` private (`docs/migrations/2026-10-28-private-receipts.sql`, policy per folder `<user id>/`). Kode tidak pernah memakai `getPublicUrl` untuk struk: `upload-receipt` mengembalikan path, route server membaca lewat `downloadReceiptAsDataUrl`, dan klien menampilkan gambar lewat `storageQueries.getReceiptSignedUrl` (10 menit). Bucket `avatar` sengaja tetap public.
 * Prompt install PWA (`PwaInstallPrompt`) hanya dipasang di `(app)/layout.tsx`. Pesan konsol Chrome "Banner not shown: beforeinstallpromptevent.preventDefault() called" muncul karena prompt bawaan ditahan untuk kartu ini; itu bukan error.
