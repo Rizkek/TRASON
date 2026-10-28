@@ -82,7 +82,8 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' blob:;",
+            // challenges.cloudflare.com serves the Turnstile bot check on the auth pages.
+            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://challenges.cloudflare.com;",
           },
           {
             key: 'X-Content-Type-Options',

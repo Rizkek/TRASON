@@ -20,6 +20,8 @@ declare const self: ServiceWorkerGlobalScope;
 const NETWORK_ONLY_ROUTES = [
   /^\/(dashboard|finance|schedule|timeline|sport|career|reminders|investments|insights|settings|onboarding)(\/.*)?$/,
   /^\/api\//,
+  // One-time email links and the pages they lead to must never come from cache.
+  /^\/(auth\/.*|forgot-password|reset-password)$/,
 ];
 
 /**

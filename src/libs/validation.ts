@@ -221,39 +221,40 @@ export const validateReminder = (data: ReminderForm, options: ReminderValidation
 // AUTH VALIDATION
 // ============================================================================
 
-export const validatePassword = (password: string): string[] => {
-  const errors: string[] = [];
+// Keep in sync with the password policy in Supabase Auth settings, which enforces it server-side.
+export const PASSWORD_RULES = [
+  { id: 'length', test: (p: string) => p.length >= 8, message: 'Password must be at least 8 characters' },
+  { id: 'upper', test: (p: string) => /[A-Z]/.test(p), message: 'Must contain at least one uppercase letter' },
+  { id: 'lower', test: (p: string) => /[a-z]/.test(p), message: 'Must contain at least one lowercase letter' },
+  { id: 'number', test: (p: string) => /[0-9]/.test(p), message: 'Must contain at least one number' },
+] as const;
 
-  if (password.length < 8) {
-    errors.push('Password must be at least 8 characters');
-  }
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Must contain at least one uppercase letter');
-  }
-  if (!/[a-z]/.test(password)) {
-    errors.push('Must contain at least one lowercase letter');
-  }
-  if (!/[0-9]/.test(password)) {
-    errors.push('Must contain at least one number');
-  }
+export type PasswordRuleId = (typeof PASSWORD_RULES)[number]['id'];
 
-  return errors;
+export const failedPasswordRules = (password: string): PasswordRuleId[] =>
+  PASSWORD_RULES.filter((rule) => !rule.test(password)).map((rule) => rule.id);
+
+export const validatePassword = (password: string): string[] =>
+  PASSWORD_RULES.filter((rule) => !rule.test(password)).map((rule) => rule.message);
+
+export type EmailIssue = 'required' | 'invalid' | 'too_long';
+
+const EMAIL_MESSAGES: Record<EmailIssue, string> = {
+  required: 'Email is required',
+  invalid: 'Invalid email format',
+  too_long: 'Email is too long',
+};
+
+export const getEmailIssue = (email: string): EmailIssue | null => {
+  if (!email?.trim()) return 'required';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return 'invalid';
+  if (email.length > 255) return 'too_long';
+  return null;
 };
 
 export const validateEmail = (email: string): string | null => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!email?.trim()) {
-    return 'Email is required';
-  }
-  if (!emailRegex.test(email)) {
-    return 'Invalid email format';
-  }
-  if (email.length > 255) {
-    return 'Email is too long';
-  }
-
-  return null;
+  const issue = getEmailIssue(email);
+  return issue ? EMAIL_MESSAGES[issue] : null;
 };
 
 // ============================================================================
