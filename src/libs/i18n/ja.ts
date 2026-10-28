@@ -572,7 +572,8 @@ export const ja = {
     "trend": {
       "vsLastMonth": "先月比"
     },
-    "wallet": "ウォレット"
+    "wallet": "ウォレット",
+    "receipt_image_alt": "スキャンしたレシートの写真"
   },
   "insights_page": {
     "ai_generic_error": "インサイトの生成に失敗しました。",

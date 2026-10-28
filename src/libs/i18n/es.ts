@@ -572,7 +572,8 @@ export const es = {
     "trend": {
       "vsLastMonth": "vs el mes pasado"
     },
-    "wallet": "Billetera"
+    "wallet": "Billetera",
+    "receipt_image_alt": "Foto del recibo escaneado"
   },
   "insights_page": {
     "ai_generic_error": "Error al generar perspectivas.",

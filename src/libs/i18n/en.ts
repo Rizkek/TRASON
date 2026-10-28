@@ -572,7 +572,8 @@ export const en = {
     "trend": {
       "vsLastMonth": "vs last month"
     },
-    "wallet": "Wallet"
+    "wallet": "Wallet",
+    "receipt_image_alt": "Photo of the scanned receipt"
   },
   "insights_page": {
     "ai_generic_error": "Failed to generate insights.",

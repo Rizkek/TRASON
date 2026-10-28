@@ -9,6 +9,7 @@ import { ItemList } from './ItemList';
 import { Receipt } from '@phosphor-icons/react';
 
 import { updateTransactionWithInvalidation } from '@/libs/mutations';
+import { storageQueries } from '@/services/core/storageQueries';
 
 interface Props {
   transactionId: string | null;
@@ -25,6 +26,23 @@ export function ReceiptReviewSheet({ transactionId, isOpen, onClose, onConfirmSu
   const [localItems, setLocalItems] = useState<TransactionItem[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  const [receiptImageUrl, setReceiptImageUrl] = useState<string | null>(null);
+  const storagePath: string | undefined = metadata?.storage_path;
+
+  // The receipts bucket is private, so the image needs a short-lived signed URL.
+  useEffect(() => {
+    setReceiptImageUrl(null);
+    if (!storagePath) return;
+    let cancelled = false;
+    storageQueries
+      .getReceiptSignedUrl(storagePath)
+      .then((url) => !cancelled && setReceiptImageUrl(url))
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [storagePath]);
 
   const initializedForId = React.useRef<string | null>(null);
 
@@ -113,13 +131,17 @@ export function ReceiptReviewSheet({ transactionId, isOpen, onClose, onConfirmSu
                   confidence={metadata.confidence_score} 
                 />
                 
-                {metadata.storage_path && (
-                  <div className="w-full h-32 md:h-48 bg-background/60 rounded-xl overflow-hidden relative border border-foreground/5 flex items-center justify-center">
-                    {/* Ideally we'd use a signed URL to show the image here. For now, a placeholder icon */}
-                    <Receipt size={48} className="text-foreground/10" />
-                    <span className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-black/60 px-2 py-1 rounded">
-                      Receipt Image Attached
-                    </span>
+                {storagePath && (
+                  <div className="relative flex h-48 w-full items-center justify-center overflow-hidden rounded-xl border border-foreground/5 bg-background/60 md:h-64">
+                    {receiptImageUrl ? (
+                      // Plain img: signed URLs expire, so next/image caching would serve dead links.
+                      <img src={receiptImageUrl} alt={t('finance.receipt_image_alt')} className="h-full w-full object-contain" />
+                    ) : (
+                      <>
+                        <Receipt size={48} aria-hidden="true" className="text-foreground/10" />
+                        <span className="sr-only">{t('finance.receipt_image_alt')}</span>
+                      </>
+                    )}
                   </div>
                 )}
                 

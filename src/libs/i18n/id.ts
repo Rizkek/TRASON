@@ -573,7 +573,8 @@ export const id = {
     "trend": {
       "vsLastMonth": "vs bulan lalu"
     },
-    "wallet": "Dompet"
+    "wallet": "Dompet",
+    "receipt_image_alt": "Foto struk yang dipindai"
   },
   "insights_page": {
     "ai_generic_error": "Gagal membuat wawasan.",
