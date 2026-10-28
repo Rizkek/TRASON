@@ -186,7 +186,7 @@ self.addEventListener('push', (event) => {
       const options: NotificationOptions = {
         body: data.body || 'You have a new update.',
         icon: '/icon-192x192.png',
-        badge: '/icon-192x192.png',
+        badge: '/badge-72x72.png',
         tag: data.tag,
         requireInteraction: data.priority === 'high',
         data: {
@@ -203,7 +203,7 @@ self.addEventListener('push', (event) => {
         self.registration.showNotification('TRASON', {
           body: event.data.text(),
           icon: '/icon-192x192.png',
-          badge: '/icon-192x192.png',
+          badge: '/badge-72x72.png',
           data: { url: '/' },
         })
       );
@@ -214,7 +214,7 @@ self.addEventListener('push', (event) => {
       self.registration.showNotification('TRASON', {
         body: 'You have a new notification.',
         icon: '/icon-192x192.png',
-        badge: '/icon-192x192.png',
+        badge: '/badge-72x72.png',
         data: { url: '/' },
       })
     );
