@@ -9,7 +9,7 @@ Dokumen ini ringkas dan mengikuti kode saat ini. Aturan UI lengkap ada di `CLAUD
 - `components/ui/`: primitif (`Button`, `Card`, `Input`, `Select`, `Badge`, `DatePicker`, `Toast`, `Placeholder`, tipografi). `components/` juga memuat `Modal`, `BottomSheet`, `ConfirmModal`, `NoticeModal`, `InlineError`.
 - `components/layout/`: shell aplikasi. `Layout` hanya menyusun `Sidebar` (desktop), `MobileHeader`, `BottomNav`, `MoreSheet` (ponsel), `OfflineBanner`, `PushSubscriptionSync`, dan `ThemeSync`; daftar navigasi dari `useNavItems`.
 - `components/auth/`: `AuthShell` dan `PasswordToggle`, dipakai halaman login dan signup.
-- `components/landing/` dan `components/modules/`: komponen landing dan komponen khusus modul. Halaman publik non-home memakai `landing/page/` (`PageShell`, `PageHeader`, `Prose`); landing memakai token yang sama dengan app dan mengikuti tema.
+- `components/landing/` dan `components/modules/`: komponen landing dan komponen khusus modul. Halaman publik non-home memakai `landing/page/` (`PageShell`, `PageHeader`, `Prose`), tanpa eyebrow di atas judul; landing memakai token yang sama dengan app dan mengikuti tema.
 - `hooks/`: satu hook SWR per domain. Key dari `libs/cacheKeys.ts`, konfigurasi dari `config/swr.ts`.
 - `services/`: satu-satunya tempat memanggil `supabase.from()`, dibungkus `withAuthQuery`.
 - `libs/`: utilitas murni (date, format, validation, i18n, analytics, cron). Fungsi baru masuk `libs`, bukan `lib/utils.ts` (hanya `cn()`).
@@ -31,7 +31,10 @@ Dokumen ini ringkas dan mengikuti kode saat ini. Aturan UI lengkap ada di `CLAUD
 ## 3. Komponen yang dipakai bersama
 
 - **`Card`**: wadah informasi; memakai class `.card` dari `globals.css`.
-- **`Button`**: pakai ini, bukan `<button>` mentah. Variant `primary`, `secondary`, `outline`, `ghost`, `danger`; ukuran `sm|md|lg`; `isLoading` menampilkan teks `loadingText`.
+- **`Button`**: pakai ini, bukan `<button>` mentah. Variant `primary`, `secondary`, `outline`, `ghost`, `danger`; ukuran `sm|md|lg` (jarak ikon `gap-2`); `isLoading` menampilkan teks `loadingText`; `iconOnlyOnMobile` menyembunyikan label di bawah `sm` dan menjadikannya `aria-label`. Class digabung lewat `cn()`, jadi `className` menimpa bawaan. Link yang tampil seperti tombol memakai `buttonClassName()`; jangan membungkus `Button` dengan `Link`.
+- **`Switch`**: toggle on/off dengan `role="switch"` dan `aria-checked`; `label` wajib diisi (nama aksesibel), `busy` untuk penyimpanan yang sedang berjalan. Dipakai di Settings (modul dan notifikasi).
+- **Shell**: `Sidebar` mulai `lg`; di bawahnya `MobileHeader`, `BottomNav`, dan `MoreSheet`. Tablet portrait sengaja memakai shell mobile agar konten tidak terjepit sidebar 288px.
+- **`AppPageHeader`** (`components/layout`): judul, deskripsi, dan `actions` untuk semua halaman `(app)` kecuali Dashboard. Aksi tetap sebaris dengan judul di semua lebar layar, pakai `size="sm"`; aksi yang sudah punya tombol mengambang di mobile diberi `hidden md:inline-flex`.
 - **`Badge`**: label status.
 - **`Modal`, `ConfirmModal`, `NoticeModal`, `BottomSheet`**: dialog. `NoticeModal` dipakai untuk penolakan seperti reminder yang waktunya sudah lewat.
 - **`InlineError`**: kegagalan memuat data, persisten dan dengan tombol coba lagi. Data yang gagal dimuat tidak boleh tampil sebagai daftar kosong.

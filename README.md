@@ -52,6 +52,7 @@ CRON_SECRET=
 RESEND_API_KEY=
 ALPHA_VANTAGE_API_KEY=
 COINGECKO_DEMO_API_KEY=
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=
 ```
 
 `SUPABASE_SERVICE_ROLE_KEY`, `VAPID_PRIVATE_KEY`, `CRON_SECRET` and the API keys are server-only. Never prefix them with `NEXT_PUBLIC_`.
@@ -72,7 +73,7 @@ src/
     (app)/       authenticated pages: dashboard, finance, investments, schedule, reminders,
                  insights, sport, career, settings, onboarding
     (auth)/      login, signup
-    (landing)/   public pages: about, pricing, vision, roadmap, legal
+    (landing)/   public pages: about, pricing, vision, roadmap, changelog, contact (help + FAQ), legal
     api/         route handlers (AI capture, prices, push, cron, validation)
     sw.ts        service worker source
   components/    ui primitives, layout shell, landing, module components

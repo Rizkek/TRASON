@@ -12,6 +12,8 @@ npm run build
 
 `next build` tidak menjalankan ESLint (`eslint.ignoreDuringBuilds: true`), jadi jalankan `npm run lint` sendiri dan periksa hasilnya.
 
+Bila `public/logo-trason.png` berubah, jalankan `node scripts/generate-brand-assets.mjs` dan commit semua PNG yang dihasilkan di `public/`. Ikon PWA di-cache perangkat; pengguna yang sudah meng-install mungkin perlu menghapus dan memasang ulang untuk melihat ikon baru.
+
 ## 2. Deploy ke Vercel
 
 1. Tambah proyek di Vercel dan hubungkan repositori.
@@ -51,3 +53,7 @@ Validasi setelah deploy: buat reminder yang jatuh tempo sekitar 62 menit lagi, l
 - **Keandalan push dan reminder**: pengiriman cron exactly-once, setiap perangkat tetap berlangganan, reminder dengan waktu lampau ditolak, shell aplikasi persisten, `InlineError` untuk data yang gagal dimuat, invalidasi cache terpusat (`libs/cacheInvalidation.ts`).
 - **Tanggal dan timezone**: tanggal lokal selalu lewat helper `libs/date.ts` dan `libs/profileDate.ts`, "hari ini" mengikuti timezone profil, dan satu guard auth di `Layout`.
 - **Investments**: halaman Goals dan Journal disembunyikan (redirect ke `/investments`) sampai ada tabel dan query yang nyata.
+- **Auth (2026-10)**: lupa dan reset password, route `/auth/confirm` untuk link email di perangkat mana pun, Turnstile lewat CAPTCHA bawaan Supabase, pemetaan error auth ke i18n, `safeRedirectPath` menutup open redirect. Butuh pengaturan dashboard Supabase di `docs/setup-environment.md` sebelum deploy.
+- **UI app (2026-10)**: `AppPageHeader` untuk semua halaman `(app)` selain Dashboard, `Button` memakai `cn()` dan jarak ikon `gap-2`, Insights dan Career dirapikan, `careerAnalytics` tidak lagi menghitung lamaran yang ditarik sebagai respons.
+- **Brand dan landing (2026-10)**: semua ikon dari mark TR (`scripts/generate-brand-assets.mjs`), manifest dengan ikon maskable dan badge monokrom, Support digabung ke Contact (`/support` redirect permanen), About, Roadmap, Changelog dan Pricing ditulis ulang sesuai fitur yang ada, eyebrow dihapus, sitemap dan robots hanya berisi halaman nyata.
+- **Legal dan responsif (2026-10)**: Privacy, Cookies, dan Terms ditulis ulang dari perilaku kode (daftar pemroses, inventaris cookie dan localStorage, UU PDP); prompt install PWA dipindah ke shell app; shell berganti di `lg` agar tablet memakai layout mobile; `Switch` untuk toggle Settings; padding kartu dan tabel responsif; kolom sekunder tabel Investments disembunyikan di ponsel.
