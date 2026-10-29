@@ -21,7 +21,7 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
   const { locale } = useUserPreferences();
   if (records.length === 0) {
     return (
-      <Card className="p-8 bg-foreground/[0.02] border-foreground/[0.05] text-center">
+      <Card className="p-5 md:p-8 bg-foreground/[0.02] border-foreground/[0.05] text-center">
         <Trophy size={32} className="mx-auto text-muted-foreground mb-4 opacity-50" />
         <h4 className="text-foreground font-semibold mb-1">No Personal Records Yet</h4>
         <p className="text-sm text-muted-foreground">Log your first workout to start tracking your bests.</p>

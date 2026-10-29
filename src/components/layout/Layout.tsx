@@ -75,7 +75,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       <Sidebar items={visibleItems} isActive={isActive} user={user} onLogout={() => setLogoutOpen(true)} />
 
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden md:ml-72">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden lg:ml-72">
         <MobileHeader
           title={current ? t(navLabelKey(current.href)) : 'TRASON'}
           user={user}
@@ -83,7 +83,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           onOpenMenu={() => setMoreOpen(true)}
         />
 
-        <main id="main-content" tabIndex={-1} ref={mainRef} className="relative z-10 flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none md:pb-0">
+        <main id="main-content" tabIndex={-1} ref={mainRef} className="relative z-10 flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none lg:pb-0">
           <div className="container mx-auto max-w-6xl px-4 py-4 md:px-8 md:py-8 lg:px-12">{children}</div>
         </main>
 

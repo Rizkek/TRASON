@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
-import { InstagramLogo, LinkedinLogo, ChatCircle } from '@phosphor-icons/react/dist/ssr';
+import { ChatCircle, Envelope } from '@phosphor-icons/react/dist/ssr';
 import { Logo } from '@/components';
+import { SITE_CONTACT } from '@/config/site';
 
 const COLUMNS = [
   {
@@ -20,7 +21,6 @@ const COLUMNS = [
       { label: 'About', href: '/about' },
       { label: 'Vision', href: '/vision' },
       { label: 'Contact', href: '/contact' },
-      { label: 'Support', href: '/support' },
     ],
   },
   {
@@ -48,14 +48,11 @@ export function LandingFooter() {
             A personal operating system for your money, career, training, schedule and reminders.
           </p>
           <div className="flex items-center gap-2 pt-1">
-            <SocialLink href="https://wa.me/62895417240107" label="WhatsApp">
-              <ChatCircle size={18} />
+            <SocialLink href={SITE_CONTACT.whatsappUrl} label="WhatsApp">
+              <ChatCircle size={18} aria-hidden="true" />
             </SocialLink>
-            <SocialLink href="https://instagram.com" label="Instagram">
-              <InstagramLogo size={18} />
-            </SocialLink>
-            <SocialLink href="https://linkedin.com" label="LinkedIn">
-              <LinkedinLogo size={18} />
+            <SocialLink href={`mailto:${SITE_CONTACT.email}`} label="Email">
+              <Envelope size={18} aria-hidden="true" />
             </SocialLink>
           </div>
         </div>
@@ -85,11 +82,11 @@ export function LandingFooter() {
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-5 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
           <p>© {year} TRASON. All rights reserved.</p>
           <p>
-            <a href="mailto:hello@trason.app" className="transition-colors hover:text-foreground">
-              hello@trason.app
+            <a href={`mailto:${SITE_CONTACT.email}`} className="transition-colors hover:text-foreground">
+              {SITE_CONTACT.email}
             </a>
             <span aria-hidden="true"> · </span>
-            Klaten, Jawa Tengah
+            {SITE_CONTACT.location}
           </p>
         </div>
       </div>

@@ -42,15 +42,9 @@ export async function POST(req: Request) {
       throw new Error('Failed to upload image to storage.');
     }
 
-    const { data: publicUrlData } = supabase.storage
-      .from('receipts')
-      .getPublicUrl(fileName);
-
-    return NextResponse.json({
-      path: data.path,
-      url: publicUrlData.publicUrl,
-      fileName,
-    });
+    // The bucket is private: callers get the storage path, and images are read back through
+    // the owner's session (server) or a short-lived signed URL (client), never a public link.
+    return NextResponse.json({ path: data.path, fileName });
   } catch (error: any) {
     console.error('Error in upload-receipt API route:', error);
     return NextResponse.json(

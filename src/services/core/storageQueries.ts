@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/supabaseClient';
 import { handleQueryError, logError } from '@/libs/apiErrors';
+import { RECEIPT_BUCKET } from '@/libs/receiptStorage';
 
 export const storageQueries = {
   /**
@@ -30,6 +31,21 @@ export const storageQueries = {
       return data.publicUrl;
     } catch (err) {
       logError(err, 'storageQueries.uploadAvatar');
+      throw handleQueryError(err);
+    }
+  },
+
+  /**
+   * Short-lived link to one of the user's own receipt images. The receipts bucket is private,
+   * so this is the only way the browser can display one; storage RLS limits it to the owner.
+   */
+  async getReceiptSignedUrl(path: string, expiresInSeconds = 600): Promise<string> {
+    try {
+      const { data, error } = await supabase.storage.from(RECEIPT_BUCKET).createSignedUrl(path, expiresInSeconds);
+      if (error || !data) throw error ?? new Error('No signed URL returned');
+      return data.signedUrl;
+    } catch (err) {
+      logError(err, 'storageQueries.getReceiptSignedUrl');
       throw handleQueryError(err);
     }
   },

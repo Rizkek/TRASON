@@ -74,7 +74,7 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
-  const [receiptUrl, setReceiptUrl] = useState('');
+  const [receiptPath, setReceiptPath] = useState('');
   const [extraction, setExtraction] = useState<Extraction | null>(null);
   const [confidence, setConfidence] = useState<number | null>(null);
   const [draft, setDraft] = useState<PayoutDraft>({
@@ -117,14 +117,14 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
       const extractionResponse = await fetch('/api/finance/extract-driver-payout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ receiptUrl: uploadResult.url }),
+        body: JSON.stringify({ receiptPath: uploadResult.path }),
       });
       const extractionResult = await extractionResponse.json();
       if (!extractionResponse.ok) throw new Error(extractionResult.error || t('finance.driverPayout.readFailed'));
 
       const data = extractionResult.data as Extraction;
       setExtraction(data);
-      setReceiptUrl(uploadResult.url);
+      setReceiptPath(uploadResult.path);
       setConfidence(typeof extractionResult.confidence === 'number' ? extractionResult.confidence : null);
       setDraft({
         date: data.date && /^\d{4}-\d{2}-\d{2}$/.test(data.date) ? data.date : getLocalISODate(),
@@ -226,7 +226,7 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
           fuel_cost: fuelCost,
           real_net_profit: realNetProfit ?? netPayoutAmount,
           extraction_confidence: confidence,
-          receipt_url: receiptUrl,
+          receipt_path: receiptPath,
         },
       });
 

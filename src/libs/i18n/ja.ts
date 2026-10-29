@@ -40,12 +40,77 @@ export const ja = {
     "domain_verified": "メールドメインを確認しました",
     "register_error_title": "登録できません",
     "register_success_title": "アカウントを作成しました",
-    "check_email": "アカウントを確認するためメールをご確認ください。",
     "create_account": "アカウントを作成",
     "creating": "ワークスペースを準備しています...",
     "has_workspace": "すでにワークスペースをお持ちですか？",
-    "server_error": "登録中にサーバーエラーが発生しました。しばらくしてからもう一度お試しください。",
-    "email_taken": "このメールアドレスはすでに登録されています。サインインするか、別のメールアドレスをお使いください。"
+    "forgot_password_link": "パスワードをお忘れですか？",
+    "forgot_title": "パスワードの再設定",
+    "forgot_lede": "登録したメールアドレスを入力してください。新しいパスワードを設定するリンクをお送りします。",
+    "send_reset_link": "リンクを送信",
+    "sending": "送信中...",
+    "reset_sent_title": "メールをご確認ください",
+    "reset_sent_desc": "{email} のアカウントが存在する場合、パスワード再設定用のリンクを送信しました。",
+    "reset_error_title": "パスワードを再設定できませんでした",
+    "back_to_login": "サインインに戻る",
+    "reset_title": "新しいパスワードを設定",
+    "reset_lede": "他のサービスで使っていないパスワードを選んでください。",
+    "new_password": "新しいパスワード",
+    "save_password": "パスワードを保存",
+    "saving": "保存中...",
+    "reset_done_title": "パスワードを更新しました",
+    "reset_done_desc": "このデバイスではサインインしたままです。他のデバイスはサインアウトされました。",
+    "reset_expired_title": "このリンクは期限切れです",
+    "reset_expired_desc": "再設定リンクは一度だけ使え、一定時間で失効します。新しいリンクをリクエストしてください。",
+    "request_new_link": "新しいリンクをリクエスト",
+    "checking_link": "リンクを確認しています...",
+    "check_inbox_title": "メールアドレスを確認してください",
+    "check_inbox_desc": "{email} に確認リンクを送信しました。どのデバイスからでも開いてアカウントを有効にできます。",
+    "check_inbox_hint": "数分たっても届かない場合は、迷惑メールフォルダをご確認ください。",
+    "resend_email": "メールを再送信",
+    "resend_in": "{s} 秒後に再送信できます",
+    "resent": "新しいメールを送信しました。",
+    "use_different_email": "別のメールアドレスを使う",
+    "password_invalid": "パスワードが下記の条件を満たしていません。",
+    "password_rules_title": "パスワードの条件",
+    "password_rules": {
+      "length": "8文字以上",
+      "upper": "大文字を1つ",
+      "lower": "小文字を1つ",
+      "number": "数字を1つ"
+    },
+    "rule_met": "（達成）",
+    "rule_unmet": "（未達成）",
+    "consent": "アカウントを作成すると、{terms}と{privacy}に同意したことになります。",
+    "terms_link": "利用規約",
+    "privacy_link": "プライバシーポリシー",
+    "captcha_required": "先に認証チェックを完了してください。",
+    "captcha_load_failed": "認証チェックを読み込めませんでした。このサイトのコンテンツブロッカーをオフにして再読み込みしてください。",
+    "domain": {
+      "invalid": "有効なメールアドレスを入力してください。",
+      "disposable": "使い捨てメールアドレスは使用できません。",
+      "no_domain": "このメールドメインは存在しません。",
+      "no_mx": "このドメインにはメールサーバーがありません。アドレスをご確認ください。",
+      "unverified": "このドメインを確認できませんでした。アドレスをご確認ください。"
+    },
+    "errors": {
+      "invalid_credentials": "メールアドレスまたはパスワードが正しくありません。",
+      "email_not_confirmed": "サインインする前にメールアドレスを確認してください。リンクは受信トレイにあります。",
+      "email_taken": "このメールアドレスはすでに登録されています。サインインするか、パスワードを再設定してください。",
+      "weak_password": "推測されやすいパスワードです。より長く、一般的でないものを選んでください。",
+      "same_password": "新しいパスワードは現在のものと異なる必要があります。",
+      "email_invalid": "有効なメールアドレスを入力してください。",
+      "email_required": "メールアドレスは必須です。",
+      "email_too_long": "メールアドレスが長すぎます。",
+      "rate_limited": "試行回数が多すぎます。1分ほど待ってから再度お試しください。",
+      "email_rate_limited": "送信されたメールが多すぎます。数分待ってから再度リクエストしてください。",
+      "captcha_failed": "認証に失敗しました。もう一度チェックを完了してください。",
+      "signup_disabled": "現在、新規登録を受け付けていません。",
+      "link_invalid": "このリンクは無効か期限切れです。新しいリンクをリクエストしてください。",
+      "session_missing": "セッションが終了しました。もう一度サインインしてください。",
+      "network": "サーバーに接続できません。接続を確認して再度お試しください。",
+      "server": "こちら側で問題が発生しました。しばらくしてから再度お試しください。",
+      "unknown": "問題が発生しました。もう一度お試しください。"
+    }
   },
   "career_page": {
     "applied_on": "応募日",
@@ -180,23 +245,27 @@ export const ja = {
       "reviewing": "選考中"
     },
     "stats_labels": {
-      "avg": "平均",
       "avgToInterview": "面接までの平均",
       "interviewRate": "面接率",
-      "intv": "面接",
-      "offer": "内定",
       "offerRate": "内定率",
-      "resp": "返答",
-      "responseRate": "返答率"
+      "responseRate": "返答率",
+      "closed": "終了"
     },
     "tabs": {
       "active": "進行中",
       "all": "すべて",
       "closed": "完了",
-      "interview": "面接"
+      "interview": "面接",
+      "applications": "応募"
     },
     "title": "キャリア",
-    "title_highlight": ""
+    "insights": {
+      "stale": "{days}日間、新しい応募がありません。",
+      "no_active": "進行中の応募はありません。新しい応募を追加しましょう。",
+      "low_response": "返信があった応募は{rate}%だけです。履歴書やカバーレターの見直しを検討してください。",
+      "low_interview": "面接に進んだ応募は{rate}%です。スキルにより合う職種を探してみてください。",
+      "offers": "回答待ちのオファーが{count}件あります。"
+    }
   },
   "common": {
     "cancel": "キャンセル",
@@ -316,7 +385,7 @@ export const ja = {
     "view_all": "すべて見る",
     "view_all_tasks": "すべてのタスクを見る ({count}件)",
     "view_schedule": "スケジュールを見る",
-    "vitality_this_week": "今週のバイタリティ",
+    "vitality_this_week": "今週のスポーツ",
     "welcome_back": "お帰りなさい",
     "load_failed": "ダッシュボードの一部を読み込めませんでした。",
     "section_load_failed": "このセクションを読み込めませんでした。",
@@ -503,13 +572,12 @@ export const ja = {
     "trend": {
       "vsLastMonth": "先月比"
     },
-    "wallet": "ウォレット"
+    "wallet": "ウォレット",
+    "receipt_image_alt": "スキャンしたレシートの写真"
   },
   "insights_page": {
     "ai_generic_error": "インサイトの生成に失敗しました。",
     "ai_timeout_error": "リクエストがタイムアウトしました。生成に時間がかかりすぎています。もう一度お試しください。",
-    "architect_perspective_desc": "記録を続けて長期的なパターンを見つけましょう。",
-    "architect_perspective_title": "概要",
     "ask_ai": "インサイトを生成",
     "delete_insight": "インサイトを削除",
     "desc": "記録されたデータから傾向を要約します。",
@@ -518,9 +586,10 @@ export const ja = {
     "reset_insights": "すべてクリア",
     "reset_insights_confirm": "以前のすべてのインサイト履歴を完全に消去してもよろしいですか？",
     "resetting": "消去中...",
-    "system_idle": "待機中",
     "thinking": "考え中...",
-    "title": "インサイト"
+    "title": "インサイト",
+    "footer_note": "記録を続けて長期的なパターンを見つけましょう。",
+    "load_failed": "保存されたインサイトを読み込めませんでした。"
   },
   "investment_page": {
     "add_first_position": "最初のポジションを追加",
@@ -585,7 +654,7 @@ export const ja = {
     "portfolio_tracker_desc": "価格更新を伴うシンプルな取得原価追跡。",
     "portfolio_value": "ポートフォリオ価値",
     "portfolio_worth": "現在のポートフォリオは、追跡されている{count}個のポジションで{value}の価値があります。",
-    "price_live": "ライブ価格、{time}に更新",
+    "price_live": "リアルタイム価格（{time} 更新）",
     "price_not_refreshed": "価格はまだ更新されていません",
     "refresh_prices": "価格を更新",
     "remaining_amount": "残額",
@@ -603,7 +672,8 @@ export const ja = {
     "unrealized_pl": "損益",
     "update_label": "更新",
     "update_position_upper": "更新",
-    "value": "評価額"
+    "value": "評価額",
+    "price_stale": "価格はまだ同期されていません"
   },
   "life_score": {
     "dimensions": {
@@ -644,8 +714,6 @@ export const ja = {
     "all_sub_off_warning": "すべてのサブ機能がオフです — モジュールに表示されるコンテンツがありません",
     "career_desc": "Track job applications, interviews, and opportunities",
     "description": "モジュールを有効または無効にして、エクスペリエンスをカスタマイズしてください。無効化されたモジュールはナビゲーションやダッシュボードに表示されません。",
-    "disabled_count": "無効なモジュール",
-    "enabled_count": "有効なモジュール",
     "finance_desc": "Track income and expenses, manage budgets",
     "insights_desc": "AI-powered analytics and recommendations",
     "investments_desc": "Portfolio tracking and investment insights",
@@ -656,7 +724,8 @@ export const ja = {
     "timeline_daily_checklist": "タスク",
     "timeline_desc": "Daily activities and schedule management",
     "timeline_weekly_log": "週次ログ",
-    "title": "アクティブモジュール"
+    "title": "アクティブモジュール",
+    "count_summary": "{total}個中{on}個のモジュールがオン"
   },
   "nav": {
     "cancel": "キャンセル",
@@ -760,7 +829,10 @@ export const ja = {
     "title_highlight": "",
     "title_required": "タイトルは必須です",
     "weekly_focus": "今週のフォーカス",
-    "weekly_focus_desc": "今週は{count}個の保留中のリマインダーがあります。"
+    "weekly_focus_desc": "今週は{count}個の保留中のリマインダーがあります。",
+    "view_label": "表示",
+    "view_calendar": "カレンダー表示",
+    "view_list": "リスト表示"
   },
   "settings": {
     "alerts": {
@@ -923,5 +995,11 @@ export const ja = {
     "title": "スケジュール",
     "today_timeline": "今日のスケジュール",
     "weekly_log": "ウィークリーログ"
+  },
+  "pwa": {
+    "install_title": "TRASONをインストール",
+    "install_desc": "ホーム画面に追加すると、他のアプリと同じように全画面で開きます。",
+    "install": "インストール",
+    "not_now": "後で"
   }
 };

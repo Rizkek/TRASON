@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { GeminiReceiptExtractor } from '@/services/ai/receiptExtractor';
 import { driverPayoutExtractionSchema } from '@/services/ai/driverPayoutExtractor';
 import { createClient, getAuthenticatedUser } from '@/utils/supabase/server';
+import { downloadReceiptAsDataUrl, isOwnedReceiptPath } from '@/libs/receiptStorage';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -13,35 +14,17 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { receiptUrl } = await req.json();
-    if (typeof receiptUrl !== 'string') {
-      return NextResponse.json({ error: 'A receipt image URL is required.' }, { status: 400 });
-    }
-
-    const imageUrl = new URL(receiptUrl);
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (!supabaseUrl) throw new Error('Supabase storage is not configured.');
-
-    const storageOrigin = new URL(supabaseUrl).origin;
-    const ownedReceiptPrefix = `/storage/v1/object/public/receipts/${user.id}/`;
-    if (imageUrl.origin !== storageOrigin || !imageUrl.pathname.startsWith(ownedReceiptPrefix)) {
+    const { receiptPath } = await req.json();
+    if (!isOwnedReceiptPath(receiptPath, user.id)) {
       return NextResponse.json({ error: 'The image must be uploaded to your TRASON receipts.' }, { status: 400 });
     }
 
-    // Since the bucket might be private, download the file using the server-side Supabase client
     const supabase = await createClient();
-    const filePath = decodeURIComponent(imageUrl.pathname.split('/storage/v1/object/public/receipts/')[1]);
-    const { data: fileData, error: downloadError } = await supabase.storage.from('receipts').download(filePath);
-
-    if (downloadError || !fileData) {
-      console.error('Error downloading file from storage:', downloadError);
-      throw new Error('Failed to download image from your TRASON storage.');
+    const download = await downloadReceiptAsDataUrl(supabase, receiptPath);
+    if ('error' in download) {
+      return NextResponse.json({ error: download.error }, { status: download.status });
     }
-
-    const arrayBuffer = await fileData.arrayBuffer();
-    const base64 = Buffer.from(arrayBuffer).toString('base64');
-    const mimeType = fileData.type || 'image/jpeg';
-    const dataUrl = `data:${mimeType};base64,${base64}`;
+    const { dataUrl } = download;
 
     const extractor = new GeminiReceiptExtractor();
     const result = await extractor.extractJSON(

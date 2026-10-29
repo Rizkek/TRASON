@@ -35,7 +35,7 @@ export function ProfileSection({
   return (
     <Card className="glass border-none relative overflow-hidden">
 
-      <div className="p-8 space-y-8 relative z-10">
+      <div className="p-5 md:p-8 space-y-8 relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-8 pb-8 border-b border-foreground/[0.05]">
           <div className="relative group">
             <input

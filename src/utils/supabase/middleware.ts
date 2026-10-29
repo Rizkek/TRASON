@@ -57,7 +57,8 @@ export async function updateSession(request: NextRequest) {
     (path) => url.pathname === path || url.pathname.startsWith(`${path}/`)
   );
 
-  const isAuthPath = url.pathname === '/login' || url.pathname === '/signup';
+  // /reset-password is deliberately absent: it runs on the recovery session the emailed link creates.
+  const isAuthPath = ['/login', '/signup', '/forgot-password'].includes(url.pathname);
   const isRootPath = url.pathname === '/';
 
   // Optimization: Only ping Supabase if it's a route that cares about auth state

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Check } from '@phosphor-icons/react/dist/ssr';
+import { Logo } from '@/components/Logo';
 
 /* Small building blocks shared by every product recreation. They mirror the
    real app's visual language (dark surfaces, mono numbers, tiny uppercase
@@ -99,15 +100,13 @@ export function UiTag({
   );
 }
 
-const NAV = ['Dashboard', 'Finance', 'Investments', 'Schedule', 'Vitality', 'Career', 'Reminders', 'Insights'];
+const NAV = ['Dashboard', 'Finance', 'Investments', 'Schedule', 'Sport', 'Career', 'Reminders', 'Insights'];
 
 export function UiSidebar({ active }: { active: string }) {
   return (
     <aside className="hidden w-44 shrink-0 flex-col gap-5 border-r border-foreground/[0.06] bg-surface/30 p-4 md:flex">
       <div className="flex items-center gap-2 px-1">
-        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-primary text-xs font-bold text-background">
-          T
-        </span>
+        <Logo size={20} />
         <span className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/70">TRASON</span>
       </div>
       <nav className="flex flex-col gap-0.5">

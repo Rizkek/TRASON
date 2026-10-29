@@ -12,6 +12,7 @@ import { formatSignedCurrency, formatSignedPercent } from '@/services/finance/in
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { AppPageHeader } from '@/components/layout/AppPageHeader';
 
 type AssetType = 'stock' | 'crypto' | 'gold' | 'property' | 'debt' | 'vehicle' | 'other';
 
@@ -231,24 +232,27 @@ export function InvestmentsClient() {
           =============================================================
         */}
         <div className="space-y-8 animate-fade-in">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="space-y-2 max-w-2xl">
-            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-foreground">{t('investment_page.investment_analyst_title')}</Heading>
-            <Paragraph className="text-subtext flex items-center gap-2">
-              {t('investment_page.investment_analyst_desc')}
-            </Paragraph>
-          </div>
-          <div className="hidden md:flex gap-4">
-            <Button variant="ghost" size="md" onClick={() => refreshPortfolio()} disabled={isRefreshing}>
-              <ArrowsClockwise size={16} className="mr-2" />
-              {t('investment_page.refresh_prices')}
-            </Button>
-            <Button variant="primary" size="md" onClick={openNewModal}>
-              <Plus size={16} className="mr-2" />
-              {t('investment_page.add_position')}
-            </Button>
-          </div>
-        </div>
+          <AppPageHeader
+            title={t('investment_page.investment_analyst_title')}
+            description={t('investment_page.investment_analyst_desc')}
+            actions={
+              <>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  iconOnlyOnMobile
+                  onClick={() => refreshPortfolio()}
+                  disabled={isRefreshing}
+                  leftIcon={<ArrowsClockwise size={16} />}
+                >
+                  {t('investment_page.refresh_prices')}
+                </Button>
+                <Button variant="primary" size="sm" onClick={openNewModal} leftIcon={<Plus size={16} />} className="hidden md:inline-flex">
+                  {t('investment_page.add_position')}
+                </Button>
+              </>
+            }
+          />
 
         {error && (
           <Alert type="error" title={t('investment_page.investment_analyst_title')}>
@@ -256,25 +260,25 @@ export function InvestmentsClient() {
           </Alert>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          <Card className="p-8 bg-background/60 border-primary/20 backdrop-blur-md">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6">
+          <Card className="p-5 md:p-8 bg-background/60 border-primary/20 backdrop-blur-md">
             <Paragraph className="text-micro text-primary/80 uppercase tracking-widest font-semibold mb-2">{t('dashboard.netWorth.title')}</Paragraph>
-            <Paragraph className="text-3xl font-sans font-semibold tracking-tight tabular-nums text-foreground">{formatCurrency(summary?.netWorth || 0, currency, locale)}</Paragraph>
+            <Paragraph className="font-mono text-heading-lg md:text-3xl font-semibold tracking-tight tabular-nums text-foreground break-words">{formatCurrency(summary?.netWorth || 0, currency, locale)}</Paragraph>
           </Card>
-          <Card className="p-8 bg-background/60 border-foreground/5">
+          <Card className="p-5 md:p-8 bg-background/60 border-foreground/5">
             <Paragraph className="text-micro text-muted-foreground mb-2 uppercase tracking-widest">{t('dashboard.netWorth.totalAssets')}</Paragraph>
-            <Paragraph className="text-2xl font-semibold tabular-nums text-foreground">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</Paragraph>
+            <Paragraph className="font-mono text-heading-md md:text-2xl font-semibold tabular-nums text-foreground break-words">{formatCurrency(summary?.totalAssets || 0, currency, locale)}</Paragraph>
             <Paragraph className="text-xs text-muted-foreground mt-1">{t('investment_page.liquid_property_vehicle')}</Paragraph>
           </Card>
-          <Card className="p-8 bg-background/60 border-foreground/5">
+          <Card className="p-5 md:p-8 bg-background/60 border-foreground/5">
             <Paragraph className="text-micro text-muted-foreground mb-2 uppercase tracking-widest">{t('dashboard.netWorth.totalLiabilities')}</Paragraph>
-            <Paragraph className="text-2xl font-semibold tabular-nums text-foreground">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</Paragraph>
+            <Paragraph className="font-mono text-heading-md md:text-2xl font-semibold tabular-nums text-foreground break-words">{formatCurrency(summary?.totalLiabilities || 0, currency, locale)}</Paragraph>
             <Paragraph className="text-xs text-muted-foreground mt-1">{t('investment_page.debt_mortgages')}</Paragraph>
           </Card>
         </div>
 
         <Card className="overflow-hidden">
-          <div className="px-6 py-4 border-b border-foreground/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="px-4 py-4 md:px-6 border-b border-foreground/5 flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
               <Heading as="h3" size="h3" className="text-sm font-semibold tracking-tight">{t('investment_page.portfolio_tracker')}</Heading>
               <Paragraph className="text-xs text-muted-foreground mt-1">{t('investment_page.portfolio_tracker_desc')}</Paragraph>
@@ -285,7 +289,7 @@ export function InvestmentsClient() {
               <button
                 onClick={() => setActiveTab('financial')}
                 title={t('investment_page.financial_assets')}
-                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                className={`flex min-h-9 items-center gap-1.5 rounded-full px-4 text-label-md transition-colors ${
                   activeTab === 'financial'
                     ? 'bg-primary text-on-primary '
                     : 'text-muted-foreground hover:text-foreground'
@@ -297,7 +301,7 @@ export function InvestmentsClient() {
               <button
                 onClick={() => setActiveTab('physical')}
                 title={t('investment_page.physical_assets')}
-                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                className={`flex min-h-9 items-center gap-1.5 rounded-full px-4 text-label-md transition-colors ${
                   activeTab === 'physical'
                     ? 'bg-primary text-on-primary '
                     : 'text-muted-foreground hover:text-foreground'
@@ -309,7 +313,7 @@ export function InvestmentsClient() {
               <button
                 onClick={() => setActiveTab('liabilities')}
                 title={t('investment_page.liabilities')}
-                className={`flex items-center gap-1.5 px-8 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                className={`flex min-h-9 items-center gap-1.5 rounded-full px-4 text-label-md transition-colors ${
                   activeTab === 'liabilities'
                     ? 'bg-expense text-background '
                     : 'text-muted-foreground hover:text-foreground'
@@ -329,8 +333,8 @@ export function InvestmentsClient() {
                 <thead>
                   <tr className="border-b border-foreground/5 text-xs uppercase tracking-widest text-muted-foreground">
                     <th className="px-2 py-2">{t('investment_page.asset')}</th>
-                    <th className="px-2 py-2">{t('investment_page.amount')}</th>
-                    <th className="px-2 py-2">{t('investment_page.avg_cost')}</th>
+                    <th className="hidden px-2 py-2 sm:table-cell">{t('investment_page.amount')}</th>
+                    <th className="hidden px-2 py-2 sm:table-cell">{t('investment_page.avg_cost')}</th>
                     <th className="px-2 py-2">{t('investment_page.value')}</th>
                     <th className="px-2 py-2 text-right">{t('investment_page.actions')}</th>
                   </tr>
@@ -351,20 +355,23 @@ export function InvestmentsClient() {
                               {position.asset_type}
                             </Badge>
                             {isLive ? (
-                              <span title={`Harga live, update ${lastUpdated}`}>
-                                <Wifi size={10} className="text-success" />
+                              <span title={t('investment_page.price_live').replace('{time}', lastUpdated ?? '')}>
+                                <Wifi size={12} aria-hidden="true" className="text-success" />
+                                <span className="sr-only">{t('investment_page.price_live').replace('{time}', lastUpdated ?? '')}</span>
                               </span>
                             ) : (
-                              <span title="Harga belum direfresh">
-                                <WifiOff size={10} className="text-muted-foreground" />
+                              <span title={t('investment_page.price_stale')}>
+                                <WifiOff size={12} aria-hidden="true" className="text-muted-foreground" />
+                                <span className="sr-only">{t('investment_page.price_stale')}</span>
                               </span>
                             )}
                           </div>
                           <Paragraph className="text-xs text-muted-foreground truncate max-w-[120px]">{position.display_name || t('investment_page.tracked_position')}</Paragraph>
+                          <Paragraph className="font-mono text-xs text-muted-foreground sm:hidden">{formatNumber(position.amount, 4)}</Paragraph>
                         </div>
                       </td>
-                      <td className="px-2 py-4 text-xs text-foreground">{formatNumber(position.amount, 4)}</td>
-                      <td className="px-2 py-4 text-xs text-foreground">{formatCurrency(position.buy_price, currency, locale)}</td>
+                      <td className="hidden px-2 py-4 text-xs text-foreground sm:table-cell">{formatNumber(position.amount, 4)}</td>
+                      <td className="hidden px-2 py-4 text-xs text-foreground sm:table-cell">{formatCurrency(position.buy_price, currency, locale)}</td>
                       <td className="px-2 py-4 text-xs font-bold text-foreground">
                         {formatCurrency(position.current_value, currency, locale)}
                       </td>
@@ -375,7 +382,7 @@ export function InvestmentsClient() {
                           </Button>
                           <button
                             onClick={() => setDeleteConfirmId(position.id)}
-                            className="p-1 text-muted-foreground hover:text-danger hover:bg-danger/10 rounded transition-colors"
+                            className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-danger/10 hover:text-danger"
                             aria-label={t('investment_page.delete')}
                           >
                             <Trash2 size={16} />
@@ -402,22 +409,22 @@ export function InvestmentsClient() {
         </Card>
 
         {calculatedPositions.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="p-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6">
+            <Card className="p-5 md:p-8">
               <div className="flex items-center gap-2 mb-4 text-secondary">
                 <Landmark size={16} />
                 <Paragraph className="text-micro">{t('investment_page.stocks_upper')}</Paragraph>
               </div>
               <Paragraph className="text-lg font-semibold text-foreground">{formatCurrency(summary?.allocationByType.stock || 0, currency, locale)}</Paragraph>
             </Card>
-            <Card className="p-8">
+            <Card className="p-5 md:p-8">
               <div className="flex items-center gap-2 mb-4 text-primary">
                 <Coins size={16} />
                 <Paragraph className="text-micro">{t('investment_page.crypto_upper')}</Paragraph>
               </div>
               <Paragraph className="text-lg font-semibold text-foreground">{formatCurrency(summary?.allocationByType.crypto || 0, currency, locale)}</Paragraph>
             </Card>
-            <Card className="p-8">
+            <Card className="p-5 md:p-8">
               <div className="flex items-center gap-2 mb-4 text-warning">
                 <Shield size={16} />
                 <Paragraph className="text-micro">{t('investment_page.gold_upper')}</Paragraph>
@@ -434,16 +441,7 @@ export function InvestmentsClient() {
         Tombol floating untuk add position di device mobile.
         =============================================================
       */}
-      <div className="md:hidden fixed bottom-24 right-4 z-40 flex flex-col gap-2">
-        <Button 
-          variant="ghost" 
-          onClick={() => refreshPortfolio()} 
-          disabled={isRefreshing}
-          className="rounded-full w-12 h-12 flex items-center justify-center bg-foreground/10 text-foreground"
-          aria-label={t('investment_page.refresh_prices')}
-        >
-          <ArrowsClockwise size={20} />
-        </Button>
+      <div className="md:hidden fixed bottom-24 right-4 z-40">
         <Button 
           variant="primary" 
           onClick={openNewModal} 

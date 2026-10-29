@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { PaperPlaneRight } from '@phosphor-icons/react';
+import { Button } from '@/components';
+import { SITE_CONTACT } from '@/config/site';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -26,7 +28,7 @@ function FieldError({ name, message }: { name: FieldName; message?: string }) {
 }
 
 // Opens the visitor's mail app with the message filled in; nothing is sent from the page itself.
-export function ContactForm({ recipient = 'riskiinferno@gmail.com' }: { recipient?: string }) {
+export function ContactForm({ recipient = SITE_CONTACT.email }: { recipient?: string }) {
   const [formData, setFormData] = useState<ContactFormData>({ name: '', email: '', message: '' });
   const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
 
@@ -84,13 +86,10 @@ export function ContactForm({ recipient = 'riskiinferno@gmail.com' }: { recipien
           <textarea rows={5} placeholder="How can we help you?" {...fieldProps('message')} />
           <FieldError name="message" message={errors.message} />
         </div>
-        <button
-          type="submit"
-          className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 font-semibold text-on-primary transition-colors hover:bg-secondary"
-        >
-          <PaperPlaneRight size={18} aria-hidden="true" />
+        <Button type="submit" size="lg" fullWidth leftIcon={<PaperPlaneRight size={18} />} className="mt-2 rounded-full">
           Send message
-        </button>
+        </Button>
+        <p className="text-sm text-muted-foreground">This opens your email app with the message filled in. Nothing is sent from this page.</p>
       </form>
     </div>
   );

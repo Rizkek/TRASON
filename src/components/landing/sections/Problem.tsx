@@ -33,7 +33,6 @@ export function Problem() {
           <div className="order-1 lg:order-2 lg:col-span-7">
             <SectionHeading
               id="problem-heading"
-              eyebrow="The problem"
               title={
                 <>
                   It isn&apos;t too many apps.

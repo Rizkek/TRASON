@@ -20,7 +20,7 @@ Diurutkan per domain. "Soft delete" berarti tabel punya kolom `deleted_at` di ti
 
 Tipe `Goal` ada di `types/database.ts` tetapi belum ada tabel `goals` yang dipakai kode.
 
-Storage bucket: `receipts` (struk dan bukti payout, path milik user) dan `avatar`.
+Storage bucket: `receipts` (private; struk dan bukti payout di `<user id>/<file>`, dibaca lewat sesi pemilik atau signed URL) dan `avatar` (public). Payout driver menyimpan `receipt_path` di metadata transaksi; data lama masih punya `receipt_url` publik yang tidak lagi dibaca.
 
 RPC: `get_transaction_analytics` dan `delete_user`.
 

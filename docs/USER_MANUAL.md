@@ -57,4 +57,4 @@ Access your configuration via `/settings`.
 
 ---
 
-*For further assistance, please contact support or visit the `/faq` section in the application.*
+*For further help, open the Contact and help page (`/contact`): it has the common questions and the ways to reach us.*

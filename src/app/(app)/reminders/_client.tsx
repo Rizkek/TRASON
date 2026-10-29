@@ -16,6 +16,7 @@ import { formatDateOnly } from '@/libs/date';
 import { useHolidays } from '@/hooks/useHolidays';
 import { Heading, Paragraph } from '@/components/ui/typography';
 import { hasUpcomingNotification, isReminderPastDue } from '@/libs/notificationLogic';
+import { AppPageHeader } from '@/components/layout/AppPageHeader';
 
 
 export function RemindersClient() {
@@ -256,40 +257,38 @@ export function RemindersClient() {
         {loadError && (
           <InlineError message={loadError} onRetry={() => refreshReminders()} retryLabel={t('common.try_again')} />
         )}
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-1">
-            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight">{t('reminders_page.title')}</Heading>
-            <Paragraph className="text-muted-foreground font-light">{t('reminders_page.desc')}</Paragraph>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Only show calendar/list toggle when active reminders is enabled */}
-            {remindersActiveEnabled && (
-              <div className="flex bg-foreground/[0.03] p-1 rounded-full border border-foreground/[0.05]">
-                <button 
-                  onClick={() => setView('calendar')}
-                  className={`p-2 rounded-full transition-all ${view === 'calendar' ? 'bg-primary text-on-primary ' : 'text-muted-foreground hover:text-foreground'}`}
-                >
-                  <CalendarIcon size={18} />
-                </button>
-                <button 
-                  onClick={() => setView('list')}
-                  className={`p-2 rounded-full transition-all ${view === 'list' ? 'bg-primary text-on-primary ' : 'text-muted-foreground hover:text-foreground'}`}
-                >
-                  <List size={18} />
-                </button>
-              </div>
-            )}
-            <div className="hidden md:block">
-              <Button variant="primary" onClick={() => openAddModal()} className="rounded-full px-8">
-                <Plus size={18} className="mr-2" />
+        <AppPageHeader
+          title={t('reminders_page.title')}
+          description={t('reminders_page.desc')}
+          actions={
+            <>
+              {/* The calendar/list switch only matters when active reminders are enabled. */}
+              {remindersActiveEnabled && (
+                <div role="group" aria-label={t('reminders_page.view_label')} className="flex rounded-full border border-foreground/[0.05] bg-foreground/[0.03] p-0.5">
+                  {([
+                    { id: 'calendar', icon: CalendarIcon, label: t('reminders_page.view_calendar') },
+                    { id: 'list', icon: List, label: t('reminders_page.view_list') },
+                  ] as const).map(({ id, icon: Icon, label }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setView(id)}
+                      aria-pressed={view === id}
+                      aria-label={label}
+                      title={label}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${view === id ? 'bg-primary text-on-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      <Icon size={16} aria-hidden="true" />
+                    </button>
+                  ))}
+                </div>
+              )}
+              <Button variant="primary" size="sm" onClick={() => openAddModal()} leftIcon={<Plus size={16} />} className="hidden md:inline-flex">
                 {t('reminders_page.new_reminder')}
               </Button>
-            </div>
-          </div>
-        </div>
-
-
+            </>
+          }
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Main View */}
@@ -384,7 +383,7 @@ export function RemindersClient() {
 
           {/* Side Panel: Selected Date Details */}
           <div className="lg:col-span-4 space-y-8">
-             <div className="glass-card p-8 border-primary/10">
+             <div className="glass-card p-5 md:p-8 border-primary/10">
                 <Heading as="h3" size="h3" className="font-sans font-bold tracking-tight text-xl mb-8">
                   {selectedDate.toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' })}
                 </Heading>
@@ -420,7 +419,7 @@ export function RemindersClient() {
              </div>
              
              {/* Weekly Context - Small Summary */}
-             <div className="glass-card p-8 bg-surface">
+             <div className="glass-card p-5 md:p-8 bg-surface">
                 <Heading as="h4" size="h4" className="text-micro uppercase tracking-[0.3em] text-deep-sage font-bold mb-4">{t('reminders_page.weekly_focus')}</Heading>
                 <Paragraph className="text-sm font-light text-subtle leading-relaxed">
                   {t('reminders_page.weekly_focus_desc').split('{count}').map((part, i, arr) => 

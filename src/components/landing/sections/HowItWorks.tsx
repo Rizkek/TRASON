@@ -31,7 +31,6 @@ export function HowItWorks() {
       <Container>
         <SectionHeading
           id="how-heading"
-          eyebrow="How it works"
           title="Log it once. See it everywhere it matters."
         />
 

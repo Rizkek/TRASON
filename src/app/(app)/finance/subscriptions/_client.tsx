@@ -13,6 +13,7 @@ import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
 import { formatDateOnly } from '@/libs/date';
 import { Subscription } from '@/types/database';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { AppPageHeader } from '@/components/layout/AppPageHeader';
 
 const SUB_PAGE_SIZE = 5;
 
@@ -165,27 +166,23 @@ export function SubscriptionsClient() {
           <ArrowLeft size={14} /> {t('finance.backToFinance') || 'Back to Finance'}
         </Link>
 
-        <div className="flex items-start justify-between flex-wrap gap-4">
-          <div className="space-y-2">
-            <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-foreground">{t('finance.subscriptions') || 'Subscriptions'}</Heading>
-            <Paragraph className="text-subtext flex items-center gap-2">
-              {t('finance.manageSubscriptions') || 'Manage your recurring payments.'}
-            </Paragraph>
-          </div>
-          <div className="hidden md:flex gap-4">
-            <Button variant="primary" size="md" onClick={openAddModal} leftIcon={<Plus size={18} />}>
-              {t('finance.addSubscription') || 'Add Subscription'}
+        <AppPageHeader
+          title={t('finance.subscriptions')}
+          description={t('finance.manageSubscriptions')}
+          actions={
+            <Button variant="primary" size="sm" onClick={openAddModal} leftIcon={<Plus size={16} />} className="hidden md:inline-flex">
+              {t('finance.addSubscription')}
             </Button>
-          </div>
-        </div>
+          }
+        />
 
-        <Card className="p-8 relative overflow-hidden group">
+        <Card className="p-5 md:p-8 relative overflow-hidden group">
           <div className="flex items-center gap-1 mb-4 text-muted-foreground">
              <Repeat size={16} className="text-primary" />
              <Paragraph className="text-xs font-bold uppercase tracking-widest">{t('finance.estimatedMonthlyCost') || 'Estimated Monthly Cost'}</Paragraph>
           </div>
           <div className="flex items-end justify-between">
-            <Paragraph className="text-4xl font-bold text-foreground">{formatCurrency(totalMonthlyCost, currency, locale)}</Paragraph>
+            <Paragraph className="font-mono text-heading-lg font-semibold text-foreground break-words md:text-4xl">{formatCurrency(totalMonthlyCost, currency, locale)}</Paragraph>
           </div>
         </Card>
 
@@ -195,10 +192,10 @@ export function SubscriptionsClient() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-foreground/[0.02] border-b border-foreground/[0.05]">
-                  <th className="px-8 py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.service') || 'Service'}</th>
-                  <th className="px-8 py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.nextBilling') || 'Next Billing'}</th>
-                  <th className="px-8 py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.cycle') || 'Cycle'}</th>
-                  <th className="px-8 py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.amount') || 'Amount'}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.service') || 'Service'}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.nextBilling') || 'Next Billing'}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.cycle') || 'Cycle'}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-6 text-xs font-bold text-muted-foreground tracking-widest uppercase">{t('finance.amount') || 'Amount'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-foreground/5">
@@ -213,7 +210,7 @@ export function SubscriptionsClient() {
                       className={`group hover:bg-foreground/[0.02] transition-colors cursor-pointer ${!s.is_active ? 'opacity-50' : ''}`}
                       onClick={() => openEditModal(s)}
                     >
-                      <td className="px-8 py-8">
+                      <td className="px-4 py-4 md:px-8 md:py-8">
                         <div className="flex items-center gap-4">
                           <div>
                             <Paragraph className="text-sm font-bold text-foreground group-hover:text-primary transition-colors underline-offset-4 decoration-primary">{s.name}</Paragraph>
@@ -221,18 +218,18 @@ export function SubscriptionsClient() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-8">
+                      <td className="px-4 py-4 md:px-8 md:py-8">
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <Calendar size={12} />
                           <span className="text-xs font-medium">{formatDate(s.next_billing_date)}</span>
                         </div>
                       </td>
-                      <td className="px-8 py-8">
+                      <td className="px-4 py-4 md:px-8 md:py-8">
                         <Badge variant="default" size="sm" className="capitalize">
                           {s.billing_cycle}
                         </Badge>
                       </td>
-                      <td className="px-8 py-8">
+                      <td className="px-4 py-4 md:px-8 md:py-8">
                         <div className="flex items-center justify-end gap-4">
                           <Paragraph className="text-sm font-bold text-foreground">
                             {formatCurrency(s.amount, s.currency, locale)}

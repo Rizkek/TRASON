@@ -154,7 +154,7 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
 
   if (!isMounted) {
     return (
-      <Card className="p-8 bg-foreground/[0.02] border-foreground/[0.05]">
+      <Card className="p-5 md:p-8 bg-foreground/[0.02] border-foreground/[0.05]">
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-foreground">Activity history</h3>
           <p className="text-sm text-muted-foreground">Last {days} days of training</p>
@@ -165,7 +165,7 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
   }
 
   return (
-    <Card className="p-8 bg-foreground/[0.02] border-foreground/[0.05]">
+    <Card className="p-5 md:p-8 bg-foreground/[0.02] border-foreground/[0.05]">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-foreground">Activity history</h3>
         <p className="text-sm text-muted-foreground">Last {days} days of training</p>

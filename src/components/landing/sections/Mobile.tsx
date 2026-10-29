@@ -24,7 +24,6 @@ export function Mobile() {
           <div className="order-1 lg:order-2 lg:col-span-7">
             <SectionHeading
               id="mobile-heading"
-              eyebrow="On your phone"
               title="The same system, in your pocket."
               lede="TRASON is a web app built for phones first. There is nothing to download from a store, and nothing you can do on desktop that you can't do here."
             />

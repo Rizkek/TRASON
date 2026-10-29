@@ -16,7 +16,7 @@ const MODULES = [
   { name: 'Finance', icon: CurrencyCircleDollar, desc: 'Income, expenses, subscriptions, budgets and receipts.' },
   { name: 'Investments', icon: ChartLineUp, desc: 'Stock, crypto and gold positions, priced daily.' },
   { name: 'Career', icon: Briefcase, desc: 'Applications from Applied to Offer, plus resume match.' },
-  { name: 'Vitality', icon: Heartbeat, desc: 'Workout sessions, weekly consistency, personal records.' },
+  { name: 'Sport', icon: Heartbeat, desc: 'Workout sessions, weekly consistency, personal records.' },
   { name: 'Schedule', icon: CalendarBlank, desc: 'A weekly log of activities and today’s tasks.' },
   { name: 'Reminders', icon: Bell, desc: 'Time-based, delivered as push notifications.' },
 ];
@@ -27,7 +27,6 @@ export function System() {
       <Container>
         <SectionHeading
           id="system-heading"
-          eyebrow="The system"
           align="center"
           title="Six parts of one life, on one Dashboard."
           lede="Each module keeps its own page. All of them feed the same Dashboard and one Life Score. Turn off what you don't need in Settings."

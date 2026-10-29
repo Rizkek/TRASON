@@ -3,11 +3,11 @@ import { Geist, Geist_Mono, DM_Serif_Display } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import { ThemeSync } from '@/components/layout/ThemeSync';
 import { NO_FLASH_THEME_SCRIPT, THEME_META_COLOR } from '@/libs/theme';
 import NextTopLoader from 'nextjs-toploader';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { SITE_CONTACT } from '@/config/site';
 
 const BASE_URL = 'https://www.trason.web.id';
 
@@ -96,14 +96,8 @@ export const metadata: Metadata = {
     title: 'TRASON',
   },
   icons: {
-    icon: [
-      { url: '/favicon.png', type: 'image/png' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/icon-192x192.png',
-    other: [
-      { rel: 'mask-icon', url: '/favicon.svg', color: '#F4C95D' },
-    ],
+    icon: [{ url: '/favicon.png', type: 'image/png', sizes: '48x48' }],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
   },
   robots: {
     index: true,
@@ -156,7 +150,7 @@ const jsonLd = {
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'customer support',
-        email: 'hello@trason.app',
+        email: SITE_CONTACT.email,
         areaServed: 'ID',
         availableLanguage: ['Indonesian', 'English'],
       },
@@ -208,8 +202,6 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_THEME_SCRIPT }} />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
-        <link rel="icon" href="/favicon.png" type="image/png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -249,7 +241,6 @@ export default function RootLayout({
           <AuthProvider>
             <ThemeSync />
             {children}
-            <PwaInstallPrompt />
             <SpeedInsights />
           </AuthProvider>
         </ErrorBoundary>

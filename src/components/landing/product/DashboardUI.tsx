@@ -112,7 +112,7 @@ export function DashboardUI({ compact = false }: { compact?: boolean }) {
                   <Heartbeat size={14} />
                 </span>
                 <div className="flex-1">
-                  <p className="text-xs text-muted-foreground">Vitality</p>
+                  <p className="text-xs text-muted-foreground">Sport</p>
                   <p className="text-body-sm text-foreground">3 sessions this week</p>
                 </div>
                 <UiTag tone="positive">On track</UiTag>

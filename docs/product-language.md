@@ -86,7 +86,7 @@ Each entry contains:
 ---
 
 ### Dashboard
-**Definition:** The home view of TRASON. Displays a real-time, cross-module overview: Life Score, reminders due today, finance and vitality pillars, daily tasks, and optional financial analytics.  
+**Definition:** The home view of TRASON. Displays a real-time, cross-module overview: Life Score, reminders due today, finance and sport pillars, daily tasks, and optional financial analytics.  
 **Type:** Noun / Module name  
 **Status:** `CANONICAL`  
 **Use as:** Always capitalized in navigation and page titles.  
@@ -249,7 +249,7 @@ Each entry contains:
 ---
 
 ### Session
-**Definition:** A single workout log entry within the Vitality module. Represents one training event: type of workout, duration, intensity, and optional exercises.  
+**Definition:** A single workout log entry within the Sport module. Represents one training event: type of workout, duration, intensity, and optional exercises.  
 **Type:** Noun  
 **Status:** `CANONICAL`  
 **Use as:** Singular: "session." Plural: "sessions."  
@@ -281,6 +281,21 @@ Each entry contains:
 - "Recurring expense" — acceptable as a description in help text but not as a primary label  
 
 **Affected locations:** `finance.subscriptions`, `finance.addSubscription`, `finance.modal.makeRecurring`
+
+---
+
+### Sport
+**Definition:** The TRASON module for logging workout sessions, tracking personal records, and monitoring physical consistency across the week. Contributes to the Life Score's Health dimension.  
+**Type:** Noun / Module name  
+**Status:** `CANONICAL` as the user-facing label since 2026-10-28, matching the route (`/sport`) and module key (`sport`).  
+**Use as:** "Sport" in all user-facing labels, in the app and on the landing pages.  
+**Do not use:**
+- "Vitality" (the previous label, deprecated 2026-10-28; some i18n keys such as `dashboard.vitality_this_week` keep the old name, only their values changed)
+- "Sport & Workout"
+- "Fitness"
+- "Health" — reserved as the Life Score dimension label only  
+
+**Affected locations:** `nav.sport`, `sport_page.sport_fitness_title`, `dashboard.vitality_this_week`, landing product mockups (`components/landing/product`)
 
 ---
 
@@ -324,27 +339,10 @@ Each entry contains:
 
 ---
 
-## V
-
-### Vitality
-**Definition:** The TRASON module for logging workout sessions, tracking personal records, and monitoring physical consistency across the week. Contributes to the Life Score's Health dimension.  
-**Type:** Noun / Module name  
-**Status:** `CANONICAL` as the user-facing label. The internal route (`/sport`) and module key (`sport`) remain for backward compatibility.  
-**Use as:** "Vitality" in all user-facing labels. Never "Sport" or "Sport & Workout" in UI.  
-**Do not use:**
-- "Sport" in UI copy (acceptable as internal code ID)
-- "Sport & Workout" — previously used in onboarding, now deprecated
-- "Fitness"
-- "Health" — reserved as the Life Score dimension label only  
-
-**Affected locations:** `nav.sport` (renders as "Vitality"), `sport_page.sport_fitness_title`, onboarding module card → **[TO BE CHANGED]** from "Sport & Workout" to "Vitality"
-
----
-
 ## W
 
 ### Week / Weekly
-**Definition:** The current calendar week (Monday–Sunday). Used as a time scope in Vitality, Schedule, and dashboard summaries.  
+**Definition:** The current calendar week (Monday–Sunday). Used as a time scope in Sport, Schedule, and dashboard summaries.  
 **Type:** Noun / Modifier  
 **Status:** `CANONICAL`  
 **Use as:** "This week" for the current period. "Weekly" as a modifier for recurring items or summaries.  
@@ -365,7 +363,7 @@ The following terms have been used in TRASON copy at some point and are now offi
 | Career Tracker | Redundant | Career |
 | Career Architect | Never shipped; overclaims | Career |
 | Smart Reminders | "Smart" is unsupported | Reminders |
-| Sport & Workout | Inconsistent with nav label | Vitality |
+| Sport & Workout | Inconsistent with nav label | Sport |
 | Financial Flow (page title) | Describes a concept, not the page | Finance |
 | Predictive Category Blueprint | Overclaims | Category Budgets |
 | Architect's Perspective | Meaningless; AI-generated sounding | Remove |
@@ -431,7 +429,7 @@ TRASON (Personal OS)
 ├── DASHBOARD
 │   ├── Life Score (Finance · Productivity · Health · Career)
 │   ├── Up Next (Reminders due today)
-│   ├── Current State (Finance · Vitality · Career pillars)
+│   ├── Current State (Finance · Sport · Career pillars)
 │   ├── Daily Tasks (Today's checklist)
 │   └── Financial Analytics (collapsible deep-dive)
 │
@@ -452,7 +450,7 @@ TRASON (Personal OS)
 ├── INVESTMENTS  [route: /investments]
 │   └── POSITION (one tracked asset: stock · crypto · gold)
 │
-├── VITALITY  [route: /sport]
+├── SPORT  [route: /sport]
 │   ├── SESSION (single workout log)
 │   ├── Workout Plans
 │   └── Personal Records

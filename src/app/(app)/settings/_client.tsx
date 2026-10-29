@@ -18,7 +18,6 @@ import {
   GridNine,
   type Icon,
 } from '@phosphor-icons/react';
-import { Heading, Paragraph } from '@/components/ui/typography';
 import {
   Tab,
   UserData,
@@ -30,6 +29,7 @@ import {
   ModulesSection,
   SecuritySection,
 } from './components';
+import { AppPageHeader } from '@/components/layout/AppPageHeader';
 
 export function SettingsClient() {
   const router = useRouter();
@@ -315,14 +315,7 @@ export function SettingsClient() {
       <ErrorAlert error={error} onDismiss={() => setError(null)} />
       <>
         <div className="space-y-8 animate-fade-in max-w-4xl">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
-            <div>
-              <Heading as="h1" size="h2" weight="semibold" className="tracking-tight text-foreground">
-                {t('settings.title')}
-              </Heading>
-              <Paragraph className="text-muted-foreground mt-1 text-sm">{t('settings.subtitle')}</Paragraph>
-            </div>
-          </div>
+          <AppPageHeader title={t('settings.title')} description={t('settings.subtitle')} />
 
           {message && (
             <Toast
@@ -333,24 +326,26 @@ export function SettingsClient() {
             />
           )}
 
-          <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar">
+          <div role="tablist" aria-label={t('settings.title')} className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   type="button"
+                  role="tab"
+                  aria-selected={activeTab === tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   title={tab.label}
                   aria-label={tab.label}
-                  className={`flex items-center justify-center p-4 md:px-8 md:py-4 gap-4 text-xs font-bold whitespace-nowrap rounded-md border transition-all shrink-0 ${
+                  className={`flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md border px-3 text-label-md transition-colors sm:px-4 ${
                     activeTab === tab.id
                       ? 'bg-primary text-on-primary border-primary'
                       : 'bg-foreground/[0.02] text-muted-foreground border-foreground/[0.05] hover:border-foreground/[0.1] hover:text-foreground'
                   }`}
                 >
-                  <Icon size={14} className="shrink-0" />
-                  <span className="hidden md:inline tracking-[0.2em]">{tab.label}</span>
+                  <Icon size={16} aria-hidden="true" className="shrink-0" />
+                  <span className="hidden sm:inline">{tab.label}</span>
                 </button>
               );
             })}

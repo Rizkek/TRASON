@@ -1,142 +1,208 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { CheckCircle, Warning, XCircle } from '@phosphor-icons/react';
 import { Button, Input, Alert } from '@/components';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { PasswordToggle } from '@/components/auth/PasswordToggle';
+import { PasswordRules } from '@/components/auth/PasswordRules';
+import { ResendConfirmation } from '@/components/auth/ResendConfirmation';
+import { useCaptcha } from '@/components/auth/Turnstile';
+import { useFocusFirstInvalid } from '@/components/auth/useFocusFirstInvalid';
 import { Heading, Paragraph } from '@/components/ui/typography';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { supabase } from '@/services/supabase/supabaseClient';
 import { userQueries } from '@/services/core/userQueries';
-import { validateEmail, validatePassword, sanitizeError } from '@/libs/validation';
-import { CheckCircle, Warning, XCircle } from '@phosphor-icons/react';
+import { failedPasswordRules, getEmailIssue } from '@/libs/validation';
+import { authErrorKey, type AuthErrorKey } from '@/libs/authErrors';
+import { authConfirmUrl } from '@/libs/authRedirect';
 
-type DomainStatus = null | 'checking' | 'valid' | 'warning' | 'invalid';
-type Notice = { kind: 'error' | 'success'; message: string };
+type Field = 'name' | 'email' | 'password' | 'confirmPassword';
+type DomainCode = 'invalid' | 'disposable' | 'no_domain' | 'no_mx' | 'unverified';
+type DomainCheck =
+  | { status: 'checking' }
+  | { status: 'valid' }
+  | { status: 'warning' | 'invalid'; code: DomainCode }
+  | null;
+type FormError = AuthErrorKey | 'captcha_required';
+
+const LINK_CLASS = 'font-medium text-primary underline underline-offset-4';
+
+/** Replaces `{token}` placeholders in a translated sentence with React nodes, so word order stays per-language. */
+function withLinks(template: string, links: Record<string, React.ReactNode>) {
+  return template.split(/(\{\w+\})/).map((part, i) => {
+    const key = part.match(/^\{(\w+)\}$/)?.[1];
+    return key && links[key] ? <React.Fragment key={i}>{links[key]}</React.Fragment> : part;
+  });
+}
 
 export default function SignupPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const captcha = useCaptcha();
+  const formRef = useRef<HTMLFormElement>(null);
+  const sentHeadingRef = useRef<HTMLHeadingElement>(null);
+  const checkedEmailRef = useRef('');
+
+  const [formData, setFormData] = useState<Record<Field, string>>({ name: '', email: '', password: '', confirmPassword: '' });
+  const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
+  const [invalidAttempt, setInvalidAttempt] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [notice, setNotice] = useState<Notice | null>(null);
+  const [formError, setFormError] = useState<FormError | null>(null);
+  const [sentTo, setSentTo] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [domain, setDomain] = useState<DomainCheck>(null);
 
-  const [emailDomainStatus, setEmailDomainStatus] = useState<DomainStatus>(null);
-  const [emailDomainMessage, setEmailDomainMessage] = useState<string | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useFocusFirstInvalid(formRef, invalidAttempt);
+
+  useEffect(() => {
+    if (sentTo) sentHeadingRef.current?.focus();
+  }, [sentTo]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const name = e.target.name as Field;
+    const { value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (name === 'email') {
-      setEmailDomainStatus(null);
-      setEmailDomainMessage(null);
-    }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: undefined }));
+    if (name === 'email') setDomain(null);
   };
 
-  const checkEmailDomain = async (email: string) => {
-    if (validateEmail(email)) return;
+  const checkEmailDomain = async () => {
+    const email = formData.email.trim();
+    if (getEmailIssue(email)) return;
 
-    setEmailDomainStatus('checking');
-    setEmailDomainMessage(null);
+    checkedEmailRef.current = email;
+    setDomain({ status: 'checking' });
     try {
       const res = await fetch('/api/validate-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      const data = await res.json();
-      if (!data.valid) {
-        setEmailDomainStatus('invalid');
-        setEmailDomainMessage(data.reason || 'This email domain does not exist');
-      } else if (data.warning) {
-        setEmailDomainStatus('warning');
-        setEmailDomainMessage(data.warning);
-      } else {
-        setEmailDomainStatus('valid');
-      }
+      const data: { valid: boolean; code?: DomainCode } = await res.json();
+      // The field may have changed while the lookup was in flight.
+      if (checkedEmailRef.current !== email) return;
+      if (!data.valid) setDomain({ status: 'invalid', code: data.code ?? 'invalid' });
+      else if (data.code) setDomain({ status: 'warning', code: data.code });
+      else setDomain({ status: 'valid' });
     } catch {
-      // A network failure must not block signup.
-      setEmailDomainStatus(null);
+      // A failed lookup must not block signup.
+      setDomain(null);
     }
-  };
-
-  const handleEmailBlur = () => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => checkEmailDomain(formData.email), 300);
   };
 
   const validateForm = (): boolean => {
-    const errors: Record<string, string> = {};
-    if (!formData.name.trim()) errors.name = t('auth.name_required');
+    const next: Partial<Record<Field, string>> = {};
+    if (!formData.name.trim()) next.name = t('auth.name_required');
 
-    const emailError = validateEmail(formData.email);
-    if (emailError) errors.email = emailError;
-    else if (emailDomainStatus === 'invalid') errors.email = emailDomainMessage || 'Email domain is invalid';
+    const emailIssue = getEmailIssue(formData.email);
+    if (emailIssue) next.email = t(`auth.errors.email_${emailIssue}`);
+    else if (domain?.status === 'invalid') next.email = t(`auth.domain.${domain.code}`);
 
-    const passwordErrors = validatePassword(formData.password);
-    if (passwordErrors.length > 0) errors.password = passwordErrors[0];
+    if (failedPasswordRules(formData.password).length > 0) next.password = t('auth.password_invalid');
+    if (formData.password !== formData.confirmPassword) next.confirmPassword = t('auth.passwords_mismatch');
 
-    if (formData.password !== formData.confirmPassword) errors.confirmPassword = t('auth.passwords_mismatch');
-
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const signUpErrorMessage = (signUpError: any): string => {
-    const message = signUpError?.message ?? 'Unable to register';
-    if (signUpError?.status === 500) return t('auth.server_error');
-    if (
-      signUpError?.status === 409 ||
-      signUpError?.code === 'DUPLICATE' ||
-      /duplicate|already exists|users_email_key|email.*exists/i.test(message)
-    ) {
-      return t('auth.email_taken');
-    }
-    return message;
+    setErrors(next);
+    return Object.keys(next).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
-    setIsLoading(true);
-    setNotice(null);
+    setFormError(null);
+    if (!validateForm()) {
+      setInvalidAttempt((n) => n + 1);
+      return;
+    }
+    if (!captcha.ready) {
+      setFormError('captcha_required');
+      return;
+    }
 
+    setIsLoading(true);
+    let navigating = false;
     try {
+      const email = formData.email.trim();
       const [firstName, ...lastNameParts] = formData.name.trim().split(/\s+/);
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email.trim(),
+      const { data, error } = await supabase.auth.signUp({
+        email,
         password: formData.password,
-        options: { data: { first_name: firstName, last_name: lastNameParts.join(' ') } },
+        options: {
+          data: { first_name: firstName, last_name: lastNameParts.join(' ') },
+          emailRedirectTo: authConfirmUrl(window.location.origin, '/onboarding'),
+          captchaToken: captcha.token ?? undefined,
+        },
       });
 
-      if (signUpError) {
-        console.error('Supabase signUp error:', signUpError);
-        setNotice({ kind: 'error', message: signUpErrorMessage(signUpError) });
+      if (error) {
+        const key = authErrorKey(error);
+        if (key === 'weak_password') {
+          setErrors({ password: t('auth.errors.weak_password') });
+          setInvalidAttempt((n) => n + 1);
+        } else {
+          setFormError(key);
+        }
         return;
       }
-      if (data.user) {
-        if (data.session) {
-          await userQueries.ensureUserProfile();
-          router.push('/onboarding');
-        } else {
-          setNotice({ kind: 'success', message: t('auth.check_email') });
-          setTimeout(() => router.push('/login'), 3000);
-        }
+
+      // With email confirmation on, Supabase answers an existing address with an
+      // identity-less user instead of an error, so the duplicate has to be detected here.
+      if (data.user && data.user.identities?.length === 0) {
+        setFormError('email_taken');
+        return;
       }
+
+      if (data.session) {
+        // The auth trigger already created the row; this only fills in the name. A failure is
+        // retried by getUserWithPreferences on the next load, so it must not block onboarding.
+        await userQueries.ensureUserProfile().catch(() => null);
+        navigating = true;
+        router.replace('/onboarding');
+        return;
+      }
+
+      setSentTo(email);
     } catch (err) {
-      setNotice({ kind: 'error', message: sanitizeError(err) });
+      setFormError(authErrorKey(err));
     } finally {
-      setIsLoading(false);
+      captcha.reset();
+      if (!navigating) setIsLoading(false);
     }
   };
 
-  const showDomainHint = formData.email && !validationErrors.email && emailDomainStatus;
+  if (sentTo) {
+    return (
+      <AuthShell quote={t('auth.signup_quote')} description={t('auth.signup_panel_desc')}>
+        <div className="space-y-3">
+          <Heading as="h1" size="h2" ref={sentHeadingRef} tabIndex={-1} className="outline-none">
+            {t('auth.check_inbox_title')}
+          </Heading>
+          <Paragraph className="text-body-md text-muted-foreground">
+            {withLinks(t('auth.check_inbox_desc'), { email: <strong className="text-foreground">{sentTo}</strong> })}
+          </Paragraph>
+          <Paragraph className="text-body-sm text-muted-foreground">{t('auth.check_inbox_hint')}</Paragraph>
+        </div>
+
+        <div className="space-y-4">
+          {captcha.widget}
+          <ResendConfirmation email={sentTo} captcha={captcha} justSent />
+          <Button type="button" variant="ghost" size="md" fullWidth onClick={() => setSentTo(null)}>
+            {t('auth.use_different_email')}
+          </Button>
+        </div>
+
+        <Paragraph className="text-center text-body-md text-muted-foreground md:text-left">
+          <Link href="/login" className={`inline-flex min-h-11 items-center ${LINK_CLASS}`}>
+            {t('auth.back_to_login')}
+          </Link>
+        </Paragraph>
+      </AuthShell>
+    );
+  }
+
+  const domainHint = formData.email && !errors.email && domain;
 
   return (
     <AuthShell quote={t('auth.signup_quote')} description={t('auth.signup_panel_desc')} busy={isLoading}>
@@ -147,92 +213,107 @@ export default function SignupPage() {
         <Paragraph className="text-body-md text-muted-foreground">{t('auth.signup_lede')}</Paragraph>
       </div>
 
-      {notice && (
-        <Alert
-          type={notice.kind}
-          title={notice.kind === 'success' ? t('auth.register_success_title') : t('auth.register_error_title')}
-          onDismiss={() => setNotice(null)}
-        >
-          {notice.message}
+      {formError && (
+        <Alert type="error" title={t('auth.register_error_title')} onDismiss={() => setFormError(null)}>
+          {formError === 'captcha_required' ? t('auth.captcha_required') : t(`auth.errors.${formError}`)}
+          {formError === 'email_taken' && (
+            <span className="mt-2 flex flex-wrap gap-x-4">
+              <Link href="/login" className={`inline-flex min-h-11 items-center ${LINK_CLASS}`}>
+                {t('auth.loginLink')}
+              </Link>
+              <Link href="/forgot-password" className={`inline-flex min-h-11 items-center ${LINK_CLASS}`}>
+                {t('auth.forgot_password_link')}
+              </Link>
+            </span>
+          )}
         </Alert>
       )}
 
-      <form onSubmit={handleSubmit} noValidate className="space-y-5">
+      <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-5">
         <Input
           label={t('auth.full_name')}
+          id="signup-name"
           name="name"
           type="text"
           autoComplete="name"
           placeholder={t('auth.full_name_ph')}
           value={formData.name}
           onChange={handleInputChange}
-          error={validationErrors.name}
+          error={errors.name}
           required
         />
 
         <div>
           <Input
             label={t('auth.email_address')}
+            id="signup-email"
             name="email"
             type="email"
             inputMode="email"
             autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
             placeholder={t('auth.email_ph')}
             value={formData.email}
             onChange={handleInputChange}
-            onBlur={handleEmailBlur}
-            error={validationErrors.email}
+            onBlur={checkEmailDomain}
+            error={errors.email}
             required
           />
-          {showDomainHint && (
-            <div className="mt-1.5 flex items-center gap-1.5 text-xs" aria-live="polite">
-              {emailDomainStatus === 'checking' && <span className="text-muted-foreground">{t('auth.domain_checking')}</span>}
-              {emailDomainStatus === 'valid' && (
-                <>
-                  <CheckCircle size={14} aria-hidden="true" className="text-success" />
-                  <span className="text-success">{t('auth.domain_verified')}</span>
-                </>
-              )}
-              {emailDomainStatus === 'warning' && (
-                <>
-                  <Warning size={14} aria-hidden="true" className="text-warning" />
-                  <span className="text-warning">{emailDomainMessage}</span>
-                </>
-              )}
-              {emailDomainStatus === 'invalid' && (
-                <>
-                  <XCircle size={14} aria-hidden="true" className="text-danger" />
-                  <span className="text-danger">{emailDomainMessage}</span>
-                </>
-              )}
-            </div>
-          )}
+          <div className="mt-1.5 min-h-5 text-body-sm" aria-live="polite">
+            {domainHint && domain.status === 'checking' && <span className="text-muted-foreground">{t('auth.domain_checking')}</span>}
+            {domainHint && domain.status === 'valid' && (
+              <span className="flex items-center gap-1.5 text-success">
+                <CheckCircle size={14} aria-hidden="true" />
+                {t('auth.domain_verified')}
+              </span>
+            )}
+            {domainHint && domain.status === 'warning' && (
+              <span className="flex items-center gap-1.5 text-warning">
+                <Warning size={14} aria-hidden="true" />
+                {t(`auth.domain.${domain.code}`)}
+              </span>
+            )}
+            {domainHint && domain.status === 'invalid' && (
+              <span className="flex items-center gap-1.5 text-danger">
+                <XCircle size={14} aria-hidden="true" />
+                {t(`auth.domain.${domain.code}`)}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <Input
+            label={t('auth.password')}
+            id="signup-password"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="new-password"
+            value={formData.password}
+            onChange={handleInputChange}
+            error={errors.password}
+            aria-describedby={errors.password ? 'signup-password-error password-rules' : 'password-rules'}
+            required
+            suffix={<PasswordToggle visible={showPassword} onToggle={() => setShowPassword((v) => !v)} />}
+          />
+          <PasswordRules id="password-rules" password={formData.password} />
         </div>
 
         <Input
-          label={t('auth.password')}
-          name="password"
-          type={showPassword ? 'text' : 'password'}
-          autoComplete="new-password"
-          placeholder="********"
-          value={formData.password}
-          onChange={handleInputChange}
-          error={validationErrors.password}
-          required
-          suffix={<PasswordToggle visible={showPassword} onToggle={() => setShowPassword((v) => !v)} />}
-        />
-        <Input
           label={t('auth.confirm_password')}
+          id="signup-confirm-password"
           name="confirmPassword"
           type={showConfirmPassword ? 'text' : 'password'}
           autoComplete="new-password"
-          placeholder="********"
           value={formData.confirmPassword}
           onChange={handleInputChange}
-          error={validationErrors.confirmPassword}
+          error={errors.confirmPassword}
           required
           suffix={<PasswordToggle visible={showConfirmPassword} onToggle={() => setShowConfirmPassword((v) => !v)} />}
         />
+
+        {captcha.widget}
 
         <Button
           type="submit"
@@ -241,10 +322,25 @@ export default function SignupPage() {
           fullWidth
           isLoading={isLoading}
           loadingText={t('auth.creating')}
-          className="mt-2 rounded-full"
+          className="rounded-full"
         >
           {t('auth.create_account')}
         </Button>
+
+        <p className="text-body-sm text-muted-foreground">
+          {withLinks(t('auth.consent'), {
+            terms: (
+              <Link href="/terms" className={LINK_CLASS}>
+                {t('auth.terms_link')}
+              </Link>
+            ),
+            privacy: (
+              <Link href="/privacy" className={LINK_CLASS}>
+                {t('auth.privacy_link')}
+              </Link>
+            ),
+          })}
+        </p>
       </form>
 
       <Paragraph className="text-center text-body-md text-muted-foreground md:text-left">

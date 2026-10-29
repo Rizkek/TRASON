@@ -50,6 +50,12 @@ const nextConfig = {
         destination: '/schedule',
         permanent: true,
       },
+      {
+        // Support and Contact were merged into one help page.
+        source: '/support',
+        destination: '/contact',
+        permanent: true,
+      },
     ];
   },
   async headers() {
@@ -82,7 +88,8 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' blob:;",
+            // challenges.cloudflare.com serves the Turnstile bot check on the auth pages.
+            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://challenges.cloudflare.com;",
           },
           {
             key: 'X-Content-Type-Options',

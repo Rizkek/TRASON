@@ -40,12 +40,77 @@ export const id = {
     "domain_verified": "Domain email terverifikasi",
     "register_error_title": "Tidak dapat mendaftar",
     "register_success_title": "Akun dibuat",
-    "check_email": "Periksa email Anda untuk mengonfirmasi akun.",
     "create_account": "Buat akun",
     "creating": "Menyiapkan ruang kerja Anda...",
     "has_workspace": "Sudah punya ruang kerja?",
-    "server_error": "Kesalahan server saat mendaftar. Coba lagi sebentar lagi.",
-    "email_taken": "Email itu sudah terdaftar. Masuk saja, atau gunakan email lain."
+    "forgot_password_link": "Lupa password?",
+    "forgot_title": "Atur ulang password",
+    "forgot_lede": "Masukkan email yang Anda pakai saat mendaftar. Kami akan mengirim tautan untuk membuat password baru.",
+    "send_reset_link": "Kirim tautan",
+    "sending": "Mengirim...",
+    "reset_sent_title": "Periksa email Anda",
+    "reset_sent_desc": "Jika ada akun untuk {email}, tautan untuk mengatur ulang password sedang dikirim.",
+    "reset_error_title": "Gagal mengatur ulang password",
+    "back_to_login": "Kembali ke halaman masuk",
+    "reset_title": "Buat password baru",
+    "reset_lede": "Pilih password yang tidak Anda pakai di tempat lain.",
+    "new_password": "Password baru",
+    "save_password": "Simpan password",
+    "saving": "Menyimpan...",
+    "reset_done_title": "Password diperbarui",
+    "reset_done_desc": "Anda sudah masuk di perangkat ini. Perangkat lain telah dikeluarkan.",
+    "reset_expired_title": "Tautan ini sudah kedaluwarsa",
+    "reset_expired_desc": "Tautan atur ulang hanya bisa dipakai sekali dan berlaku sementara. Minta tautan baru untuk melanjutkan.",
+    "request_new_link": "Minta tautan baru",
+    "checking_link": "Memeriksa tautan...",
+    "check_inbox_title": "Konfirmasi email Anda",
+    "check_inbox_desc": "Kami mengirim tautan konfirmasi ke {email}. Buka di perangkat mana pun untuk mengaktifkan akun.",
+    "check_inbox_hint": "Belum masuk setelah beberapa menit? Periksa folder spam.",
+    "resend_email": "Kirim ulang email",
+    "resend_in": "Kirim ulang dalam {s} dtk",
+    "resent": "Email baru sedang dikirim.",
+    "use_different_email": "Pakai email lain",
+    "password_invalid": "Password belum memenuhi syarat di bawah.",
+    "password_rules_title": "Password harus memiliki",
+    "password_rules": {
+      "length": "Minimal 8 karakter",
+      "upper": "Satu huruf besar",
+      "lower": "Satu huruf kecil",
+      "number": "Satu angka"
+    },
+    "rule_met": "(terpenuhi)",
+    "rule_unmet": "(belum terpenuhi)",
+    "consent": "Dengan membuat akun, Anda menyetujui {terms} dan {privacy}.",
+    "terms_link": "Ketentuan Layanan",
+    "privacy_link": "Kebijakan Privasi",
+    "captcha_required": "Selesaikan verifikasi terlebih dahulu.",
+    "captcha_load_failed": "Verifikasi gagal dimuat. Matikan pemblokir konten untuk situs ini, lalu muat ulang.",
+    "domain": {
+      "invalid": "Masukkan alamat email yang valid.",
+      "disposable": "Alamat email sekali pakai tidak diizinkan.",
+      "no_domain": "Domain email ini tidak ada.",
+      "no_mx": "Domain ini tidak punya server email. Periksa alamatnya.",
+      "unverified": "Domain ini tidak bisa diverifikasi. Periksa alamatnya."
+    },
+    "errors": {
+      "invalid_credentials": "Email atau password salah.",
+      "email_not_confirmed": "Konfirmasi email Anda sebelum masuk. Tautannya ada di kotak masuk.",
+      "email_taken": "Email itu sudah terdaftar. Masuk, atau atur ulang password jika Anda lupa.",
+      "weak_password": "Password itu terlalu mudah ditebak. Pilih yang lebih panjang dan tidak umum.",
+      "same_password": "Password baru harus berbeda dari password saat ini.",
+      "email_invalid": "Masukkan alamat email yang valid.",
+      "email_required": "Email wajib diisi.",
+      "email_too_long": "Email terlalu panjang.",
+      "rate_limited": "Terlalu banyak percobaan. Tunggu satu menit, lalu coba lagi.",
+      "email_rate_limited": "Terlalu banyak email terkirim. Tunggu beberapa menit sebelum meminta lagi.",
+      "captcha_failed": "Verifikasi gagal. Selesaikan verifikasi sekali lagi.",
+      "signup_disabled": "Pendaftaran baru sedang ditutup.",
+      "link_invalid": "Tautan ini tidak valid atau sudah kedaluwarsa. Minta tautan baru.",
+      "session_missing": "Sesi Anda telah berakhir. Silakan masuk lagi.",
+      "network": "Tidak bisa terhubung ke server. Periksa koneksi lalu coba lagi.",
+      "server": "Terjadi masalah di sisi kami. Coba lagi sebentar lagi.",
+      "unknown": "Terjadi kesalahan. Coba lagi."
+    }
   },
   "career_page": {
     "applied_on": "Dilamar",
@@ -180,23 +245,27 @@ export const id = {
       "reviewing": "Ditinjau"
     },
     "stats_labels": {
-      "avg": "Rata-rata",
       "avgToInterview": "Rata-rata ke wawancara",
       "interviewRate": "Tingkat wawancara",
-      "intv": "Wawn.",
-      "offer": "Tawaran",
       "offerRate": "Tingkat tawaran",
-      "resp": "Resp.",
-      "responseRate": "Tingkat respon"
+      "responseRate": "Tingkat respon",
+      "closed": "Selesai"
     },
     "tabs": {
       "active": "Aktif",
       "all": "Semua",
       "closed": "Tutup",
-      "interview": "Wawancara"
+      "interview": "Wawancara",
+      "applications": "Lamaran"
     },
     "title": "Karier",
-    "title_highlight": ""
+    "insights": {
+      "stale": "Belum ada lamaran baru selama {days} hari.",
+      "no_active": "Tidak ada lamaran yang sedang berjalan. Tambahkan lamaran baru agar prosesnya tetap bergerak.",
+      "low_response": "Hanya {rate}% lamaran yang mendapat balasan. Pertimbangkan memperbarui resume atau cover letter.",
+      "low_interview": "{rate}% lamaran sampai tahap interview. Coba posisi yang lebih sesuai dengan keahlian Anda.",
+      "offers": "Ada {count} tawaran kerja yang menunggu keputusan Anda."
+    }
   },
   "common": {
     "cancel": "Batal",
@@ -317,7 +386,7 @@ export const id = {
     "view_all": "Lihat semua",
     "view_all_tasks": "Lihat semua {count} tugas",
     "view_schedule": "Lihat jadwal",
-    "vitality_this_week": "Vitalitas minggu ini",
+    "vitality_this_week": "Olahraga minggu ini",
     "welcome_back": "Selamat datang kembali",
     "load_failed": "Beberapa bagian dashboard tidak dapat dimuat.",
     "section_load_failed": "Bagian ini tidak dapat dimuat.",
@@ -504,13 +573,12 @@ export const id = {
     "trend": {
       "vsLastMonth": "vs bulan lalu"
     },
-    "wallet": "Dompet"
+    "wallet": "Dompet",
+    "receipt_image_alt": "Foto struk yang dipindai"
   },
   "insights_page": {
     "ai_generic_error": "Gagal membuat wawasan.",
     "ai_timeout_error": "Batas waktu permintaan habis. Pembuatan memakan waktu terlalu lama — silakan coba lagi.",
-    "architect_perspective_desc": "Terus catat untuk melihat pola jangka panjang.",
-    "architect_perspective_title": "Ringkasan",
     "ask_ai": "Buat wawasan",
     "delete_insight": "Hapus wawasan",
     "desc": "Ringkasan pola dari data aktivitas Anda.",
@@ -519,9 +587,10 @@ export const id = {
     "reset_insights": "Hapus semua",
     "reset_insights_confirm": "Apakah Anda yakin ingin menghapus permanen semua riwayat wawasan?",
     "resetting": "Menghapus...",
-    "system_idle": "Siap",
     "thinking": "Berpikir...",
-    "title": "Wawasan"
+    "title": "Wawasan",
+    "footer_note": "Terus catat untuk melihat pola jangka panjang.",
+    "load_failed": "Wawasan yang tersimpan gagal dimuat."
   },
   "investment_page": {
     "add_first_position": "Tambah posisi pertama",
@@ -604,7 +673,8 @@ export const id = {
     "unrealized_pl": "P/L",
     "update_label": "diperbarui",
     "update_position_upper": "Simpan",
-    "value": "Nilai"
+    "value": "Nilai",
+    "price_stale": "Harga belum disinkronkan"
   },
   "life_score": {
     "dimensions": {
@@ -645,8 +715,6 @@ export const id = {
     "all_sub_off_warning": "Semua sub-fitur dimatikan — modul tidak memiliki konten yang terlihat",
     "career_desc": "Lacak lamaran kerja, wawancara, dan peluang",
     "description": "Aktifkan atau nonaktifkan modul untuk menyesuaikan pengalaman Anda. Modul yang dinonaktifkan tidak akan muncul di navigasi atau dasbor.",
-    "disabled_count": "Modul nonaktif",
-    "enabled_count": "Modul aktif",
     "finance_desc": "Lacak pendapatan dan pengeluaran, kelola anggaran",
     "insights_desc": "Analitik dan rekomendasi berbasis AI",
     "investments_desc": "Pelacakan portofolio dan wawasan investasi",
@@ -657,7 +725,8 @@ export const id = {
     "timeline_daily_checklist": "Tugas",
     "timeline_desc": "Aktivitas harian dan manajemen jadwal",
     "timeline_weekly_log": "Log mingguan",
-    "title": "Modul Aktif"
+    "title": "Modul Aktif",
+    "count_summary": "{on} dari {total} modul aktif"
   },
   "nav": {
     "cancel": "Batal",
@@ -761,7 +830,10 @@ export const id = {
     "title_highlight": "",
     "title_required": "Judul pengingat wajib diisi",
     "weekly_focus": "Fokus mingguan",
-    "weekly_focus_desc": "Anda memiliki {count} pengingat tertunda minggu ini."
+    "weekly_focus_desc": "Anda memiliki {count} pengingat tertunda minggu ini.",
+    "view_label": "Tampilan",
+    "view_calendar": "Tampilan kalender",
+    "view_list": "Tampilan daftar"
   },
   "settings": {
     "alerts": {
@@ -924,5 +996,11 @@ export const id = {
     "title": "Jadwal",
     "today_timeline": "Jadwal hari ini",
     "weekly_log": "Log mingguan"
+  },
+  "pwa": {
+    "install_title": "Pasang TRASON",
+    "install_desc": "Tambahkan ke layar utama. Terbuka layar penuh seperti aplikasi lain.",
+    "install": "Pasang",
+    "not_now": "Nanti saja"
   }
 };

@@ -1,94 +1,64 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { CheckCircle, Rocket, Clock } from '@phosphor-icons/react/dist/ssr';
+import Link from 'next/link';
+import { CheckCircle, Circle } from '@phosphor-icons/react/dist/ssr';
 import { PageShell } from '@/components/landing/page/PageShell';
 import { PageHeader } from '@/components/landing/page/PageHeader';
-import { Mark } from '@/components/landing/primitives/SectionHeading';
 
 export const metadata: Metadata = {
-  title: 'Roadmap – What We Are Building Next',
-  description:
-    'See what the TRASON team has recently shipped, what is actively in development, and what features are planned for Q3 2026. We build in public.',
+  title: 'Roadmap',
+  description: 'What you can use in TRASON today, and what is planned next.',
   alternates: { canonical: '/roadmap' },
   openGraph: {
-    title: 'TRASON Roadmap – What We Are Building Next',
-    description:
-      'Crypto Wallet Integration, Career CRM Upgrades, Mobile App, and more. See the full TRASON product evolution.',
+    title: 'TRASON Roadmap',
+    description: 'What you can use in TRASON today, and what is planned next.',
     url: 'https://www.trason.web.id/roadmap',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TRASON Roadmap' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TRASON' }],
   },
 };
 
 interface Item {
   title: string;
   desc: string;
-  progress?: number;
 }
 
-const SHIPPED: Item[] = [
-  { title: 'Multi-Currency Support', desc: 'Real-time FX conversion for all connected bank accounts.' },
-  { title: 'Habit Heatmaps', desc: 'GitHub-style contribution graphs for daily routines.' },
-  { title: 'Smart Reminders Engine', desc: 'Context-aware notifications that respect focus hours.' },
+// "Available" must match shipped features; "Planned" carries no dates until work has started.
+const AVAILABLE: Item[] = [
+  { title: 'Finance', desc: 'Income and expenses, categories, budgets, subscriptions, instalments, and transactions in several currencies.' },
+  { title: 'Receipt and payout capture', desc: 'Scan a receipt or import a driver payout into a draft you review and correct before saving.' },
+  { title: 'Smart Input', desc: 'Type a sentence like “lunch 45k” or “gym tomorrow 7am” and it becomes a transaction or a task.' },
+  { title: 'Investments', desc: 'Positions in stocks and crypto, with prices synced from CoinGecko and Alpha Vantage.' },
+  { title: 'Schedule', desc: 'A weekly activity log and a daily checklist, with public holidays on the calendar.' },
+  { title: 'Reminders', desc: 'Push notifications on every device you enable, plus an optional email digest.' },
+  { title: 'Sport', desc: 'Workout sessions, training plans, an exercise library, and a weekly streak.' },
+  { title: 'Career', desc: 'Applications by stage, interview notes, follow-up reminders, and a resume matcher.' },
+  { title: 'Insights and Life Score', desc: 'A plain-language summary of your week when you ask for one, and a daily score from fixed rules.' },
+  { title: 'Install on your phone', desc: 'Add TRASON to your home screen; it opens full-screen. Available in English, Indonesian, Japanese and Spanish.' },
 ];
 
-const IN_PROGRESS: Item[] = [
-  { title: 'Crypto Wallet Integration', desc: 'Native support for tracking Web3 assets across EVM chains.', progress: 65 },
-  { title: 'Career CRM Upgrades', desc: 'Adding interview recording attachments and compensation negotiation playbooks.', progress: 65 },
+const PLANNED: Item[] = [
+  { title: 'Investment goals', desc: 'Set a target for a portfolio and see how close your positions are to it.' },
+  { title: 'Investment journal', desc: 'Record why you bought or sold, next to the trade itself.' },
+  { title: 'Export your data', desc: 'Download all of your records in one file.' },
 ];
 
-const UP_NEXT: Item[] = [
-  { title: 'Mobile App (iOS/Android)', desc: 'Native applications with offline support and widgets.' },
-  { title: 'Automated Tax Forecasting', desc: 'Predict end-of-year tax liabilities based on current income trajectory.' },
-  { title: 'Public API', desc: 'Build your own integrations on top of the TRASON Nexus Engine.' },
-];
-
-interface ColumnProps {
-  icon: React.ElementType;
-  title: string;
-  badge: string;
-  items: Item[];
-  variant?: 'solid' | 'active' | 'planned';
-}
-
-function Column({ icon: Icon, title, badge, items, variant = 'solid' }: ColumnProps) {
-  const card =
-    variant === 'active'
-      ? 'border-primary/50 bg-primary/10'
-      : variant === 'planned'
-      ? 'border-dashed border-foreground/25 bg-transparent'
-      : 'border-foreground/15 bg-surface';
-
+function ItemList({ items, done }: { items: Item[]; done: boolean }) {
+  const Icon = done ? CheckCircle : Circle;
   return (
-    <section aria-label={title} className="space-y-5">
-      <div className="flex items-center gap-2 border-b border-foreground/15 pb-4">
-        <Icon size={20} aria-hidden="true" className="text-primary" />
-        <h2 className="font-sans text-lg font-semibold text-foreground">{title}</h2>
-        <span className="ml-auto rounded bg-foreground/10 px-2 py-1 text-xs font-semibold text-foreground">{badge}</span>
-      </div>
-      <ul className="space-y-4">
-        {items.map((item) => (
-          <li key={item.title} className={`rounded-2xl border p-5 ${card}`}>
-            <h3 className="font-sans text-base font-semibold text-foreground">{item.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
-            {item.progress !== undefined && (
-              <div className="mt-4">
-                <div
-                  role="progressbar"
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={item.progress}
-                  aria-label={`${item.title} progress`}
-                  className="h-1.5 w-full overflow-hidden rounded-full bg-foreground/15"
-                >
-                  <div className="h-full rounded-full bg-primary" style={{ width: `${item.progress}%` }} />
-                </div>
-                <p className="mt-1 text-right text-xs text-muted-foreground">{item.progress}% complete</p>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
-    </section>
+    <ul className="grid gap-3 sm:grid-cols-2">
+      {items.map((item) => (
+        <li
+          key={item.title}
+          className={`flex gap-3 rounded-xl border p-5 ${done ? 'border-foreground/15 bg-surface' : 'border-dashed border-foreground/25'}`}
+        >
+          <Icon size={20} weight={done ? 'fill' : 'regular'} aria-hidden="true" className={`mt-0.5 shrink-0 ${done ? 'text-success' : 'text-muted-foreground'}`} />
+          <div>
+            <h3 className="text-base font-semibold text-foreground">{item.title}</h3>
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -96,20 +66,36 @@ export default function RoadmapPage() {
   return (
     <PageShell width="wide">
       <PageHeader
-        align="center"
-        eyebrow="Product evolution"
-        title={
-          <>
-            The <Mark>roadmap.</Mark>
-          </>
-        }
-        lede="We build in public. See what we are working on, what comes next, and what we have recently shipped."
+        title="Roadmap"
+        lede="What you can use today, and what is planned next. Planned items get a date once work on them has started."
       />
 
-      <div className="mt-16 grid gap-8 md:grid-cols-3">
-        <Column icon={CheckCircle} title="Recently shipped" badge="Q2 2026" items={SHIPPED} />
-        <Column icon={Rocket} title="In progress" badge="Active" items={IN_PROGRESS} variant="active" />
-        <Column icon={Clock} title="Up next" badge="Q3 2026" items={UP_NEXT} variant="planned" />
+      <div className="mt-14 space-y-14">
+        <section aria-labelledby="available-heading" className="space-y-5">
+          <h2 id="available-heading" className="text-heading-lg text-foreground">
+            Available now
+          </h2>
+          <ItemList items={AVAILABLE} done />
+        </section>
+
+        <section aria-labelledby="planned-heading" className="space-y-5">
+          <h2 id="planned-heading" className="text-heading-lg text-foreground">
+            Planned
+          </h2>
+          <ItemList items={PLANNED} done={false} />
+        </section>
+
+        <p className="text-sm text-muted-foreground">
+          Something missing?{' '}
+          <Link href="/contact" className="font-medium text-primary underline underline-offset-4">
+            Tell us what you need
+          </Link>
+          . Recent changes are listed in the{' '}
+          <Link href="/changelog" className="font-medium text-primary underline underline-offset-4">
+            changelog
+          </Link>
+          .
+        </p>
       </div>
     </PageShell>
   );

@@ -1,15 +1,22 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Card } from '@/components';
+import { Card, Switch } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useAuthStore } from '@/store/authStore';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ModuleId } from '@/modules/types';
 import { DEFAULT_MODULE_STATUS, MODULE_METADATA } from '@/modules/registry';
+import { cn } from '@/lib/utils';
 import { MODULE_ICONS } from './types';
 import { GridNine } from '@phosphor-icons/react';
-import { Heading, Paragraph } from '@/components/ui/typography';
+import { Paragraph } from '@/components/ui/typography';
+
+// Sub-features are stored in module_features next to the module flags; missing means on.
+const SUB_FEATURES: Partial<Record<ModuleId, string[]>> = {
+  timeline: ['timeline_weekly_log', 'timeline_daily_checklist'],
+  reminders: ['reminders_history'],
+};
 
 interface ModuleItemProps {
   id: ModuleId;
@@ -32,165 +39,73 @@ export const ModuleItem = React.memo(function ModuleItem({
 }: ModuleItemProps) {
   const [isLocalLoading, setIsLocalLoading] = useState(false);
 
-  const handleToggle = useCallback(async () => {
+  const run = useCallback(async (action: () => Promise<void>) => {
     setIsLocalLoading(true);
     try {
-      await onToggle(id);
+      await action();
     } catch (err) {
-      console.error(`Failed to toggle module ${id}:`, err);
+      console.error(`Failed to update module ${id}:`, err);
     } finally {
       setIsLocalLoading(false);
     }
-  }, [id, onToggle]);
-
-  const handleSubToggle = useCallback(
-    async (featureId: string) => {
-      setIsLocalLoading(true);
-      try {
-        await onSubToggle(featureId);
-      } catch (err) {
-        console.error('Failed to toggle sub-feature:', err);
-      } finally {
-        setIsLocalLoading(false);
-      }
-    },
-    [onSubToggle]
-  );
+  }, [id]);
 
   const Icon = MODULE_ICONS[metadata.icon] || GridNine;
-
-  const allSubFeaturesOff =
-    isEnabled &&
-    (() => {
-      const f = moduleFeatures || {};
-      if (id === 'timeline') {
-        return f['timeline_weekly_log'] === false && f['timeline_daily_checklist'] === false;
-      }
-      return false;
-    })();
+  const subFeatures = SUB_FEATURES[id] ?? [];
+  const isSubOn = (featureId: string) => moduleFeatures?.[featureId] !== false;
+  // A module that is on but has every sub-feature off shows nothing, so flag it.
+  const allSubFeaturesOff = isEnabled && subFeatures.length > 1 && subFeatures.every((f) => !isSubOn(f));
+  const name = t(`nav.${id}`);
 
   return (
-    <div className="space-y-2">
-      <div
-        className={`flex items-center justify-between p-6 rounded-md border transition-all ${
-          isEnabled && !allSubFeaturesOff
-            ? 'bg-foreground/[0.02] border-foreground/[0.05]'
-            : allSubFeaturesOff
-            ? 'bg-warning/[0.04] border-warning/20'
-            : 'bg-transparent border-foreground/[0.02] opacity-60'
-        }`}
-      >
-        <div className="flex items-center gap-4 flex-1 min-w-0">
-          <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-            style={{ backgroundColor: `${metadata.color}15` }}
-          >
-            <Icon size={20} className={allSubFeaturesOff ? 'text-warning' : undefined} style={allSubFeaturesOff ? undefined : { color: metadata.color }} />
-          </div>
-          <div className="min-w-0">
-            <Heading as="h4" size="h4" className="text-sm font-medium text-foreground truncate">{t(`nav.${id}`)}</Heading>
-            <Paragraph className="text-xs text-muted-foreground">
-              {allSubFeaturesOff ? (
-                <span className="text-warning">{t('modules.all_sub_off_warning')}</span>
-              ) : (
-                t(`modules.${id}_desc`)
-              )}
-            </Paragraph>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleToggle}
-          disabled={isLocalLoading}
-          aria-label={`${isEnabled ? 'Disable' : 'Enable'} ${metadata.name}`}
-          className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors will-change-transform ${
-            isEnabled
-              ? 'bg-primary'
-              : 'bg-surface border border-foreground/[0.1]'
-          } ${isLocalLoading ? 'opacity-50 cursor-wait' : ''}`}
+    <div
+      className={cn(
+        'rounded-lg border p-4 transition-colors',
+        allSubFeaturesOff
+          ? 'border-warning/30 bg-warning/[0.04]'
+          : isEnabled
+            ? 'border-foreground/10 bg-foreground/[0.02]'
+            : 'border-foreground/[0.06] bg-transparent'
+      )}
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+          style={{ backgroundColor: `${metadata.color}15` }}
         >
-          <span
-            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-              isEnabled ? 'translate-x-6' : 'translate-x-1'
-            }`}
+          <Icon
+            size={20}
+            aria-hidden="true"
+            className={allSubFeaturesOff ? 'text-warning' : undefined}
+            style={allSubFeaturesOff ? undefined : { color: metadata.color }}
           />
-        </button>
+        </div>
+        <div className="min-w-0 flex-1">
+          <h4 className={cn('text-label-md', isEnabled ? 'text-foreground' : 'text-muted-foreground')}>{name}</h4>
+          <p className={cn('mt-0.5 text-body-sm', allSubFeaturesOff ? 'text-warning' : 'text-muted-foreground')}>
+            {allSubFeaturesOff ? t('modules.all_sub_off_warning') : t(`modules.${id}_desc`)}
+          </p>
+        </div>
+        <Switch checked={isEnabled} onChange={() => run(() => onToggle(id))} busy={isLocalLoading} label={name} />
       </div>
 
-      {/* Sub-toggles for Timeline and Reminders */}
-      {isEnabled && (id === 'timeline' || id === 'reminders') && (
-        <div className="ml-4 pl-3 border-l border-foreground/10 space-y-2 mt-2">
-          {id === 'timeline' && (
-            <>
-              <div className="flex items-center justify-between gap-4 py-2">
-                <span className="text-xs text-muted-foreground flex-1 min-w-0">
-                  {t('modules.timeline_weekly_log')}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleSubToggle('timeline_weekly_log')}
-                  disabled={isLocalLoading}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 will-change-transform ${
-                    moduleFeatures?.['timeline_weekly_log'] !== false
-                      ? 'bg-primary'
-                      : 'bg-surface border border-foreground/[0.1]'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      moduleFeatures?.['timeline_weekly_log'] !== false ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-              <div className="flex items-center justify-between gap-4 py-2">
-                <span className="text-xs text-muted-foreground flex-1 min-w-0">
-                  {t('modules.timeline_daily_checklist')}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleSubToggle('timeline_daily_checklist')}
-                  disabled={isLocalLoading}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 will-change-transform ${
-                    moduleFeatures?.['timeline_daily_checklist'] !== false
-                      ? 'bg-primary'
-                      : 'bg-surface border border-foreground/[0.1]'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      moduleFeatures?.['timeline_daily_checklist'] !== false ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-            </>
-          )}
-          {id === 'reminders' && (
-            <div className="flex items-center justify-between gap-4 py-2">
-              <span className="text-xs text-muted-foreground flex-1 min-w-0">
-                {t('modules.reminders_history')}
-              </span>
-              <button
-                type="button"
-                onClick={() => handleSubToggle('reminders_history')}
-                disabled={isLocalLoading}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 will-change-transform ${
-                  moduleFeatures?.['reminders_history'] !== false
-                    ? 'bg-primary'
-                    : 'bg-surface border border-foreground/[0.1]'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    moduleFeatures?.['reminders_history'] !== false ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+      {isEnabled && subFeatures.length > 0 && (
+        <ul className="mt-3 space-y-1 border-t border-foreground/10 pt-2">
+          {subFeatures.map((featureId) => {
+            const label = t(`modules.${featureId}`);
+            return (
+              <li key={featureId} className="flex min-h-11 items-center justify-between gap-3 pl-[3.25rem]">
+                <span className="min-w-0 text-body-sm text-muted-foreground">{label}</span>
+                <Switch
+                  checked={isSubOn(featureId)}
+                  onChange={() => run(() => onSubToggle(featureId))}
+                  busy={isLocalLoading}
+                  label={`${name}: ${label}`}
                 />
-              </button>
-            </div>
-          )}
-        </div>
+              </li>
+            );
+          })}
+        </ul>
       )}
     </div>
   );
@@ -210,7 +125,6 @@ export function ModulesSection() {
   }));
 
   const enabledCount = statuses.filter((s) => s.isEnabled).length;
-  const disabledCount = statuses.filter((s) => !s.isEnabled).length;
 
   const handleModuleToggle = useCallback(
     async (id: ModuleId) => {
@@ -253,43 +167,25 @@ export function ModulesSection() {
   );
 
   return (
-    <div className="space-y-6">
-      <Card className="glass border-none" title={t('settings.modules.sectionTitle')}>
-        <Paragraph className="text-sm text-muted-foreground mb-8">{t('settings.modules.description')}</Paragraph>
-        <div className="space-y-8">
-          <div className="grid gap-4">
-            {statuses.map((status) => (
-              <ModuleItem
-                key={status.id}
-                id={status.id}
-                isEnabled={status.isEnabled}
-                metadata={status.metadata}
-                moduleFeatures={module_features}
-                onToggle={handleModuleToggle}
-                onSubToggle={handleSubToggle}
-                t={t}
-              />
-            ))}
-          </div>
-        </div>
-      </Card>
-
-      <Card className="glass border-none bg-foreground/[0.01]" title="MODULE STATUS">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-6 rounded-md bg-foreground/[0.02] border border-foreground/[0.05]">
-            <div className="text-2xl font-semibold text-primary">{enabledCount}</div>
-            <div className="text-xs text-muted-foreground tracking-widest">
-              {t('modules.enabled_count').toUpperCase()}
-            </div>
-          </div>
-          <div className="p-6 rounded-md bg-foreground/[0.02] border border-foreground/[0.05]">
-            <div className="text-2xl font-semibold text-secondary">{disabledCount}</div>
-            <div className="text-xs text-muted-foreground tracking-widest">
-              {t('modules.disabled_count').toUpperCase()}
-            </div>
-          </div>
-        </div>
-      </Card>
-    </div>
+    <Card className="glass border-none" title={t('settings.modules.sectionTitle')}>
+      <Paragraph className="text-body-sm text-muted-foreground">{t('settings.modules.description')}</Paragraph>
+      <p className="mt-1 text-label-sm text-muted-foreground" aria-live="polite">
+        {t('modules.count_summary').replace('{on}', String(enabledCount)).replace('{total}', String(statuses.length))}
+      </p>
+      <div className="mt-5 grid items-start gap-3 lg:grid-cols-2">
+        {statuses.map((status) => (
+          <ModuleItem
+            key={status.id}
+            id={status.id}
+            isEnabled={status.isEnabled}
+            metadata={status.metadata}
+            moduleFeatures={module_features}
+            onToggle={handleModuleToggle}
+            onSubToggle={handleSubToggle}
+            t={t}
+          />
+        ))}
+      </div>
+    </Card>
   );
 }

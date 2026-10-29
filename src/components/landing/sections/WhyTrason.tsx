@@ -62,7 +62,6 @@ export function WhyTrason() {
       <Container>
         <SectionHeading
           id="why-heading"
-          eyebrow="Why TRASON"
           title="Less switching. More context."
           lede="Not more features than six apps. The same parts of life, in one place that keeps the whole picture."
         />

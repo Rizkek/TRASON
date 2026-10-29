@@ -23,7 +23,7 @@ export function Sidebar({ items, isActive, user, onLogout }: SidebarProps) {
   const { t } = useTranslation();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-50 hidden h-dvh w-72 shrink-0 flex-col overflow-y-auto border-r border-foreground/10 bg-surface md:flex">
+    <aside className="fixed inset-y-0 left-0 z-50 hidden h-dvh w-72 shrink-0 flex-col overflow-y-auto border-r border-foreground/10 bg-surface lg:flex">
       <div className="flex flex-col items-center px-6 py-8">
         <Logo size={40} variant="gold" className="mb-4" />
         <p className="font-brand text-heading-lg text-primary">TRASON</p>

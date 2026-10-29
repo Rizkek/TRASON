@@ -47,10 +47,10 @@ export function InsightsUI() {
           <span className="text-xs text-muted-foreground">Thu, 18 Sep</span>
         </div>
         <p className="mt-2 text-body-sm leading-relaxed text-foreground/85">
-          Expenses this week sit about 18% above your four-week average, mostly Transport. Vitality is steady at three
+          Expenses this week sit about 18% above your four-week average, mostly Transport. Training is steady at three
           sessions, the same as last week. Two applications moved to Interview; the Tokopedia round is on Friday.
         </p>
-        <p className="mt-3 text-xs text-muted-foreground">Written from your Finance, Vitality and Career records.</p>
+        <p className="mt-3 text-xs text-muted-foreground">Written from your Finance, Sport and Career records.</p>
       </UiCard>
     </div>
   );

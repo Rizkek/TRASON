@@ -23,9 +23,11 @@ Middleware tidak melindungi `/api` (dikecualikan dari matcher). Tiap route wajib
 | `career/autocomplete`, `holidays`, `sport/exercises` | data pendukung |
 | `push/subscribe` | dipanggil service worker saat endpoint push berputar (`pushsubscriptionchange`) |
 | `cron/reminders`, `cron/timeline`, `cron/digest` | web-push dan email digest, dipanggil cron-job.org |
-| `validate-email` | cek MX lewat DNS-over-HTTPS |
+| `validate-email` | cek MX lewat DNS-over-HTTPS; respons `{ valid, code? }` dengan `code` = `invalid`, `disposable`, `no_domain` (menolak) atau `no_mx`, `unverified` (peringatan) |
 
-Server tidak boleh mem-fetch URL yang dikirim klien. Route receipt hanya menerima path storage milik user (`libs/receiptStorage.ts`), dan `GeminiReceiptExtractor` hanya menerima data URL.
+Di luar `api/` ada route handler `auth/confirm`: tujuan link email Supabase. Menerima `token_hash` + `type` (`verifyOtp`) atau `code` (`exchangeCodeForSession`), lalu redirect ke `next` yang sudah disaring `safeRedirectPath`. Bila gagal, redirect ke `/login` atau `/forgot-password` dengan `?auth_error=link_invalid`.
+
+Server tidak boleh mem-fetch URL yang dikirim klien. Route receipt hanya menerima path storage milik user (`libs/receiptStorage.ts`), dan `GeminiReceiptExtractor` hanya menerima data URL. `upload-receipt` mengembalikan `{ path, fileName }` (tanpa URL publik; bucket private); `extract-receipt` menerima `fileName` dan `extract-driver-payout` menerima `receiptPath`, keduanya divalidasi `isOwnedReceiptPath`.
 
 RPC yang dipakai kode: `get_transaction_analytics` dan `delete_user`.
 

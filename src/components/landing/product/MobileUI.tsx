@@ -90,7 +90,7 @@ export function MobileUI() {
           <UiCard className="p-3">
             <div className="flex items-center gap-1.5">
               <Heartbeat size={11} className="text-danger" />
-              <UiLabel>Vitality</UiLabel>
+              <UiLabel>Sport</UiLabel>
             </div>
             <p className="mt-1 text-xs text-foreground">3 sessions</p>
             <p className="mt-0.5 text-xs text-muted-foreground">this week</p>

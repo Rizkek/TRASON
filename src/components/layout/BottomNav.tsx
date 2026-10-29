@@ -21,7 +21,7 @@ export function BottomNav({ items, isActive, moreOpen, onOpenMore }: BottomNavPr
   return (
     <nav
       aria-label="Main"
-      className="safe-area-pb fixed inset-x-0 bottom-0 z-40 flex items-stretch justify-around border-t border-foreground/10 bg-background px-1 md:hidden"
+      className="safe-area-pb fixed inset-x-0 bottom-0 z-40 flex items-stretch justify-around border-t border-foreground/10 bg-background px-1 lg:hidden"
     >
       {items.map((item) => {
         const active = isActive(item.href);

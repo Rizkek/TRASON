@@ -54,7 +54,8 @@ src/
     (app)/        halaman terautentikasi: dashboard, finance, investments, schedule,
                   reminders, insights, sport, career, settings, onboarding
     (auth)/       login, signup
-    (landing)/    halaman publik: about, pricing, vision, roadmap, legal, dll
+    (landing)/    halaman publik: about, pricing, vision, roadmap, changelog, contact (gabungan contact + FAQ;
+                  `/support` redirect permanen ke sini), privacy, cookies, terms
     api/          route handler (lihat bagian 5)
     sw.ts         source service worker
   components/     ui/ (primitif: Button, Card, Input, Placeholder, typography), layout/ (shell: Layout, Sidebar, MobileHeader, BottomNav, MoreSheet, ThemeSync), auth/ (AuthShell), landing/ (sections, page/ untuk halaman publik), modules/Sport/
@@ -71,7 +72,8 @@ src/
   modules/        registry.ts + types.ts: metadata, setting, dependency, dan toggle modul
   utils/supabase/ server.ts (createClient, getAuthenticatedUser), middleware.ts (updateSession)
   middleware.ts   guard rute; API route dikecualikan dari matcher
-  data/ config/ providers/
+  data/ config/ providers/   config/site.ts = satu-satunya sumber email, WhatsApp, lokasi publik
+scripts/          generate-brand-assets.mjs: favicon, ikon PWA, badge push, og-image dari public/logo-trason.png
 docs/             dokumentasi produk, API, skema DB (sebagian usang, lihat bagian 8)
 ```
 
@@ -83,9 +85,9 @@ docs/             dokumentasi produk, API, skema DB (sebagian usang, lihat bagia
 
 **Hook dan SWR:** key harus dari `CACHE_KEYS` di `libs/cacheKeys.ts`; konfigurasi dari `config/swr.ts`. Mutasi memakai `executeMutation` (`libs/api/mutationBuilder.ts`) dengan update optimistik, lalu invalidasi lewat `INVALIDATION_PATTERNS`. Setelah mutasi yang memengaruhi dashboard, invalidasi `dashboard:overview`. Pola alternatif terpusat ada di `libs/mutations.ts`. Update optimistik memakai updater biasa `mutate((current) => ..., { revalidate: false })`, bukan `optimisticData` atau mutator async: keduanya menerima data committed dan menghapus perubahan lain yang masih berjalan (contoh benar: `hooks/useDailyTasks.ts`). Revalidasi setelah mutasi lewat `invalidateKeys` (`libs/cacheInvalidation.ts`) dengan pola dari `INVALIDATION_PATTERNS`, bukan `mutate()` lokal ditambah `globalMutate` terpisah (key yang sama ter-fetch dua kali). Satu mutasi cukup satu revalidasi. Data yang gagal dimuat harus ditampilkan dengan `InlineError`, bukan sebagai daftar kosong.
 
-**Halaman:** server component (`page.tsx`) mengambil data awal dengan `createServerClient` dan mengoper ke `*Client.tsx` / `_client.tsx` sebagai props; interaksi dan SWR ada di komponen klien. Halaman yang membaca cookie (contoh `finance`, `career`) memakai `export const dynamic = 'force-dynamic'`; halaman lain hanya merender shell klien. Halaman di `(app)` tidak boleh membungkus diri dengan `<Layout>`: shell persisten ada di `(app)/layout.tsx` (onboarding dikecualikan di dalam `Layout`).
+**Halaman:** server component (`page.tsx`) mengambil data awal dengan `createServerClient` dan mengoper ke `*Client.tsx` / `_client.tsx` sebagai props; interaksi dan SWR ada di komponen klien. Halaman yang membaca cookie (contoh `finance`, `career`) memakai `export const dynamic = 'force-dynamic'`; halaman lain hanya merender shell klien. Judul halaman `(app)` memakai `AppPageHeader` (`components/layout/AppPageHeader.tsx`), bukan markup header sendiri. Halaman di `(app)` tidak boleh membungkus diri dengan `<Layout>`: shell persisten ada di `(app)/layout.tsx` (onboarding dikecualikan di dalam `Layout`).
 
-**Auth:** `middleware.ts` memanggil `updateSession` yang me-redirect rute terproteksi ke `/login?redirect_to=...` dan `/login`, `/signup`, `/` ke `/dashboard` bila sudah login. Daftar rute terproteksi hardcoded di `utils/supabase/middleware.ts`; modul baru harus ditambahkan ke sana dan ke `NETWORK_ONLY_ROUTES` di `app/sw.ts`. `AuthProvider` memanggil `useAuth()` sekali sebagai satu-satunya subscription `onAuthStateChange`; komponen lain membaca `useAuthStore`. Guard klien tunggal ada di `components/layout/Layout.tsx` dan baru meredirect setelah `isAuthReady` true (pemeriksaan sesi pertama selesai), karena `isAuthenticated` yang dipersist bisa usang. Halaman tidak boleh punya efek `router.push('/login')` sendiri.
+**Auth:** `middleware.ts` memanggil `updateSession` yang me-redirect rute terproteksi ke `/login?redirect_to=...` dan `/login`, `/signup`, `/` ke `/dashboard` bila sudah login. Daftar rute terproteksi hardcoded di `utils/supabase/middleware.ts`; modul baru harus ditambahkan ke sana dan ke `NETWORK_ONLY_ROUTES` di `app/sw.ts`. `/forgot-password` diperlakukan seperti `/login`; `/reset-password` sengaja tidak, karena berjalan di atas sesi recovery dari link email. Semua tujuan redirect dari URL (`redirect_to`, `next`) lewat `safeRedirectPath` (`libs/authRedirect.ts`). Error auth Supabase dipetakan ke key `auth.errors.*` lewat `authErrorKey` (`libs/authErrors.ts`); `error.message` mentah tidak ditampilkan. CAPTCHA memakai Cloudflare Turnstile bawaan Supabase (`useCaptcha`, token sekali pakai, reset setelah tiap request). `AuthProvider` memanggil `useAuth()` sekali sebagai satu-satunya subscription `onAuthStateChange`; komponen lain membaca `useAuthStore`. Guard klien tunggal ada di `components/layout/Layout.tsx` dan baru meredirect setelah `isAuthReady` true (pemeriksaan sesi pertama selesai), karena `isAuthenticated` yang dipersist bisa usang. Halaman tidak boleh punya efek `router.push('/login')` sendiri.
 
 **API route (`src/app/api`):** middleware tidak melindungi `/api`, jadi tiap route wajib memverifikasi sendiri dengan `getAuthenticatedUser()` dan mengembalikan 401. Pengecualian: `validate-email` (publik) dan `cron/*` (memakai `CRON_SECRET` dan Supabase service role). Route AI memakai `maxDuration` bila perlu.
 
@@ -98,7 +100,8 @@ docs/             dokumentasi produk, API, skema DB (sebagian usang, lihat bagia
 | `analytics/life-score`, `career/autocomplete`, `holidays`, `sport/exercises` | data pendukung |
 | `push/subscribe` | dipanggil service worker saat endpoint push berputar (`pushsubscriptionchange`) |
 | `cron/reminders`, `cron/timeline`, `cron/digest` | web-push dan email digest, dipanggil cron-job.org |
-| `validate-email` | cek MX lewat DNS-over-HTTPS |
+| `validate-email` | cek MX lewat DNS-over-HTTPS; mengembalikan `{ valid, code? }`, teks diterjemahkan di klien |
+| `/auth/confirm` (di luar `api/`) | tujuan link email Supabase (konfirmasi signup, reset password): `verifyOtp` dengan `token_hash` atau `exchangeCodeForSession` dengan `code`, lalu redirect ke `next` |
 
 **Cron dan push:** cron-job.org memanggil `cron/reminders` (tiap menit) dan `cron/timeline` (tiap 6 jam) dengan header `Authorization: Bearer <CRON_SECRET>`; `authorizeCron` (`libs/cron/auth.ts`) menolak semua panggilan bila `CRON_SECRET` kosong. Pengiriman exactly-once dijamin tabel `reminder_notifications` dan `task_nudges` (klaim dulu dengan upsert `ignoreDuplicates`, baru kirim, lepas klaim bila tidak ada push yang sampai). `libs/cron/push.ts` menonaktifkan subscription hanya pada 404/410 atau 5 kegagalan beruntun. Satu user boleh punya satu subscription aktif per perangkat; jangan menonaktifkan endpoint lain saat menyimpan endpoint baru. Sinkronisasi endpoint klien ada di `libs/pushSync.ts` dan dijalankan sekali oleh `Layout`; izin notifikasi hanya diminta dari aksi user. Skema SQL untuk fitur ini ada di `docs/migrations/`, dijalankan manual di Supabase sebelum deploy.
 
@@ -108,7 +111,7 @@ docs/             dokumentasi produk, API, skema DB (sebagian usang, lihat bagia
 
 **Modul:** `ModuleId` = finance, investments, timeline, insights, reminders, sport, career. Modul baru didaftarkan di `modules/registry.ts` dan `modules/types.ts`. Route `/timeline` di-redirect permanen ke `/schedule`. Toggle modul per pengguna tersimpan di preferensi.
 
-**i18n:** `useTranslation()` dengan kamus `en`, `id`, `ja`, `es` di `libs/i18n`; key dot-notation, fallback ke English. Setiap string UI baru ditambahkan ke keempat kamus. Istilah produk mengikuti `docs/product-language.md` (misalnya "Activity", "Application", "Dashboard", "Finance"; hindari "Financial Flow", "Command Center", "Career Architect").
+**i18n:** `useTranslation()` dengan kamus `en`, `id`, `ja`, `es` di `libs/i18n`; key dot-notation, fallback ke English. Setiap string UI baru ditambahkan ke keempat kamus. Istilah produk mengikuti `docs/product-language.md` (misalnya "Activity", "Application", "Dashboard", "Finance", "Sport"; hindari "Financial Flow", "Command Center", "Career Architect", dan "Vitality", label lama modul Sport).
 
 **Tipe:** definisi tabel ada di `types/database.ts`. Soft delete lewat kolom `deleted_at`; query selalu menyertakan `.is('deleted_at', null)`.
 
@@ -130,6 +133,7 @@ Hanya nama; nilai ada di `.env.local` (di-gitignore, jangan dibaca).
 | `CRON_SECRET` | `cron/*` | rahasia |
 | `RESEND_API_KEY` | `cron/digest` | rahasia |
 | `ALPHA_VANTAGE_API_KEY`, `COINGECKO_DEMO_API_KEY` | `investments/prices` | rahasia |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | `components/auth/Turnstile.tsx` (bot check login, signup, lupa password); kosong berarti widget tidak dirender | publik |
 | `NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_APP_VERSION`, `NEXT_PUBLIC_API_URL` | konfigurasi umum | publik |
 
 Aturan: variabel tanpa awalan `NEXT_PUBLIC_` tidak boleh disentuh dari kode klien. Service role key hanya di route handler server, dan route yang memakainya harus lebih dulu memverifikasi pemanggil. Variabel baru ditambahkan ke tabel ini (nama saja).
@@ -148,7 +152,12 @@ Aturan untuk semua kode UI baru:
 * Mode tema lewat class `dark` / `light` pada `<html>` (`darkMode: 'class'`). Pemilik tunggalnya `components/layout/ThemeSync.tsx`, dengan skrip anti-flash di `<head>` (`NO_FLASH_THEME_SCRIPT` di `libs/theme.ts`). Default adalah `system` (`DEFAULT_THEME_PREFERENCE`): pengunjung dan akun baru mengikuti perangkat, onboarding memilih tema perangkat lebih dulu, dan pilihan yang tersimpan di preferensi menang. Nilai `system` hanya hidup di store lokal; tipe `UserPreferences.theme` hanya `light|dark`, dan belum diverifikasi apakah kolom database menerima nilai lain, jadi jangan menyimpannya sebelum itu dicek. `useResolvedTheme()` memberi tema yang sedang tampil.
 * Pakai komponen `components/ui` (`Button`, `Card`, `Input`, `Select`, `Badge`, `DatePicker`, `Toast`) dan `components/Modal`, `BottomSheet`, `ConfirmModal`. Jangan menulis elemen tombol mentah bila `Button` cukup.
 * Teks bersih: hindari bullet hyphen berlebihan dan kalimat hiperbolis. Ikuti `docs/product-language.md` untuk istilah.
-* Mobile-first (PWA, `BottomSheet` dipakai untuk form di layar kecil).
+* Mobile-first (PWA, `BottomSheet` dipakai untuk form di layar kecil). Shell berganti di `lg`, bukan `md`: di bawah 1024px (ponsel dan tablet portrait) tampil `MobileHeader` + `BottomNav` dengan konten selebar layar; `Sidebar` (`w-72`) baru muncul mulai `lg`. Tombol mengambang (FAB) halaman tetap `md:hidden`, dan aksi yang sama ada di header (`hidden md:inline-flex`), jadi tablet memakai tombol header.
+* Padding kartu dan sel tabel responsif: `p-5 md:p-8`, `px-4 py-4 md:px-8`; jangan `p-8` atau `px-8 py-8` polos. Tabel lebar menyembunyikan kolom sekunder dengan `hidden sm:table-cell` atau punya tampilan kartu terpisah untuk mobile.
+* Toggle on/off memakai `Switch` (`components/ui/Switch.tsx`, `role="switch"`), bukan tombol toggle buatan sendiri.
+* Judul tanpa eyebrow: jangan menaruh label kecil uppercase dengan titik emas di atas judul. `SectionHeading` dan `PageHeader` sengaja tidak punya prop `eyebrow`.
+* Logo: komponen `Logo` (`public/logo-trason.png`, mark TR). Mark lama (huruf T polos, kompas) sudah dihapus; jangan membuat mark tiruan dengan teks "T". Bila logo berubah, jalankan `node scripts/generate-brand-assets.mjs` lalu commit hasilnya di `public/`.
+* Isi landing (Pricing, Roadmap, Changelog, FAQ) hanya menyebut fitur yang benar-benar ada di kode. Tidak ada paket berbayar, sistem pembayaran, atau batas jumlah record; "Planned" di Roadmap tanpa tanggal. Kontak publik dibaca dari `config/site.ts`.
 
 ## 8. Dokumentasi: Mana yang Bisa Dipercaya
 
@@ -172,3 +181,6 @@ Bila mengubah perilaku yang tercakup dokumen di atas, perbarui dokumennya sekali
 * `/investments/goals` dan `/investments/journal` hanya me-redirect ke `/investments`. Hook mock dan halamannya dihapus; tipe `Goal`, `InvestmentGoalAllocation`, `InvestmentTransaction` belum punya tabel atau query. Bangun skema dan query nyata sebelum membuat halamannya lagi.
 * `getCurrentUser()` membaca sesi lokal tanpa validasi server; keamanan data bergantung penuh pada RLS. Setiap tabel baru wajib punya RLS aktif dan policy `auth.uid() = user_id`.
 * `eslint.ignoreDuringBuilds: true`: lint tidak memblokir build, jalankan `npm run lint` sendiri.
+* Halaman legal mendaftar fakta dari kode: `PROCESSORS` di `(landing)/privacy/page.tsx` (setiap layanan eksternal dan data yang diterimanya) dan tabel di `(landing)/cookies/page.tsx` (cookie Supabase dan setiap key localStorage). Menambah integrasi, layanan eksternal, atau key `localStorage` berarti memperbarui tabel itu dan tanggal `LAST_UPDATED`.
+* Bucket `receipts` private (`docs/migrations/2026-10-28-private-receipts.sql`, policy per folder `<user id>/`). Kode tidak pernah memakai `getPublicUrl` untuk struk: `upload-receipt` mengembalikan path, route server membaca lewat `downloadReceiptAsDataUrl`, dan klien menampilkan gambar lewat `storageQueries.getReceiptSignedUrl` (10 menit). Bucket `avatar` sengaja tetap public.
+* Prompt install PWA (`PwaInstallPrompt`) hanya dipasang di `(app)/layout.tsx`. Pesan konsol Chrome "Banner not shown: beforeinstallpromptevent.preventDefault() called" muncul karena prompt bawaan ditahan untuk kartu ini; itu bukan error.

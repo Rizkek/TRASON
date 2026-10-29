@@ -11,13 +11,9 @@ export function Hero() {
       <Container>
         <div className="grid gap-10 lg:grid-cols-12 lg:items-end lg:gap-8">
           <div className="lg:col-span-7">
-            <p className="lp-rise flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Personal operating system
-            </p>
             <h1
               id="hero-heading"
-              className="lp-rise lp-rise-delay-1 mt-6 text-display-md leading-[1.05] text-foreground sm:text-6xl lg:text-display-2xl"
+              className="lp-rise text-display-md leading-[1.05] text-foreground sm:text-6xl lg:text-display-2xl"
             >
               <span className="block">Your life,</span>
               <span className="block">in one</span>

@@ -40,12 +40,77 @@ export const en = {
     "domain_verified": "Email domain verified",
     "register_error_title": "Unable to register",
     "register_success_title": "Account created",
-    "check_email": "Check your email to confirm your account.",
     "create_account": "Create account",
     "creating": "Setting up your workspace...",
     "has_workspace": "Already have a workspace?",
-    "server_error": "Server error while registering. Try again in a moment.",
-    "email_taken": "That email is already registered. Sign in instead, or use a different email."
+    "forgot_password_link": "Forgot password?",
+    "forgot_title": "Reset your password",
+    "forgot_lede": "Enter the email you signed up with. We'll send a link to set a new password.",
+    "send_reset_link": "Send reset link",
+    "sending": "Sending...",
+    "reset_sent_title": "Check your email",
+    "reset_sent_desc": "If an account exists for {email}, a link to reset your password is on its way.",
+    "reset_error_title": "Couldn't reset password",
+    "back_to_login": "Back to sign in",
+    "reset_title": "Set a new password",
+    "reset_lede": "Choose a password you don't use anywhere else.",
+    "new_password": "New password",
+    "save_password": "Save password",
+    "saving": "Saving...",
+    "reset_done_title": "Password updated",
+    "reset_done_desc": "You're signed in on this device. Other devices were signed out.",
+    "reset_expired_title": "This link has expired",
+    "reset_expired_desc": "Reset links work once and expire after a while. Request a new one to continue.",
+    "request_new_link": "Request a new link",
+    "checking_link": "Checking your link...",
+    "check_inbox_title": "Confirm your email",
+    "check_inbox_desc": "We sent a confirmation link to {email}. Open it on any device to activate your account.",
+    "check_inbox_hint": "Nothing after a few minutes? Check your spam folder.",
+    "resend_email": "Resend email",
+    "resend_in": "Resend in {s}s",
+    "resent": "A new email is on its way.",
+    "use_different_email": "Use a different email",
+    "password_invalid": "Password doesn't meet the requirements below.",
+    "password_rules_title": "Your password needs",
+    "password_rules": {
+      "length": "At least 8 characters",
+      "upper": "One uppercase letter",
+      "lower": "One lowercase letter",
+      "number": "One number"
+    },
+    "rule_met": "(met)",
+    "rule_unmet": "(not met yet)",
+    "consent": "By creating an account, you agree to the {terms} and {privacy}.",
+    "terms_link": "Terms of Service",
+    "privacy_link": "Privacy Policy",
+    "captcha_required": "Complete the verification check first.",
+    "captcha_load_failed": "The verification check couldn't load. Turn off content blockers for this site, then reload.",
+    "domain": {
+      "invalid": "Enter a valid email address.",
+      "disposable": "Disposable email addresses aren't allowed.",
+      "no_domain": "This email domain doesn't exist.",
+      "no_mx": "This domain has no mail server. Check the address.",
+      "unverified": "We couldn't verify this domain. Check the address."
+    },
+    "errors": {
+      "invalid_credentials": "Email or password is incorrect.",
+      "email_not_confirmed": "Confirm your email before signing in. The link is in your inbox.",
+      "email_taken": "That email is already registered. Sign in, or reset your password if you forgot it.",
+      "weak_password": "That password is too easy to guess. Choose a longer, less common one.",
+      "same_password": "The new password must be different from your current one.",
+      "email_invalid": "Enter a valid email address.",
+      "email_required": "Email is required.",
+      "email_too_long": "Email is too long.",
+      "rate_limited": "Too many attempts. Wait a minute, then try again.",
+      "email_rate_limited": "Too many emails sent. Wait a few minutes before requesting another.",
+      "captcha_failed": "Verification failed. Complete the check again.",
+      "signup_disabled": "New sign-ups are closed right now.",
+      "link_invalid": "This link is invalid or has expired. Request a new one.",
+      "session_missing": "Your session has ended. Sign in again.",
+      "network": "Can't reach the server. Check your connection and try again.",
+      "server": "Something went wrong on our side. Try again in a moment.",
+      "unknown": "Something went wrong. Try again."
+    }
   },
   "career_page": {
     "applied_on": "Applied",
@@ -180,23 +245,27 @@ export const en = {
       "reviewing": "Reviewing"
     },
     "stats_labels": {
-      "avg": "Avg.",
       "avgToInterview": "Avg. to interview",
       "interviewRate": "Interview rate",
-      "intv": "Intv.",
-      "offer": "Offer",
       "offerRate": "Offer rate",
-      "resp": "Resp.",
-      "responseRate": "Response rate"
+      "responseRate": "Response rate",
+      "closed": "Closed"
     },
     "tabs": {
       "active": "Active",
       "all": "All",
       "closed": "Closed",
-      "interview": "Interview"
+      "interview": "Interview",
+      "applications": "Applications"
     },
     "title": "Career",
-    "title_highlight": ""
+    "insights": {
+      "stale": "No new application in {days} days.",
+      "no_active": "No application is in progress. Add a new one to keep the pipeline moving.",
+      "low_response": "Only {rate}% of applications got a reply. Consider updating your resume or cover letter.",
+      "low_interview": "{rate}% of applications reached an interview. Try roles that match your skills more closely.",
+      "offers": "You have {count} offer(s) waiting for a decision."
+    }
   },
   "common": {
     "cancel": "Cancel",
@@ -316,7 +385,7 @@ export const en = {
     "view_all": "View all",
     "view_all_tasks": "View all {count} tasks",
     "view_schedule": "View schedule",
-    "vitality_this_week": "Vitality this week",
+    "vitality_this_week": "Sport this week",
     "welcome_back": "Welcome back",
     "load_failed": "Some dashboard sections could not be loaded.",
     "section_load_failed": "Could not load this section.",
@@ -503,13 +572,12 @@ export const en = {
     "trend": {
       "vsLastMonth": "vs last month"
     },
-    "wallet": "Wallet"
+    "wallet": "Wallet",
+    "receipt_image_alt": "Photo of the scanned receipt"
   },
   "insights_page": {
     "ai_generic_error": "Failed to generate insights.",
     "ai_timeout_error": "Request timeout. Generation is taking too long — please try again.",
-    "architect_perspective_desc": "Keep logging to see long-term patterns.",
-    "architect_perspective_title": "Summary",
     "ask_ai": "Generate insights",
     "delete_insight": "Delete insight",
     "desc": "Discover patterns and signals in your data.",
@@ -518,9 +586,10 @@ export const en = {
     "reset_insights": "Clear all",
     "reset_insights_confirm": "Are you sure you want to permanently clear all previous insights?",
     "resetting": "Clearing...",
-    "system_idle": "Ready",
     "thinking": "Thinking...",
-    "title": "Insights"
+    "title": "Insights",
+    "footer_note": "Keep logging to see long-term patterns.",
+    "load_failed": "Saved insights could not be loaded."
   },
   "investment_page": {
     "add_first_position": "Add first position",
@@ -603,7 +672,8 @@ export const en = {
     "unrealized_pl": "P/L",
     "update_label": "update",
     "update_position_upper": "Save",
-    "value": "Value"
+    "value": "Value",
+    "price_stale": "Price not synced yet"
   },
   "life_score": {
     "dimensions": {
@@ -644,8 +714,6 @@ export const en = {
     "all_sub_off_warning": "All sub-features are turned off — module has no visible content",
     "career_desc": "Track job applications, interviews, and opportunities",
     "description": "Enable or disable modules to customize your experience. Disabled modules will not appear in the navigation or dashboard.",
-    "disabled_count": "Disabled modules",
-    "enabled_count": "Enabled modules",
     "finance_desc": "Track income and expenses, manage budgets",
     "insights_desc": "AI-powered analytics and recommendations",
     "investments_desc": "Portfolio tracking and investment insights",
@@ -656,7 +724,8 @@ export const en = {
     "timeline_daily_checklist": "Tasks",
     "timeline_desc": "Daily activities and schedule management",
     "timeline_weekly_log": "Weekly log",
-    "title": "Active modules"
+    "title": "Active modules",
+    "count_summary": "{on} of {total} modules on"
   },
   "nav": {
     "cancel": "Cancel",
@@ -760,7 +829,10 @@ export const en = {
     "title_highlight": "",
     "title_required": "Title is required",
     "weekly_focus": "Weekly focus",
-    "weekly_focus_desc": "You have {count} pending reminders this week."
+    "weekly_focus_desc": "You have {count} pending reminders this week.",
+    "view_label": "View",
+    "view_calendar": "Calendar view",
+    "view_list": "List view"
   },
   "settings": {
     "alerts": {
@@ -923,5 +995,11 @@ export const en = {
     "title": "Schedule",
     "today_timeline": "Today's schedule",
     "weekly_log": "Weekly log"
+  },
+  "pwa": {
+    "install_title": "Install TRASON",
+    "install_desc": "Add it to your home screen. It opens full-screen, like any other app.",
+    "install": "Install",
+    "not_now": "Not now"
   }
 };
