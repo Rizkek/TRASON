@@ -8,6 +8,10 @@ import { Placeholder } from '@/components/ui/Placeholder';
 import { ArrowRight } from '@phosphor-icons/react';
 import { Reminder } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useNow } from '@/hooks/useNow';
+import { formatReminderDue } from '@/libs/format';
+import { getReminderDueAt, isReminderActive } from '@/libs/notificationLogic';
 
 interface UpNextCardProps {
   reminders: Reminder[];
@@ -16,22 +20,21 @@ interface UpNextCardProps {
 
 const MAX_SHOWN = 4;
 
+const dueTimestamp = (reminder: Reminder) => getReminderDueAt(reminder)?.getTime() ?? Infinity;
+
 export const UpNextCard: React.FC<UpNextCardProps> = ({ reminders, isLoading }) => {
   const { t } = useTranslation();
+  const { locale, timezone } = useUserPreferences();
+  const now = useNow();
 
-  const upcoming = useMemo(() => {
-    if (!reminders || reminders.length === 0) return [];
-
-    return reminders
-      .filter((r) => r.status !== 'completed' && r.status !== 'cancelled')
-      .sort((a, b) => {
-        const dateA = a.due_date || '9999-12-31';
-        const dateB = b.due_date || '9999-12-31';
-        if (dateA !== dateB) return dateA.localeCompare(dateB);
-        return (a.due_time || '23:59').localeCompare(b.due_time || '23:59');
-      })
-      .slice(0, MAX_SHOWN);
-  }, [reminders]);
+  const upcoming = useMemo(
+    () =>
+      (reminders ?? [])
+        .filter((r) => isReminderActive(now, r))
+        .sort((a, b) => dueTimestamp(a) - dueTimestamp(b))
+        .slice(0, MAX_SHOWN),
+    [reminders, now]
+  );
 
   return (
     <Card className="p-4 md:p-6">
@@ -57,29 +60,36 @@ export const UpNextCard: React.FC<UpNextCardProps> = ({ reminders, isLoading }) 
         <Paragraph className="py-4 text-center text-body-md text-muted-foreground">{t('dashboard.up_next_empty')}</Paragraph>
       ) : (
         <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          {upcoming.map((reminder) => (
-            <li
-              key={reminder.id}
-              className="flex min-w-0 items-center gap-3 rounded-lg border border-foreground/10 bg-foreground/[0.03] p-3"
-            >
-              <span className="shrink-0 rounded bg-primary/15 px-2 py-1 font-mono text-xs font-bold text-primary">
-                {reminder.due_time || t('dashboard.today')}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-body-md font-medium text-foreground" title={reminder.title}>
-                  {reminder.title}
-                </p>
-                {reminder.description && (
-                  <p className="truncate text-xs text-muted-foreground">{reminder.description}</p>
-                )}
-              </div>
-              {reminder.priority === 'high' && (
-                <span className="shrink-0 rounded-full bg-danger/15 px-2 py-0.5 text-xs font-medium text-danger">
-                  {t('dashboard.high_priority')}
-                </span>
-              )}
-            </li>
-          ))}
+          {upcoming.map((reminder) => {
+            const dueLabel = formatReminderDue(reminder, locale, timezone, now);
+            return (
+              <li
+                key={reminder.id}
+                className="flex min-w-0 flex-col gap-2 rounded-lg border border-foreground/10 bg-foreground/[0.03] p-3"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  {dueLabel && (
+                    <span className="rounded bg-primary/15 px-2 py-1 font-mono text-xs font-bold text-primary">
+                      {dueLabel}
+                    </span>
+                  )}
+                  {reminder.priority === 'high' && (
+                    <span className="rounded-full bg-danger/15 px-2 py-0.5 text-xs font-medium text-danger">
+                      {t('dashboard.high_priority')}
+                    </span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-body-md font-medium text-foreground" title={reminder.title}>
+                    {reminder.title}
+                  </p>
+                  {reminder.description && (
+                    <p className="truncate text-xs text-muted-foreground">{reminder.description}</p>
+                  )}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </Card>

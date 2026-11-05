@@ -10,6 +10,8 @@ import { Activity, Reminder } from '@/services/supabase/supabaseClient';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useReminder } from '@/hooks/useReminder';
+import { useNow } from '@/hooks/useNow';
+import { isReminderActive } from '@/libs/notificationLogic';
 import { Calendar, ListChecks } from '@phosphor-icons/react';
 import {
   getCurrentWeekBounds,
@@ -36,6 +38,7 @@ export function TimelineClient() {
     weekEnd
   );
   const { reminders } = useReminder(weekStart, weekEnd);
+  const now = useNow();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -278,7 +281,7 @@ export function TimelineClient() {
   });
 
   reminders.forEach((rem) => {
-    if (!rem.due_date || rem.status === 'completed' || rem.status === 'cancelled') return;
+    if (!rem.due_date || !isReminderActive(now, rem)) return;
     const remDate = new Date(rem.due_date);
     const dayIdx = daysOfWeek.findIndex((d) => d.toDateString() === remDate.toDateString());
     if (dayIdx >= 0) {

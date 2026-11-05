@@ -49,10 +49,15 @@ export const useReminder = (startDate?: Date, endDate?: Date): UseReminderReturn
     SWR_CONFIG_DASHBOARD
   );
 
-  // One refetch per mutation: `mutate` refreshes the shared reminders key for every hook instance, and the
-  // dashboard overview is the only other cache that depends on reminders.
+  // One refetch per mutation: `mutate` refreshes the shared reminders key for every hook instance. Schedule's
+  // range keys are usually unmounted here and revalidateIfStale is off, so they are cleared to refetch on next mount.
   const revalidateReminders = useCallback(
-    () => Promise.all([mutate(), globalMutate(CACHE_KEYS.dashboard.overview)]),
+    () =>
+      Promise.all([
+        mutate(),
+        globalMutate((k) => Array.isArray(k) && k[0] === 'reminders' && k[1] === 'range', undefined, { revalidate: true }),
+        globalMutate(CACHE_KEYS.dashboard.overview),
+      ]),
     [mutate]
   );
 

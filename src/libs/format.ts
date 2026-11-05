@@ -1,3 +1,5 @@
+import { getReminderDueAt } from './notificationLogic';
+
 export const formatCurrency = (amount: number, currency = 'USD', locale = 'en-US'): string => {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
@@ -56,5 +58,34 @@ export const getLocalISODate = (date: Date = new Date(), timezone?: string): str
   });
   
   return formatter.format(date);
+};
+
+/**
+ * Due date and time of a reminder, or null when it has none. With `now`, the parts the reader can
+ * assume are dropped: the date on the same day and the year within the same year. Without `now`
+ * the full date is shown, which is what a history entry needs.
+ */
+export const formatReminderDue = (
+  reminder: { due_datetime?: string | null; due_date?: string | null; due_time?: string | null },
+  locale: string,
+  timezone?: string,
+  now?: Date,
+): string | null => {
+  const dueAt = getReminderDueAt(reminder);
+  if (!dueAt) return null;
+
+  const dueDay = getLocalISODate(dueAt, timezone);
+  const today = now ? getLocalISODate(now, timezone) : null;
+  const hasTime = Boolean(reminder.due_datetime || reminder.due_time);
+
+  return dueAt.toLocaleString(locale, {
+    ...((dueDay !== today || !hasTime) && {
+      day: 'numeric',
+      month: 'short',
+      ...(dueDay.slice(0, 4) !== today?.slice(0, 4) && { year: 'numeric' }),
+    }),
+    ...(hasTime && { hour: '2-digit', minute: '2-digit' }),
+    timeZone: timezone,
+  });
 };
 

@@ -24,7 +24,7 @@ Pengguna biasanya memakai satu aplikasi untuk pengeluaran, satu untuk daftar har
 4. **Schedule** (`timeline`)
    - Weekly Log: aktivitas per minggu dengan durasi, kategori, dan catatan.
    - Daily Checklist: kebiasaan harian yang di-reset menurut timezone profil.
-5. **Reminders**: pengingat dengan waktu jatuh tempo, notifikasi web-push pada beberapa waktu sebelum jatuh tempo, tab Active (judul, waktu, prioritas) dan History (read-only). Reminder dengan waktu lampau ditolak.
+5. **Reminders**: pengingat dengan waktu jatuh tempo, notifikasi web-push pada beberapa waktu sebelum jatuh tempo, tab Active (judul, waktu, prioritas) dan History (status Selesai atau Terlewat). Reminder bisa ditandai selesai dan dibatalkan lagi dari History. Reminder di History hanya tampil di tab itu: kalender, panel tanggal, Up Next, dan Schedule hanya memuat reminder aktif (`isReminderActive` di `libs/notificationLogic.ts`). Reminder dengan waktu lampau ditolak.
 6. **Sport**: rencana latihan, sesi, dan personal records.
 7. **Career**: pipeline lamaran (Applied, Interview, Accepted, Rejected, Withdrawn), interview journal, dan resume match.
 8. **Insights**: ringkasan yang dibuat saat diminta, dengan Life Score dan data aturan sebagai dasar.

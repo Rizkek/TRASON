@@ -1,8 +1,11 @@
 import {
   getDueNotifications,
   getLocalDateHour,
+  getReminderDueAt,
   hasDueTimePassed,
   hasUpcomingNotification,
+  isReminderActive,
+  isReminderInHistory,
   isReminderPastDue,
   shouldSendTaskReminder,
 } from '@/libs/notificationLogic';
@@ -61,6 +64,45 @@ describe('isReminderPastDue', () => {
 
   it('keeps future reminders active', () => {
     expect(isReminderPastDue(now, { due_datetime: '2026-10-03T10:00:01.000Z' })).toBe(false);
+  });
+});
+
+describe('getReminderDueAt', () => {
+  it('prefers due_datetime over the date and time fields', () => {
+    const dueAt = getReminderDueAt({ due_datetime: '2026-10-03T10:00:00.000Z', due_date: '2020-01-01', due_time: '08:00' });
+    expect(dueAt?.toISOString()).toBe('2026-10-03T10:00:00.000Z');
+  });
+
+  it('falls back to the end of the day when only a date is stored', () => {
+    expect(getReminderDueAt({ due_date: '2026-10-03' })).toEqual(new Date(2026, 9, 3, 23, 59, 59));
+  });
+
+  it('returns null for a missing or invalid due time', () => {
+    expect(getReminderDueAt({})).toBeNull();
+    expect(getReminderDueAt({ due_datetime: 'not-a-date' })).toBeNull();
+  });
+});
+
+describe('reminder active and history rules', () => {
+  const now = new Date('2026-10-03T10:00:00.000Z');
+  const future = '2026-10-03T11:00:00.000Z';
+  const past = '2026-10-03T09:00:00.000Z';
+
+  it.each([
+    { status: 'pending', due_datetime: future, active: true, history: false },
+    { status: 'pending', due_datetime: past, active: false, history: true },
+    { status: 'completed', due_datetime: future, active: false, history: true },
+    { status: 'completed', due_datetime: past, active: false, history: true },
+    { status: 'cancelled', due_datetime: future, active: false, history: false },
+    { status: 'cancelled', due_datetime: past, active: false, history: false },
+  ])('$status due at $due_datetime', ({ active, history, ...reminder }) => {
+    expect(isReminderActive(now, reminder)).toBe(active);
+    expect(isReminderInHistory(now, reminder)).toBe(history);
+  });
+
+  it('keeps a pending reminder without a due time active', () => {
+    expect(isReminderActive(now, { status: 'pending' })).toBe(true);
+    expect(isReminderInHistory(now, { status: 'pending' })).toBe(false);
   });
 });
 

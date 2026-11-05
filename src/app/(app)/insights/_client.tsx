@@ -15,6 +15,7 @@ import { useActivity } from '@/hooks/useActivity';
 import { Lightbulb, Target, ChartBar, Calendar, Stack, Trash as Trash2, ArrowCounterClockwise, ArrowsClockwise } from '@phosphor-icons/react';
 import { formatDate } from '@/libs/format';
 import { getProfileToday } from '@/libs/profileDate';
+import { isReminderActive } from '@/libs/notificationLogic';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 
@@ -107,8 +108,9 @@ export function InsightsClient() {
       const topSport = sportSummary?.topActivity || 'None';
 
       // 3. Reminders Context
-      const pendingCount = pendingReminders?.length || 0;
-      const highPriorityReminders = pendingReminders?.filter((r: any) => r.priority === 'high') || [];
+      const activeReminders = pendingReminders?.filter((r) => isReminderActive(now, r)) || [];
+      const pendingCount = activeReminders.length;
+      const highPriorityReminders = activeReminders.filter((r) => r.priority === 'high');
 
       // 4. Career Context
       const appliedCount = careerStats?.applied || 0;

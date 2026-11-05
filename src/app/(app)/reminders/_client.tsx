@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Button, Loading, Placeholder, Modal, NoticeModal, InlineError, Input, ErrorAlert, Calendar as CalendarUI, DatePicker } from '@/components';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Button, Loading, Placeholder, Modal, NoticeModal, ConfirmModal, InlineError, Input, ErrorAlert, Calendar as CalendarUI, DatePicker } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useReminder } from '@/hooks/useReminder';
 
@@ -10,12 +10,13 @@ import { ApiError } from '@/libs/apiErrors';
 import { Reminder } from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Bell, BellSlash as BellOff, Clock, Plus, Trash as Trash2, PencilSimple as Edit2, List, Calendar as CalendarIcon, Check } from '@phosphor-icons/react';
-import { getLocalISODate } from '@/libs/format';
+import { Bell, BellSlash as BellOff, Clock, Plus, Trash as Trash2, PencilSimple as Edit2, List, Calendar as CalendarIcon, Check, ArrowCounterClockwise } from '@phosphor-icons/react';
+import { formatReminderDue, getLocalISODate } from '@/libs/format';
 import { formatDateOnly } from '@/libs/date';
 import { useHolidays } from '@/hooks/useHolidays';
+import { useNow } from '@/hooks/useNow';
 import { Heading, Paragraph } from '@/components/ui/typography';
-import { hasUpcomingNotification, isReminderPastDue } from '@/libs/notificationLogic';
+import { hasUpcomingNotification, isReminderActive, isReminderInHistory } from '@/libs/notificationLogic';
 import { AppPageHeader } from '@/components/layout/AppPageHeader';
 
 
@@ -30,27 +31,22 @@ export function RemindersClient() {
 
   const [view, setView] = useState<'calendar' | 'list'>('calendar');
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [now, setNow] = useState(() => new Date());
+  const now = useNow();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isPastDueNoticeOpen, setIsPastDueNoticeOpen] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Reminder | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const remindersActiveEnabled = module_features?.['reminders_active'] !== false;
   const remindersHistoryEnabled = module_features?.['reminders_history'] !== false;
 
-  useEffect(() => {
-    const interval = window.setInterval(() => setNow(new Date()), 60_000);
-    return () => window.clearInterval(interval);
-  }, []);
-
-  const isReminderInHistory = (reminder: Reminder) =>
-    reminder.status === 'completed' ||
-    (reminder.status === 'pending' && isReminderPastDue(now, reminder));
-  const isReminderActive = (reminder: Reminder) =>
-    reminder.status === 'pending' && !isReminderPastDue(now, reminder);
+  const activeReminders = useMemo(() => reminders.filter((r) => isReminderActive(now, r)), [reminders, now]);
+  const historyReminders = useMemo(() => reminders.filter((r) => isReminderInHistory(now, r)), [reminders, now]);
 
   // Default filter based on which sub-features are on
   const defaultFilter: 'active' | 'history' = remindersActiveEnabled ? 'active' : 'history';
@@ -105,7 +101,7 @@ export function RemindersClient() {
   };
 
   // Tapping a day goes straight to the form for that day. Past days only select, since a reminder
-  // in the past is refused; their reminders stay readable in the side panel.
+  // in the past is refused; what happened on them is in the History tab.
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
     if (formatDateOnly(date) >= formatDateOnly(new Date())) openAddModal(date);
@@ -225,16 +221,44 @@ export function RemindersClient() {
     }
   };
 
-  const formatReminderTime = (reminder: Reminder, withDate: boolean) => {
-    const raw = reminder.due_datetime || reminder.due_date;
-    const date = raw ? new Date(raw) : null;
-    if (!date || isNaN(date.getTime())) return '—';
-    return date.toLocaleString(locale, {
-      ...(withDate && { day: 'numeric', month: 'short', year: 'numeric' }),
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: timezone || 'UTC',
-    });
+  const setReminderStatus = async (id: string, status: Reminder['status']) => {
+    setActionError(null);
+    try {
+      await updateReminder(id, { status });
+    } catch (err) {
+      setActionError(sanitizeError(err));
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    setActionError(null);
+    try {
+      await deleteReminder(deleteTarget.id);
+    } catch (err) {
+      setActionError(sanitizeError(err));
+    } finally {
+      setIsDeleting(false);
+      setDeleteTarget(null);
+    }
+  };
+
+  // Completing a reminder moves it out of sight, so the same control in History has to undo it.
+  const renderStatusAction = (reminder: Reminder) => {
+    const isCompleted = reminder.status === 'completed';
+    const label = t(isCompleted ? 'reminders_page.mark_not_done' : 'reminders_page.mark_done');
+    return (
+      <Button
+        variant="ghost"
+        onClick={() => setReminderStatus(reminder.id, isCompleted ? 'pending' : 'completed')}
+        aria-label={label}
+        title={label}
+        className="h-11 w-11 shrink-0 px-0 text-muted-foreground hover:text-success"
+      >
+        {isCompleted ? <ArrowCounterClockwise size={18} aria-hidden="true" /> : <Check size={18} aria-hidden="true" />}
+      </Button>
+    );
   };
 
   if (authLoading) return (
@@ -243,7 +267,9 @@ export function RemindersClient() {
     </>
   );
 
-  const selectedDateReminders = reminders.filter(r => {
+  const listedReminders = filter === 'active' ? activeReminders : historyReminders;
+
+  const selectedDateReminders = activeReminders.filter(r => {
     const eventDateStr = r.due_date || (r.due_datetime ? r.due_datetime.split('T')[0] : '');
     const selectedDateStr = selectedDate.getFullYear() + '-' + 
       String(selectedDate.getMonth() + 1).padStart(2, '0') + '-' + 
@@ -257,6 +283,7 @@ export function RemindersClient() {
         {loadError && (
           <InlineError message={loadError} onRetry={() => refreshReminders()} retryLabel={t('common.try_again')} />
         )}
+        {actionError && <ErrorAlert error={actionError} onDismiss={() => setActionError(null)} />}
         <AppPageHeader
           title={t('reminders_page.title')}
           description={t('reminders_page.desc')}
@@ -290,15 +317,15 @@ export function RemindersClient() {
           }
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <div className="grid grid-cols-1 gap-8 xl:grid-cols-12 xl:gap-12">
           {/* Main View */}
-          <div className="lg:col-span-8">
+          <div className="xl:col-span-8">
             {/* Calendar view only available when reminders_active is on */}
             {view === 'calendar' && remindersActiveEnabled ? (
               <CalendarUI 
                 selectedDate={selectedDate} 
                 onDateSelect={handleDateSelect} 
-                events={reminders}
+                events={activeReminders}
                 locale={locale}
                 holidays={holidays}
               />
@@ -335,7 +362,7 @@ export function RemindersClient() {
                     <Placeholder className="h-24 w-full" />
                   </div>
                 ) : ((filter === 'active' && remindersActiveEnabled) || (filter === 'history' && remindersHistoryEnabled)) && (
-                  reminders.filter(r => filter === 'active' ? isReminderActive(r) : isReminderInHistory(r)).length === 0 ? (
+                  listedReminders.length === 0 ? (
                     <div className="glass-card p-10 sm:p-16 text-center space-y-4">
                       <Bell size={48} className="mx-auto text-deep-sage opacity-20" />
                       <Paragraph className="text-muted-foreground font-light italic">
@@ -343,9 +370,7 @@ export function RemindersClient() {
                       </Paragraph>
                     </div>
                   ) : (
-                    reminders
-                      .filter(r => filter === 'active' ? isReminderActive(r) : isReminderInHistory(r))
-                      .map(reminder => (
+                    listedReminders.map(reminder => (
                       <div key={reminder.id} className="glass-card p-5 md:p-8 flex items-center justify-between gap-4">
                         <div className="min-w-0 space-y-1">
                           <Heading as="h4" size="h4" className="text-lg font-medium break-words">{reminder.title}</Heading>
@@ -354,25 +379,30 @@ export function RemindersClient() {
                           )}
                           <div className="flex items-center gap-3 text-micro text-muted-foreground uppercase tracking-widest">
                             <Clock size={12} />
-                            <span>{formatReminderTime(reminder, filter === 'history')}</span>
-                            {filter === 'active' && (
-                              <>
-                                <span>•</span>
-                                <span className={reminder.priority === 'high' ? 'text-expense font-bold' : ''}>{t(`career_page.form.options.${reminder.priority}`)}</span>
-                              </>
+                            <span>{formatReminderDue(reminder, locale, timezone, filter === 'active' ? now : undefined) ?? '—'}</span>
+                            <span>•</span>
+                            {filter === 'active' ? (
+                              <span className={reminder.priority === 'high' ? 'text-expense font-bold' : ''}>{t(`career_page.form.options.${reminder.priority}`)}</span>
+                            ) : (
+                              <span className={reminder.status === 'completed' ? 'text-success' : 'text-warning'}>
+                                {t(reminder.status === 'completed' ? 'reminders_page.status_completed' : 'reminders_page.status_missed')}
+                              </span>
                             )}
                           </div>
                         </div>
-                        {filter === 'active' && (
-                          <div className="flex items-center gap-1 flex-shrink-0">
-                            <button onClick={() => openEditModal(reminder)} aria-label={t('common.edit')} className="text-muted-foreground hover:text-primary p-3">
-                              <Edit2 size={18} />
-                            </button>
-                            <button onClick={() => deleteReminder(reminder.id)} aria-label={t('common.delete')} className="text-muted-foreground hover:text-expense p-3">
-                              <Trash2 size={18} />
-                            </button>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          {renderStatusAction(reminder)}
+                          {filter === 'active' && (
+                            <>
+                              <button onClick={() => openEditModal(reminder)} aria-label={t('common.edit')} className="text-muted-foreground hover:text-primary p-3">
+                                <Edit2 size={18} />
+                              </button>
+                              <button onClick={() => setDeleteTarget(reminder)} aria-label={t('common.delete')} className="text-muted-foreground hover:text-expense p-3">
+                                <Trash2 size={18} />
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
                     ))
                   )
@@ -382,7 +412,7 @@ export function RemindersClient() {
           </div>
 
           {/* Side Panel: Selected Date Details */}
-          <div className="lg:col-span-4 space-y-8">
+          <div className="xl:col-span-4 space-y-8">
              <div className="glass-card p-5 md:p-8 border-primary/10">
                 <Heading as="h3" size="h3" className="font-sans font-bold tracking-tight text-xl mb-8">
                   {selectedDate.toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' })}
@@ -404,7 +434,10 @@ export function RemindersClient() {
                           </span>
                           <span className="text-micro text-muted-foreground">{r.due_time}</span>
                         </div>
-                        <Paragraph className="text-sm font-medium">{r.title}</Paragraph>
+                        <div className="flex items-start justify-between gap-2">
+                          <Paragraph className="min-w-0 break-words text-sm font-medium">{r.title}</Paragraph>
+                          {renderStatusAction(r)}
+                        </div>
                       </div>
                     ))
                   )}
@@ -423,7 +456,7 @@ export function RemindersClient() {
                 <Heading as="h4" size="h4" className="text-micro uppercase tracking-[0.3em] text-deep-sage font-bold mb-4">{t('reminders_page.weekly_focus')}</Heading>
                 <Paragraph className="text-sm font-light text-subtle leading-relaxed">
                   {t('reminders_page.weekly_focus_desc').split('{count}').map((part, i, arr) => 
-                    i === arr.length - 1 ? part : <React.Fragment key={i}>{part}<span className="text-primary font-bold">{reminders.filter(isReminderActive).length}</span></React.Fragment>
+                    i === arr.length - 1 ? part : <React.Fragment key={i}>{part}<span className="text-primary font-bold">{activeReminders.length}</span></React.Fragment>
                   )}
                 </Paragraph>
              </div>
@@ -437,6 +470,18 @@ export function RemindersClient() {
         title={t('reminders_page.past_due_title')}
         message={t('reminders_page.past_due_message')}
         buttonText={t('reminders_page.past_due_ok')}
+      />
+
+      <ConfirmModal
+        isOpen={deleteTarget !== null}
+        onClose={() => !isDeleting && setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        title={t('reminders_page.delete_title')}
+        description={t('reminders_page.delete_desc')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
+        isDangerous
+        isLoading={isDeleting}
       />
 
       {/* Add/Edit Modal */}

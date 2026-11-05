@@ -57,17 +57,32 @@ export function hasUpcomingNotification(
   return minutesList.some((minutes) => due - minutes * 60_000 > now.getTime());
 }
 
-export function isReminderPastDue(
-  now: Date,
-  reminder: { due_datetime?: string | null; due_date?: string | null; due_time?: string | null },
-): boolean {
+type ReminderDue = { due_datetime?: string | null; due_date?: string | null; due_time?: string | null };
+type ReminderState = ReminderDue & { status: string };
+
+export function getReminderDueAt(reminder: ReminderDue): Date | null {
   const dueAt = reminder.due_datetime
     ? new Date(reminder.due_datetime)
     : reminder.due_date
       ? new Date(`${reminder.due_date}T${reminder.due_time || '23:59:59'}`)
       : null;
 
-  return dueAt !== null && !Number.isNaN(dueAt.getTime()) && dueAt.getTime() <= now.getTime();
+  return dueAt && !Number.isNaN(dueAt.getTime()) ? dueAt : null;
+}
+
+export function isReminderPastDue(now: Date, reminder: ReminderDue): boolean {
+  const dueAt = getReminderDueAt(reminder);
+  return dueAt !== null && dueAt.getTime() <= now.getTime();
+}
+
+// Passing the due time never changes the stored status, so a missed reminder is still 'pending'.
+// Every surface must use these two rules rather than reading `status` alone.
+export function isReminderActive(now: Date, reminder: ReminderState): boolean {
+  return reminder.status === 'pending' && !isReminderPastDue(now, reminder);
+}
+
+export function isReminderInHistory(now: Date, reminder: ReminderState): boolean {
+  return reminder.status === 'completed' || (reminder.status === 'pending' && isReminderPastDue(now, reminder));
 }
 
 /**
