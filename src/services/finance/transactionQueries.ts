@@ -53,7 +53,6 @@ export const transactionQueries = {
   ) {
     try {
   return await withAuthQuery(async (userId) => {
-    console.log('[transactionQueries] createTransaction input:', { amount: transaction.amount, category_id: transaction.category_id, currency: transaction.original_currency });
   const { data, error } = await supabase
           .from('transactions')
           .insert([{ ...transaction, user_id: userId }])
@@ -64,7 +63,6 @@ export const transactionQueries = {
           )
           .single();
   if (error) throw error;
-  console.log('[transactionQueries] createTransaction result:', { amount: data?.amount, category_id: data?.category_id, categories: data?.categories });
   return data;
   });
   } catch (err) {
@@ -80,7 +78,6 @@ export const transactionQueries = {
   ) {
     try {
       return await withAuthQuery(async (userId) => {
-        console.log('[transactionQueries] updateTransaction input:', { id, amount: updates.amount, category_id: updates.category_id });
         const { data, error } = await supabase
           .from('transactions')
           .update({ ...updates, updated_at: new Date().toISOString() })
@@ -93,7 +90,6 @@ export const transactionQueries = {
           )
           .single();
         if (error) throw error;
-        console.log('[transactionQueries] updateTransaction result:', { amount: data?.amount, category_id: data?.category_id, categories: data?.categories });
         return data;
       });
     } catch (err) {

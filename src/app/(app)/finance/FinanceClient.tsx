@@ -187,16 +187,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
       }
     };
 
-    console.log('[Finance] handleSave payload:', {
-      form_amount_raw: form.amount,
-      raw_parsed: rawAmount,
-      safe_rounded: safeAmount,
-      category_id: form.category_id || null,
-      exchange_rate: exchangeRate,
-      original_currency: form.original_currency,
-      isEdit: !!editingTransaction,
-    });
-
     if (!editingTransaction && !ignoreDuplicates) {
       const matches = detectDuplicates(
         {
