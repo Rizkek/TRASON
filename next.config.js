@@ -88,8 +88,9 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            // challenges.cloudflare.com serves the Turnstile bot check on the auth pages.
-            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://challenges.cloudflare.com;",
+            // challenges.cloudflare.com serves the Turnstile bot check on the auth pages;
+            // va.vercel-scripts.com is where Speed Insights loads its debug script in development.
+            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://challenges.cloudflare.com https://va.vercel-scripts.com;",
           },
           {
             key: 'X-Content-Type-Options',
