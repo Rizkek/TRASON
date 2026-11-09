@@ -72,7 +72,7 @@ Kolom utama: `title`, `amount` (> 0), `type` (`income`/`expense`), `date`, `cate
 
 ### 3.5 `investment_positions`
 
-Kolom utama: `asset_type` (`stock`, `crypto`, `gold`, `property`, `debt`, `vehicle`, `other`), `symbol`, `display_name`, `amount`, `buy_price`, `buy_date`, `quote_currency`, `price_source`, `external_id`, `manual_current_price`, `last_price`, `last_price_change_pct`, `last_valued_at`, `is_active`.
+Kolom utama: `asset_type` (`stock`, `crypto`, `gold`, `property`, `debt`, `vehicle`, `other`), `symbol`, `display_name`, `amount`, `buy_price`, `buy_date`, `quote_currency`, `price_source`, `external_id`, `manual_current_price`, `last_price`, `last_price_change_pct`, `last_valued_at`, `is_active`. `quote_currency` lama selalu `USD` walau harga manualnya dalam mata uang profil; baca lewat `getPositionCurrency`, bukan langsung.
 
 ### 3.6 `push_subscriptions`, `reminder_notifications`, `task_nudges`, `cron_runs`
 
