@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthenticatedUser } from '@/utils/supabase/server';
 
 type AssetType = 'stock' | 'crypto' | 'gold';
 
@@ -267,6 +268,12 @@ const fetchGoldQuote = async (positions: PriceRequestPosition[]) => {
 };
 
 export async function POST(request: NextRequest) {
+  // The quotes cost API quota (Alpha Vantage's free key allows 25 requests a day), so only signed-in users may ask.
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
+  }
+
   try {
     const body = (await request.json()) as { positions?: PriceRequestPosition[] };
     const positions = body.positions || [];
