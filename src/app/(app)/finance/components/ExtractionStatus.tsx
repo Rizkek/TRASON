@@ -55,7 +55,7 @@ export function ExtractionStatus({ status, confidence = 0 }: Props) {
   return (
     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${config.bg} border border-foreground/5 w-fit`}>
       {config.icon}
-      <span className={`text-xs font-semibold tracking-wide ${config.textColor}`}>
+      <span className={`text-xs font-semibold ${config.textColor}`}>
         {config.text}
       </span>
       {status === 'verified' && confidence > 0 && (

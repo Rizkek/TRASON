@@ -32,7 +32,7 @@ export function InstallmentSheet({ isOpen, onClose }: InstallmentSheetProps) {
 
   const handleSave = async () => {
     if (!form.title || !form.total_amount || !form.monthly_amount || !form.total_months) {
-      setError('Mohon lengkapi semua field wajib (Judul, Total, Cicilan, Jumlah Bulan).');
+      setError(t('installments.required'));
       return;
     }
 
@@ -53,7 +53,7 @@ export function InstallmentSheet({ isOpen, onClose }: InstallmentSheetProps) {
       });
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Gagal menyimpan cicilan');
+      setError(t('installments.save_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -63,17 +63,17 @@ export function InstallmentSheet({ isOpen, onClose }: InstallmentSheetProps) {
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      title="Tambah Cicilan Baru"
+      title={t('installments.form_title')}
       footer={
         <div className="flex gap-4 justify-end">
           <Button variant="ghost" size="md" onClick={onClose} disabled={isSaving}>{t('common.cancel')}</Button>
           <Button variant="primary" onClick={handleSave} disabled={isSaving} className="w-full">
-            {isSaving ? 'Menyimpan...' : 'Simpan Cicilan'}
+            {isSaving ? t('common.saving') : t('installments.save')}
           </Button>
         </div>
       }
     >
-      <div className="space-y-6 pb-24 md:pb-6">
+      <div className="space-y-6">
         {error && (
           <div className="bg-danger/10 text-danger p-3 rounded-md text-xs">
             {error}
@@ -81,66 +81,66 @@ export function InstallmentSheet({ isOpen, onClose }: InstallmentSheetProps) {
         )}
 
         <Input
-          label="Judul / Nama Barang"
-          placeholder="mis. Motor NMAX, KPR Rumah, iPhone 15"
+          label={t('installments.title_label')}
+          placeholder={t('installments.title_placeholder')}
           value={form.title}
           onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
         />
         
         <Input
-          label="Kreditur (Leasing/Bank)"
-          placeholder="mis. BCA Finance, Adira (opsional)"
+          label={t('installments.creditor_label')}
+          placeholder={t('installments.creditor_placeholder')}
           value={form.creditor}
           onChange={(e) => setForm(f => ({ ...f, creditor: e.target.value }))}
         />
 
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Total Pinjaman/Harga"
+            label={t('installments.total_label')}
             type="text"
             inputMode="numeric"
             placeholder="0"
             value={form.total_amount}
-            onChange={(e) => setForm(f => ({ ...f, total_amount: e.target.value.replace(/\\D/g, '') }))}
+            onChange={(e) => setForm(f => ({ ...f, total_amount: e.target.value.replace(/\D/g, '') }))}
           />
           <Input
-            label="Uang Muka (DP)"
+            label={t('installments.down_payment_label')}
             type="text"
             inputMode="numeric"
-            placeholder="0 (opsional)"
+            placeholder={t('installments.down_payment_placeholder')}
             value={form.down_payment}
-            onChange={(e) => setForm(f => ({ ...f, down_payment: e.target.value.replace(/\\D/g, '') }))}
+            onChange={(e) => setForm(f => ({ ...f, down_payment: e.target.value.replace(/\D/g, '') }))}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Cicilan per Bulan"
+            label={t('installments.monthly_label')}
             type="text"
             inputMode="numeric"
             placeholder="0"
             value={form.monthly_amount}
-            onChange={(e) => setForm(f => ({ ...f, monthly_amount: e.target.value.replace(/\\D/g, '') }))}
+            onChange={(e) => setForm(f => ({ ...f, monthly_amount: e.target.value.replace(/\D/g, '') }))}
           />
           <Input
-            label="Lama Cicilan (Bulan)"
+            label={t('installments.months_label')}
             type="text"
             inputMode="numeric"
-            placeholder="mis. 12"
+            placeholder={t('installments.months_placeholder')}
             value={form.total_months}
-            onChange={(e) => setForm(f => ({ ...f, total_months: e.target.value.replace(/\\D/g, '') }))}
+            onChange={(e) => setForm(f => ({ ...f, total_months: e.target.value.replace(/\D/g, '') }))}
           />
         </div>
 
         <DatePicker
-          label="Tanggal Mulai Cicilan Pertama"
+          label={t('installments.start_date_label')}
           value={form.start_date}
           onChange={(val) => setForm(f => ({ ...f, start_date: val }))}
         />
 
         {form.monthly_amount && form.total_months && (
           <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 text-center mt-4">
-            <p className="text-xs text-primary mb-1">Total yang akan dibayarkan (di luar DP):</p>
+            <p className="text-xs text-primary mb-1">{t('installments.total_payable')}</p>
             <p className="text-lg font-bold text-foreground">
               {(Number(form.monthly_amount) * Number(form.total_months)).toLocaleString(locale)}
             </p>

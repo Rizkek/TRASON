@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import React, { useRef, useState } from 'react';
 import { Camera } from '@phosphor-icons/react';
 import { compressImage } from '@/libs/imageCompression';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function ReceiptUpload({ onUploadSuccess, onError }: Props) {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -82,7 +84,7 @@ export function ReceiptUpload({ onUploadSuccess, onError }: Props) {
       onUploadSuccess(txId);
     } catch (err: any) {
       console.error('Upload error:', err);
-      onError(err.message || 'Something went wrong during upload.');
+      onError(t('receipt.upload_failed'));
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -107,8 +109,8 @@ export function ReceiptUpload({ onUploadSuccess, onError }: Props) {
         aria-busy={isUploading}
         onClick={() => fileInputRef.current?.click()}
         className="p-3.5 h-full bg-surface border border-foreground/5 hover:border-primary/50 text-muted-foreground hover:text-primary rounded-xl flex items-center justify-center transition-colors disabled:opacity-50"
-        title="Scan Receipt"
-        aria-label="Scan Receipt"
+        title={t('receipt.scan')}
+        aria-label={t('receipt.scan')}
       >
         <Camera size={20} weight="bold" />
       </button>

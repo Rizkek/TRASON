@@ -1,3 +1,4 @@
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import React from 'react';
 import { WarningCircle, ArrowRight } from '@phosphor-icons/react';
 import { DuplicateMatch } from '@/services/finance/capture/duplicateDetector';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function DuplicateAlert({ matches, currency = 'USD', locale = 'en-US', onIgnore, onViewDuplicate }: Props) {
+  const { t } = useTranslation();
   if (matches.length === 0) return null;
 
   const topMatch = matches[0];
@@ -22,7 +24,7 @@ export function DuplicateAlert({ matches, currency = 'USD', locale = 'en-US', on
       <div className="flex items-start gap-3">
         <WarningCircle size={20} className="text-warning shrink-0 mt-0.5" weight="fill" />
         <div className="flex-1">
-          <h4 className="text-sm font-semibold text-warning mb-1">Possible Duplicate Detected</h4>
+          <h4 className="text-sm font-semibold text-warning mb-1">{t('finance_ui.duplicate_title')}</h4>
           <p className="text-xs text-muted-foreground mb-3">
             {topMatch.reason}
           </p>
@@ -42,15 +44,12 @@ export function DuplicateAlert({ matches, currency = 'USD', locale = 'en-US', on
               type="button"
               onClick={onIgnore}
               className="text-xs font-semibold text-warning hover:text-foreground transition-colors"
-            >
-              Ignore & Save Anyway
-            </button>
+            >{t('finance_ui.duplicate_ignore')}</button>
             <button
               type="button"
               onClick={() => onViewDuplicate(topMatch.transaction.id)}
               className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
-            >
-              View Existing <ArrowRight size={12} />
+            >{t('finance_ui.duplicate_view')} <ArrowRight size={12} />
             </button>
           </div>
         </div>

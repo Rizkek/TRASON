@@ -1,10 +1,14 @@
 'use client';
 
+import { EmptyState } from '@/components/ui/EmptyState';
+import { useOpeningBalance } from '@/hooks/useOpeningBalance';
+import { StatCard } from '@/components/ui/StatCard';
+import { Tabs } from '@/components/ui/Tabs';
+import { Fab } from '@/components/ui/Fab';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { Card, Button, buttonClassName, Badge, Loading, Modal, Input, ErrorAlert, InlineError, ConfirmModal, CategoryIcon, BottomSheet, DatePicker } from '@/components';
+import { Card, Button, buttonClassName, Badge, Loading, Input, ErrorAlert, InlineError, ConfirmModal, CategoryIcon, BottomSheet, DatePicker } from '@/components';
 import { AppPageHeader } from '@/components/layout/AppPageHeader';
 import { CategoryManagerModal } from './components/CategoryManagerModal';
 import { BudgetManagerModal } from './components/BudgetManagerModal';
@@ -16,7 +20,6 @@ const ReceiptUpload = dynamic(() => import('./components/ReceiptUpload').then(m 
 const DriverPayoutImport = dynamic(() => import('./components/DriverPayoutImport').then(m => m.DriverPayoutImport), { ssr: false });
 const ReceiptReviewSheet = dynamic(() => import('./components/ReceiptReviewSheet').then(m => m.ReceiptReviewSheet), { ssr: false });
 import { DuplicateAlert } from './components/DuplicateAlert';
-import { FinanceTabBar, FinanceTab } from './components/FinanceTabBar';
 import { detectDuplicates } from '@/services/finance/capture/duplicateDetector';
 import { useAuthStore } from '@/store/authStore';
 import { useTransaction } from '@/hooks/useTransaction';
@@ -26,13 +29,12 @@ import { useBudget } from '@/hooks/useBudget';
 import { useInstallment } from '@/hooks/useInstallment';
 import { validateTransaction, sanitizeError } from '@/libs/validation';
 import { Transaction, InstallmentPayment, Installment } from '@/types/database';
-import { Plus, Wallet, Funnel, MagnifyingGlass as Search, Info, Target, Swap, X, Bell, TrendUp as TrendingUp, TrendDown as TrendingDown, DotsThreeVertical as MoreVertical, ArrowUpRight, ArrowDownLeft, Calendar, ArrowsClockwise, CaretLeft as ChevronLeft, CaretRight as ChevronRight, Coins, Receipt, Bank as Landmark } from '@phosphor-icons/react';
-import { formatCurrency, formatDate, getLocalISODate } from '@/libs/format';
+import { Plus, Wallet, MagnifyingGlass as Search, Info, Calendar, CaretLeft as ChevronLeft, CaretRight as ChevronRight, Coins, Receipt } from '@phosphor-icons/react';
+import { currencyFractionDigits, formatCurrency, formatDate, getLocalISODate, roundToCurrency, sanitizeAmountInput } from '@/libs/format';
 import { fetchExchangeRates } from '@/libs/exchange';
 import { addBillingCycle, formatDateOnly, getDateRange } from '@/libs/date';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import type { CategoryJoin } from '@/types/database';
 import { DEFAULT_FINANCE_CATEGORIES } from '@/libs/defaultCategories';
 import { categoryQueries } from '@/services/activity/categoryQueries';
 import { Heading, Paragraph } from '@/components/ui/typography';
@@ -44,7 +46,6 @@ interface Props {
 }
 
 export default function FinanceClient({ initialTransactions }: Props) {
-  const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const authLoading = useAuthStore((s) => s.isLoading);
   const { t } = useTranslation();
@@ -55,9 +56,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
   
   const { start, end } = getDateRange(selectedMonth, selectedYear);
   
-  // All-time start (far in the past) to fetch carry-forward balance
-  const carryStart = new Date(2000, 0, 1);
-  const carryEnd = new Date(start.getTime() - 1); // 1ms before start of selected month
   
   const isCurrentMonth = selectedMonth === now.getMonth() && selectedYear === now.getFullYear();
   
@@ -67,13 +65,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
     undefined, 
     isCurrentMonth ? initialTransactions : undefined
   );
-  // Fetch all transactions BEFORE selected month to compute opening balance (carry-forward)
-  const { transactions: prevTransactions, isLoading: isPrevLoading } = useTransaction(carryStart, carryEnd);
-  
-  // Carry-forward: net balance of all past months
-  const carryForwardBalance = prevTransactions.reduce((sum: number, t: Transaction) => {
-    return t.type === 'income' ? sum + t.amount : sum - t.amount;
-  }, 0);
+  const { openingBalance: carryForwardBalance, isLoading: isPrevLoading } = useOpeningBalance(start);
   const { categories, mutate: mutateCategories } = useCategory();
   const { createSubscription } = useSubscription();
   const { globalBudget, budgets } = useBudget();
@@ -106,7 +98,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<FinanceTab>('transactions');
+  const [activeTab, setActiveTab] = useState<'transactions' | 'installments'>('transactions');
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   
@@ -117,8 +109,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
     category_id: '',
     date: getLocalISODate(new Date(), timezone),
     original_currency: currency || 'USD',
-    decision_notes: '',
-    expected_impact: '',
     is_recurring: false,
     billing_cycle: 'monthly' as 'monthly' | 'yearly' | 'weekly',
     source: 'manual' as 'manual' | 'text' | 'receipt' | 'import' | 'api'
@@ -167,8 +157,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
     // So 'amount' remains the original amount, but we save original_currency and exchange_rate_to_base.
     
     const rawAmount = parseFloat(form.amount);
-    // Round to avoid float precision loss in DB (PostgreSQL real/float4 has ~7 sig digits)
-    const safeAmount = Math.round(rawAmount);
+    const safeAmount = roundToCurrency(rawAmount, form.original_currency);
 
     const payload = {
       title: form.title,
@@ -180,11 +169,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
       original_amount: safeAmount,
       original_currency: form.original_currency,
       exchange_rate_to_base: exchangeRate,
-      metadata: {
-        ...(typeof editingTransaction?.metadata === 'object' ? editingTransaction.metadata : {}),
-        decision_notes: form.decision_notes || null,
-        expected_impact: form.expected_impact || null,
-      }
+      metadata: { ...(editingTransaction?.metadata ?? {}) }
     };
 
     if (!editingTransaction && !ignoreDuplicates) {
@@ -262,7 +247,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
   const handlePayInstallment = async (payment: InstallmentPayment, installment: Installment) => {
     try {
       const tx = await createTransaction({
-        title: `Cicilan: ${installment.title}`,
+        title: t('installments.tx_title').replace('{title}', installment.title),
         amount: payment.amount,
         type: 'expense' as const,
         date: getLocalISODate(new Date(), timezone),
@@ -274,7 +259,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
         await payInstallment(payment.id, tx.id);
       }
     } catch (err: any) {
-      setError(err.message || 'Gagal membayar cicilan');
+      setError(sanitizeError(err) || t('installments.pay_failed'));
     }
   };
 
@@ -288,8 +273,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
       date: getLocalISODate(new Date(), timezone),
       source: 'manual',
       original_currency: currency || 'USD',
-      decision_notes: '',
-      expected_impact: '',
       is_recurring: false,
       billing_cycle: 'monthly',
     });
@@ -317,8 +300,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
       date: parsed.date,
       source: 'text',
       original_currency: currency || 'USD',
-      decision_notes: '',
-      expected_impact: '',
       is_recurring: false,
       billing_cycle: 'monthly',
     });
@@ -336,8 +317,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
       category_id: t.category_id || '',
       date: formatDateOnly(t.date),
       original_currency: t.original_currency || currency || 'USD',
-      decision_notes: (t.metadata?.decision_notes as string) || '',
-      expected_impact: (t.metadata?.expected_impact as string) || '',
       is_recurring: false, // Editing doesn't re-create subscription
       billing_cycle: 'monthly' as 'monthly' | 'yearly' | 'weekly',
       source: (t.source as 'manual' | 'text' | 'receipt' | 'import' | 'api') || 'manual',
@@ -355,7 +334,6 @@ export default function FinanceClient({ initialTransactions }: Props) {
   
   // Closing balance = carry-forward + this month's net
   const closingBalance = carryForwardBalance + (totalIncome - totalExpense);
-  const isFirstMonth = prevTransactions.length === 0;
 
   const filteredTransactions = transactions.filter((t: Transaction) => {
     const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -394,7 +372,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
   if (authLoading) {
     return (
       <>
-        <div className="flex justify-center py-12"><Loading text="Checking your session..." /></div>
+        <div className="flex justify-center py-12"><Loading text={t('dashboard.checking_session')} /></div>
       </>
     );
   }
@@ -442,94 +420,27 @@ export default function FinanceClient({ initialTransactions }: Props) {
         </AppPageHeader>
 
         {/* --- GLOBAL OVERVIEW CARDS --- */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 w-full">
-          {/* Income */}
-          <Card className="p-2 md:p-8 relative overflow-hidden group">
-            <div className="flex items-center gap-1 mb-1 md:mb-4 text-muted-foreground">
-              <div className="p-1 bg-success/10 rounded-md shrink-0 text-success">
-                <Coins size={12} />
-              </div>
-              <Paragraph className="text-xs md:text-micro tracking-widest uppercase truncate">{t('finance.totalIncome')}</Paragraph>
-            </div>
-            <div className="flex items-end justify-between mt-2">
-              <Paragraph className="text-sm md:text-2xl font-semibold text-success truncate">
-                {isTransactionsLoading ? (
-                  <span className="text-muted-foreground">...</span>
-                ) : (
-                  formatCurrency(totalIncome, currency, locale)
-                )}
-              </Paragraph>
-            </div>
-          </Card>
-          
-          {/* Expense */}
-          <Card className="p-2 md:p-8 relative overflow-hidden group">
-            <div className="flex items-center gap-1 mb-1 md:mb-4 text-muted-foreground">
-              <div className="p-1 bg-danger/10 rounded-md shrink-0 text-danger">
-                <Receipt size={12} />
-              </div>
-              <Paragraph className="text-xs md:text-micro tracking-widest uppercase truncate">{t('finance.totalExpense')}</Paragraph>
-            </div>
-            <div className="flex items-end justify-between mt-2">
-              <Paragraph className="text-sm md:text-2xl font-semibold text-danger truncate">
-                {isTransactionsLoading ? (
-                  <span className="text-muted-foreground">...</span>
-                ) : (
-                  formatCurrency(totalExpense, currency, locale)
-                )}
-              </Paragraph>
-            </div>
-          </Card>
-
-          {/* Net Balance */}
-          <Card className="p-2 md:p-8 relative overflow-hidden group border-b-2 border-primary/20">
-            <div className="flex items-center gap-1 mb-1 md:mb-4 text-muted-foreground">
-              <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary">
-                <Landmark size={12} />
-              </div>
-              <Paragraph className="text-xs md:text-micro tracking-widest uppercase truncate">{t('finance.netBalance')}</Paragraph>
-            </div>
-            <div className="flex items-end justify-between mt-2">
-              <Paragraph className="text-sm md:text-2xl font-semibold text-foreground truncate">
-                {isTransactionsLoading ? (
-                  <span className="text-muted-foreground">...</span>
-                ) : (
-                  formatCurrency(totalIncome - totalExpense, currency, locale)
-                )}
-              </Paragraph>
-            </div>
-          </Card>
-
-          {/* Wallet / Closing Balance card — always visible */}
-          <Card className="p-2 md:p-8 relative overflow-hidden group border-b-2 border-primary/30">
-            <div className="flex items-center gap-1 mb-1 md:mb-4 text-muted-foreground">
-              <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary">
-                <Wallet size={12} />
-              </div>
-              <Paragraph className="text-xs md:text-micro tracking-widest uppercase truncate">{t('finance.wallet')}</Paragraph>
-            </div>
-            <div className="flex items-end justify-between mt-2">
-              <div className="min-w-0">
-                <Paragraph className={`text-sm md:text-2xl font-semibold truncate ${(isTransactionsLoading || isPrevLoading) ? 'text-muted-foreground' : (closingBalance >= 0 ? 'text-primary' : 'text-danger')}`}>
-                  {(isTransactionsLoading || isPrevLoading) ? (
-                    <span>...</span>
-                  ) : (
-                    formatCurrency(closingBalance, currency, locale)
-                  )}
-                </Paragraph>
-              </div>
-            </div>
-          </Card>
+        <div className="grid w-full grid-cols-2 gap-2 md:gap-4 xl:grid-cols-4">
+          <StatCard label={t('finance.totalIncome')} value={formatCurrency(totalIncome, currency, locale)} tone="income" isLoading={isTransactionsLoading} />
+          <StatCard label={t('finance.totalExpense')} value={formatCurrency(totalExpense, currency, locale)} tone="expense" isLoading={isTransactionsLoading} />
+          <StatCard label={t('finance.netBalance')} value={formatCurrency(totalIncome - totalExpense, currency, locale)} isLoading={isTransactionsLoading} />
+          <StatCard
+            label={t('finance.wallet')}
+            value={formatCurrency(closingBalance, currency, locale)}
+            tone={closingBalance >= 0 ? 'primary' : 'expense'}
+            isLoading={isTransactionsLoading || isPrevLoading}
+          />
         </div>
 
-        {/* --- TABS --- */}
-        <FinanceTabBar activeTab={activeTab} onChange={(tab) => {
-          if (tab === 'subscriptions') {
-            router.push('/finance/subscriptions');
-          } else {
-            setActiveTab(tab);
-          }
-        }} />
+        <Tabs
+          label={t('finance.title')}
+          value={activeTab}
+          onChange={setActiveTab}
+          items={[
+            { id: 'transactions', label: t('finance.tabs.transactions') },
+            { id: 'installments', label: t('finance.tabs.installments') },
+          ]}
+        />
 
         {activeTab === 'transactions' && (
           <>
@@ -546,7 +457,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
 
         {/* Budget Progress Bar */}
         {globalBudget && (
-          <div className="bg-surface border border-foreground/5 rounded-2xl p-6 relative overflow-hidden group">
+          <div className="rounded-xl border border-foreground/10 bg-surface p-5">
             <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
               <div>
                 <div className="flex items-center gap-2">
@@ -564,7 +475,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
             
             <div className="h-2 w-full bg-foreground/5 rounded-full overflow-hidden">
               <div 
-                className={`h-full rounded-full transition-all duration-1000 ${
+                className={`h-full rounded-full transition-[width] ${
                   (totalExpense / globalBudget.amount) > 0.9 ? 'bg-danger' : 
                   (totalExpense / globalBudget.amount) > 0.75 ? 'bg-warning' : 'bg-primary'
                 }`}
@@ -578,7 +489,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
         )}
 
         {!globalBudget && (
-          <div className="bg-surface border border-foreground/5 border-dashed rounded-2xl p-2 md:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div className="flex flex-col items-start justify-between gap-2 rounded-xl border border-dashed border-foreground/10 bg-surface p-4 sm:flex-row sm:items-center">
             <Paragraph className="text-xs md:text-sm text-muted-foreground flex items-center gap-2">
               <Wallet size={14} className="shrink-0" /> {t('finance.budget.no_target_set')}
             </Paragraph>
@@ -590,20 +501,20 @@ export default function FinanceClient({ initialTransactions }: Props) {
 
         {/* Category Budget Progress Bars (Predictive Budgeting) */}
         {categoryBudgets.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {categoryBudgets.map(budget => {
               const spent = categorySpending[budget.category_id!] || 0;
               const cat = categories.find(c => c.id === budget.category_id);
               const percentage = Math.min((spent / budget.amount) * 100, 100);
               
               return (
-                <div key={budget.id} className="bg-foreground/[0.02] border border-foreground/5 rounded-2xl p-4 relative overflow-hidden group">
+                <div key={budget.id} className="rounded-xl border border-foreground/10 bg-foreground/[0.02] p-4">
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-md bg-surface/40 flex items-center justify-center text-xs text-foreground">
                         <CategoryIcon name={cat?.icon || 'Box'} />
                       </div>
-                      <Heading as="h3" size="h3" className="text-xs font-medium text-foreground">{cat?.name || 'Kategori'}</Heading>
+                      <Heading as="h3" size="h3" className="text-xs font-medium text-foreground">{cat?.name || t('finance_ui.category')}</Heading>
                     </div>
                     <Paragraph className="text-xs font-mono text-muted-foreground">
                       {Math.round(percentage)}%
@@ -612,7 +523,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                   
                   <div className="h-1.5 w-full bg-foreground/5 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full rounded-full transition-all duration-1000 ${
+                      className={`h-full rounded-full transition-[width] ${
                         percentage > 90 ? 'bg-danger' : 
                         percentage > 75 ? 'bg-warning' : 'bg-primary'
                       }`}
@@ -634,47 +545,40 @@ export default function FinanceClient({ initialTransactions }: Props) {
         )}
 
 
-        <div className="hidden md:flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full md:w-96 group">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
-            <input 
-              type="text" 
+        <div className="hidden items-center justify-between gap-4 md:flex">
+          <div className="w-full max-w-sm">
+            <Input
+              aria-label={t('finance.search')}
+              leftIcon={<Search size={16} aria-hidden="true" />}
               placeholder={t('finance.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-surface/40 border border-foreground/[0.05] rounded-md text-sm focus:border-primary focus:outline-none transition-all"
             />
           </div>
-          
-          <div className="flex bg-surface/40 p-1 rounded-md border border-foreground/[0.05]">
-            {(['all', 'income', 'expense'] as const).map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setFilterType(type)}
-                className={`px-8 py-2 text-xs font-bold rounded-sm transition-all uppercase tracking-widest ${
-                  filterType === type 
-                    ? 'bg-primary text-on-primary' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {t(`finance.filter${type.charAt(0).toUpperCase() + type.slice(1)}` as any)}
-              </button>
-            ))}
-          </div>
+          <Tabs
+            variant="segmented"
+            label={t('finance.search')}
+            value={filterType}
+            onChange={setFilterType}
+            items={[
+              { id: 'all', label: t('finance.filterAll') },
+              { id: 'income', label: t('finance.filterIncome') },
+              { id: 'expense', label: t('finance.filterExpense') },
+            ]}
+          />
         </div>
 
         <div className="hidden md:block">
-          <Card className="overflow-hidden border-none ">
+          <Card className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-foreground/[0.02] border-b border-foreground/[0.05]">
-                  <th className="px-4 py-4 md:px-8 md:py-6 text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.transaction')}</th>
-                  <th className="px-4 py-4 md:px-8 md:py-6 text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.date')}</th>
-                  <th className="px-4 py-4 md:px-8 md:py-6 text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.category')}</th>
-                  <th className="px-4 py-4 md:px-8 md:py-6 text-right text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.amount')}</th>
-                  <th className="px-4 py-4 md:px-8 md:py-6 text-right text-xs font-medium text-muted-foreground tracking-widest uppercase">{t('finance.table.actions')}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-3 text-xs font-medium text-muted-foreground">{t('finance.table.transaction')}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-3 text-xs font-medium text-muted-foreground">{t('finance.table.date')}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-3 text-xs font-medium text-muted-foreground">{t('finance.table.category')}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-3 text-right text-xs font-medium text-muted-foreground">{t('finance.table.amount')}</th>
+                  <th className="px-4 py-4 md:px-8 md:py-3 text-right text-xs font-medium text-muted-foreground">{t('finance.table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-foreground/5">
@@ -683,72 +587,61 @@ export default function FinanceClient({ initialTransactions }: Props) {
                     <td colSpan={5} className="py-12 text-center"><Loading /></td>
                   </tr>
                 ) : paginatedTransactions.length > 0 ? (
-                  paginatedTransactions.map((t: Transaction) => (
+                  paginatedTransactions.map((tx: Transaction) => (
                     <tr 
-                      key={t.id} 
+                      key={tx.id} 
                       className="group hover:bg-foreground/[0.02] transition-colors cursor-pointer"
-                      onClick={() => openEditModal(t)}
+                      onClick={() => openEditModal(tx)}
                     >
-                      <td className="px-4 py-4 md:px-8 md:py-8">
+                      <td className="px-4 py-4 md:px-8 md:py-4">
                         <div className="flex items-center gap-4">
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                            t.type === 'income' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
+                            tx.type === 'income' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
                           }`}>
-                            {t.type === 'income' ? <Coins size={18} /> : <Receipt size={18} />}
+                            {tx.type === 'income' ? <Coins size={18} /> : <Receipt size={18} />}
                           </div>
                           <div>
-                            <Paragraph className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors underline-offset-4 decoration-primary">{t.title}</Paragraph>
+                            <Paragraph className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors underline-offset-4 decoration-primary">{tx.title}</Paragraph>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-4 md:px-8 md:py-8">
+                      <td className="px-4 py-4 md:px-8 md:py-4">
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <Calendar size={12} />
-                          <span className="text-xs font-medium">{formatDate(t.date)}</span>
+                          <span className="text-xs font-medium">{formatDate(tx.date)}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-4 md:px-8 md:py-8">
-                        <Badge variant={t.type === 'income' ? 'success' : 'danger'} size="sm">
-                          {resolveCategory(t.categories)?.name || 'Uncategorized'}
+                      <td className="px-4 py-4 md:px-8 md:py-4">
+                        <Badge variant={tx.type === 'income' ? 'success' : 'danger'} size="sm">
+                          {resolveCategory(tx.categories)?.name || t('finance_ui.uncategorized')}
                         </Badge>
                       </td>
-                      <td className="px-4 py-4 md:px-8 md:py-8 text-right">
-                        <Paragraph className={`text-sm font-semibold ${t.type === 'income' ? 'text-success' : 'text-foreground'}`}>
-                          {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount, t.original_currency || currency, locale)}
+                      <td className="px-4 py-4 md:px-8 md:py-4 text-right">
+                        <Paragraph className={`text-sm font-semibold ${tx.type === 'income' ? 'text-success' : 'text-foreground'}`}>
+                          {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount, tx.original_currency || currency, locale)}
                         </Paragraph>
                       </td>
-                      <td className="px-4 py-4 md:px-8 md:py-8 text-right">
+                      <td className="px-4 py-4 md:px-8 md:py-4 text-right">
                         <div className="flex justify-end gap-2">
-                          {(t.source === 'receipt' || t.source === 'text') && (
+                          {(tx.source === 'receipt' || tx.source === 'text') && (
                             <button 
                               type="button" 
-                              title="View Receipt" 
-                              onClick={(e) => { e.stopPropagation(); setReviewTransactionId(t.id); }}
+                              title={t('finance_ui.view_receipt')}
+                              aria-label={t('finance_ui.view_receipt')}
+                              onClick={(e) => { e.stopPropagation(); setReviewTransactionId(tx.id); }}
                               className="p-2 text-primary hover:bg-primary/10 rounded-md transition-all"
                             >
                               <Receipt size={16} />
                             </button>
                           )}
-                          <button 
-                            type="button" 
-                            title="More options" 
-                            onClick={(e) => { e.stopPropagation(); openEditModal(t); }}
-                            className="p-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-foreground/5 transition-all"
-                          >
-                            <MoreVertical size={16} />
-                          </button>
                         </div>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="py-12 text-center">
-                      <div className="flex flex-col items-center justify-center opacity-50">
-                        <Info size={32} className="text-muted-foreground mb-4" />
-                        <Paragraph className="text-sm text-foreground">{t('moduleCommon.emptyTitle')}</Paragraph>
-                        <Paragraph className="text-xs text-muted-foreground">{t('moduleCommon.emptyDesc')}</Paragraph>
-                      </div>
+                    <td colSpan={5}>
+                      <EmptyState icon={Info} title={t('moduleCommon.emptyTitle')} description={t('moduleCommon.emptyDesc')} />
                     </td>
                   </tr>
                 )}
@@ -766,9 +659,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                   size="sm" 
                   onClick={() => setPage(p => Math.max(1, p - 1))} 
                   disabled={page === 1}
-                >
-                  Prev
-                </Button>
+                >{t('moduleCommon.prev')}</Button>
                 <div className="px-2 text-xs font-medium text-foreground min-w-[60px] text-center">
                   {page} / {totalPages}
                 </div>
@@ -777,9 +668,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                   size="sm" 
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
                   disabled={page === totalPages}
-                >
-                  Next
-                </Button>
+                >{t('moduleCommon.next')}</Button>
               </div>
             </div>
           )}
@@ -815,16 +704,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
 
       {/* Mobile-only FAB for New Entry */}
       {activeTab === 'transactions' && (
-        <div className="md:hidden fixed bottom-24 right-4 z-40">
-          <Button 
-            variant="primary" 
-            onClick={openAddModal} 
-            className="rounded-full w-14 h-14 flex items-center justify-center "
-            aria-label={t('finance.newEntry')}
-          >
-            <Plus size={24} />
-          </Button>
-        </div>
+        <Fab label={t('finance.newEntry')} onClick={openAddModal} />
       )}
 
       {isModalOpen && (
@@ -865,7 +745,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                 key={type}
                 type="button"
                 onClick={() => form.type !== type && setForm(f => ({ ...f, type, category_id: '' }))}
-                className={`flex-1 py-4 text-xs font-bold rounded-sm transition-all uppercase tracking-widest ${
+                className={`flex-1 py-4 text-xs font-bold rounded-sm transition-all ${
                   form.type === type 
                     ? type === 'income' ? 'bg-success text-background' : 'bg-danger text-background'
                     : 'text-muted-foreground hover:text-foreground'
@@ -897,11 +777,11 @@ export default function FinanceClient({ initialTransactions }: Props) {
             <Input
               label={t('finance.modal.amount')}
               type="text"
-              inputMode="numeric"
+              inputMode={currencyFractionDigits(form.original_currency) > 0 ? 'decimal' : 'numeric'}
               placeholder="0"
               value={form.amount}
               onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, '');
+                const val = sanitizeAmountInput(e.target.value, form.original_currency);
                 setForm(f => ({ ...f, amount: val }));
                 if (formErrors.amount) {
                   setFormErrors(prev => {
@@ -932,7 +812,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
 
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <label className="text-xs font-bold text-muted-foreground tracking-widest block">
+              <label className="text-xs font-bold text-muted-foreground block">
                 {t('finance.modal.category')}
                 {form.category_id && (
                   <span className="ml-2 text-primary normal-case font-normal">
@@ -943,13 +823,13 @@ export default function FinanceClient({ initialTransactions }: Props) {
               <button 
                 type="button" 
                 onClick={() => setIsCategoryManagerOpen(true)}
-                className="text-xs text-primary hover:underline font-bold uppercase tracking-widest"
+                className="text-xs text-primary hover:underline font-bold"
               >
                 {t('finance.modal.manage')}
               </button>
             </div>
             {categories.filter(c => c.type === form.type).length === 0 ? (
-              <Paragraph className="text-xs text-muted-foreground italic py-4">
+              <Paragraph className="text-xs text-muted-foreground py-4">
                 {t('finance.modal.noCategories')} <button type="button" onClick={() => setIsCategoryManagerOpen(true)} className="text-primary underline">{t('finance.modal.manage')}</button> {t('finance.modal.toAddSome')}
               </Paragraph>
             ) : (
@@ -965,7 +845,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                   }`}
                 >
                   <span className="text-lg">—</span>
-                  <span className="text-xs uppercase font-bold tracking-wider truncate w-full text-center">{t('finance.modal.none')}</span>
+                  <span className="text-xs font-bold truncate w-full text-center">{t('finance.modal.none')}</span>
                 </button>
                 {categories.filter(c => c.type === form.type).map(cat => (
                   <button
@@ -979,7 +859,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                     }`}
                   >
                     <CategoryIcon name={cat.icon || 'ShoppingCart'} className="text-muted-foreground" />
-                    <span className="text-xs uppercase font-bold tracking-wider truncate w-full text-center">{cat.name}</span>
+                    <span className="text-xs font-bold truncate w-full text-center">{cat.name}</span>
                   </button>
                 ))}
               </div>
@@ -1009,7 +889,7 @@ export default function FinanceClient({ initialTransactions }: Props) {
                         key={cycle}
                         type="button"
                         onClick={() => setForm(f => ({ ...f, billing_cycle: cycle }))}
-                        className={`px-3 py-1 text-xs font-bold rounded-sm transition-all uppercase tracking-widest ${
+                        className={`px-3 py-1 text-xs font-bold rounded-sm transition-all ${
                           form.billing_cycle === cycle 
                             ? 'bg-primary/20 text-primary'
                             : 'text-muted-foreground hover:text-foreground'
@@ -1024,61 +904,11 @@ export default function FinanceClient({ initialTransactions }: Props) {
             </div>
           )}
 
-          <details className="bg-primary/5 border border-primary/10 rounded-lg group">
-            <summary className="p-4 text-sm font-bold text-primary cursor-pointer flex items-center justify-between list-none">
-              {t('finance.modal.mindfulSpending')}
-              <ChevronRight size={16} className="group-open:rotate-90 transition-transform" />
-            </summary>
-            
-            <div className="px-4 pb-4 space-y-4 border-t border-primary/10 pt-4">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-muted-foreground tracking-widest block">{t('finance.modal.expenseNature')}</label>
-                <div className="flex bg-surface p-1 rounded-md border border-foreground/[0.05]">
-                  <button
-                    type="button"
-                    onClick={() => setForm(f => ({ ...f, expected_impact: 'Kebutuhan (Need)' }))}
-                    className={`flex-1 py-2 text-xs font-bold rounded-sm transition-all ${
-                      form.expected_impact === 'Kebutuhan (Need)' 
-                        ? 'bg-primary text-on-primary '
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    {t('finance.modal.need')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setForm(f => ({ ...f, expected_impact: 'Keinginan (Want)' }))}
-                    className={`flex-1 py-2 text-xs font-bold rounded-sm transition-all ${
-                      form.expected_impact === 'Keinginan (Want)' 
-                        ? 'bg-primary text-on-primary '
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    {t('finance.modal.want')}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-muted-foreground tracking-widest block">
-                  {t('finance.modal.reason')} <span className="font-normal opacity-70">({t('common.optional')})</span>
-                </label>
-                <textarea
-                  placeholder={t('finance.modal.reasonPlaceholder')}
-                  rows={2}
-                  value={form.decision_notes}
-                  onChange={(e) => setForm(f => ({ ...f, decision_notes: e.target.value }))}
-                  className="w-full bg-surface/40 border border-foreground/[0.05] rounded-md p-4 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
-                />
-              </div>
-            </div>
-          </details>
-
           {editingTransaction && (
             <button 
               type="button"
               onClick={() => setDeleteConfirmId(editingTransaction.id)}
-              className="w-full py-4 text-danger text-xs font-bold uppercase tracking-widest border border-danger/20 hover:bg-danger/5 rounded-md transition-all"
+              className="w-full py-4 text-danger text-xs font-bold border border-danger/20 hover:bg-danger/5 rounded-md transition-all"
             >
               {t('finance.modal.deleteBtn')}
             </button>

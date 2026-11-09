@@ -25,7 +25,7 @@ export function TextCaptureForm({ onCaptureSuccess }: Props) {
       setText('');
       setError(null);
     } else {
-      setError(t('finance.captureError') || "Couldn't understand that. Try formatting like 'Makan siang 25k' or use the global Smart Input (Ctrl+K) for AI parsing.");
+      setError(t('finance.captureError'));
     }
   };
 
@@ -38,7 +38,7 @@ export function TextCaptureForm({ onCaptureSuccess }: Props) {
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={t('finance.capturePlaceholder') || "Quick add (e.g. 'Makan siang 25k', 'Beli bensin 50ribu')"}
+          placeholder={t('finance.capturePlaceholder')}
           className="w-full bg-surface border border-foreground/5 rounded-xl pl-12 pr-12 py-3.5 text-sm focus:outline-none focus:border-primary transition-colors text-foreground placeholder-gray-500 shadow-inner"
         />
         <button 

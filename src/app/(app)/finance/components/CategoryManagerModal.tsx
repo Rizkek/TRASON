@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Modal, Button, Input, ErrorAlert } from '@/components';
 import { useCategory } from '@/hooks/useCategory';
 import { useTranslation } from '@/libs/i18n/useTranslation';
-import { Plus, Trash as Trash2, PencilSimple as Edit2, X, Smiley } from '@phosphor-icons/react/dist/ssr';
+import { Plus, Trash as Trash2, PencilSimple as Edit2, X} from '@phosphor-icons/react/dist/ssr';
 import { Category } from '@/types/database';
-import { CategoryIcon, CATEGORY_ICONS, ICON_CATEGORIES } from '@/components';
+import { CategoryIcon, ICON_CATEGORIES } from '@/components';
 import { ICON_NAME_SUGGESTIONS } from '@/libs/defaultCategories';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Heading, Paragraph } from '@/components/ui/typography';
+import { Heading} from '@/components/ui/typography';
 
 interface CategoryManagerModalProps {
   isOpen: boolean;
@@ -43,7 +43,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      setError('Name is required');
+      setError(t('finance_ui.name_required'));
       return;
     }
     
@@ -65,7 +65,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
       }
       resetForm();
     } catch (err: any) {
-      setError(err.message || 'Failed to save category');
+      setError(t('finance_ui.category_save_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -75,7 +75,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
     try {
       await deleteCategory(id);
     } catch (err: any) {
-      setError(err.message || 'Failed to delete category');
+      setError(t('finance_ui.category_delete_failed'));
     }
   };
 
@@ -139,7 +139,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
             
             <div className="flex gap-4 relative">
               <div className="w-20 flex flex-col items-center gap-1">
-                <label className="text-xs font-bold text-muted-foreground tracking-widest self-start">{t('finance.categories.iconLabel')}</label>
+                <label className="text-xs font-bold text-muted-foreground self-start">{t('finance.categories.iconLabel')}</label>
                 <button
                   type="button"
                   onClick={() => setShowIconPicker(!showIconPicker)}
@@ -164,7 +164,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
                   if (!suggestedText || form.name === suggestedText) return null;
                   return (
                     <div className="flex items-center gap-1.5 pt-0.5">
-                      <span className="text-xs text-muted-foreground/60">{t('finance.categories.suggested_name')}</span>
+                      <span className="text-xs text-muted-foreground">{t('finance.categories.suggested_name')}</span>
                       <button
                         type="button"
                         onClick={() => setForm((prev) => ({ ...prev, name: suggestedText }))}
@@ -182,7 +182,7 @@ export function CategoryManagerModal({ isOpen, onClose, typeFilter }: CategoryMa
               <div className="bg-surface/40 border border-foreground/5 rounded-md p-2 max-h-[250px] overflow-y-auto space-y-4 relative">
                 {ICON_CATEGORIES.map(category => (
                   <div key={category.name}>
-                    <div className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-widest sticky top-0 bg-surface/90 backdrop-blur py-1 z-10">
+                    <div className="text-xs font-bold text-muted-foreground mb-2 sticky top-0 bg-surface/90 backdrop-blur py-1 z-10">
                       {category.name}
                     </div>
                     <div className="grid grid-cols-5 sm:grid-cols-7 gap-1">

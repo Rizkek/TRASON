@@ -321,7 +321,7 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
                 type="number" min="0" step="1" inputMode="numeric"
                 value={draft.fare}
                 onChange={(e) => updateDraft('fare', e.target.value)}
-                placeholder="Contoh: 166500"
+                placeholder={t('finance_ui.payout_fare_placeholder')}
                 className="w-full rounded-md border border-foreground/10 bg-background/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60"
               />
             </div>
@@ -330,11 +330,11 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
           {/* Info estimasi potongan platform (display only) */}
           {estimate != null && fareAmount != null && (
             <div className="rounded-md bg-foreground/5 border border-foreground/10 p-3 space-y-1.5 text-xs text-muted-foreground">
-              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">
+              <p className="font-semibold text-foreground text-xs mb-2">
                 {t('finance.driverPayout.estimated')}
               </p>
               <div className="flex justify-between">
-                <span>Service Payment ({((estimate.servicePaymentRate) * 100).toFixed(1)}%)</span>
+                <span>{t('finance_ui.service_payment')} ({((estimate.servicePaymentRate) * 100).toFixed(1)}%)</span>
                 <span className="font-mono tabular-nums">- {fmt(estimate.servicePaymentAmount)}</span>
               </div>
               <div className="flex justify-between">
@@ -342,7 +342,7 @@ export function DriverPayoutImport({ onSaved, onError }: Props) {
                 <span className="font-mono tabular-nums">- {fmt(estimate.vatAmount)}</span>
               </div>
               <div className="flex justify-between border-t border-foreground/10 pt-1.5 font-semibold text-foreground">
-                <span>Total</span>
+                <span>{t('receipt.total')}</span>
                 <span className="font-mono tabular-nums">- {fmt(estimate.totalDeductionAmount)}</span>
               </div>
             </div>

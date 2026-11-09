@@ -146,7 +146,7 @@ export function BudgetManagerModal({ isOpen, onClose }: Props) {
             {t('finance.budget.category_desc')}
           </Paragraph>
           
-          <div className="space-y-2 mt-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="space-y-2 mt-4 max-h-[40vh] overflow-y-auto pr-2">
             {categories.length === 0 ? (
               <Paragraph className="text-xs text-center text-muted-foreground py-4">{t('finance.budget.noCategories')}</Paragraph>
             ) : (

@@ -83,7 +83,7 @@ export function ReceiptReviewSheet({ transactionId, isOpen, onClose, onConfirmSu
 
       // Update the main transaction with the extracted total and merchant name
       if (metadata && transactionId) {
-        const extractedTitle = metadata.extracted_merchant || 'Receipt Expense';
+        const extractedTitle = metadata.extracted_merchant || t('receipt.expense_fallback');
         const extractedAmount = metadata.extracted_total || localItems.reduce((acc, curr) => acc + (curr.total || 0), 0) || 1;
         
         await updateTransactionWithInvalidation(transactionId, {
@@ -96,7 +96,7 @@ export function ReceiptReviewSheet({ transactionId, isOpen, onClose, onConfirmSu
       if (onConfirmSuccess) onConfirmSuccess();
       onClose();
     } catch (err: any) {
-      setSaveError(err.message || 'Failed to save items');
+      setSaveError(t('receipt.save_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -106,21 +106,21 @@ export function ReceiptReviewSheet({ transactionId, isOpen, onClose, onConfirmSu
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      title="Receipt Details"
+      title={t('receipt.details')}
       footer={
         <div className="flex gap-4 justify-end">
           <Button variant="ghost" size="md" onClick={onClose} disabled={isSaving}>{t('common.cancel')}</Button>
           <Button variant="primary" onClick={handleSave} disabled={isSaving || isLoading} className="w-full">
-            {isSaving ? 'Saving...' : 'Confirm Items'}
+            {isSaving ? t('common.saving') : t('receipt.confirm')}
           </Button>
         </div>
       }
     >
-      <div className="space-y-6 pb-24 md:pb-6">
+      <div className="space-y-6">
         <ErrorAlert error={error?.message || saveError} onDismiss={() => setSaveError(null)} />
         
         {isLoading ? (
-          <div className="py-12 flex justify-center"><Loading text="Loading receipt data..." /></div>
+          <div className="py-12 flex justify-center"><Loading text={t('common.loading')} /></div>
         ) : (
           <>
             {/* Metadata Section */}

@@ -1,10 +1,12 @@
 'use client';
 
+import { EmptyState } from '@/components/ui/EmptyState';
+import { Tabs } from '@/components/ui/Tabs';
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { Card, Badge, Loading } from '@/components';
-import { Receipt, Calendar, ArrowUpRight, ArrowDownLeft, X, Check, MagnifyingGlass as Search, PencilSimple as Edit2, Trash as Trash2 } from '@phosphor-icons/react';
+import { Card, Badge, Button, BottomSheet, Loading } from '@/components';
+import { Receipt, Calendar, ArrowUpRight, ArrowDownLeft, MagnifyingGlass as Search, PencilSimple as Edit2, Trash as Trash2 } from '@phosphor-icons/react';
 import { formatCurrency, formatDate } from '@/libs/format';
-import type { Transaction, CategoryJoin } from '@/types/database';
+import type { Transaction} from '@/types/database';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Heading, Paragraph } from '@/components/ui/typography';
 import { resolveCategory } from '@/libs/finance/categoryHelpers';
@@ -121,7 +123,7 @@ export function TransactionFeed({
   return (
     <>
       {/* Sticky search + filter bar */}
-      <div className="sticky top-0 z-20 pt-1 pb-2 space-y-2">
+      <div className="sticky top-0 z-20 space-y-2 bg-background pb-2 pt-1">
         <div className="relative">
           <Search
             size={15}
@@ -135,28 +137,23 @@ export function TransactionFeed({
             className="w-full pl-12 pr-4 py-2 bg-surface/60 border border-foreground/[0.06] rounded-lg text-sm focus:border-primary focus:outline-none transition-all"
           />
         </div>
-        <div className="flex gap-1 overflow-x-auto no-scrollbar">
-          {(['all', 'income', 'expense'] as const).map((type) => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => onFilterChange(type)}
-              className={`px-4 py-1 text-xs font-bold rounded-full transition-all uppercase tracking-widest whitespace-nowrap shrink-0 ${
-                filterType === type
-                  ? 'bg-primary text-on-primary'
-                  : 'bg-foreground/[0.05] text-muted-foreground hover:bg-foreground/[0.1] hover:text-foreground'
-              }`}
-            >
-              {type === 'all' ? t('finance.feed.filterAll') : type === 'income' ? t('finance.feed.filterIncome') : t('finance.feed.filterExpense')}
-            </button>
-          ))}
-        </div>
+        <Tabs
+          variant="segmented"
+          label={t('finance.feed.transactionHistory')}
+          value={filterType}
+          onChange={onFilterChange}
+          items={[
+            { id: 'all', label: t('finance.feed.filterAll') },
+            { id: 'income', label: t('finance.feed.filterIncome') },
+            { id: 'expense', label: t('finance.feed.filterExpense') },
+          ]}
+        />
       </div>
 
       {/* Transaction list */}
       <Card className="overflow-hidden">
         <div className="px-4 pt-4 pb-1 flex items-center justify-between">
-          <Heading as="h3" size="h3" className="text-xs font-bold text-muted-foreground tracking-widest uppercase">
+          <Heading as="h3" size="h3" className="text-xs font-bold text-muted-foreground">
             {t('finance.feed.transactionHistory')}
           </Heading>
           {filtered.length > 0 && (
@@ -169,24 +166,18 @@ export function TransactionFeed({
             <Loading />
           </div>
         ) : visibleGroups.length === 0 ? (
-          <div className="py-12 flex flex-col items-center justify-center gap-4 opacity-50">
-            <div className="text-center">
-              <Paragraph className="text-sm font-semibold text-foreground">{t('finance.feed.empty')}</Paragraph>
-              <Paragraph className="text-xs text-muted-foreground mt-1">
-                {searchQuery || filterType !== 'all'
-                  ? t('finance.feed.filterAll')
-                  : t('moduleCommon.emptyDesc')}
-              </Paragraph>
-            </div>
-          </div>
+          <EmptyState
+            title={t('finance.feed.empty')}
+            description={searchQuery || filterType !== 'all' ? t('finance.feed.emptyFiltered') : t('moduleCommon.emptyDesc')}
+          />
         ) : (
           <div className="pb-1">
             {visibleGroups.map((group) => (
               <div key={group.date}>
                 {/* Date group header */}
                 <div className="px-4 py-1 mt-2 flex items-center gap-2">
-                  <Calendar size={10} className="text-muted-foreground shrink-0" />
-                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                  <Calendar size={12} className="text-muted-foreground shrink-0" />
+                  <span className="text-xs font-bold text-muted-foreground">
                     {group.label}
                   </span>
                 </div>
@@ -223,7 +214,7 @@ export function TransactionFeed({
                           )}
                         </div>
                         <Paragraph className="text-xs text-muted-foreground truncate">
-                          {cat?.name || 'Lainnya'}
+                          {cat?.name || t('finance_ui.other')}
                         </Paragraph>
                       </div>
                       {/* Amount */}
@@ -250,7 +241,7 @@ export function TransactionFeed({
 
             {/* End of list indicator */}
             {!hasMore && allGroups.length > 0 && visibleCount >= filtered.length && filtered.length > PAGE_SIZE && (
-              <Paragraph className="text-center text-xs text-muted-foreground py-6 tracking-widest uppercase">
+              <Paragraph className="text-center text-xs text-muted-foreground py-6">
                 {t('finance.feed.allShown')}
               </Paragraph>
             )}
@@ -258,130 +249,54 @@ export function TransactionFeed({
         )}
       </Card>
 
-      {/* Bottom Sheet */}
       {selected && (
-        <>
-          {/* Scrim */}
-          <div
-            className="fixed inset-0 bg-black/60 z-40"
-            style={{ backdropFilter: 'blur(2px)' }}
-            onClick={() => setSelected(null)}
-          />
-          {/* Panel */}
-          <div
-            className="fixed bottom-0 inset-x-0 z-50 max-w-lg mx-auto"
-            style={{ animation: 'slideUp 0.22s ease-out' }}
-          >
-            <style>{`@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }`}</style>
-            <div className="bg-surface rounded-t-2xl border-t border-foreground/10 ">
-              {/* Drag handle */}
-              <div className="flex justify-center pt-4 pb-2">
-                <div className="w-10 h-1 bg-foreground/20 rounded-full" />
-              </div>
-
-              <div className="px-6">
-                {/* Header row */}
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                        selected.type === 'income'
-                          ? 'bg-success/10 text-success'
-                          : 'bg-danger/10 text-danger'
-                      }`}
-                    >
-                      {selected.type === 'income' ? (
-                        <ArrowUpRight size={18} />
-                      ) : (
-                        <ArrowDownLeft size={18} />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <Paragraph className="text-base font-bold text-foreground truncate">{selected.title}</Paragraph>
-                      <Paragraph className="text-xs text-muted-foreground">{formatDate(selected.date)}</Paragraph>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setSelected(null)}
-                    className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-foreground/[0.05] transition-all shrink-0 ml-2"
-                    aria-label="Tutup"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-
-                {/* Amount */}
-                <div className="text-center py-6 border-y border-foreground/[0.05] mb-6">
-                  <Paragraph
-                    className={`text-3xl font-bold ${
-                      selected.type === 'income' ? 'text-success' : 'text-danger'
-                    }`}
-                  >
-                    {selected.type === 'income' ? '+' : '-'}
-                    {formatCurrency(selected.amount, selected.original_currency || currency, locale)}
-                  </Paragraph>
-                  {selected.original_currency && (
-                    <Paragraph className="text-xs text-muted-foreground mt-1">{selected.original_currency}</Paragraph>
-                  )}
-                </div>
-
-                {/* Detail rows */}
-                <div className="space-y-2 mb-6">
-                  {selectedCat && (
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">{t('finance.feed.category')}</span>
-                      <Badge
-                        variant={selected.type === 'income' ? 'success' : 'danger'}
-                        size="sm"
-                      >
-                        {selectedCat.name}
-                      </Badge>
-                    </div>
-                  )}
-                  {(selected.metadata?.decision_notes as string) && (
-                    <div className="bg-primary/5 border border-primary/10 rounded-lg p-4 mt-2">
-                      <Paragraph className="text-xs font-bold text-primary uppercase tracking-widest mb-1">
-                        Reasoning
-                      </Paragraph>
-                      <Paragraph className="text-xs text-foreground">
-                        {selected.metadata?.decision_notes as string}
-                      </Paragraph>
-                    </div>
-                  )}
-                </div>
-
-                {/* Action buttons */}
-                <div className="grid grid-cols-2 gap-2 pb-24 md:pb-6">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const tx = selected;
-                      setSelected(null);
-                      onEdit(tx);
-                    }}
-                    className="flex items-center justify-center gap-2 py-4 px-6 bg-foreground/[0.05] hover:bg-foreground/[0.1] border border-foreground/10 text-foreground rounded-xl text-sm font-semibold transition-all"
-                  >
-                    <Edit2 size={15} />
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const id = selected.id;
-                      setSelected(null);
-                      onDeleteRequest(id);
-                    }}
-                    className="flex items-center justify-center gap-2 py-4 px-6 bg-danger/10 hover:bg-danger/20 border border-danger/20 text-danger rounded-xl text-sm font-semibold transition-all"
-                  >
-                    <Trash2 size={15} />
-                    Hapus
-                  </button>
-                </div>
-              </div>
+        <BottomSheet
+          isOpen
+          onClose={() => setSelected(null)}
+          title={selected.title}
+          description={formatDate(selected.date)}
+          footer={
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="secondary"
+                leftIcon={<Edit2 size={16} />}
+                onClick={() => {
+                  const tx = selected;
+                  setSelected(null);
+                  onEdit(tx);
+                }}
+              >
+                {t('common.edit')}
+              </Button>
+              <Button
+                variant="danger"
+                leftIcon={<Trash2 size={16} />}
+                onClick={() => {
+                  const id = selected.id;
+                  setSelected(null);
+                  onDeleteRequest(id);
+                }}
+              >
+                {t('common.delete')}
+              </Button>
             </div>
+          }
+        >
+          <p className={`py-2 text-center font-mono text-heading-lg font-semibold ${selected.type === 'income' ? 'text-income' : 'text-expense'}`}>
+            {selected.type === 'income' ? '+' : '-'}
+            {formatCurrency(selected.amount, selected.original_currency || currency, locale)}
+          </p>
+          <div className="mt-4 space-y-3">
+            {selectedCat && (
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">{t('finance.feed.category')}</span>
+                <Badge variant={selected.type === 'income' ? 'success' : 'danger'} size="sm">
+                  {selectedCat.name}
+                </Badge>
+              </div>
+            )}
           </div>
-        </>
+        </BottomSheet>
       )}
     </>
   );
