@@ -2,7 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { Plus } from '@phosphor-icons/react';
 import { Logo } from '../Logo';
+import { openSmartInput } from '../SmartInput';
+import { Button } from '@/components/ui/Button';
 import { NavIcon } from '@/components/ui/NavIcon';
 import { TrasonIcon } from '@/components/ui/TrasonIcon';
 import { SYS_ICONS } from '@/config/icons';
@@ -18,19 +21,24 @@ interface SidebarProps {
   onLogout: () => void;
 }
 
-// Desktop navigation (md and up). Phones use MobileHeader, BottomNav and MoreSheet instead.
+// Desktop navigation (lg and up). Phones and tablets use MobileHeader, BottomNav and MoreSheet instead.
 export function Sidebar({ items, isActive, user, onLogout }: SidebarProps) {
   const { t } = useTranslation();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-50 hidden h-dvh w-72 shrink-0 flex-col overflow-y-auto border-r border-foreground/10 bg-surface lg:flex">
-      <div className="flex flex-col items-center px-6 py-8">
-        <Logo size={40} variant="gold" className="mb-4" />
-        <p className="font-brand text-heading-lg text-primary">TRASON</p>
-        <p className="mt-1 text-label-sm uppercase text-muted-foreground">{t('nav.tagline')}</p>
+    <aside className="fixed inset-y-0 left-0 z-50 hidden h-dvh w-60 shrink-0 flex-col overflow-y-auto border-r border-foreground/10 bg-surface lg:flex">
+      <div className="flex items-center gap-3 px-6 py-6">
+        <Logo size={32} variant="gold" />
+        <p className="font-brand text-heading-md font-normal text-primary">TRASON</p>
       </div>
 
-      <nav aria-label="Main" className="flex-1 space-y-1 px-4 py-4">
+      <div className="px-3 pb-2">
+        <Button variant="secondary" size="sm" fullWidth onClick={openSmartInput} leftIcon={<Plus size={16} />}>
+          {t('nav.quick_add')}
+        </Button>
+      </div>
+
+      <nav aria-label="Main" className="flex-1 space-y-1 px-3 py-2">
         {items.map((item) => {
           const active = isActive(item.href);
           return (
@@ -39,7 +47,7 @@ export function Sidebar({ items, isActive, user, onLogout }: SidebarProps) {
               href={item.href}
               prefetch={false}
               aria-current={active ? 'page' : undefined}
-              className={`relative flex min-h-11 items-center gap-4 rounded-lg px-4 py-3 transition-colors ${
+              className={`relative flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
                 active
                   ? 'bg-foreground/[0.06] text-foreground'
                   : 'text-muted-foreground hover:bg-foreground/5 hover:text-foreground'
@@ -53,8 +61,8 @@ export function Sidebar({ items, isActive, user, onLogout }: SidebarProps) {
         })}
       </nav>
 
-      <div className="mt-auto space-y-2 p-4">
-        <div className="flex items-center gap-3 rounded-lg border border-foreground/10 bg-foreground/[0.03] px-4 py-3">
+      <div className="mt-auto space-y-2 p-3">
+        <div className="flex items-center gap-2 rounded-lg border border-foreground/10 bg-foreground/[0.03] px-3 py-2">
           <Avatar user={user} size={32} />
           <div className="min-w-0 flex-1">
             <p className="truncate text-label-md text-foreground">{user?.first_name || user?.name || t('common.user')}</p>
@@ -65,7 +73,7 @@ export function Sidebar({ items, isActive, user, onLogout }: SidebarProps) {
         <button
           type="button"
           onClick={onLogout}
-          className="flex min-h-11 w-full items-center gap-4 rounded-lg px-4 py-3 text-muted-foreground transition-colors hover:bg-danger/10 hover:text-danger"
+          className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-danger/10 hover:text-danger"
         >
           <TrasonIcon icon={SYS_ICONS.logout} size={20} />
           <span className="text-label-md">{t('nav.logout')}</span>

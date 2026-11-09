@@ -11,7 +11,7 @@ import { Sidebar } from './Sidebar';
 import { MobileHeader } from './MobileHeader';
 import { BottomNav } from './BottomNav';
 import { MoreSheet } from './MoreSheet';
-import { navLabelKey, useNavItems } from './useNavItems';
+import { useNavItems } from './useNavItems';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -29,7 +29,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useTranslation();
-  const { visibleItems, barItems, sheetItems, isActive, current } = useNavItems();
+  const { visibleItems, barItems, sheetItems, isActive } = useNavItems();
 
   const mainRef = React.useRef<HTMLElement>(null);
   const [moreOpen, setMoreOpen] = React.useState(false);
@@ -75,16 +75,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       <Sidebar items={visibleItems} isActive={isActive} user={user} onLogout={() => setLogoutOpen(true)} />
 
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden lg:ml-72">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden lg:ml-60">
         <MobileHeader
-          title={current ? t(navLabelKey(current.href)) : 'TRASON'}
           user={user}
           menuOpen={moreOpen}
           onOpenMenu={() => setMoreOpen(true)}
         />
 
         <main id="main-content" tabIndex={-1} ref={mainRef} className="relative z-10 flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none lg:pb-0">
-          <div className="container mx-auto max-w-6xl px-4 py-4 md:px-8 md:py-8 lg:px-12">{children}</div>
+          <div className="container mx-auto max-w-6xl px-4 py-4 md:px-8 md:py-8">{children}</div>
         </main>
 
         <BottomNav items={barItems} isActive={isActive} moreOpen={moreOpen} onOpenMore={() => setMoreOpen(true)} />

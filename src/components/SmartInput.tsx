@@ -1,21 +1,33 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { MagnifyingGlass as Search, PaperPlaneRight } from '@phosphor-icons/react';
+import React, { useState, useEffect } from 'react';
+import { PaperPlaneRight } from '@phosphor-icons/react';
+import { Modal } from './Modal';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
 import { getLocalISODate } from '@/libs/format';
 import { ApiError } from '@/libs/apiErrors';
-import { 
+import { useTranslation } from '@/libs/i18n/useTranslation';
+import {
   createTransactionWithInvalidation,
   createActivityWithInvalidation,
   createReminderWithInvalidation
 } from '@/libs/mutations';
 
+const OPEN_EVENT = 'trason:open-smart-input';
+
+/** Opens Smart Input from anywhere in the shell. Ctrl/Cmd+K does the same on a keyboard. */
+export const openSmartInput = () => window.dispatchEvent(new Event(OPEN_EVENT));
+
+/** "dueTime" becomes "due time" for the draft preview. */
+const fieldLabel = (key: string) => key.replace(/([A-Z])/g, ' $1').toLowerCase();
+
 export function SmartInput() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -23,19 +35,15 @@ export function SmartInput() {
         e.preventDefault();
         setIsOpen((prev) => !prev);
       }
-      if (e.key === 'Escape') {
-        setIsOpen(false);
-      }
     };
+    const handleOpen = () => setIsOpen(true);
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener(OPEN_EVENT, handleOpen);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener(OPEN_EVENT, handleOpen);
+    };
   }, []);
-
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,14 +58,14 @@ export function SmartInput() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: input }),
       });
-      
+
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
-      
+
       setResult(data);
     } catch (error) {
       console.error(error);
-      setResult({ error: 'Failed to process input. Try again.' });
+      setResult({ error: t('smart_input.error_process') });
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +76,7 @@ export function SmartInput() {
 
     try {
       setIsLoading(true);
-      
+
       if (result.type === 'transaction') {
         await createTransactionWithInvalidation({
           title: result.data.title || 'Untitled Transaction',
@@ -104,7 +112,7 @@ export function SmartInput() {
       } else {
         throw new Error('Unsupported item type.');
       }
-      
+
       setIsOpen(false);
       setInput('');
       setResult(null);
@@ -112,82 +120,75 @@ export function SmartInput() {
       console.error('Failed to save:', error);
       const message =
         error instanceof ApiError && error.code === 'REMINDER_PAST_DUE'
-          ? 'That time has already passed. Add a later date or time, for example "tomorrow at 9".'
-          : 'Failed to save to database.';
+          ? t('smart_input.error_past_due')
+          : t('smart_input.error_save');
       setResult({ ...result, error: message });
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (!isOpen) return null;
+  const draftFields = result?.data
+    ? Object.entries(result.data as Record<string, unknown>).filter(([, value]) => value !== null && value !== undefined && value !== '')
+    : [];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center pt-[20vh]">
-      <div className="bg-surface border border-foreground/10 w-full max-w-2xl rounded-2xl overflow-hidden flex flex-col">
-        
-        <form onSubmit={handleSubmit} className="relative flex items-center p-4 border-b border-foreground/10">
-          <Search className="absolute left-6 text-muted-foreground" size={20} />
-          <input
-            ref={inputRef}
-            type="text"
+    <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={t('nav.quick_add')} maxWidth="2xl">
+      <form onSubmit={handleSubmit} className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <Input
+            aria-label={t('nav.quick_add')}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type 'Spent $15 on lunch' or 'Remind me to run tomorrow'..."
-            className="w-full bg-transparent text-foreground text-lg pl-16 pr-8 py-4 focus:outline-none placeholder-muted-foreground/50"
+            placeholder={t('smart_input.placeholder')}
             disabled={isLoading}
           />
-          <button 
-            type="submit" 
-            disabled={isLoading || !input.trim()}
-            aria-busy={isLoading}
-            className="absolute right-6 text-primary hover:text-foreground disabled:opacity-50"
-          >
-            <PaperPlaneRight size={20} />
-          </button>
-        </form>
-
-        {result && !result.error && (
-          <div className="p-8 bg-background/60">
-            <p className="text-sm text-muted-foreground mb-4">{result.message}</p>
-            
-            {result.data && (
-              <div className="bg-foreground/5 rounded-lg p-4 mb-4 font-mono text-xs text-foreground/80">
-                {JSON.stringify(result.data, null, 2)}
-              </div>
-            )}
-
-            {result.confidence > 0.7 && result.action === 'create' && (
-              <div className="flex justify-end gap-4 mt-6">
-                <button 
-                  onClick={() => setResult(null)} 
-                  className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleConfirm}
-                  disabled={isLoading}
-                  className="px-4 py-2 text-sm bg-primary text-on-primary font-semibold rounded hover:opacity-90 disabled:opacity-50"
-                >
-                  Confirm & Save
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {result?.error && (
-          <div className="p-8 bg-danger/10 text-danger text-sm">
-            {result.error}
-          </div>
-        )}
-        
-        <div className="p-4 text-xs text-muted-foreground/40 flex justify-between bg-background/80">
-          <span>Smart Input Engine (Powered by AI)</span>
-          <span>Press ESC to close</span>
         </div>
-      </div>
-    </div>
+        <Button
+          type="submit"
+          disabled={!input.trim()}
+          isLoading={isLoading}
+          aria-label={t('smart_input.submit')}
+          title={t('smart_input.submit')}
+          className="w-11 shrink-0 px-0"
+        >
+          <PaperPlaneRight size={18} aria-hidden="true" />
+        </Button>
+      </form>
+
+      {result && !result.error && (
+        <div className="mt-4 space-y-4 border-t border-foreground/10 pt-4">
+          {result.message && <p className="text-sm text-muted-foreground">{result.message}</p>}
+
+          {draftFields.length > 0 && (
+            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-lg bg-foreground/5 p-4 text-sm">
+              {draftFields.map(([key, value]) => (
+                <React.Fragment key={key}>
+                  <dt className="text-muted-foreground first-letter:uppercase">{fieldLabel(key)}</dt>
+                  <dd className="min-w-0 break-words text-foreground">{String(value)}</dd>
+                </React.Fragment>
+              ))}
+            </dl>
+          )}
+
+          {result.confidence > 0.7 && result.action === 'create' && (
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setResult(null)}>
+                {t('common.cancel')}
+              </Button>
+              <Button size="sm" onClick={handleConfirm} isLoading={isLoading}>
+                {t('smart_input.save')}
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {result?.error && (
+        <p role="alert" className="mt-4 rounded-lg bg-danger/10 p-4 text-sm text-danger">
+          {result.error}
+        </p>
+      )}
+    </Modal>
   );
 }
