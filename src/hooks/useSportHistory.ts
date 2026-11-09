@@ -4,8 +4,7 @@ import { useCallback } from 'react';
 import useSWR from 'swr';
 import { workoutSessionQueries } from '@/services/workout/sessionQueries';
 import { personalRecordQueries } from '@/services/workout/prQueries';
-import { activityQueries } from '@/services/activity/activityQueries';
-import type { WorkoutSession, PersonalRecord, Activity } from '@/types/database';
+import type { WorkoutSession, Activity } from '@/types/database';
 import { CACHE_KEYS } from '@/libs/cacheKeys';
 import { formatDateOnly } from '@/libs/date';
 import { SWR_CONFIG } from '@/config/swr';
@@ -65,7 +64,7 @@ export const useSportHistory = (startDate?: Date, endDate?: Date) => {
 
   // Fetch workout sessions
   const sessionsKey = CACHE_KEYS.sport.sessions(startStr, endStr);
-  const { data: sessions, isLoading: sessionsLoading, mutate: mutateSessions } = useSWR(
+  const { data: sessions, isLoading: sessionsLoading, error: sessionsError, mutate: mutateSessions } = useSWR(
     sessionsKey,
     async () => {
       return await executeMutation(
@@ -144,6 +143,8 @@ export const useSportHistory = (startDate?: Date, endDate?: Date) => {
   );
 
   return {
+    error: sessionsError as Error | undefined,
+    refresh: mutateSessions,
     sessions: sessions || [],
     recentSessions: recentSessions || [],
     prBoard: prBoard || [],

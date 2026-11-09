@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import React, { useMemo, useState, useEffect } from 'react';
 import { Card } from '@/components';
 import {
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
+  const { t } = useTranslation();
   const [isMounted, setIsMounted] = useState(false);
   const { locale } = useUserPreferences();
   const { colors, chrome } = useChartTheme();
@@ -115,7 +117,7 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
               const sessionsStr = `${dataItem.sessionsCount} session${dataItem.sessionsCount > 1 ? 's' : ''}`;
               return [`${dataItem.minutes} minutes`, sessionsStr];
             }
-            return 'Rest Day';
+            return t('sport_forms.rest_day');
           },
           labelTextColor: (context: any) => {
             const index = context.dataIndex;
@@ -156,8 +158,8 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
     return (
       <Card className="p-5 md:p-8 bg-foreground/[0.02] border-foreground/[0.05]">
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-foreground">Activity history</h3>
-          <p className="text-sm text-muted-foreground">Last {days} days of training</p>
+          <h3 className="text-lg font-semibold text-foreground">{t('sport_forms.history_title')}</h3>
+          <p className="text-sm text-muted-foreground">{t('sport_forms.history_desc').replace('{days}', String(days))}</p>
         </div>
         <div className="h-[250px] w-full bg-foreground/[0.01] rounded-lg" />
       </Card>
@@ -167,8 +169,8 @@ export const SportHistoryChart: React.FC<Props> = ({ sessions, days = 14 }) => {
   return (
     <Card className="p-5 md:p-8 bg-foreground/[0.02] border-foreground/[0.05]">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-foreground">Activity history</h3>
-        <p className="text-sm text-muted-foreground">Last {days} days of training</p>
+        <h3 className="text-lg font-semibold text-foreground">{t('sport_forms.history_title')}</h3>
+        <p className="text-sm text-muted-foreground">{t('sport_forms.history_desc').replace('{days}', String(days))}</p>
       </div>
       <div className="h-[250px] w-full" style={{ minWidth: 0 }}>
         <Bar data={barChartData} options={options} />

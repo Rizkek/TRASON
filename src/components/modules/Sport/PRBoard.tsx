@@ -1,3 +1,4 @@
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import React from 'react';
 import { Card } from '@/components';
 import type { PersonalRecord } from '@/types/database';
@@ -19,12 +20,13 @@ const getSportIcon = (type: string) => {
 
 export const PRBoard: React.FC<Props> = ({ records }) => {
   const { locale } = useUserPreferences();
+  const { t } = useTranslation();
   if (records.length === 0) {
     return (
       <Card className="p-5 md:p-8 bg-foreground/[0.02] border-foreground/[0.05] text-center">
-        <Trophy size={32} className="mx-auto text-muted-foreground mb-4 opacity-50" />
-        <h4 className="text-foreground font-semibold mb-1">No Personal Records Yet</h4>
-        <p className="text-sm text-muted-foreground">Log your first workout to start tracking your bests.</p>
+        <Trophy size={32} className="mx-auto text-muted-foreground mb-4" />
+        <h4 className="text-foreground font-semibold mb-1">{t('sport_forms.no_pr_title')}</h4>
+        <p className="text-sm text-muted-foreground">{t('sport_forms.no_pr_desc')}</p>
       </Card>
     );
   }
@@ -42,7 +44,7 @@ export const PRBoard: React.FC<Props> = ({ records }) => {
               {getSportIcon(pr.sport_type)}
             </div>
             <div>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">
+              <p className="text-xs text-muted-foreground font-medium">
                 {pr.sport_type}
               </p>
               <h4 className="text-sm font-semibold text-foreground leading-tight">

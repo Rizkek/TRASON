@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslation } from '@/libs/i18n/useTranslation';
+import { Textarea } from '@/components/ui/Textarea';
 import React, { useState } from 'react';
 import { Modal, Input, Button } from '@/components';
 import { Barbell as Dumbbell } from '@phosphor-icons/react';
@@ -12,6 +14,7 @@ interface Props {
 }
 
 export const CreatePlanModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isLoading }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [durationWeeks, setDurationWeeks] = useState('4');
@@ -31,18 +34,18 @@ export const CreatePlanModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, is
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create Workout Plan">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('sport_forms.plan_title')}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
-          label="Plan Name"
+          label={t('sport_forms.plan_name')}
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. 5x5 Strength, Summer Shred"
+          placeholder={t('sport_forms.plan_name_placeholder')}
           required
         />
         
         <Input
-          label="Duration (Weeks)"
+          label={t('sport_forms.plan_weeks')}
           type="number"
           min="1"
           max="52"
@@ -52,23 +55,18 @@ export const CreatePlanModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, is
         />
 
         <div>
-          <label className="block text-sm font-semibold text-foreground mb-2">Description (Optional)</label>
-          <textarea
+          <label className="block text-sm font-semibold text-foreground mb-2">{t('sport_forms.plan_desc_label')}</label>
+          <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-foreground/5 border border-foreground/10 rounded-md p-3 text-foreground focus:outline-none focus:border-primary/50 transition-colors"
             rows={3}
-            placeholder="What is the goal of this plan?"
+            placeholder={t('sport_forms.plan_desc_placeholder')}
           />
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-foreground/10">
-          <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading}>
-            Cancel
-          </Button>
-          <Button type="submit" variant="primary" isLoading={isLoading} leftIcon={<Dumbbell size={16} />}>
-            Create Plan
-          </Button>
+          <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading}>{t('common.cancel')}</Button>
+          <Button type="submit" variant="primary" isLoading={isLoading} leftIcon={<Dumbbell size={16} />}>{t('sport_forms.plan_create')}</Button>
         </div>
       </form>
     </Modal>
