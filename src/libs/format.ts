@@ -89,3 +89,27 @@ export const formatReminderDue = (
   });
 };
 
+// Currencies without minor units. Intl reports two digits for IDR, but nobody prices in sen.
+const ZERO_DECIMAL_CURRENCIES = new Set(['IDR', 'JPY', 'KRW', 'VND', 'CLP', 'PYG', 'UGX', 'XAF', 'XOF']);
+
+export const currencyFractionDigits = (currency: string): number =>
+  ZERO_DECIMAL_CURRENCIES.has(currency.toUpperCase()) ? 0 : 2;
+
+/** Rounds to the currency's minor unit, so float noise never reaches the amount column. */
+export const roundToCurrency = (amount: number, currency: string): number => {
+  const factor = 10 ** currencyFractionDigits(currency);
+  return Math.round((amount + Number.EPSILON) * factor) / factor;
+};
+
+/**
+ * What a money field may hold: digits only for currencies without cents, so "166.500" typed with a
+ * thousands dot stays 166500; otherwise digits and one decimal separator, with cents capped.
+ */
+export const sanitizeAmountInput = (raw: string, currency: string): string => {
+  const digits = currencyFractionDigits(currency);
+  if (digits === 0) return raw.replace(/\D/g, '');
+  const normalized = raw.replace(/,/g, '.').replace(/[^\d.]/g, '');
+  const cut = normalized.lastIndexOf('.');
+  if (cut === -1) return normalized;
+  return `${normalized.slice(0, cut).replace(/\./g, '')}.${normalized.slice(cut + 1, cut + 1 + digits)}`;
+};

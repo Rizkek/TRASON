@@ -1,4 +1,4 @@
-import { formatReminderDue } from '@/libs/format';
+import { formatReminderDue, roundToCurrency, sanitizeAmountInput } from '@/libs/format';
 
 describe('formatReminderDue', () => {
   const now = new Date('2026-11-05T03:00:00.000Z');
@@ -39,5 +39,39 @@ describe('formatReminderDue', () => {
 
   it('returns null without a due time', () => {
     expect(formatReminderDue({}, 'en-GB', timezone, now)).toBeNull();
+  });
+});
+
+describe('roundToCurrency', () => {
+  it('keeps cents for currencies that have them', () => {
+    expect(roundToCurrency(12.5, 'USD')).toBe(12.5);
+    expect(roundToCurrency(12.345, 'USD')).toBe(12.35);
+  });
+
+  it('rounds to whole units for currencies without cents', () => {
+    expect(roundToCurrency(166500.4, 'IDR')).toBe(166500);
+    expect(roundToCurrency(1999.5, 'JPY')).toBe(2000);
+  });
+});
+
+describe('sanitizeAmountInput', () => {
+  it('keeps digits only for IDR, so a thousands dot does not become a decimal', () => {
+    expect(sanitizeAmountInput('166.500', 'IDR')).toBe('166500');
+    expect(sanitizeAmountInput('1a2b3', 'IDR')).toBe('123');
+  });
+
+  it('allows one decimal separator and two cents for USD', () => {
+    expect(sanitizeAmountInput('12.50', 'USD')).toBe('12.50');
+    expect(sanitizeAmountInput('12,5', 'USD')).toBe('12.5');
+    expect(sanitizeAmountInput('12.345', 'USD')).toBe('12.34');
+    expect(sanitizeAmountInput('12.', 'USD')).toBe('12.');
+  });
+
+  it('treats earlier separators as thousands marks', () => {
+    expect(sanitizeAmountInput('1,250.50', 'USD')).toBe('1250.50');
+  });
+
+  it('drops letters and signs', () => {
+    expect(sanitizeAmountInput('-$12.5x', 'USD')).toBe('12.5');
   });
 });
