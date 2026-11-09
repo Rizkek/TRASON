@@ -2,7 +2,6 @@
  * Core module types for the modular architecture
  */
 
-import { ReactNode } from 'react';
 
 // Module identifiers
 export type ModuleId = 'finance' | 'investments' | 'timeline' | 'insights' | 'reminders' | 'sport' | 'career';
@@ -46,44 +45,4 @@ export interface ModuleStatus {
   isEnabled: boolean;
   isAvailable: boolean; // Whether user has access (subscription, etc.)
   lastSyncedAt: Date | null;
-}
-
-// Module hook result
-export interface ModuleHookResult<T> extends ModuleDataState {
-  data: T | null;
-}
-
-// Module mutation result
-export interface ModuleMutationResult<T> {
-  data: T | null;
-  isLoading: boolean;
-  error: Error | null;
-  mutate: (data: Partial<T>) => Promise<T | null>;
-}
-
-// Cross-module insight
-export interface CrossModuleInsight {
-  id: string;
-  type: string;
-  title: string;
-  description: string;
-  severity: 'info' | 'warning' | 'success' | 'error';
-  relatedModules: ModuleId[];
-  metadata?: Record<string, unknown>;
-  createdAt: Date;
-}
-
-// Module page props
-export interface ModulePageProps {
-  moduleId: ModuleId;
-}
-
-// Module layout props
-export interface ModuleLayoutProps {
-  moduleId: ModuleId;
-  title: string;
-  description?: string;
-  actions?: ReactNode;
-  children: ReactNode;
-  showBreadcrumbs?: boolean;
 }

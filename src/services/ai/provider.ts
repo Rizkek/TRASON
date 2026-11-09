@@ -72,12 +72,3 @@ export const aiModels = {
   // Helper to retrieve the actual provider name for logging/DB storage
   getProviderName: () => getAIProvider(),
 };
-
-export function listAvailableModels(): Record<string, string> {
-  return getProviderConfig().models;
-}
-
-export function isProviderConfigured(provider?: AIProvider): boolean {
-  const config = getProviderConfig(provider);
-  return Boolean(config.getApiKey());
-}

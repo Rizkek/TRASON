@@ -3,7 +3,7 @@
  * All modules must be registered here
  */
 
-import { ModuleConfig, ModuleId, ModuleMetadata, ModuleStatus } from './types';
+import { ModuleConfig, ModuleId, ModuleMetadata} from './types';
 
 // Module metadata definitions
 export const MODULE_METADATA: Record<ModuleId, ModuleMetadata> = {
@@ -192,20 +192,6 @@ export const getModuleConfig = (id: ModuleId): ModuleConfig => {
 // Get all modules
 export const getAllModules = (): ModuleMetadata[] => {
   return Object.values(MODULE_METADATA).sort((a, b) => a.order - b.order);
-};
-
-// Get enabled modules from user preferences
-export const getEnabledModules = (
-  preferences: Record<string, boolean> = {}
-): ModuleId[] => {
-  return (Object.keys(DEFAULT_MODULE_STATUS) as ModuleId[]).filter(
-    (id) => preferences[id] ?? DEFAULT_MODULE_STATUS[id]
-  );
-};
-
-// Check if module is valid
-export const isValidModule = (id: string): id is ModuleId => {
-  return id in MODULE_METADATA;
 };
 
 // Get module dependencies
