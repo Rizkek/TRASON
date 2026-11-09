@@ -14,8 +14,9 @@ export function useLifeScore(): {
   lifeScore: LifeScoreResult | null;
   isLoading: boolean;
   error: Error | null;
+  refresh: () => Promise<unknown>;
 } {
-  const { data, error, isLoading } = useSWR<{ lifeScore: LifeScoreResult }>(
+  const { data, error, isLoading, mutate } = useSWR<{ lifeScore: LifeScoreResult }>(
     '/api/analytics/life-score',
     async (url: string) => {
       const res = await fetch(url);
@@ -33,5 +34,6 @@ export function useLifeScore(): {
     lifeScore: data?.lifeScore || null,
     isLoading,
     error: error as Error | null,
+    refresh: () => mutate(),
   };
 }

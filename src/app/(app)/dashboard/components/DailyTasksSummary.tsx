@@ -21,10 +21,10 @@ export const DailyTasksSummary = () => {
   const hasMore = totalCount > MAX_PREVIEW;
 
   return (
-    <Card className="flex flex-col p-4 md:p-6">
+    <Card className="flex h-full flex-col p-5">
       <div className="mb-4 flex items-center justify-between border-b border-foreground/10 pb-2">
         <div className="flex items-center gap-2">
-          <Heading as="h2" size="h6" className="uppercase tracking-widest">
+          <Heading as="h2" size="h6">
             {t('dashboard.dailyTasks.title')}
           </Heading>
           {totalCount > 0 && (

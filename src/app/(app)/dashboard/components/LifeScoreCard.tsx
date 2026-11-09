@@ -22,7 +22,7 @@ const TONE_BADGE = {
 } as const;
 
 export function LifeScoreCard() {
-  const { lifeScore, isLoading, error } = useLifeScore();
+  const { lifeScore, isLoading, error, refresh } = useLifeScore();
   const [showInsights, setShowInsights] = useState(false);
   const { t } = useTranslation();
   const { module_features } = useUserPreferences();
@@ -40,12 +40,12 @@ export function LifeScoreCard() {
   );
 
   if (error) {
-    return <InlineError message={t('dashboard.section_load_failed')} />;
+    return <InlineError message={t('dashboard.section_load_failed')} retryLabel={t('common.try_again')} onRetry={() => refresh()} />;
   }
 
   if (isLoading) {
     return (
-      <Card className="p-4">
+      <Card className="p-5">
         <Placeholder className="h-12 w-full" />
       </Card>
     );
@@ -64,14 +64,14 @@ export function LifeScoreCard() {
       : t('life_score.labels.critical');
 
   return (
-    <Card className="p-4">
+    <Card className="p-5">
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div className="flex items-center gap-3">
           <span className="rounded-lg bg-primary/15 p-2 text-primary">
             <TrendingUp size={18} aria-hidden="true" />
           </span>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="text-label-sm uppercase text-foreground">{t('life_score.ui.title')}</span>
+            <span className="text-label-sm text-foreground">{t('life_score.ui.title')}</span>
             <span className="font-mono text-title-md text-foreground">
               {lifeScore.overall}
               <span className="text-xs font-normal text-muted-foreground">/100</span>

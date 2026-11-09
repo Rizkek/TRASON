@@ -40,9 +40,9 @@ const TileHeader = ({ icon: Icon, label }: TileHeaderProps) => (
       <span className="rounded-lg bg-primary/15 p-1.5 text-primary">
         <Icon size={16} aria-hidden="true" />
       </span>
-      <span className="text-label-sm uppercase text-muted-foreground">{label}</span>
+      <span className="text-label-sm text-muted-foreground">{label}</span>
     </div>
-    <ArrowRight size={14} aria-hidden="true" className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />
+    <ArrowRight size={14} aria-hidden="true" className="text-muted-foreground transition-opacity can-hover:opacity-0 can-hover:group-hover:opacity-100 group-focus-visible:opacity-100" />
   </div>
 );
 
@@ -73,7 +73,7 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
 
   return (
     <section aria-labelledby="current-state-heading" className="space-y-3">
-      <Heading as="h2" size="h6" id="current-state-heading" className="px-1 uppercase tracking-widest text-muted-foreground">
+      <Heading as="h2" size="h6" id="current-state-heading" className="text-muted-foreground">
         {t('dashboard.current_state')}
       </Heading>
 
@@ -82,28 +82,28 @@ export const CurrentStateCard: React.FC<CurrentStateCardProps> = ({
           <Link href="/finance" className={TILE}>
             <TileHeader icon={Wallet} label={t('nav.finance')} />
 
-            <div className="flex items-end justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-label-sm uppercase text-muted-foreground">{t('dashboard.income')}</div>
-                <div className="truncate font-mono text-body-md font-semibold text-success">
+            <dl className="space-y-1">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                <dt className="text-label-sm font-normal text-muted-foreground">{t('dashboard.income')}</dt>
+                <dd className="break-words font-mono text-body-md font-semibold text-success">
                   {formatCurrency(totalIncome, currency, locale)}
-                </div>
+                </dd>
               </div>
-              <div className="min-w-0 text-right">
-                <div className="text-label-sm uppercase text-muted-foreground">{t('dashboard.expenses')}</div>
-                <div className="truncate font-mono text-body-md font-semibold text-danger">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                <dt className="text-label-sm font-normal text-muted-foreground">{t('dashboard.expenses')}</dt>
+                <dd className="break-words font-mono text-body-md font-semibold text-danger">
                   {formatCurrency(totalExpense, currency, locale)}
-                </div>
+                </dd>
               </div>
-            </div>
+            </dl>
 
             {globalBudget && (
               <div className="mt-3 space-y-2 border-t border-foreground/10 pt-3">
-                <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                  <span className="truncate">
+                <div className="flex flex-wrap items-center justify-between gap-x-2 text-xs text-muted-foreground">
+                  <span>
                     {Math.round(budgetRatio * 100)}% {t('dashboard.budget_used')}
                   </span>
-                  <span className="shrink-0 font-mono">
+                  <span className="font-mono">
                     {t('dashboard.max_budget').replace('{amount}', formatCurrency(globalBudget.amount, currency, locale))}
                   </span>
                 </div>

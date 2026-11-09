@@ -37,29 +37,29 @@ export const UpNextCard: React.FC<UpNextCardProps> = ({ reminders, isLoading }) 
   );
 
   return (
-    <Card className="p-4 md:p-6">
+    <Card className="p-5">
       <div className="mb-4 flex items-center justify-between border-b border-foreground/10 pb-2">
-        <Heading as="h2" size="h6" className="uppercase tracking-widest">
+        <Heading as="h2" size="h6">
           {t('dashboard.up_next')}
         </Heading>
         <Link
           href="/reminders"
           className="-mr-2 inline-flex min-h-11 items-center gap-1 px-2 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
         >
-          <span>{t('dashboard.view_schedule')}</span>
+          <span>{t('dashboard.view_all')}</span>
           <ArrowRight size={12} aria-hidden="true" />
         </Link>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <Placeholder className="h-14 w-full" />
           <Placeholder className="h-14 w-full" />
         </div>
       ) : upcoming.length === 0 ? (
         <Paragraph className="py-4 text-center text-body-md text-muted-foreground">{t('dashboard.up_next_empty')}</Paragraph>
       ) : (
-        <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {upcoming.map((reminder) => {
             const dueLabel = formatReminderDue(reminder, locale, timezone, now);
             return (
