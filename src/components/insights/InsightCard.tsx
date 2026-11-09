@@ -1,3 +1,4 @@
+import { useTranslation } from '@/libs/i18n/useTranslation';
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { InsightCandidate } from '@/types/insight';
@@ -11,6 +12,7 @@ interface InsightCardProps {
 }
 
 export function InsightCard({ insight, className = '' }: InsightCardProps) {
+  const { t } = useTranslation();
   const [showEvidence, setShowEvidence] = useState(false);
 
   const renderIcon = () => {
@@ -24,7 +26,7 @@ export function InsightCard({ insight, className = '' }: InsightCardProps) {
   };
 
   return (
-    <Card className={`p-5 flex flex-col gap-3 bg-card border border-border shadow-sm rounded-xl ${className}`}>
+    <Card className={`p-5 flex flex-col gap-3 ${className}`}>
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
           {renderIcon()}
@@ -43,26 +45,26 @@ export function InsightCard({ insight, className = '' }: InsightCardProps) {
             className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             <Info className="w-3 h-3" />
-            <span>Why am I seeing this?</span>
+            <span>{t('insights_ui.why')}</span>
           </button>
           
           {showEvidence && (
-            <div className="mt-3 p-3 bg-secondary/50 rounded-lg text-xs text-secondary-foreground">
+            <div className="mt-3 p-3 rounded-lg bg-foreground/5 text-xs text-foreground">
               {insight.evidence.metric && (
                 <div className="flex justify-between items-center py-1">
-                  <span className="text-muted-foreground">Metric</span>
+                  <span className="text-muted-foreground">{t('insights_ui.metric')}</span>
                   <span className="font-medium">{insight.evidence.metric}</span>
                 </div>
               )}
               {insight.evidence.comparison && (
-                <div className="flex justify-between items-center py-1 border-t border-border/50">
-                  <span className="text-muted-foreground">Change</span>
+                <div className="flex justify-between items-center py-1 border-t border-foreground/10">
+                  <span className="text-muted-foreground">{t('insights_ui.change')}</span>
                   <span className="font-medium">{insight.evidence.comparison}</span>
                 </div>
               )}
               {insight.evidence.period && (
-                <div className="flex justify-between items-center py-1 border-t border-border/50">
-                  <span className="text-muted-foreground">Period</span>
+                <div className="flex justify-between items-center py-1 border-t border-foreground/10">
+                  <span className="text-muted-foreground">{t('insights_ui.period')}</span>
                   <span className="font-medium">{insight.evidence.period}</span>
                 </div>
               )}

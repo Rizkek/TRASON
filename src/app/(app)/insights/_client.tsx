@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Card, Badge, Button, Alert, Loading, ConfirmModal, InlineError } from '@/components';
 import { AppPageHeader } from '@/components/layout/AppPageHeader';
-import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/authStore';
 import { insightQueries } from '@/services/analytics/insightQueries';
 import { transactionQueries } from '@/services/finance/transactionQueries';
@@ -13,7 +12,7 @@ import { useCareer } from '@/hooks/useCareer';
 import { useReminder } from '@/hooks/useReminder';
 import { useActivity } from '@/hooks/useActivity';
 import { Lightbulb, Target, ChartBar, Calendar, Stack, Trash as Trash2, ArrowCounterClockwise, ArrowsClockwise } from '@phosphor-icons/react';
-import { formatDate } from '@/libs/format';
+import { formatCurrency, formatDate } from '@/libs/format';
 import { getProfileToday } from '@/libs/profileDate';
 import { isReminderActive } from '@/libs/notificationLogic';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -25,7 +24,7 @@ export function InsightsClient() {
   const authLoading = isLoading;
   const userId = useAuthStore((s) => s.user?.id);
   const { t } = useTranslation();
-  const { language } = useUserPreferences();
+  const { language, currency } = useUserPreferences();
 
   const [dbInsights, setDbInsights] = useState<any[]>([]);
   const [isFetching, setIsFetching] = useState(true);
@@ -101,7 +100,7 @@ export function InsightsClient() {
         }
       });
 
-      // 2. Vitality Context
+      // 2. Sport Context
       const activeMinutes = sportSummary?.totalMinutes || 0;
       const activeSessions = sportSummary?.totalSessions || 0;
       const sportStreak = sportSummary?.streak || 0;
@@ -130,16 +129,19 @@ export function InsightsClient() {
       const loggedActivitiesCount = weeklyActivities?.length || 0;
       const productiveHours = weeklyActivities?.reduce((acc: number, act: any) => acc + (act.duration_minutes || 0), 0) / 60;
 
+      // The model repeats these amounts to the user, so they carry the profile currency.
+      const money = (amount: number) => formatCurrency(amount, currency);
+
       const userContextText = `
 User Context Profile (TRASON Unified Life OS):
 
 1. FINANCIALS (Last 30 Days):
-- Total Income: $${totalIncome.toFixed(2)}
-- Total Expenses: $${totalSpend.toFixed(2)}
-- Top Expense Categories: ${Object.entries(categorySpend).map(([cat, amount]) => `${cat}: $${amount.toFixed(2)}`).join(', ') || 'None'}
+- Total Income: ${money(totalIncome)}
+- Total Expenses: ${money(totalSpend)}
+- Top Expense Categories: ${Object.entries(categorySpend).map(([cat, amount]) => `${cat}: ${money(amount)}`).join(', ') || 'None'}
 - Savings Rate: ${totalIncome > 0 ? (((totalIncome - totalSpend) / totalIncome) * 100).toFixed(1) : 0}%
 
-2. VITALITY & SPORTS (This Week):
+2. SPORT (This Week):
 - Active Workout Minutes: ${activeMinutes} minutes
 - Total Workout Sessions: ${activeSessions}
 - Current Active Streak: ${sportStreak} days
@@ -160,9 +162,9 @@ User Context Profile (TRASON Unified Life OS):
 - Next Scheduled Interview: ${upcomingInterviewText}
 
 6. PORTFOLIO & INVESTMENTS:
-- Total Portfolio Value: $${portfolioValue.toFixed(2)}
-- Total Cost Basis: $${portfolioCost.toFixed(2)}
-- Net Profit/Loss: $${portfolioProfitLoss.toFixed(2)} (${portfolioCost > 0 ? ((portfolioProfitLoss / portfolioCost) * 100).toFixed(2) : 0}%)
+- Total Portfolio Value: ${money(portfolioValue)}
+- Total Cost Basis: ${money(portfolioCost)}
+- Net Profit/Loss: ${money(portfolioProfitLoss)} (${portfolioCost > 0 ? ((portfolioProfitLoss / portfolioCost) * 100).toFixed(2) : 0}%)
 - Daily Portfolio Change: ${dailyChangePct >= 0 ? '+' : ''}${dailyChangePct.toFixed(2)}%
 `;
 
@@ -178,10 +180,7 @@ User Context Profile (TRASON Unified Life OS):
 
       clearTimeout(clientTimeout);
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `HardDrives error ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`Insight request failed with status ${res.status}`);
 
       const data = await res.json();
       
@@ -234,10 +233,7 @@ User Context Profile (TRASON Unified Life OS):
         setDbInsights(savedInsights);
       }
     } catch (err: any) {
-      const msg = err?.name === 'AbortError'
-        ? t('insights_page.ai_timeout_error')
-        : err?.message || t('insights_page.ai_generic_error');
-      setAiError(msg);
+      setAiError(t(err?.name === 'AbortError' ? 'insights_page.ai_timeout_error' : 'insights_page.ai_generic_error'));
       console.error('[handleGenerateAI]', err);
     } finally {
       setIsGenerating(false);
@@ -257,6 +253,7 @@ User Context Profile (TRASON Unified Life OS):
       setDbInsights([]);
     } catch (err) {
       console.error('Failed to reset insights:', err);
+      setAiError(t('insights_page.ai_generic_error'));
     } finally {
       setIsResetting(false);
     }
@@ -269,6 +266,7 @@ User Context Profile (TRASON Unified Life OS):
       setDbInsights(prev => prev.filter(i => i.id !== id));
     } catch (err) {
       console.error('Failed to delete insight:', err);
+      setAiError(t('insights_page.ai_generic_error'));
     }
   };
 
@@ -280,7 +278,7 @@ User Context Profile (TRASON Unified Life OS):
             type: 'investment',
             insight_text: investmentInsight.headline,
             data: {
-              title: 'Investment Analyst',
+              title: t('insights_ui.investment_title'),
               actionable_advice: investmentInsight.observations.join(' '),
             },
             date: new Date().toISOString(),
@@ -290,7 +288,7 @@ User Context Profile (TRASON Unified Life OS):
     ...dbInsights,
   ];
 
-  // MapTrifold Supabase canonical Insight type rows to UI expectations
+  // Map stored Insight rows to the shape the cards render.
   const insights = rawInsights.map((i: any) => {
     if (i.description && i.title) {
       return i;
@@ -298,7 +296,7 @@ User Context Profile (TRASON Unified Life OS):
     return {
       id: i.id,
       type: i.type || 'general',
-      title: i.data?.title || i.category || 'AI Insight',
+      title: i.data?.title || i.category || t('insights_ui.fallback_title'),
       description: i.insight_text || i.description || '',
       content: i.data?.actionable_advice || i.content || '',
       date: i.date,
@@ -373,19 +371,18 @@ User Context Profile (TRASON Unified Life OS):
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {insights.length > 0 ? (
                 insights.map((insight) => {
-                  const tone = insightTone(insight.type);
-                  const Icon = tone.icon;
+                  const Icon = insightIcon(insight.type);
                   return (
-                    <Card key={insight.id} className="p-5 md:p-6">
+                    <Card key={insight.id} className="p-5">
                       <div className="flex items-start gap-4">
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${tone.box}`}>
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-foreground/5 text-muted-foreground">
                           <Icon size={20} aria-hidden="true" />
                         </div>
                         <div className="min-w-0 flex-1 space-y-2">
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex min-w-0 flex-wrap items-center gap-2">
-                              <Badge variant={tone.badge} size="sm">
-                                {insight.type.toUpperCase()}
+                              <Badge size="sm">
+                                {t(`insights_ui.type_${INSIGHT_TYPES.includes(insight.type) ? insight.type : 'general'}`)}
                               </Badge>
                               <span className="flex items-center gap-1 text-label-sm text-muted-foreground">
                                 <Calendar size={12} aria-hidden="true" /> {formatDate(insight.date)}
@@ -441,12 +438,10 @@ User Context Profile (TRASON Unified Life OS):
   );
 }
 
-function insightTone(type: string) {
-  if (type === 'finance' || type === 'investment') {
-    return { icon: ChartBar, box: 'bg-success/10 text-success', badge: 'success' as const };
-  }
-  if (type === 'productivity' || type === 'career') {
-    return { icon: Target, box: 'bg-secondary/10 text-secondary', badge: 'insight' as const };
-  }
-  return { icon: Lightbulb, box: 'bg-primary/10 text-primary', badge: 'activity' as const };
+const INSIGHT_TYPES = ['finance', 'health', 'productivity', 'career', 'investment', 'general'];
+
+function insightIcon(type: string) {
+  if (type === 'finance' || type === 'investment') return ChartBar;
+  if (type === 'productivity' || type === 'career') return Target;
+  return Lightbulb;
 }

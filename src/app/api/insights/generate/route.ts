@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       schema: insightsSchema,
       prompt: `
         You are a highly analytical and empathetic lifestyle architect and coach AI for TRASON (Personal Life OS).
-        Read the user context below, which aggregates their finances, life logs, daily task reminders, career pipeline status, investment portfolio performance, and sport activity/vitality summaries.
+        Read the user context below, which aggregates their finances, life logs, daily task reminders, career pipeline status, investment portfolio performance, and sport activity summaries.
         
         Generate exactly 3 deep, cross-module insights / daily briefing highlights.
         Connect different modules together (e.g. correlation between high sport activity and low dining expenses, or how an upcoming high-priority career interview demands schedule time-blocking, or how their cash-flow runway matches their portfolio volatility).
