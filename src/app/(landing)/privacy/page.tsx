@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/privacy' },
 };
 
-const LAST_UPDATED = 'October 28, 2026';
+const LAST_UPDATED = 'November 5, 2026';
 
 // Each row must match a service the code actually calls; update when an integration is added or removed.
 const PROCESSORS = [
@@ -71,7 +71,7 @@ export default function PrivacyPolicyPage() {
         <ul>
           <li>To run your account and show your records on every device you sign in on.</li>
           <li>To send the reminders, notifications and email digest you turned on.</li>
-          <li>To calculate scores such as Life Score, streaks and financial health. These use fixed rules, not AI.</li>
+          <li>To calculate scores such as Life Score and streaks. These use fixed rules, not AI.</li>
           <li>To produce AI drafts and summaries, but only when you use a feature that asks for one.</li>
           <li>To keep the service secure, for example by stopping automated sign-up attempts.</li>
         </ul>

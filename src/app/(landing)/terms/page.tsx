@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/terms' },
 };
 
-const LAST_UPDATED = 'October 28, 2026';
+const LAST_UPDATED = 'November 5, 2026';
 
 export default function TermsPage() {
   return (
@@ -52,7 +52,7 @@ export default function TermsPage() {
         <h2>4. AI drafts, scores and figures</h2>
         <p>
           Receipt scans, Smart Input, payout imports and weekly summaries are drafts produced by AI and can be wrong.
-          Check them before you save. Life Score, financial health, career rates, exchange rates and investment prices
+          Check them before you save. Life Score, career rates, exchange rates and investment prices
           are calculated or fetched automatically and are for your own tracking only. Nothing in TRASON is financial,
           tax, legal, medical or career advice.
         </p>

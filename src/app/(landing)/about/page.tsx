@@ -31,7 +31,7 @@ const DATA_PROMISES = [
   },
   {
     title: 'Scores you can follow',
-    body: 'Life Score, streaks and financial health come from fixed rules over your own records, so the same week always gives the same result.',
+    body: 'Life Score and streaks come from fixed rules over your own records, so the same week always gives the same result.',
   },
 ];
 
