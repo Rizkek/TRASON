@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require('tailwindcss/plugin');
 
 // Colors are CSS variables set in src/app/globals.css (dark base, html.light override).
 const token = (name) => `rgb(var(--color-${name}) / <alpha-value>)`;
@@ -70,9 +71,9 @@ module.exports = {
       // and, for headings and titles, weight.
       fontSize: {
         'display-2xl': ['72px', { lineHeight: '1.02', letterSpacing: '-0.02em', fontWeight: '800' }],
-        'display-md': ['44px', { lineHeight: '1.08', letterSpacing: '-0.02em', fontWeight: '800' }],
         'display-xl': ['48px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '800' }],
-        'display-lg': ['40px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '800' }],
+        'display-lg': ['44px', { lineHeight: '1.08', letterSpacing: '-0.02em', fontWeight: '800' }],
+        'display-md': ['40px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '800' }],
         'heading-xl': ['32px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }],
         'heading-lg': ['24px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }],
         'heading-md': ['20px', { lineHeight: '1.3', fontWeight: '600' }],
@@ -101,14 +102,18 @@ module.exports = {
       maxWidth: {
         'container': '1024px',
       },
+      // Ascending scale. xl (12px) and 2xl (16px) are Tailwind's own values.
       borderRadius: {
         'xs': '4px',
-        'sm': '8px',
-        'md': '12px',
+        'sm': '6px',
+        'md': '8px',
+        'lg': '10px',
       },
     },
   },
   plugins: [
     require('@tailwindcss/typography'),
+    // Row actions may hide until hover only where hover exists; width says nothing about touch on tablets.
+    plugin(({ addVariant }) => addVariant('can-hover', '@media (hover: hover)')),
   ],
 };

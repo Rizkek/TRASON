@@ -58,7 +58,7 @@ type Step = 1 | 2 | 3;
 const CHOICE_BASE = 'min-h-11 rounded-lg border px-4 py-2 text-body-md font-semibold transition-colors';
 const CHOICE_ON = 'border-primary bg-primary text-on-primary';
 const CHOICE_OFF = 'border-foreground/20 bg-foreground/[0.03] text-muted-foreground hover:border-foreground/40 hover:text-foreground';
-const FIELD_LABEL = 'mb-2 block text-label-sm uppercase text-muted-foreground';
+const FIELD_LABEL = 'mb-2 block text-label-sm text-muted-foreground';
 
 export function OnboardingClient() {
   const router = useRouter();

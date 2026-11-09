@@ -30,7 +30,7 @@ export function SectionHeading({
 
   return (
     <div className={`flex max-w-2xl flex-col gap-4 ${alignClass} ${className}`}>
-      <Tag id={id} className="text-heading-xl leading-[1.08] text-foreground sm:text-4xl lg:text-display-md">
+      <Tag id={id} className="text-heading-xl leading-[1.08] text-foreground sm:text-4xl lg:text-display-lg">
         {title}
       </Tag>
       {lede && <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">{lede}</p>}

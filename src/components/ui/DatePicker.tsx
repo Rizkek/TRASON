@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { DayPicker } from 'react-day-picker';
-import { CalendarBlank, CaretLeft, CaretRight, X, Check } from '@phosphor-icons/react';
+import { CalendarBlank, X} from '@phosphor-icons/react';
 import { formatDateOnly } from '@/libs/date';
 
 export interface HolidayItem {
@@ -121,7 +121,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       {label && (
         <label
           htmlFor={id}
-          className="block text-xs font-medium text-muted-foreground uppercase tracking-wider select-none"
+          className="block text-xs font-semibold text-muted-foreground select-none"
         >
           {label}
         </label>
@@ -147,7 +147,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               {displayString ? (
                 <span className="text-foreground font-medium truncate">{displayString}</span>
               ) : (
-                <span className="text-muted-foreground/60 truncate">{placeholder}</span>
+                <span className="text-muted-foreground truncate">{placeholder}</span>
               )}
             </div>
 
@@ -217,8 +217,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               .rdp-weekday {
                 font-size: 0.75rem;
                 font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.1em;
                 color: rgb(var(--color-muted));
                 padding: 0.5rem 0.25rem;
                 text-align: center;

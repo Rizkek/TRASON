@@ -45,7 +45,7 @@ export const Input = memo(
           {label && (
             <label
               htmlFor={inputId}
-              className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5"
+              className="block text-xs font-semibold text-muted-foreground mb-1.5"
             >
               {label}
             </label>

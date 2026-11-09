@@ -13,7 +13,7 @@ export function Hero() {
           <div className="lg:col-span-7">
             <h1
               id="hero-heading"
-              className="lp-rise text-display-md leading-[1.05] text-foreground sm:text-6xl lg:text-display-2xl"
+              className="lp-rise text-display-lg leading-[1.05] text-foreground sm:text-6xl lg:text-display-2xl"
             >
               <span className="block">Your life,</span>
               <span className="block">in one</span>

@@ -257,29 +257,41 @@ p {
   }
 }
 
-/* Surfaces. Written after the utilities on purpose: they win over same-specificity utility
-   classes on the element, which the current screens rely on. Flat: no blur, no shadow, no lift. */
-.card {
-  @apply rounded-md;
-  background-color: rgb(var(--color-surface) / var(--card-alpha));
-  border: 1px solid rgb(var(--color-foreground) / var(--card-border-alpha));
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+/* Surfaces. In the components layer so a utility on the element (bg-*, border-*, rounded-*) wins.
+   Flat: no blur, no shadow, no lift. Only a clickable card reacts to hover. */
+@layer components {
+  .card {
+    @apply rounded-md;
+    background-color: rgb(var(--color-surface) / var(--card-alpha));
+    border: 1px solid rgb(var(--color-foreground) / var(--card-border-alpha));
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+  }
+
+  .card-interactive:hover {
+    border-color: rgb(var(--color-primary-text) / 0.3);
+    background-color: rgb(var(--color-surface-hover) / 0.5);
+  }
+
+  .glass {
+    background-color: rgb(var(--color-foreground) / 0.03);
+    border: 1px solid rgb(var(--color-foreground) / var(--card-border-alpha));
+  }
+
+  .glass-card {
+    @apply rounded-md;
+    background-color: rgb(var(--color-foreground) / 0.03);
+    border: 1px solid rgb(var(--color-foreground) / var(--card-border-alpha));
+  }
 }
 
-.card:hover {
-  border-color: rgb(var(--color-primary-text) / 0.3);
-  background-color: rgb(var(--color-surface-hover) / 0.5);
-}
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
 
-.glass {
-  background-color: rgb(var(--color-foreground) / 0.03);
-  border: 1px solid rgb(var(--color-foreground) / var(--card-border-alpha));
-}
-
-.glass-card {
-  @apply rounded-md;
-  background-color: rgb(var(--color-foreground) / 0.03);
-  border: 1px solid rgb(var(--color-foreground) / var(--card-border-alpha));
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Text utilities */
@@ -288,7 +300,7 @@ p {
 }
 
 .text-micro {
-  @apply font-sans text-xs font-medium uppercase tracking-wider;
+  @apply font-sans text-xs font-medium;
 }
 
 /* Remove autocomplete background for Chrome/Webkit */

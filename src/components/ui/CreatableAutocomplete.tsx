@@ -237,12 +237,12 @@ export function CreatableAutocomplete({
   return (
     <div ref={containerRef} className={`relative w-full space-y-2 ${className}`}>
       {label && (
-        <label className="block text-xs font-semibold text-subtle tracking-wide flex items-center justify-between">
+        <label className="block text-xs font-semibold text-subtle flex items-center justify-between">
           <span>
             {label}
             {required && <span className="text-danger ml-1">*</span>}
           </span>
-          <span className="text-xs text-muted-foreground/60 font-normal">
+          <span className="text-xs text-muted-foreground font-normal">
             {type === 'company' ? 'Ketik nama / pilih dari daftar' : 'Pilih posisi standar'}
           </span>
         </label>
@@ -314,7 +314,7 @@ export function CreatableAutocomplete({
       {isOpen && (
         <div className="absolute left-0 right-0 top-full mt-1 z-[300] max-h-72 overflow-y-auto rounded-xl border border-foreground/10 bg-background p-1.5 text-foreground animate-in fade-in-0 zoom-in-95">
           {/* Header indicator */}
-          <div className="px-2.5 py-1 text-xs font-medium uppercase tracking-wider text-muted-foreground/50 flex items-center justify-between border-b border-foreground/5 mb-1 pb-1">
+          <div className="px-2.5 py-1 text-xs font-medium text-muted-foreground flex items-center justify-between border-b border-foreground/5 mb-1 pb-1">
             <span>
               {type === 'company' ? 'Rekomendasi Perusahaan Indonesia & Global' : 'Rekomendasi Posisi & Peran'}
             </span>
@@ -341,11 +341,11 @@ export function CreatableAutocomplete({
                   <span className="text-xs font-medium truncate">
                     + Tambah &ldquo;{inputValue.trim()}&rdquo;
                   </span>
-                  <span className="text-xs px-1.5 py-0.2 rounded bg-primary/25 text-primary uppercase font-medium tracking-wider">
+                  <span className="text-xs px-1.5 py-0.2 rounded bg-primary/25 text-primary font-medium">
                     Baru
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground/80 font-light truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   Simpan ke daftar pilihan pribadi Anda
                 </p>
               </div>
@@ -389,15 +389,15 @@ export function CreatableAutocomplete({
                     ) : item.badgeType === 'api' ? (
                       <Globe size={14} className="text-info shrink-0" />
                     ) : type === 'company' ? (
-                      <Buildings size={14} className="text-muted-foreground/60 shrink-0" />
+                      <Buildings size={14} className="text-muted-foreground shrink-0" />
                     ) : (
-                      <Briefcase size={14} className="text-muted-foreground/60 shrink-0" />
+                      <Briefcase size={14} className="text-muted-foreground shrink-0" />
                     )}
 
                     <div className="min-w-0">
                       <p className="truncate font-medium">{item.title}</p>
                       {item.subtitle && (
-                        <p className="text-xs text-muted-foreground/60 truncate font-mono">
+                        <p className="text-xs text-muted-foreground truncate font-mono">
                           {item.subtitle}
                         </p>
                       )}
@@ -425,7 +425,7 @@ export function CreatableAutocomplete({
             })}
 
             {suggestions.length === 0 && !showCreatable && (
-              <div className="p-4 text-center text-xs text-muted-foreground/70 italic">
+              <div className="p-4 text-center text-xs text-muted-foreground">
                 {isLoadingApi ? 'Mencari...' : 'Tidak ada rekomendasi ditemukan.'}
               </div>
             )}

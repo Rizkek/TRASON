@@ -116,12 +116,12 @@ export const Calendar: React.FC<CalendarProps> = ({
         {/* Events list */}
         <div className="mt-1 space-y-1 overflow-hidden hidden md:block">
           {dateEvents.slice(0, 2).map((e, i) => (
-            <div key={i} className="text-xs truncate px-1.5 py-0.5 rounded border font-light bg-deep-sage/10 text-foreground border-deep-sage/20">
+            <div key={i} className="text-xs truncate px-1.5 py-0.5 rounded border bg-deep-sage/10 text-foreground border-deep-sage/20">
               {e.title}
             </div>
           ))}
           {dateEvents.length > 2 && (
-            <div className="text-xs text-muted-foreground italic pl-1">+{dateEvents.length - 2} more</div>
+            <div className="text-xs text-muted-foreground pl-1">+{dateEvents.length - 2} more</div>
           )}
         </div>
       </div>
@@ -139,7 +139,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       {/* Calendar Header */}
       <div className="flex items-center justify-between p-6 border-b border-foreground/[0.03]">
         <h3 className="text-heading-lg flex items-center gap-2">
-          <span className="text-primary">{monthName}</span> <span className="text-foreground/40 font-light">{year}</span>
+          <span className="text-primary">{monthName}</span> <span className="text-foreground/40">{year}</span>
         </h3>
         <div className="flex gap-2">
           <button onClick={handlePrevMonth} aria-label="Previous month" className="p-2 hover:bg-foreground/5 rounded-full transition-colors text-foreground">
@@ -160,8 +160,8 @@ export const Calendar: React.FC<CalendarProps> = ({
         }).map((day, i) => (
           <div 
             key={day} 
-            className={`py-2 text-center text-xs uppercase tracking-[0.2em] font-medium ${
-              i === 0 ? 'text-danger font-extrabold' : 'text-muted-foreground/60'
+            className={`py-2 text-center text-xs font-medium ${
+              i === 0 ? 'text-danger font-extrabold' : 'text-muted-foreground'
             }`}
           >
             {day}
@@ -177,7 +177,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       {/* Month Holiday Footer Summary */}
       {currentMonthHolidays.length > 0 && (
         <div className="p-4 md:px-6 border-t border-foreground/[0.05] bg-surface/30 flex items-start gap-4 flex-wrap">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider shrink-0 pt-0.5">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground shrink-0 pt-0.5">
             <CalendarCheck size={14} className="text-primary" />
             <span>Hari Libur Bulan Ini:</span>
           </div>

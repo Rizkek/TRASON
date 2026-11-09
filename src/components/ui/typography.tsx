@@ -18,7 +18,7 @@ const headingVariants = cva("font-sans leading-tight tracking-tight", {
             inverse: "text-background",
         },
         size: {
-            display: "text-display-lg md:text-display-xl",
+            display: "text-display-md md:text-display-xl",
             h1: "text-heading-lg md:text-heading-xl",
             h2: "text-heading-md md:text-heading-lg",
             h3: "text-title-lg md:text-heading-md",

@@ -17,7 +17,7 @@ export default function NotFound() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-display-lg text-primary">Page Not Found</h1>
+          <h1 className="text-display-md text-primary">Page Not Found</h1>
           <p className="text-muted-foreground">
             The page you requested does not exist or may have been moved.
           </p>

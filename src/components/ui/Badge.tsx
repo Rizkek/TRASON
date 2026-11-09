@@ -22,9 +22,9 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
     };
 
     const sizeStyles = {
-      sm: 'px-2 py-1 text-xs font-medium uppercase tracking-wider',
-      md: 'px-4 py-2 text-xs font-medium uppercase tracking-widest',
-      lg: 'px-6 py-4 text-sm font-medium uppercase tracking-widest',
+      sm: 'px-2 py-1 text-xs font-medium',
+      md: 'px-4 py-2 text-xs font-medium',
+      lg: 'px-6 py-4 text-sm font-medium',
     };
 
     return (

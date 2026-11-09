@@ -69,7 +69,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
         {label && (
           <label
             htmlFor={id}
-            className="block text-xs font-medium text-muted-foreground uppercase tracking-wider select-none"
+            className="block text-xs font-semibold text-muted-foreground select-none"
           >
             {label}
           </label>
@@ -94,10 +94,10 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             } ${triggerClassName}`}
           >
             <span className="truncate">
-              <SelectPrimitive.Value placeholder={<span className="text-muted-foreground/60">{placeholder}</span>} />
+              <SelectPrimitive.Value placeholder={<span className="text-muted-foreground">{placeholder}</span>} />
             </span>
             <SelectPrimitive.Icon asChild>
-              <CaretDown size={14} weight="bold" className="text-muted-foreground/70 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+              <CaretDown size={14} weight="bold" className="text-muted-foreground shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
             </SelectPrimitive.Icon>
           </SelectPrimitive.Trigger>
 
@@ -120,7 +120,7 @@ export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                       return (
                         <SelectPrimitive.Group key={opt.label || idx}>
                           {opt.label && (
-                            <SelectPrimitive.Label className="px-2.5 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground/50">
+                            <SelectPrimitive.Label className="px-2.5 py-1.5 text-xs font-medium text-muted-foreground">
                               {opt.label}
                             </SelectPrimitive.Label>
                           )}
@@ -200,7 +200,7 @@ export const SelectLabel = React.forwardRef<
 >(({ className = '', ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={`px-2.5 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground/50 ${className}`}
+    className={`px-2.5 py-1.5 text-xs font-medium text-muted-foreground ${className}`}
     {...props}
   />
 ));
