@@ -1,7 +1,8 @@
 'use client';
 
+import { Tabs } from '@/components/ui/Tabs';
 import React, { useEffect, useState, useCallback } from 'react';
-import { Loading, ErrorAlert, InlineError, ConfirmModal } from '@/components';
+import { Button, Loading, ErrorAlert, InlineError, ConfirmModal } from '@/components';
 import { useAuthStore } from '@/store/authStore';
 import { useActivity } from '@/hooks/useActivity';
 import { useDailyTasks } from '@/hooks/useDailyTasks';
@@ -11,10 +12,10 @@ import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useReminder } from '@/hooks/useReminder';
 import { useNow } from '@/hooks/useNow';
-import { isReminderActive } from '@/libs/notificationLogic';
-import { Calendar, ListChecks } from '@phosphor-icons/react';
+import { getReminderDueAt, isReminderActive } from '@/libs/notificationLogic';
+import { Calendar, CaretLeft, CaretRight, ListChecks } from '@phosphor-icons/react';
 import {
-  getCurrentWeekBounds,
+  getWeekBounds,
   getDaysOfWeek,
   defaultActivityForm,
   ActivityFormData,
@@ -30,7 +31,8 @@ export function TimelineClient() {
   const { module_features, locale } = useUserPreferences();
   const { t } = useTranslation();
 
-  const { start: weekStart, end: weekEnd } = getCurrentWeekBounds();
+  const [weekOffset, setWeekOffset] = useState(0);
+  const { start: weekStart, end: weekEnd } = getWeekBounds(weekOffset);
   const daysOfWeek = getDaysOfWeek(weekStart);
 
   const { activities, isLoading, userErrorMessage: activitiesError, refresh: refreshActivities, createActivity, updateActivity, deleteActivity } = useActivity(
@@ -110,13 +112,10 @@ export function TimelineClient() {
       title: activity.title,
       description: activity.description || '',
       category: activity.category || '',
-      mood: activity.mood || '',
       dayIndex: jsDay === 0 ? 6 : jsDay - 1,
       start_hour: start.getHours(),
       start_minute: start.getMinutes(),
       duration_minutes: end ? Math.round((end.getTime() - start.getTime()) / 60000) : 60,
-      location: activity.location || '',
-      rating: activity.rating || 0,
       applyToAllDays: false,
       isWeeklyRoutine: isRoutine,
     });
@@ -124,7 +123,10 @@ export function TimelineClient() {
   }, []);
 
   const handleSave = async () => {
-    if (!form.title.trim()) return;
+    if (!form.title.trim()) {
+      setFormErrors({ title: t('timeline_page.title_required') });
+      return;
+    }
 
     setIsSaving(true);
     setFormErrors({});
@@ -141,12 +143,9 @@ export function TimelineClient() {
           title: form.title.trim(),
           description: form.description.trim() || undefined,
           category: form.category || undefined,
-          mood: form.mood || undefined,
           start_time: startDate.toISOString(),
           end_time: endDate.toISOString(),
           duration_minutes: form.duration_minutes,
-          location: form.location.trim() || undefined,
-          rating: form.rating || undefined,
           metadata: {
             ...(editingActivity?.metadata || {}),
             is_weekly_routine: form.isWeeklyRoutine,
@@ -174,12 +173,9 @@ export function TimelineClient() {
               title: form.title.trim(),
               description: form.description.trim() || undefined,
               category: form.category || undefined,
-              mood: form.mood || undefined,
               start_time: startDate.toISOString(),
               end_time: endDate.toISOString(),
               duration_minutes: form.duration_minutes,
-              location: form.location.trim() || undefined,
-              rating: form.rating || undefined,
               metadata: {
                 is_weekly_routine: form.isWeeklyRoutine,
               },
@@ -204,12 +200,9 @@ export function TimelineClient() {
             title: form.title.trim(),
             description: form.description.trim() || undefined,
             category: form.category || undefined,
-            mood: form.mood || undefined,
             start_time: startDate.toISOString(),
             end_time: endDate.toISOString(),
             duration_minutes: form.duration_minutes,
-            location: form.location.trim() || undefined,
-            rating: form.rating || undefined,
             metadata: {
               is_weekly_routine: form.isWeeklyRoutine,
             },
@@ -282,8 +275,8 @@ export function TimelineClient() {
 
   reminders.forEach((rem) => {
     if (!rem.due_date || !isReminderActive(now, rem)) return;
-    const remDate = new Date(rem.due_date);
-    const dayIdx = daysOfWeek.findIndex((d) => d.toDateString() === remDate.toDateString());
+    const remDate = getReminderDueAt(rem);
+    const dayIdx = daysOfWeek.findIndex((d) => d.toDateString() === remDate?.toDateString());
     if (dayIdx >= 0) {
       let h = 9;
       if (rem.due_time) {
@@ -321,47 +314,38 @@ export function TimelineClient() {
           />
 
           {/* Tab Switcher */}
-          <div className="flex items-center gap-2 bg-foreground/[0.02] p-4 rounded-lg mb-8 w-max border border-foreground/[0.05]">
-            {module_features?.['timeline_weekly_log'] !== false && (
-              <button
-                onClick={() => setActiveTab('weekly-log')}
-                title={t('timeline_page.weekly_log')}
-                className={`flex items-center gap-2 px-6 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
-                  activeTab === 'weekly-log'
-                    ? 'bg-primary text-on-primary '
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Calendar size={14} />
-                <span className="hidden md:inline">{t('timeline_page.weekly_log')}</span>
-              </button>
-            )}
-            {module_features?.['timeline_daily_checklist'] !== false && (
-              <button
-                onClick={() => setActiveTab('daily-checklist')}
-                title={t('timeline_page.daily_checklist')}
-                className={`flex items-center gap-2 px-6 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
-                  activeTab === 'daily-checklist'
-                    ? 'bg-primary text-on-primary '
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <ListChecks size={14} />
-                <span className="hidden md:inline">{t('timeline_page.daily_checklist')}</span>
-                {totalCount > 0 && (
-                  <span
-                    className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold ${
-                      completedCount === totalCount
-                        ? 'bg-income/20 text-income'
-                        : 'bg-foreground/10 text-muted-foreground'
-                    }`}
-                  >
-                    {completedCount}
-                  </span>
-                )}
-              </button>
-            )}
-          </div>
+          <Tabs
+            label={t('timeline_page.title')}
+            value={activeTab}
+            onChange={setActiveTab}
+            items={[
+              ...(module_features?.['timeline_weekly_log'] !== false
+                ? [{ id: 'weekly-log' as const, label: t('timeline_page.weekly_log'), icon: Calendar }]
+                : []),
+              ...(module_features?.['timeline_daily_checklist'] !== false
+                ? [{ id: 'daily-checklist' as const, label: t('timeline_page.daily_checklist'), icon: ListChecks }]
+                : []),
+            ]}
+          />
+
+          {activeTab === 'weekly-log' && (
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="ghost" onClick={() => setWeekOffset((w) => w - 1)} aria-label={t('schedule_ui.prev_week')} title={t('schedule_ui.prev_week')} className="h-11 w-11 px-0">
+                <CaretLeft size={16} aria-hidden="true" />
+              </Button>
+              <span className="min-w-36 text-center text-label-md text-foreground" aria-live="polite">
+                {daysOfWeek[0].toLocaleDateString(locale, { month: 'short', day: 'numeric' })} – {daysOfWeek[6].toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
+              </span>
+              <Button variant="ghost" onClick={() => setWeekOffset((w) => w + 1)} aria-label={t('schedule_ui.next_week')} title={t('schedule_ui.next_week')} className="h-11 w-11 px-0">
+                <CaretRight size={16} aria-hidden="true" />
+              </Button>
+              {weekOffset !== 0 && (
+                <Button variant="outline" size="sm" onClick={() => setWeekOffset(0)}>
+                  {t('schedule_ui.this_week')}
+                </Button>
+              )}
+            </div>
+          )}
 
           {/* Daily Checklist Panel */}
           {activeTab === 'daily-checklist' && module_features?.['timeline_daily_checklist'] !== false && (
@@ -408,6 +392,10 @@ export function TimelineClient() {
           formErrors={formErrors}
           isSaving={isSaving}
           onSave={handleSave}
+          onDelete={() => {
+            setIsModalOpen(false);
+            setDeleteConfirmId(editingActivity?.id ?? null);
+          }}
           daysOfWeek={daysOfWeek}
           locale={locale}
         />

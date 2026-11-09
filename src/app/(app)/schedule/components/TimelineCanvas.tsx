@@ -63,7 +63,7 @@ export function TimelineCanvas({
   return (
     <div className="glass rounded-xl border border-foreground/[0.05] overflow-hidden">
       {/* Desktop View */}
-      <div className="hidden md:block overflow-x-auto custom-scrollbar">
+      <div className="hidden md:block overflow-x-auto">
         <div className="min-w-[700px] md:min-w-0">
           <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-foreground/[0.05] bg-surface/60 sticky top-0 z-20">
             <div className="border-r border-foreground/[0.03]" />
@@ -80,14 +80,14 @@ export function TimelineCanvas({
                     <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
                   )}
                   <Paragraph
-                    className={`text-xs font-bold uppercase tracking-[0.15em] ${
+                    className={`text-xs font-bold ${
                       isToday ? 'text-primary' : 'text-muted-foreground'
                     }`}
                   >
                     {day.toLocaleDateString(locale, { weekday: 'short' })}
                   </Paragraph>
                   <Paragraph
-                    className="text-xs font-mono mt-0.5 text-muted-foreground/60"
+                    className="text-xs font-mono mt-0.5 text-muted-foreground"
                   >
                     {day.getDate()}
                   </Paragraph>
@@ -102,7 +102,7 @@ export function TimelineCanvas({
             className="overflow-y-auto"
             style={{ maxHeight: 'calc(100dvh - 280px)' }}
             role="grid"
-            aria-label="Weekly schedule grid"
+            aria-label={t('schedule_ui.grid_label')}
           >
             <div className="relative">
               {/* Current time line */}
@@ -129,7 +129,7 @@ export function TimelineCanvas({
                     {/* Hour label */}
                     <div
                       className={`flex items-start justify-end pr-2 pt-2 border-r border-foreground/[0.03] sticky left-0 bg-surface/40 ${
-                        isCurrentHour ? 'text-danger' : 'text-muted-foreground opacity-40'
+                        isCurrentHour ? 'text-danger' : 'text-muted-foreground'
                       }`}
                     >
                       <span className="text-xs font-bold font-mono">{formatHour(hour)}</span>
@@ -170,7 +170,7 @@ export function TimelineCanvas({
                           {hasClash && (
                             <div className="flex items-center gap-1 bg-warning/20 text-warning border border-warning/40 rounded px-1.5 py-0.5 mb-1 text-xs font-bold">
                               <Warning size={10} className="shrink-0" />
-                              <span className="truncate">Bentrok ({cellReminders.length} Pengingat)</span>
+                              <span className="truncate">{t('schedule_ui.conflict').replace('{count}', String(cellReminders.length))}</span>
                             </div>
                           )}
 
@@ -179,7 +179,7 @@ export function TimelineCanvas({
                             <div
                               key={rem.id}
                               className="rounded p-1 mb-1 text-left border-l-2 border-warning bg-warning/10 text-foreground relative group/rem"
-                              title={`Pengingat: ${rem.title}${rem.due_time ? ' (' + rem.due_time + ')' : ''}`}
+                              title={`${t('schedule_ui.reminder')}: ${rem.title}${rem.due_time ? ' (' + rem.due_time + ')' : ''}`}
                             >
                               <div className="flex items-center gap-1">
                                 <Bell size={10} className="text-warning shrink-0" />
@@ -224,7 +224,7 @@ export function TimelineCanvas({
                               >
                                 <div className="flex items-center gap-1">
                                   {isRoutine && (
-                                    <span title="Jadwal Rutin Mingguan" className="inline-flex items-center shrink-0">
+                                    <span title={t('schedule_ui.weekly_routine')} className="inline-flex items-center shrink-0">
                                       <Repeat size={10} className="text-primary" />
                                     </span>
                                   )}
@@ -234,12 +234,12 @@ export function TimelineCanvas({
                                 </div>
                                 <div className="flex items-center gap-1 mt-0.5">
                                   {act.category && (
-                                    <span className="text-xs text-primary opacity-80 uppercase tracking-wide">
+                                    <span className="text-xs text-primary opacity-80">
                                       {act.category}
                                     </span>
                                   )}
                                   {getDurationLabel(act) && (
-                                    <span className="text-xs text-muted-foreground opacity-60">
+                                    <span className="text-xs text-muted-foreground">
                                       {getDurationLabel(act)}
                                     </span>
                                   )}
@@ -250,10 +250,10 @@ export function TimelineCanvas({
                                     e.stopPropagation();
                                     onConfirmDelete(act.id);
                                   }}
-                                  className="absolute top-0.5 right-0.5 opacity-0 group-hover/card:opacity-100 text-muted-foreground hover:text-danger transition-all"
+                                  className="absolute top-0.5 right-0.5 can-hover:opacity-0 can-hover:group-hover/card:opacity-100 focus-visible:opacity-100 text-muted-foreground hover:text-danger transition-colors"
                                   aria-label={`Delete ${act.title}`}
                                 >
-                                  <Trash2 size={9} />
+                                  <Trash2 size={12} />
                                 </button>
                               </div>
                             );
@@ -277,7 +277,7 @@ export function TimelineCanvas({
           >
             <CaretLeft size={20} />
           </button>
-          <Heading as="h3" size="h3" className="font-bold text-foreground uppercase tracking-widest text-sm flex-1 text-center">
+          <Heading as="h3" size="h3" className="font-bold text-foreground text-sm flex-1 text-center">
             {daysOfWeek[mobileDayIdx]?.toLocaleDateString(locale, {
               weekday: 'short',
               month: 'short',
@@ -304,12 +304,12 @@ export function TimelineCanvas({
 
               {todaysActivities.length === 0 && todaysReminders.length === 0 && (
                 <div className="text-center py-8 space-y-2">
-                  <Paragraph className="text-muted-foreground italic text-xs">
+                  <Paragraph className="text-muted-foreground text-xs">
                     {t('timeline_page.no_activities_today')}
                   </Paragraph>
                   <button
                     onClick={() => onOpenAddModal()}
-                    className="text-primary hover:text-primary-light flex items-center gap-1 text-sm mx-auto mt-4"
+                    className="text-primary hover:underline flex items-center gap-1 text-sm mx-auto mt-4"
                   >
                     <Plus size={16} /> {t('timeline_page.log_activity_btn')}
                   </button>
@@ -326,13 +326,11 @@ export function TimelineCanvas({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <Paragraph className="font-bold text-sm text-warning truncate">{rem.title}</Paragraph>
-                      <span className="text-xs px-1.5 py-0.5 rounded bg-warning/20 text-warning font-bold uppercase tracking-wider">
-                        Pengingat
-                      </span>
+                      <span className="text-xs px-1.5 py-0.5 rounded bg-warning/20 text-warning font-bold">{t('schedule_ui.reminder')}</span>
                     </div>
                     {rem.due_time && (
                       <Paragraph className="text-xs text-warning/80 font-mono mt-0.5">
-                        Waktu: {rem.due_time}
+                        {t('schedule_ui.time')}: {rem.due_time}
                       </Paragraph>
                     )}
                   </div>
@@ -362,11 +360,9 @@ export function TimelineCanvas({
                         {isRoutine && <Repeat size={12} className="text-accent-purple shrink-0" />}
                         <Paragraph className="font-bold text-sm text-foreground truncate">{act.title}</Paragraph>
                       </div>
-                      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground uppercase tracking-widest mt-1">
+                      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-1">
                         {isRoutine && (
-                          <span className="text-accent-purple bg-accent-purple/20 px-1 rounded shrink-0">
-                            Rutin
-                          </span>
+                          <span className="text-accent-purple bg-accent-purple/20 px-1 rounded shrink-0">{t('schedule_ui.routine')}</span>
                         )}
                         {act.category && <span className="text-primary shrink-0">{act.category}</span>}
                         {getDurationLabel(act) && <span className="shrink-0">• {getDurationLabel(act)}</span>}
@@ -376,9 +372,10 @@ export function TimelineCanvas({
                           e.stopPropagation();
                           onConfirmDelete(act.id);
                         }}
-                        className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-expense transition-opacity"
+                        aria-label={`Delete ${act.title}`}
+                        className="absolute -top-2 -right-2 p-3 text-muted-foreground hover:text-expense transition-colors"
                       >
-                        <Trash2 size={12} />
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
@@ -386,7 +383,7 @@ export function TimelineCanvas({
               })}
               <button
                 onClick={() => onOpenAddModal()}
-                className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-foreground/10 hover:border-primary/50 text-muted-foreground hover:text-primary rounded-lg transition-colors text-xs font-bold uppercase tracking-widest mt-4"
+                className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-foreground/10 hover:border-primary/50 text-muted-foreground hover:text-primary rounded-lg transition-colors text-xs font-bold mt-4"
               >
                 <Plus size={14} /> {t('timeline_page.log_activity_btn')}
               </button>

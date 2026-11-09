@@ -1,5 +1,6 @@
 'use client';
 
+import { EmptyState } from '@/components/ui/EmptyState';
 import React, { useState } from 'react';
 import { Loading } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
@@ -58,7 +59,7 @@ export function DailyTasksPanel({
       {/* Checklist Header */}
       <div className="flex items-center justify-between px-4 py-4 md:px-8 md:py-6 border-b border-foreground/[0.05] bg-surface/40">
         <div className="space-y-1">
-          <Heading as="h2" size="h2" className="text-sm font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+          <Heading as="h2" size="h2" className="text-sm font-bold text-foreground flex items-center gap-2">
             <ListChecks size={15} className="text-primary" />
             {new Date().toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' })}
           </Heading>
@@ -73,12 +74,12 @@ export function DailyTasksPanel({
               <span className="text-xs text-muted-foreground">
                 {completedCount === totalCount && totalCount > 0
                   ? t('timeline_page.all_done')
-                  : `${completedCount} of ${totalCount}`}
+                  : `${completedCount} / ${totalCount}`}
               </span>
             </div>
           )}
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground opacity-50">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <ArrowCounterClockwise size={11} />
           {t('timeline_page.resets_midnight')}
         </div>
@@ -97,7 +98,7 @@ export function DailyTasksPanel({
           <button
             type="submit"
             disabled={!newTaskInput.trim() || isAddingTask}
-            className="flex items-center gap-2 px-6 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary rounded-md text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary rounded-md text-xs font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <Plus size={14} />
             {t('timeline_page.add')}
@@ -113,15 +114,7 @@ export function DailyTasksPanel({
             <Loading />
           </div>
         ) : tasks.length === 0 ? (
-          <div className="flex flex-col items-center py-16 gap-4 text-center px-8">
-            <ListChecks size={40} className="text-muted-foreground opacity-20" />
-            <Paragraph className="text-sm text-muted-foreground opacity-60 font-light italic">
-              {t('dailyTasks.empty')}
-            </Paragraph>
-            <Paragraph className="text-xs text-muted-foreground opacity-40">
-              {t('timeline_page.resets_midnight')}
-            </Paragraph>
-          </div>
+          <EmptyState icon={ListChecks} title={t('dailyTasks.empty')} description={t('timeline_page.resets_midnight')} />
         ) : (
           tasks.map((task) => {
             const isToggling = pendingToggleIds.has(task.id);
@@ -129,7 +122,7 @@ export function DailyTasksPanel({
             return (
               <div
                 key={task.id}
-                className={`flex items-center gap-6 px-8 py-6 group transition-all hover:bg-foreground/[0.01] ${
+                className={`flex items-center gap-4 px-4 py-3 group transition-colors hover:bg-foreground/[0.02] md:px-8 ${
                   task.completed_today ? 'opacity-60' : ''
                 } ${isDeleting ? 'opacity-30 pointer-events-none' : ''}`}
               >
@@ -140,7 +133,7 @@ export function DailyTasksPanel({
                   className={`flex-shrink-0 transition-all ${
                     task.completed_today ? 'text-income' : 'text-muted-foreground hover:text-primary'
                   } ${isToggling ? 'opacity-50 cursor-wait' : ''}`}
-                  aria-label={task.completed_today ? 'Mark as not done' : 'Mark as done'}
+                  aria-label={t(task.completed_today ? 'reminders_page.mark_not_done' : 'reminders_page.mark_done')}
                 >
                   {task.completed_today ? (
                     <CheckSquare size={20} className="" />
@@ -162,7 +155,7 @@ export function DailyTasksPanel({
                 <button
                   onClick={() => deleteTask(task.id)}
                   disabled={isDeleting || isToggling}
-                  className={`opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-expense transition-all p-2 ${
+                  className={`can-hover:opacity-0 can-hover:group-hover:opacity-100 focus-visible:opacity-100 text-muted-foreground hover:text-expense transition-colors p-2 ${
                     isDeleting ? 'opacity-50 cursor-wait' : ''
                   }`}
                   aria-label={`Delete ${task.title}`}

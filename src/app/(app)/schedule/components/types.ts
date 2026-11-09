@@ -1,14 +1,5 @@
 import { Activity } from '@/services/supabase/supabaseClient';
 
-export const MOOD_OPTIONS = [
-  { labelKey: 'happy', value: 'Happy' },
-  { labelKey: 'neutral', value: 'Neutral' },
-  { labelKey: 'tired', value: 'Tired' },
-  { labelKey: 'energized', value: 'Energized' },
-  { labelKey: 'stressed', value: 'Stressed' },
-  { labelKey: 'calm', value: 'Calm' },
-];
-
 export const CATEGORY_OPTIONS = [
   'work',
   'study',
@@ -42,11 +33,12 @@ export function getDurationLabel(activity: Activity) {
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
-export function getCurrentWeekBounds() {
+/** Monday to Sunday of the current week, or `weekOffset` weeks away from it. */
+export function getWeekBounds(weekOffset = 0) {
   const now = new Date();
   const day = now.getDay();
   const diffToMon = day === 0 ? -6 : 1 - day;
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMon);
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMon + weekOffset * 7);
   start.setHours(0, 0, 0, 0);
 
   const end = new Date(start);
@@ -68,13 +60,10 @@ export interface ActivityFormData {
   title: string;
   description: string;
   category: string;
-  mood: string;
   dayIndex: number; // 0 = Mon, 1 = Tue, ..., 6 = Sun
   start_hour: number;
   start_minute: number;
   duration_minutes: number;
-  location: string;
-  rating: number;
   applyToAllDays: boolean;
   isWeeklyRoutine: boolean;
 }
@@ -83,7 +72,6 @@ export const defaultActivityForm: ActivityFormData = {
   title: '',
   description: '',
   category: '',
-  mood: '',
   dayIndex: (() => {
     const d = new Date().getDay();
     return d === 0 ? 6 : d - 1; // 0=Mon, 6=Sun
@@ -91,8 +79,6 @@ export const defaultActivityForm: ActivityFormData = {
   start_hour: new Date().getHours(),
   start_minute: 0,
   duration_minutes: 60,
-  location: '',
-  rating: 0,
   applyToAllDays: false,
   isWeeklyRoutine: false,
 };

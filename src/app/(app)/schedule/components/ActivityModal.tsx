@@ -1,12 +1,13 @@
 'use client';
 
+import { Textarea } from '@/components/ui/Textarea';
 import React from 'react';
 import { Modal, Button, Input, Select } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { Activity } from '@/services/supabase/supabaseClient';
-import { ActivityFormData, CATEGORY_OPTIONS, MOOD_OPTIONS, HOURS, formatHour } from './types';
-import { Repeat, Star, MapPin } from '@phosphor-icons/react';
-import { Heading, Paragraph } from '@/components/ui/typography';
+import { ActivityFormData, CATEGORY_OPTIONS, HOURS, formatHour } from './types';
+import { Repeat } from '@phosphor-icons/react';
+import { Paragraph } from '@/components/ui/typography';
 
 interface ActivityModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface ActivityModalProps {
   formErrors: Record<string, string>;
   isSaving: boolean;
   onSave: () => void;
+  onDelete: () => void;
   daysOfWeek: Date[];
   locale: string;
 }
@@ -30,6 +32,7 @@ export function ActivityModal({
   formErrors,
   isSaving,
   onSave,
+  onDelete,
   daysOfWeek,
   locale,
 }: ActivityModalProps) {
@@ -44,6 +47,11 @@ export function ActivityModal({
       title={editingActivity ? t('timeline_page.edit_log') : t('timeline_page.log_activity_modal')}
       footer={
         <div className="flex gap-4 justify-end">
+          {editingActivity && (
+            <Button variant="ghost" size="md" onClick={onDelete} disabled={isSaving} className="mr-auto text-danger">
+              {t('timeline_page.delete_btn')}
+            </Button>
+          )}
           <Button variant="ghost" size="md" onClick={onClose}>
             {t('investment_page.cancel_upper')}
           </Button>
@@ -59,12 +67,8 @@ export function ActivityModal({
           <div className="flex items-center gap-2.5">
             <Repeat size={18} className="text-accent-purple shrink-0" />
             <div>
-              <label htmlFor="routine-checkbox" className="text-xs font-bold text-foreground cursor-pointer block">
-                Jadwal Rutin Mingguan (Template)
-              </label>
-              <Paragraph className="text-xs text-muted-foreground">
-                Aktivitas berulang tiap minggu (misal: jam kerja, kuliah, olahraga, standup).
-              </Paragraph>
+              <label htmlFor="routine-checkbox" className="text-xs font-bold text-foreground cursor-pointer block">{t('schedule_ui.routine_title')}</label>
+              <Paragraph className="text-xs text-muted-foreground">{t('schedule_ui.routine_desc')}</Paragraph>
             </div>
           </div>
           <input
@@ -131,76 +135,26 @@ export function ActivityModal({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Select
-            id="form-cat"
-            label={t('timeline_page.form.category')}
-            value={form.category || 'none'}
-            onValueChange={(val) => setForm((f) => ({ ...f, category: val === 'none' ? '' : val }))}
-            options={[
-              { value: 'none', label: t('timeline_page.form.uncategorized') },
-              ...CATEGORY_OPTIONS.map((c) => ({
-                value: c,
-                label: t(`timeline_page.form.categories.${c}`),
-              })),
-            ]}
-          />
-          <Select
-            id="form-mood"
-            label={t('timeline_page.form.mood')}
-            value={form.mood || 'none'}
-            onValueChange={(val) => setForm((f) => ({ ...f, mood: val === 'none' ? '' : val }))}
-            options={[
-              { value: 'none', label: t('timeline_page.form.none') },
-              ...MOOD_OPTIONS.map((m) => ({
-                value: m.value,
-                label: t(`timeline_page.form.moods.${m.labelKey}`),
-              })),
-            ]}
-          />
-        </div>
+        <Select
+          id="form-cat"
+          label={t('timeline_page.form.category')}
+          value={form.category || 'none'}
+          onValueChange={(val) => setForm((f) => ({ ...f, category: val === 'none' ? '' : val }))}
+          options={[
+            { value: 'none', label: t('timeline_page.form.uncategorized') },
+            ...CATEGORY_OPTIONS.map((c) => ({
+              value: c,
+              label: t(`timeline_page.form.categories.${c}`),
+            })),
+          ]}
+        />
 
-        <div>
-          <label className="text-xs font-bold text-muted-foreground mb-2 block">
-            {t('timeline_page.form.rating')} <span className="font-normal opacity-70">({t('common.optional')})</span>
-          </label>
-          <div className="flex gap-4" role="group" aria-label="Rating">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setForm((f) => ({ ...f, rating: f.rating === s ? 0 : s }))}
-                aria-label={`${s} star${s > 1 ? 's' : ''}`}
-                className={`transition-all ${
-                  s <= form.rating
-                    ? 'text-primary '
-                    : 'text-muted-foreground opacity-20 hover:opacity-100 hover:text-primary'
-                }`}
-              >
-                <Star fill={s <= form.rating ? 'currentColor' : 'none'} size={22} />
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="relative">
-          <MapPin size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" />
-          <input
-            placeholder={`${t('timeline_page.form.location')} (${t('common.optional')})`}
-            value={form.location}
-            onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
-            aria-label="Location"
-            className="w-full pl-8 pr-4 py-4 bg-surface/40 border border-foreground/5 rounded-md text-sm focus:border-primary focus:outline-none transition-all"
-          />
-        </div>
-
-        <textarea
+        <Textarea
           value={form.description}
           onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
           placeholder={`${t('timeline_page.form.notes')} (${t('common.optional')})`}
           rows={3}
-          aria-label="Notes"
-          className="w-full bg-surface border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
+          aria-label={t('timeline_page.form.notes')}
         />
       </div>
     </Modal>
