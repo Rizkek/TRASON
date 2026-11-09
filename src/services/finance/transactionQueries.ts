@@ -1,6 +1,7 @@
 import { supabase, Transaction } from '../supabase/supabaseClient';
 import { handleQueryError, logError } from '@/libs/apiErrors';
 import { formatDateOnly } from '@/libs/date';
+import { netBalance } from '@/libs/finance/balance';
 import { withAuthQuery } from "@/services/supabase/queryBuilder";
 
 export const transactionQueries = {
@@ -43,6 +44,33 @@ export const transactionQueries = {
     });
     } catch (err) {
       logError(err, 'transactionQueries.getTransactions');
+      throw handleQueryError(err);
+    }
+  },
+
+  // Net of everything before `date`. Paged because one request stops at 1000 rows, and a balance
+  // built from a truncated list would be wrong without any error showing.
+  async getNetBalanceBefore(date: Date) {
+    const PAGE_SIZE = 1000;
+    try {
+      return await withAuthQuery(async (userId) => {
+        let balance = 0;
+        for (let offset = 0; ; offset += PAGE_SIZE) {
+          const { data, error } = await supabase
+            .from('transactions')
+            .select('amount, type')
+            .eq('user_id', userId)
+            .is('deleted_at', null)
+            .lt('date', formatDateOnly(date))
+            .order('id', { ascending: true })
+            .range(offset, offset + PAGE_SIZE - 1);
+          if (error) throw error;
+          balance += netBalance(data ?? []);
+          if (!data || data.length < PAGE_SIZE) return balance;
+        }
+      });
+    } catch (err) {
+      logError(err, 'transactionQueries.getNetBalanceBefore');
       throw handleQueryError(err);
     }
   },
