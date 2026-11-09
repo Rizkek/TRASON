@@ -19,6 +19,7 @@ export const CACHE_KEYS = {
   transactions: {
     list: (start: string, end: string) => ['transactions', start, end],
     byId: (id: string) => ['transactions', id],
+    balanceBefore: (date: string) => ['transactions', 'balance-before', date],
     all: () => ['transactions', '*'],
   },
 
@@ -58,6 +59,8 @@ export const CACHE_KEYS = {
     insights: 'investments:insights',
     prices: (symbol: string) => ['investments', 'prices', symbol],
   },
+
+  exchangeRates: 'exchange:rates',
 
   // User Settings
   settings: {

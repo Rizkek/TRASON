@@ -7,6 +7,20 @@ export interface ExchangeRates {
 const CACHE_KEY = 'exchange_rates_cache';
 const CACHE_DURATION = 1000 * 60 * 60 * 24; // 24 hours
 
+/** Converts through the shared base of `rates`. Null when a rate is missing, so a caller never shows an unconverted amount as converted. */
+export function convertCurrency(
+  amount: number,
+  from: string,
+  to: string,
+  rates: Record<string, number> | null | undefined,
+): number | null {
+  if (from === to) return amount;
+  const fromRate = rates?.[from];
+  const toRate = rates?.[to];
+  if (!fromRate || !toRate) return null;
+  return (amount / fromRate) * toRate;
+}
+
 export async function fetchExchangeRates(): Promise<ExchangeRates | null> {
   try {
     if (typeof window !== 'undefined') {
