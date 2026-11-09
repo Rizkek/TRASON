@@ -1,5 +1,6 @@
 'use client';
 
+import { convertCurrency } from '@/libs/exchange';
 import { formatCurrency } from '@/libs/format';
 import { InvestmentPosition } from '@/types/database';
 
@@ -28,6 +29,8 @@ export interface CalculatedInvestmentPosition extends InvestmentPosition {
   risk_score: number;
   risk_category: 'low' | 'moderate' | 'high';
   risk_status: 'underweight' | 'balanced' | 'overweight';
+  /** Set only when the position could not be converted: its values are still in this currency. */
+  display_currency?: string;
 }
 
 export interface InvestmentPortfolioSummary {
@@ -226,6 +229,61 @@ export const calculatePortfolioSummary = (
       totalAssets,
       totalLiabilities,
     } satisfies InvestmentPortfolioSummary,
+  };
+};
+
+/**
+ * The currency a position's stored prices are in. quote_currency cannot answer this alone: it was
+ * saved as 'USD' for every position, while manual prices were entered and shown in the profile
+ * currency. Treating those as USD would multiply a Rupiah property value by the exchange rate.
+ */
+export const getPositionCurrency = (position: InvestmentPosition, profileCurrency: string) => {
+  if (position.symbol.toUpperCase() === 'XAU.IDR') return 'IDR';
+  if (position.price_source !== 'manual') return 'USD';
+  return position.quote_currency !== 'USD' ? position.quote_currency : profileCurrency;
+};
+
+/** Null when the rate is unavailable. Conversion is display-only: the stored prices never change. */
+export const convertPositionToCurrency = (
+  position: InvestmentPosition,
+  currency: string,
+  rates: Record<string, number> | null,
+): InvestmentPosition | null => {
+  const rate = convertCurrency(1, getPositionCurrency(position, currency), currency, rates);
+  if (rate === null) return null;
+  if (rate === 1) return position;
+
+  return {
+    ...position,
+    buy_price: position.buy_price * rate,
+    manual_current_price: position.manual_current_price == null ? position.manual_current_price : position.manual_current_price * rate,
+    last_price: position.last_price == null ? position.last_price : position.last_price * rate,
+  };
+};
+
+/**
+ * Portfolio values in one currency. A position that cannot be converted stays listed in its own
+ * currency but is left out of the summary, because adding it would mix currencies in the totals.
+ */
+export const calculatePortfolioInCurrency = (
+  positions: InvestmentPosition[],
+  currency: string,
+  rates: Record<string, number> | null,
+) => {
+  const converted: InvestmentPosition[] = [];
+  const unconverted: CalculatedInvestmentPosition[] = [];
+
+  positions.forEach((position) => {
+    const inCurrency = convertPositionToCurrency(position, currency, rates);
+    if (inCurrency) converted.push(inCurrency);
+    else unconverted.push({ ...calculateInvestmentPosition(position), display_currency: getPositionCurrency(position, currency) });
+  });
+
+  const { calculatedPositions, summary } = calculatePortfolioSummary(converted);
+  return {
+    calculatedPositions: [...calculatedPositions, ...unconverted],
+    summary,
+    unconvertedCount: unconverted.length,
   };
 };
 

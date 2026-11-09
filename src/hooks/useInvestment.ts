@@ -1,10 +1,13 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
+import { useExchangeRates } from './useExchangeRates';
+import { useUserPreferences } from './useUserPreferences';
 import { investmentQueries } from '@/services/finance/investmentQueries';
 import {
   buildInvestmentTimelineText,
+  calculatePortfolioInCurrency,
   calculatePortfolioSummary,
   fetchInvestmentQuotes,
   generateInvestmentInsights,
@@ -15,11 +18,10 @@ import {
   InvestmentPortfolioSummary,
   CalculatedInvestmentPosition,
 } from '@/services/finance/investmentService';
-import { activityQueries } from '@/services/activity/activityQueries';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { getProfileToday } from '@/libs/profileDate';
 import { CACHE_KEYS, INVALIDATION_PATTERNS } from '@/libs/cacheKeys';
-import { getUserErrorMessage, logError } from '@/libs/apiErrors';
+import { getUserErrorMessage} from '@/libs/apiErrors';
 import { executeMutation } from "@/libs/api/mutationBuilder";
 import { invalidateKeys } from '@/libs/cacheInvalidation';
 
@@ -39,6 +41,8 @@ export interface UseInvestmentReturn {
   calculatedPositions: CalculatedInvestmentPosition[];
   summary: InvestmentPortfolioSummary | null;
   insights: InvestmentInsightResponse | null;
+  /** Positions left out of `summary` because no exchange rate was available for them. */
+  unconvertedCount: number;
   isLoading: boolean;
   isRefreshing: boolean;
   error: Error | null;
@@ -51,6 +55,10 @@ export interface UseInvestmentReturn {
 }
 
 export const useInvestment = (): UseInvestmentReturn => {
+  const { currency } = useUserPreferences();
+  const { rates, isLoading: ratesLoading } = useExchangeRates();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   // Use separate cache key for positions (stable data)
   const { data: positions, error: positionsError, isLoading: positionsLoading, mutate: mutatePositions } = useSWR(
     CACHE_KEYS.investments.positions(),
@@ -65,12 +73,16 @@ export const useInvestment = (): UseInvestmentReturn => {
     SWR_CONFIG_DASHBOARD
   );
 
-  // Derived data: calculated positions and summary
-  const calculatedData = positions ? calculatePortfolioSummary(positions, {}) : null;
+  // Derived data: calculated positions and summary. Waits for the rates, otherwise every USD position
+  // briefly counts as unconverted.
+  const calculatedData = useMemo(
+    () => (positions && !ratesLoading ? calculatePortfolioInCurrency(positions, currency, rates) : null),
+    [positions, currency, rates, ratesLoading]
+  );
 
   // Use separate cache key for insights (calculated data)
   const { data: insights, error: insightsError, isLoading: insightsLoading } = useSWR<InvestmentInsightResponse | null>(
-    positions && positions.length > 0 ? CACHE_KEYS.investments.insights : null,
+    calculatedData && calculatedData.calculatedPositions.length > 0 ? CACHE_KEYS.investments.insights : null,
     async () => {
       return await executeMutation(
         (async () => {
@@ -85,6 +97,7 @@ export const useInvestment = (): UseInvestmentReturn => {
   );
 
   const refreshPortfolio = useCallback(async () => {
+    setIsRefreshing(true);
     return await executeMutation(
         (async () => {
       const pos = positions || await investmentQueries.getPositions();
@@ -118,7 +131,7 @@ export const useInvestment = (): UseInvestmentReturn => {
       await mutatePositions();
         })(),
         'useInvestment.refreshPortfolio'
-      );
+      ).finally(() => setIsRefreshing(false));
   }, [positions, mutatePositions]);
 
   const createPosition = useCallback(
@@ -162,8 +175,7 @@ export const useInvestment = (): UseInvestmentReturn => {
   }, []);
 
   // Combine loading states
-  const isLoading = positionsLoading || insightsLoading;
-  const isRefreshing = false; // Not tracking revalidation state separately
+  const isLoading = positionsLoading || insightsLoading || ratesLoading;
 
   // Combine errors
   const error = (positionsError || insightsError) as Error | null;
@@ -176,6 +188,7 @@ export const useInvestment = (): UseInvestmentReturn => {
     calculatedPositions: calculatedData?.calculatedPositions || [],
     summary: calculatedData?.summary || null,
     insights: insights || null,
+    unconvertedCount: calculatedData?.unconvertedCount ?? 0,
     isLoading,
     isRefreshing,
     error,
