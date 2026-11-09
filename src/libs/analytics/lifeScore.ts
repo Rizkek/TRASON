@@ -5,7 +5,6 @@
  * All calculations are deterministic and based on user's actual data.
  */
 
-import { Transaction } from '@/types/database';
 
 export interface LifeScoreDetail {
   score: number;

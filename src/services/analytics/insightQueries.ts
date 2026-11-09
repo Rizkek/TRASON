@@ -11,7 +11,6 @@ import {
 } from '../supabase/supabaseClient';
 import { handleQueryError, logError } from '@/libs/apiErrors';
 import { formatDateOnly } from '@/libs/date';
-import type { DailyTask } from '@/types/database';
 import { withAuthQuery } from "@/services/supabase/queryBuilder";
 
 export const insightQueries = {

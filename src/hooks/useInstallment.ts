@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { installmentQueries } from '@/services/finance/installmentQueries';
-import { Installment, InstallmentPayment } from '@/types/database';
+import { Installment } from '@/types/database';
 
 export function useInstallment() {
   const { data: installments, error: instError, mutate: mutateInstallments, isLoading: isInstLoading } = useSWR(

@@ -3,7 +3,6 @@
 import useSWR, { mutate as globalMutate } from 'swr';
 import { categoryQueries } from '@/services/activity/categoryQueries';
 import { Category } from '@/types/database';
-import { CACHE_KEYS } from '@/libs/cacheKeys';
 import { SWR_CONFIG_DASHBOARD } from '@/config/swr';
 import { executeMutation } from "@/libs/api/mutationBuilder";
 

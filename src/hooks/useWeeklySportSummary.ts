@@ -1,7 +1,6 @@
 'use client';
 
 import useSWR from 'swr';
-import { useAuthStore } from '@/store/authStore';
 import { useActivity } from './useActivity';
 
 export interface WeeklySportSummary {

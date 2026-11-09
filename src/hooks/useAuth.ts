@@ -4,7 +4,7 @@ import { useEffect, useCallback, useRef } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { supabase, User } from '@/services/supabase/supabaseClient';
 import { userQueries } from '@/services/core/userQueries';
-import { logError, handleQueryError } from '@/libs/apiErrors';
+import { logError } from '@/libs/apiErrors';
 
 // Profile fetch timeout constants
 const INIT_TIMEOUT_MS = 8000;    // initial session load

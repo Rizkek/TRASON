@@ -13,7 +13,6 @@ import { ApiError, handleQueryError, logError } from '@/libs/apiErrors';
 import { formatDateOnly } from '@/libs/date';
 import { hasDueTimePassed } from '@/libs/notificationLogic';
 import { REMINDER_PAST_DUE_ERROR } from '@/libs/validation';
-import type { DailyTask } from '@/types/database';
 import { withAuthQuery } from "@/services/supabase/queryBuilder";
 
 export const reminderQueries = {

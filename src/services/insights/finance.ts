@@ -1,7 +1,7 @@
 import { transactionQueries } from '../finance/transactionQueries';
 import { budgetQueries } from '../finance/budgetQueries';
 import { InsightCandidate } from '@/types/insight';
-import { startOfMonth, endOfMonth, subMonths, subDays } from 'date-fns';
+import { startOfMonth, endOfMonth, subMonths } from 'date-fns';
 
 export interface FinanceSnapshot {
   currentMonthTotal: number;

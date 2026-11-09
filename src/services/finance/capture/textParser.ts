@@ -1,4 +1,3 @@
-import { DEFAULT_FINANCE_CATEGORIES, ICON_NAME_SUGGESTIONS } from '@/libs/defaultCategories';
 import { getLocalISODate } from '@/libs/format';
 
 export interface ParsedTransaction {
