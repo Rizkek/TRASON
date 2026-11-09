@@ -1,5 +1,6 @@
 'use client';
 
+import { Tabs } from '@/components/ui/Tabs';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loading, Toast, ErrorAlert } from '@/components';
@@ -166,7 +167,7 @@ export function SettingsClient() {
     if (!file || !user?.id) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      showMessage('error', (t('settings.messages.avatar_size_error') as string) || 'Image must be smaller than 5MB');
+      showMessage('error', t('settings.messages.avatar_size_error'));
       return;
     }
 
@@ -179,7 +180,7 @@ export function SettingsClient() {
       await userQueries.updateUserProfile({ avatar_url: publicUrl });
       setUser({ ...user, avatar_url: publicUrl } as any);
 
-      showMessage('success', (t('settings.messages.avatar_success') as string) || 'Avatar updated');
+      showMessage('success', t('settings.messages.avatar_success'));
     } catch (err) {
       showMessage('error', sanitizeError(err));
     } finally {
@@ -195,7 +196,7 @@ export function SettingsClient() {
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
-      showMessage('error', (t('settings.messages.validation_error') as string) || 'Validation failed');
+      showMessage('error', t('settings.messages.validation_error'));
       return;
     }
 
@@ -206,7 +207,7 @@ export function SettingsClient() {
       await userQueries.updateUserProfile(profile);
       const updated = await userQueries.getUserWithPreferences();
       if (updated) setUser(updated as any);
-      showMessage('success', (t('settings.messages.profile_success') as string) || 'Profile saved');
+      showMessage('success', t('settings.messages.profile_success'));
     } catch (err) {
       showMessage('error', sanitizeError(err));
     } finally {
@@ -226,18 +227,15 @@ export function SettingsClient() {
         originalPrefs.notifications_enabled !== prefs.notifications_enabled ||
         originalPrefs.push_notifications_enabled !== prefs.push_notifications_enabled;
 
-      const pushEnabled = prefs.notifications_enabled && prefs.push_notifications_enabled;
-      if (pushEnabled) {
+      // Only a change to the push settings may touch the subscription: subscribing can open the browser's
+      // permission prompt, which must not follow a save of the theme or language.
+      if (pushSettingChanged) {
+        const pushEnabled = prefs.notifications_enabled && prefs.push_notifications_enabled;
         try {
-          await push.subscribe();
+          if (pushEnabled) await push.subscribe();
+          else await push.unsubscribe();
         } catch (pushErr) {
-          pushWarning = pushErr instanceof Error ? pushErr.message : 'Push subscription failed';
-        }
-      } else if (pushSettingChanged) {
-        try {
-          await push.unsubscribe();
-        } catch {
-          // Silently ignore unsubscribe errors
+          if (pushEnabled) pushWarning = pushErr instanceof Error ? pushErr.message : 'Push subscription failed';
         }
       }
 
@@ -265,9 +263,9 @@ export function SettingsClient() {
       }
 
       if (pushWarning) {
-        showMessage('success', `${(t('settings.messages.prefs_success') as string) || 'Preferences saved'} (Push: ${pushWarning})`);
+        showMessage('success', `${t('settings.messages.prefs_success')} (Push: ${pushWarning})`);
       } else {
-        showMessage('success', (t('settings.messages.prefs_success') as string) || 'Preferences saved');
+        showMessage('success', t('settings.messages.prefs_success'));
       }
     } catch (err) {
       showMessage('error', sanitizeError(err));
@@ -283,10 +281,7 @@ export function SettingsClient() {
       await supabase.auth.signOut();
       router.push('/login');
     } catch (err) {
-      showMessage(
-        'error',
-        sanitizeError(err) || 'Failed to delete account. Migration 005 might be missing.'
-      );
+      showMessage('error', sanitizeError(err));
     }
   };
 
@@ -294,7 +289,7 @@ export function SettingsClient() {
     return (
       <>
         <div className="flex items-center justify-center h-[60vh]">
-          <Loading text="Loading your settings..." />
+          <Loading text={t('common.loading')} />
         </div>
       </>
     );
@@ -326,30 +321,7 @@ export function SettingsClient() {
             />
           )}
 
-          <div role="tablist" aria-label={t('settings.title')} className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeTab === tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  title={tab.label}
-                  aria-label={tab.label}
-                  className={`flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md border px-3 text-label-md transition-colors sm:px-4 ${
-                    activeTab === tab.id
-                      ? 'bg-primary text-on-primary border-primary'
-                      : 'bg-foreground/[0.02] text-muted-foreground border-foreground/[0.05] hover:border-foreground/[0.1] hover:text-foreground'
-                  }`}
-                >
-                  <Icon size={16} aria-hidden="true" className="shrink-0" />
-                  <span className="hidden sm:inline">{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          <Tabs label={t('settings.title')} items={tabs} value={activeTab} onChange={setActiveTab} />
 
           {/* Profile Tab */}
           {activeTab === 'profile' && (

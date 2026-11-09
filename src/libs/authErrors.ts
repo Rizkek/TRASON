@@ -5,6 +5,7 @@ export type AuthErrorKey =
   | 'email_taken'
   | 'weak_password'
   | 'same_password'
+  | 'current_password_wrong'
   | 'email_invalid'
   | 'rate_limited'
   | 'email_rate_limited'
@@ -23,6 +24,8 @@ const CODE_TO_KEY: Record<string, AuthErrorKey> = {
   email_exists: 'email_taken',
   weak_password: 'weak_password',
   same_password: 'same_password',
+  current_password_mismatch: 'current_password_wrong',
+  current_password_required: 'current_password_wrong',
   email_address_invalid: 'email_invalid',
   email_address_not_authorized: 'email_invalid',
   over_request_rate_limit: 'rate_limited',

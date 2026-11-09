@@ -5,7 +5,7 @@ import { Card, Button, Select } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { PreferenceData, CURRENCY_OPTIONS, TIMEZONE_OPTIONS, LANGUAGE_OPTIONS } from './types';
 import { FloppyDisk as Save } from '@phosphor-icons/react';
-import { Heading, Paragraph } from '@/components/ui/typography';
+import { Paragraph } from '@/components/ui/typography';
 
 interface PreferencesSectionProps {
   prefs: PreferenceData;
@@ -24,11 +24,11 @@ export function PreferencesSection({
 
   return (
     <div className="space-y-6">
-      <Card className="glass border-none" title={t('settings.interface.sectionTitle')}>
+      <Card title={t('settings.interface.sectionTitle')}>
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-muted-foreground tracking-widest">
+              <label className="text-xs font-bold text-muted-foreground">
                 {t('settings.interface.themeEngine')}
               </label>
               <div className="flex gap-4">
@@ -37,7 +37,7 @@ export function PreferencesSection({
                     key={th}
                     type="button"
                     onClick={() => setPrefs((p) => ({ ...p, theme: th as 'light' | 'dark' }))}
-                    className={`px-6 py-2 rounded-md border text-xs font-bold uppercase tracking-widest transition-all ${
+                    className={`px-6 py-2 rounded-md border text-xs font-bold transition-all ${
                       prefs.theme === th
                         ? 'bg-primary text-on-primary border-primary '
                         : 'bg-foreground/5 text-muted-foreground border-foreground/10 hover:bg-foreground/10 hover:border-foreground/20'
@@ -47,7 +47,7 @@ export function PreferencesSection({
                   </button>
                 ))}
               </div>
-              <Paragraph className="text-xs text-primary mt-2 italic opacity-80">
+              <Paragraph className="text-xs text-primary mt-2 opacity-80">
                 {t('settings.interface.themePreview')}
               </Paragraph>
             </div>

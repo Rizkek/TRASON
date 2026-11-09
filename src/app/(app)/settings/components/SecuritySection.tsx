@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Card, Button, Input, ConfirmModal } from '@/components';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { supabase } from '@/services/supabase/supabaseClient';
-import { sanitizeError } from '@/libs/validation';
+import { authErrorKey } from '@/libs/authErrors';
 import { Warning as AlertTriangle } from '@phosphor-icons/react';
 import { Heading, Paragraph } from '@/components/ui/typography';
 
@@ -34,28 +34,31 @@ export function SecuritySection({
     setFormErrors({});
 
     const errors: Record<string, string> = {};
-    if (!security.new_password) errors.new_password = (t('settings.messages.password_error_required') as string) || 'New password is required';
+    if (!security.current_password) errors.current_password = t('settings.messages.password_error_current');
+    if (!security.new_password) errors.new_password = t('settings.messages.password_error_required');
     if (security.new_password.length < 8)
-      errors.new_password = (t('settings.messages.password_error_length') as string) || 'Password must be at least 8 characters';
+      errors.new_password = t('settings.messages.password_error_length');
     if (security.new_password !== security.confirm_password)
-      errors.confirm_password = (t('settings.messages.password_error_match') as string) || 'Passwords do not match';
+      errors.confirm_password = t('settings.messages.password_error_match');
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
-      showMessage('error', (t('settings.messages.validation_error') as string) || 'Validation failed');
+      showMessage('error', t('settings.messages.validation_error'));
       return;
     }
 
     setIsChangingPassword(true);
     try {
+      // Supabase only checks this when "require current password" is on for the project.
       const { error: pwError } = await supabase.auth.updateUser({
         password: security.new_password,
+        current_password: security.current_password,
       });
       if (pwError) throw pwError;
       setSecurity({ current_password: '', new_password: '', confirm_password: '' });
-      showMessage('success', (t('settings.messages.password_success') as string) || 'Password updated');
+      showMessage('success', t('settings.messages.password_success'));
     } catch (err) {
-      setError(sanitizeError(err));
+      setError(t(`auth.errors.${authErrorKey(err)}`));
     } finally {
       setIsChangingPassword(false);
     }
@@ -64,10 +67,7 @@ export function SecuritySection({
   return (
     <>
       <div className="space-y-8">
-        <Card
-          className="glass border-none border-t border-danger"
-          title={t('settings.security.sectionTitle')}
-        >
+        <Card title={t('settings.security.sectionTitle')}>
           <div className="space-y-8 max-w-md">
             <Input
               label={t('settings.security.currentPass')}
@@ -103,7 +103,7 @@ export function SecuritySection({
           </div>
         </Card>
 
-        <Card className="glass border-none bg-danger/5 border-danger/20">
+        <Card className="bg-danger/5 border-danger/20 p-5 md:p-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div>
               <Heading as="h3" size="h3" className="text-lg font-semibold text-danger flex items-center gap-2">

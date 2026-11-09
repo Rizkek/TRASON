@@ -47,7 +47,7 @@ export function NotificationsSection({
   };
 
   return (
-    <Card className="glass border-none" title={t('settings.alerts.sectionTitle')}>
+    <Card title={t('settings.alerts.sectionTitle')}>
       <div className="space-y-4">
         <div className="flex items-start gap-3 rounded-lg border border-foreground/10 bg-foreground/[0.02] p-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary/10">

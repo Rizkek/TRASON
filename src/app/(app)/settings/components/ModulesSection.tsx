@@ -70,14 +70,12 @@ export const ModuleItem = React.memo(function ModuleItem({
     >
       <div className="flex items-start gap-3">
         <div
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
-          style={{ backgroundColor: `${metadata.color}15` }}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-foreground/5"
         >
           <Icon
             size={20}
             aria-hidden="true"
-            className={allSubFeaturesOff ? 'text-warning' : undefined}
-            style={allSubFeaturesOff ? undefined : { color: metadata.color }}
+            className={allSubFeaturesOff ? 'text-warning' : 'text-muted-foreground'}
           />
         </div>
         <div className="min-w-0 flex-1">
@@ -167,7 +165,7 @@ export function ModulesSection() {
   );
 
   return (
-    <Card className="glass border-none" title={t('settings.modules.sectionTitle')}>
+    <Card title={t('settings.modules.sectionTitle')}>
       <Paragraph className="text-body-sm text-muted-foreground">{t('settings.modules.description')}</Paragraph>
       <p className="mt-1 text-label-sm text-muted-foreground" aria-live="polite">
         {t('modules.count_summary').replace('{on}', String(enabledCount)).replace('{total}', String(statuses.length))}
