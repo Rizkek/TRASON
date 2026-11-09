@@ -1,5 +1,10 @@
 'use client';
 
+import { EmptyState } from '@/components/ui/EmptyState';
+import { StatCard } from '@/components/ui/StatCard';
+import { Tabs } from '@/components/ui/Tabs';
+import { Textarea } from '@/components/ui/Textarea';
+import { Fab } from '@/components/ui/Fab';
 import React, { useCallback, useState } from 'react';
 import { Card, Button, Badge, Loading, Modal, Input, ErrorAlert, InlineError, ConfirmModal, Select, DatePicker, CreatableAutocomplete } from '@/components';
 import { useAuthStore } from '@/store/authStore';
@@ -11,7 +16,7 @@ import { getLocalISODate } from '@/libs/format';
 import { sanitizeError } from '@/libs/validation';
 import { useTranslation } from '@/libs/i18n/useTranslation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare, FunnelSimple, CheckCircle, Users, XCircle, Newspaper, Bell, Money } from '@phosphor-icons/react';
+import { Briefcase, Plus, Trash as Trash2, ArrowSquareOut as ExternalLink, Calendar, MapPin, Clock, GraduationCap, Rocket, BookOpen, Star, Target, Chat as MessageSquare, Newspaper, Bell, Money } from '@phosphor-icons/react';
 import { useInterviewJournal } from '@/hooks/useInterviewJournal';
 import { useReminder } from '@/hooks/useReminder';
 import { useHolidays } from '@/hooks/useHolidays';
@@ -19,10 +24,10 @@ import { Heading, Paragraph } from '@/components/ui/typography';
 import { AppPageHeader } from '@/components/layout/AppPageHeader';
 
 const FILTER_TABS = [
-  { id: 'all',       labelKey: 'all',       icon: FunnelSimple },
-  { id: 'active',    labelKey: 'active',    icon: CheckCircle },
-  { id: 'interview', labelKey: 'interview', icon: Users },
-  { id: 'closed',    labelKey: 'closed',    icon: XCircle },
+  { id: 'all',       labelKey: 'all' },
+  { id: 'active',    labelKey: 'active' },
+  { id: 'interview', labelKey: 'interview' },
+  { id: 'closed',    labelKey: 'closed' },
 ] as const;
 
 type FilterTab = typeof FILTER_TABS[number]['id'];
@@ -66,12 +71,12 @@ const defaultForm: CareerFormData = {
   sync_to_reminder: true,
 };
 
-function validateCareerForm(form: CareerFormData): Record<string, string> {
+function validateCareerForm(form: CareerFormData, t: (key: string) => string): Record<string, string> {
   const errors: Record<string, string> = {};
-  if (!form.company_name.trim()) errors.company_name = 'Company name is required';
-  if (!form.role_title.trim()) errors.role_title = 'Role title is required';
-  if (!form.applied_date) errors.applied_date = 'Application date is required';
-  if (form.url && !/^https?:\/\//i.test(form.url)) errors.url = 'URL must start with http:// or https://';
+  if (!form.company_name.trim()) errors.company_name = t('career_form.company_required');
+  if (!form.role_title.trim()) errors.role_title = t('career_form.role_required');
+  if (!form.applied_date) errors.applied_date = t('career_form.date_required');
+  if (form.url && !/^https?:\/\//i.test(form.url)) errors.url = t('career_form.url_invalid');
   return errors;
 }
 
@@ -100,6 +105,7 @@ export default function CareerClient({ initialApplications }: Props) {
   const [pageError, setPageError] = useState<string | null>(null);
 
   const [mainTab, setMainTab] = useState<'applications' | 'journal' | 'ats_matcher'>('applications');
+  const [atsApplicationId, setAtsApplicationId] = useState<string>();
 
   const { journals, isLoading: journalLoading, createJournal, updateJournal, deleteJournal } = useInterviewJournal();
   const [isJournalModalOpen, setIsJournalModalOpen] = useState(false);
@@ -238,7 +244,7 @@ export default function CareerClient({ initialApplications }: Props) {
   }, []);
 
   const handleSave = async () => {
-    const errors = validateCareerForm(form);
+    const errors = validateCareerForm(form, t);
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
@@ -282,8 +288,8 @@ export default function CareerClient({ initialApplications }: Props) {
       if (form.interview_date && form.sync_to_reminder) {
         try {
           await createReminder({
-            title: `Wawancara: ${form.role_title} @ ${form.company_name}`,
-            description: `Wawancara kerja untuk posisi ${form.role_title} di ${form.company_name}.\nLokasi: ${form.location || form.work_scheme || 'WFO'}\nCatatan: ${form.notes || '-'}`,
+            title: t('career_form.interview_title').replace('{role}', form.role_title).replace('{company}', form.company_name),
+            description: t('career_form.interview_desc').replace('{role}', form.role_title).replace('{company}', form.company_name).replace('{location}', form.location || form.work_scheme || 'WFO').replace('{notes}', form.notes || '-'),
             due_date: form.interview_date,
             due_time: '09:00',
             due_datetime: new Date(form.interview_date + 'T09:00:00').toISOString(),
@@ -389,18 +395,11 @@ export default function CareerClient({ initialApplications }: Props) {
           />
 
           {!isLoading && (
-            <div className="grid grid-cols-4 gap-2 md:gap-3">
-              {[
-                { label: t('career_page.stats.applied'), value: stats.applied, color: 'text-primary' },
-                { label: t('career_page.stats.reviewing'), value: stats.reviewing, color: 'text-warning' },
-                { label: t('career_page.stats.interview'), value: stats.interview, color: 'text-accent-purple' },
-                { label: t('career_page.stats.offer'), value: stats.offer, color: 'text-income' },
-              ].map((s) => (
-                <Card key={s.label} className="glass border-none p-3 md:p-4">
-                  <p className={`font-mono text-title-lg md:text-heading-md ${s.color}`}>{s.value}</p>
-                  <p className="mt-0.5 truncate text-label-sm text-muted-foreground">{s.label}</p>
-                </Card>
-              ))}
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 md:gap-3">
+              <StatCard label={t('career_page.stats.applied')} value={stats.applied} />
+              <StatCard label={t('career_page.stats.reviewing')} value={stats.reviewing} />
+              <StatCard label={t('career_page.stats.interview')} value={stats.interview} />
+              <StatCard label={t('career_page.stats.offer')} value={stats.offer} />
             </div>
           )}
 
@@ -437,79 +436,35 @@ export default function CareerClient({ initialApplications }: Props) {
             </Card>
           )}
 
-          <div className="flex bg-foreground/[0.03] p-1 rounded-full border border-foreground/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-fit gap-0.5">
-            <button
-              onClick={() => setMainTab('applications')}
-              title={t('career_page.tabs.applications')}
-              className={`flex min-h-11 items-center gap-1.5 rounded-full px-4 text-label-md transition-colors ${
-                mainTab === 'applications'
-                  ? 'bg-primary text-on-primary '
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Briefcase size={14} weight="bold" />
-              <span className="hidden md:inline">{t('career_page.tabs.applications')}</span>
-            </button>
-            <button
-              onClick={() => setMainTab('journal')}
-              title={t('career_page.interview_journal.tab')}
-              className={`flex min-h-11 items-center gap-1.5 rounded-full px-4 text-label-md transition-colors ${
-                mainTab === 'journal'
-                  ? 'bg-primary text-on-primary '
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Newspaper size={14} weight="bold" />
-              <span className="hidden md:inline">{t('career_page.interview_journal.tab')}</span>
-            </button>
-            <button
-              onClick={() => setMainTab('ats_matcher')}
-              title={t('career_page.ats_matcher.title')}
-              className={`flex min-h-11 items-center gap-1.5 rounded-full px-4 text-label-md transition-colors ${
-                mainTab === 'ats_matcher'
-                  ? 'bg-primary text-on-primary '
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Target size={14} weight="bold" />
-              <span className="hidden md:inline">{t('career_page.ats_matcher.title')}</span>
-            </button>
-          </div>
+          <Tabs
+            label={t('career_page.title')}
+            value={mainTab}
+            onChange={setMainTab}
+            items={[
+              { id: 'applications', label: t('career_page.tabs.applications'), icon: Briefcase },
+              { id: 'journal', label: t('career_page.interview_journal.tab'), icon: Newspaper },
+              { id: 'ats_matcher', label: t('career_page.ats_matcher.title'), icon: Target },
+            ]}
+          />
 
           {mainTab === 'applications' ? (
             <>
-          <div className="flex bg-foreground/[0.03] p-1 rounded-full border border-foreground/[0.05] overflow-x-auto whitespace-nowrap no-scrollbar max-w-full gap-0.5" role="tablist" aria-label="Application filter">
-            {FILTER_TABS.map((tab) => {
-              const TabIcon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveFilter(tab.id)}
-                  role="tab"
-                  aria-selected={activeFilter === tab.id}
-                  title={t(`career_page.tabs.${tab.labelKey}`)}
-                  className={`flex min-h-11 items-center gap-1.5 rounded-full px-4 text-label-md transition-colors ${
-                    activeFilter === tab.id
-                      ? 'bg-primary text-on-primary '
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <TabIcon size={14} weight="bold" />
-                  <span className="hidden md:inline">{t(`career_page.tabs.${tab.labelKey}`)}</span>
-                </button>
-              );
-            })}
-          </div>
+          <Tabs
+            variant="segmented"
+            label={t('career_page.title')}
+            value={activeFilter}
+            onChange={setActiveFilter}
+            items={FILTER_TABS.map((tab) => ({ id: tab.id, label: t(`career_page.tabs.${tab.labelKey}`) }))}
+          />
 
           {isLoading ? (
             <div className="flex justify-center py-12"><Loading /></div>
           ) : filteredApps.length === 0 ? (
-            <div className="glass-card p-24 text-center space-y-4">
-              <Briefcase size={48} className="mx-auto text-deep-sage opacity-20" />
-              <Paragraph className="text-muted-foreground font-light italic">
-                {activeFilter === 'all' ? t('career_page.empty_all') : t('career_page.empty_filter').replace('{filter}', t(`career_page.tabs.${activeFilter}`))}
-              </Paragraph>
-            </div>
+            <EmptyState
+              icon={Briefcase}
+              className="glass-card"
+              title={activeFilter === 'all' ? t('career_page.empty_all') : t('career_page.empty_filter').replace('{filter}', t(`career_page.tabs.${activeFilter}`))}
+            />
           ) : (
             <div className="space-y-4">
               {filteredApps.map((app) => {
@@ -532,12 +487,17 @@ export default function CareerClient({ initialApplications }: Props) {
                         >
                           {status.label}
                         </Badge>
-                        <span className="text-xs text-muted-foreground uppercase tracking-widest flex items-center">
+                        <span className="text-xs text-muted-foreground flex items-center">
                           {type.icon} {type.label}
                         </span>
                         {app.priority === 'high' && (
-                          <span className="text-xs text-expense font-bold uppercase tracking-widest">
+                          <span className="text-xs text-expense font-bold">
                             {t('career_page.high_priority')}
+                          </span>
+                        )}
+                        {typeof app.ats_score === 'number' && (
+                          <span className="font-mono text-xs text-muted-foreground">
+                            {t('ats_ui.score_badge').replace('{score}', String(app.ats_score))}
                           </span>
                         )}
                       </div>
@@ -547,7 +507,7 @@ export default function CareerClient({ initialApplications }: Props) {
                         <Paragraph className="text-sm text-muted-foreground">{app.role_title}</Paragraph>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground opacity-80">
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar size={10} />
                           {t('career_page.applied_on')} {new Date(app.applied_date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
@@ -573,13 +533,13 @@ export default function CareerClient({ initialApplications }: Props) {
                       </div>
 
                       {app.notes && (
-                        <Paragraph className="text-xs text-muted-foreground italic line-clamp-1 opacity-80">
+                        <Paragraph className="text-xs text-muted-foreground line-clamp-1">
                           {app.notes}
                         </Paragraph>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
+                    <div className="flex items-center gap-2 can-hover:opacity-0 can-hover:group-hover:opacity-100 focus-within:opacity-100 transition-opacity flex-shrink-0">
                       {app.url && (
                         <a
                           href={app.url}
@@ -592,8 +552,18 @@ export default function CareerClient({ initialApplications }: Props) {
                         </a>
                       )}
                       <button
+                        onClick={() => {
+                          setAtsApplicationId(app.id);
+                          setMainTab('ats_matcher');
+                        }}
+                        className="px-4 py-3 min-h-[44px] flex items-center justify-center text-xs font-bold text-muted-foreground hover:text-foreground border border-foreground/10 hover:border-foreground/20 rounded-md transition-all"
+                        aria-label={`${t('ats_ui.check_match')}: ${app.company_name}`}
+                      >
+                        {t('ats_ui.check_match')}
+                      </button>
+                      <button
                         onClick={() => openEditModal(app)}
-                        className="px-4 py-3 min-h-[44px] flex items-center justify-center text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground border border-foreground/10 hover:border-foreground/20 rounded-md transition-all"
+                        className="px-4 py-3 min-h-[44px] flex items-center justify-center text-xs font-bold text-muted-foreground hover:text-foreground border border-foreground/10 hover:border-foreground/20 rounded-md transition-all"
                         aria-label={`Edit ${app.company_name} application`}
                       >
                         {t('career_page.edit')}
@@ -617,12 +587,7 @@ export default function CareerClient({ initialApplications }: Props) {
             {journalLoading ? (
               <div className="flex justify-center py-12"><Loading /></div>
             ) : journals.length === 0 ? (
-              <div className="glass-card p-24 text-center space-y-4">
-                <BookOpen size={48} className="mx-auto text-deep-sage opacity-20" />
-                <Paragraph className="text-muted-foreground font-light italic">
-                  {(t('career_page.interview_journal.empty') as string) || 'No interview notes yet.'}
-                </Paragraph>
-              </div>
+              <EmptyState icon={BookOpen} className="glass-card" title={t('career_page.interview_journal.empty')} />
             ) : (
               <div className="space-y-4">
                 {journals.map((journal: any) => {
@@ -639,7 +604,7 @@ export default function CareerClient({ initialApplications }: Props) {
                         <div>
                           <Heading as="h3" size="h3" className="text-lg font-semibold text-foreground">{journal.company_name}</Heading>
                           <Paragraph className="text-sm text-muted-foreground">{journal.role_title}</Paragraph>
-                          <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground opacity-80 mt-1">
+                          <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mt-1">
                             <span className="flex items-center gap-1">
                               <Calendar size={10} />
                               {new Date(journal.interview_date).toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })}
@@ -657,10 +622,10 @@ export default function CareerClient({ initialApplications }: Props) {
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-2 can-hover:opacity-0 can-hover:group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                           <button
                             onClick={() => openEditJournalModal(journal)}
-                            className="px-4 py-2 flex items-center justify-center text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground border border-foreground/10 hover:border-foreground/20 rounded-md transition-all"
+                            className="px-4 py-2 flex items-center justify-center text-xs font-bold text-muted-foreground hover:text-foreground border border-foreground/10 hover:border-foreground/20 rounded-md transition-all"
                             aria-label={`Edit journal entry`}
                           >
                             {t('career_page.edit')}
@@ -679,9 +644,9 @@ export default function CareerClient({ initialApplications }: Props) {
                         <div className="bg-foreground/5 p-4 rounded-md">
                           <Paragraph className="text-xs font-bold text-muted-foreground mb-1 flex items-center gap-1">
                             <MessageSquare size={10} />
-                            {(t('career_page.interview_journal.questions') as string) || 'Questions Asked'}
+                            {t('career_page.interview_journal.questions')}
                           </Paragraph>
-                          <Paragraph className="text-sm text-foreground whitespace-pre-wrap font-light">{journal.questions_asked}</Paragraph>
+                          <Paragraph className="text-sm text-foreground whitespace-pre-wrap">{journal.questions_asked}</Paragraph>
                         </div>
                       )}
 
@@ -689,15 +654,15 @@ export default function CareerClient({ initialApplications }: Props) {
                         <div className="bg-primary/5 p-4 rounded-md border border-primary/10">
                           <Paragraph className="text-xs font-bold text-primary mb-1 flex items-center gap-1">
                             <Star size={10} />
-                            {(t('career_page.interview_journal.lessons') as string) || 'Lessons Learned'}
+                            {t('career_page.interview_journal.lessons')}
                           </Paragraph>
-                          <Paragraph className="text-sm text-foreground whitespace-pre-wrap font-light">{journal.lessons_learned}</Paragraph>
+                          <Paragraph className="text-sm text-foreground whitespace-pre-wrap">{journal.lessons_learned}</Paragraph>
                         </div>
                       )}
                       
                       {journal.notes && (
                         <div>
-                          <Paragraph className="text-xs text-muted-foreground italic opacity-80 whitespace-pre-wrap">
+                          <Paragraph className="text-xs text-muted-foreground whitespace-pre-wrap">
                             {journal.notes}
                           </Paragraph>
                         </div>
@@ -709,32 +674,30 @@ export default function CareerClient({ initialApplications }: Props) {
             )}
           </>
           ) : mainTab === 'ats_matcher' ? (
-            <ATSMatcher applications={applications} />
+            <ATSMatcher
+              key={atsApplicationId ?? 'manual'}
+              applications={applications}
+              initialApplicationId={atsApplicationId}
+              onSaveScore={async (id, score) => {
+                await updateApplication(id, { ats_score: score, ats_checked_at: new Date().toISOString() });
+              }}
+            />
           ) : null}
         </div>
 
-        <div className="md:hidden fixed bottom-24 right-4 z-40">
-          <Button 
-            variant="primary" 
-            onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal} 
-            className="rounded-full w-14 h-14 flex items-center justify-center "
-            aria-label={mainTab === 'applications' ? "Add new application" : "Add new journal entry"}
-          >
-            <Plus size={24} />
-          </Button>
-        </div>
+
 
         {isModalOpen && (
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title={editingApp ? (t('career_page.edit_app') as string) : (t('career_page.new_app') as string)}
+          title={editingApp ? t('career_page.edit_app') : t('career_page.new_app')}
           maxWidth="2xl"
           footer={
             <div className="flex gap-4 justify-end">
               <Button variant="ghost" size="md" onClick={() => setIsModalOpen(false)}>{t('investment_page.cancel_upper')}</Button>
               <Button variant="primary" size="md" onClick={handleSave} disabled={isSaving}>
-                {isSaving ? t('investment_page.saving_upper') : (t('career_page.save_btn') as string)}
+                {isSaving ? t('investment_page.saving_upper') : t('career_page.save_btn')}
               </Button>
             </div>
           }
@@ -821,7 +784,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   label={`${t('career_page.form.interview_date')} (${t('common.optional')})`}
                   value={form.interview_date}
                   onChange={(val) => setForm((f) => ({ ...f, interview_date: val }))}
-                  placeholder={t('career_page.form.interview_date_placeholder') as string || "Optional interview date"}
+                  placeholder={t('career_page.form.interview_date_placeholder')}
                   holidays={holidays}
                 />
               </div>
@@ -837,7 +800,7 @@ export default function CareerClient({ initialApplications }: Props) {
                   />
                   <label htmlFor="sync-reminder-cb" className="text-xs text-foreground font-medium cursor-pointer flex items-center gap-1.5">
                     <Bell size={14} className="text-primary" />
-                    <span>{t('career_page.form.sync_reminder_label') as string || 'Auto-add to Reminders / Calendar (notify 1 hour & 1 day before)'}</span>
+                    <span>{t('career_page.form.sync_reminder_label')}</span>
                   </label>
                 </div>
               )}
@@ -872,7 +835,7 @@ export default function CareerClient({ initialApplications }: Props) {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider select-none">
+                <label className="block text-xs font-bold text-muted-foreground select-none">
                   {t('career_page.form.salary')} <span className="font-normal opacity-70 normal-case">({t('common.optional')})</span>
                 </label>
                 {(form.salary_min.trim() || form.salary_max.trim()) && (
@@ -883,7 +846,7 @@ export default function CareerClient({ initialApplications }: Props) {
                       ? `${form.salary_min} – ${form.salary_max}`
                       : form.salary_min
                       ? `${form.salary_min}`
-                      : `${t('career_page.form.salary_up_to') || 'Up to'} ${form.salary_max}`}
+                      : `${t('career_page.form.salary_up_to')} ${form.salary_max}`}
                   </span>
                 )}
               </div>
@@ -905,22 +868,22 @@ export default function CareerClient({ initialApplications }: Props) {
                   type="text"
                   value={form.salary_min}
                   onChange={(e) => setForm((f) => ({ ...f, salary_min: e.target.value }))}
-                  placeholder={t('career_page.form.salary_min_placeholder') || 'Min'}
+                  placeholder={t('career_page.form.salary_min_placeholder')}
                   className="w-full h-10 bg-surface/80 hover:bg-surface border border-foreground/10 hover:border-foreground/20 focus:border-primary rounded-lg text-sm px-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
                 />
-                <span className="text-muted-foreground/50 font-bold select-none text-xs px-1">—</span>
+                <span className="text-muted-foreground font-bold select-none text-xs px-1">—</span>
                 <input
                   type="text"
                   value={form.salary_max}
                   onChange={(e) => setForm((f) => ({ ...f, salary_max: e.target.value }))}
-                  placeholder={t('career_page.form.salary_max_placeholder') || 'Max'}
+                  placeholder={t('career_page.form.salary_max_placeholder')}
                   className="w-full h-10 bg-surface/80 hover:bg-surface border border-foreground/10 hover:border-foreground/20 focus:border-primary rounded-lg text-sm px-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-mono"
                 />
               </div>
 
               {/* Quick Salary Presets */}
               <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                <span className="text-xs text-muted-foreground/60 font-medium">{t('career_page.form.salary_presets') as string || 'Quick presets:'}</span>
+                <span className="text-xs text-muted-foreground font-medium">{t('career_page.form.salary_presets')}</span>
                 {form.salary_currency === 'IDR' ? (
                   [
                     { label: '5-10 Jt', min: '5.000.000', max: '10.000.000' },
@@ -958,16 +921,15 @@ export default function CareerClient({ initialApplications }: Props) {
             </div>
 
             <div className="space-y-1">
-              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider select-none">
-                {t('career_page.form.notes_label') as string || 'Notes'} <span className="font-normal opacity-70 normal-case">({t('common.optional')})</span>
+              <label className="block text-xs font-bold text-muted-foreground select-none">
+                {t('career_page.form.notes_label')} <span className="font-normal opacity-70 normal-case">({t('common.optional')})</span>
               </label>
-              <textarea
+              <Textarea
                 value={form.notes}
                 onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
                 placeholder={t('career_page.form.notes_placeholder')}
                 rows={3}
-                aria-label="Notes"
-                className="w-full bg-surface border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
+                aria-label={t('career_page.form.notes_label')}
               />
             </div>
           </div>
@@ -989,13 +951,13 @@ export default function CareerClient({ initialApplications }: Props) {
         <Modal
           isOpen={isJournalModalOpen}
           onClose={() => setIsJournalModalOpen(false)}
-          title={(t('career_page.interview_journal.new_entry_modal') as string) || 'Interview Journal'}
+          title={t('career_page.interview_journal.new_entry_modal')}
           maxWidth="2xl"
           footer={
             <div className="flex gap-4 justify-end">
               <Button variant="ghost" size="md" onClick={() => setIsJournalModalOpen(false)}>{t('investment_page.cancel_upper')}</Button>
               <Button variant="primary" size="md" onClick={handleSaveJournal} disabled={isSaving}>
-                {isSaving ? t('investment_page.saving_upper') : ((t('career_page.interview_journal.save') as string) || 'Save')}
+                {isSaving ? t('investment_page.saving_upper') : (t('career_page.interview_journal.save'))}
               </Button>
             </div>
           }
@@ -1003,7 +965,7 @@ export default function CareerClient({ initialApplications }: Props) {
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <CreatableAutocomplete
-                label={(t('career_page.interview_journal.company') as string) || 'Company'}
+                label={t('career_page.interview_journal.company')}
                 value={journalForm.company_name}
                 onChange={(val) => setJournalForm((f: any) => ({ ...f, company_name: val }))}
                 type="company"
@@ -1011,7 +973,7 @@ export default function CareerClient({ initialApplications }: Props) {
                 autoFocus
               />
               <CreatableAutocomplete
-                label={(t('career_page.interview_journal.role') as string) || 'Role'}
+                label={t('career_page.interview_journal.role')}
                 value={journalForm.role_title}
                 onChange={(val) => setJournalForm((f: any) => ({ ...f, role_title: val }))}
                 type="role"
@@ -1021,70 +983,67 @@ export default function CareerClient({ initialApplications }: Props) {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <DatePicker
-                label={(t('career_page.interview_journal.date') as string) || 'Interview Date'}
+                label={t('career_page.interview_journal.date')}
                 value={journalForm.interview_date}
                 onChange={(val) => setJournalForm((f: any) => ({ ...f, interview_date: val }))}
                 holidays={holidays}
               />
               <Select
-                label={(t('career_page.interview_journal.difficulty') as string) || 'Difficulty'}
+                label={t('career_page.interview_journal.difficulty')}
                 value={journalForm.difficulty}
                 onValueChange={(val) => setJournalForm((f: any) => ({ ...f, difficulty: val }))}
                 options={[
-                  { value: 'easy', label: (t('career_page.interview_journal.options.difficulty_easy') as string) || 'Easy' },
-                  { value: 'medium', label: (t('career_page.interview_journal.options.difficulty_medium') as string) || 'Medium' },
-                  { value: 'hard', label: (t('career_page.interview_journal.options.difficulty_hard') as string) || 'Hard' },
+                  { value: 'easy', label: t('career_page.interview_journal.options.difficulty_easy') },
+                  { value: 'medium', label: t('career_page.interview_journal.options.difficulty_medium') },
+                  { value: 'hard', label: t('career_page.interview_journal.options.difficulty_hard') },
                 ]}
               />
               <Select
-                label={(t('career_page.interview_journal.outcome') as string) || 'Outcome'}
+                label={t('career_page.interview_journal.outcome')}
                 value={journalForm.outcome}
                 onValueChange={(val) => setJournalForm((f: any) => ({ ...f, outcome: val }))}
                 options={[
-                  { value: 'pending', label: (t('career_page.interview_journal.options.outcome_pending') as string) || 'Pending' },
-                  { value: 'pass', label: (t('career_page.interview_journal.options.outcome_pass') as string) || 'Passed' },
-                  { value: 'fail', label: (t('career_page.interview_journal.options.outcome_fail') as string) || 'Failed' },
-                  { value: 'unknown', label: (t('career_page.interview_journal.options.outcome_unknown') as string) || 'Unknown' },
+                  { value: 'pending', label: t('career_page.interview_journal.options.outcome_pending') },
+                  { value: 'pass', label: t('career_page.interview_journal.options.outcome_pass') },
+                  { value: 'fail', label: t('career_page.interview_journal.options.outcome_fail') },
+                  { value: 'unknown', label: t('career_page.interview_journal.options.outcome_unknown') },
                 ]}
               />
             </div>
 
             <div>
               <label className="text-xs font-bold text-muted-foreground mb-1 block">
-                {(t('career_page.interview_journal.questions') as string) || 'Questions Asked'}
+                {t('career_page.interview_journal.questions')}
               </label>
-              <textarea
+              <Textarea
                 value={journalForm.questions_asked}
                 onChange={(e) => setJournalForm((f: any) => ({ ...f, questions_asked: e.target.value }))}
-                placeholder={(t('career_page.interview_journal.questions_placeholder') as string) || 'What did they ask?'}
+                placeholder={t('career_page.interview_journal.questions_placeholder')}
                 rows={4}
-                className="w-full bg-surface border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
               />
             </div>
 
             <div>
               <label className="text-xs font-bold text-muted-foreground mb-1 block">
-                {(t('career_page.interview_journal.lessons') as string) || 'Lessons Learned'}
+                {t('career_page.interview_journal.lessons')}
               </label>
-              <textarea
+              <Textarea
                 value={journalForm.lessons_learned}
                 onChange={(e) => setJournalForm((f: any) => ({ ...f, lessons_learned: e.target.value }))}
-                placeholder={(t('career_page.interview_journal.lessons_placeholder') as string) || 'What would you do differently?'}
+                placeholder={t('career_page.interview_journal.lessons_placeholder')}
                 rows={3}
-                className="w-full bg-surface border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
               />
             </div>
 
             <div>
               <label className="text-xs font-bold text-muted-foreground mb-1 block">
-                {(t('career_page.interview_journal.notes') as string) || 'Notes'}
+                {t('career_page.interview_journal.notes')}
               </label>
-              <textarea
+              <Textarea
                 value={journalForm.notes}
                 onChange={(e) => setJournalForm((f: any) => ({ ...f, notes: e.target.value }))}
-                placeholder={(t('career_page.interview_journal.notes_placeholder') as string) || 'Additional context...'}
+                placeholder={t('career_page.interview_journal.notes_placeholder')}
                 rows={2}
-                className="w-full bg-surface border border-foreground/5 rounded-md p-6 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
               />
             </div>
           </div>
@@ -1094,24 +1053,14 @@ export default function CareerClient({ initialApplications }: Props) {
         <ConfirmModal
           isOpen={!!deleteJournalConfirmId}
           onClose={() => setDeleteJournalConfirmId(null)}
-          title={(t('career_page.interview_journal.remove_entry') as string) || 'Remove Entry'}
-          description={(t('career_page.interview_journal.remove_desc') as string) || 'Are you sure you want to remove this journal entry?'}
-          confirmText={(t('career_page.interview_journal.remove_btn') as string) || 'Remove'}
+          title={t('career_page.interview_journal.remove_entry')}
+          description={t('career_page.interview_journal.remove_desc')}
+          confirmText={t('career_page.interview_journal.remove_btn')}
           isDangerous={true}
           onConfirm={handleConfirmDeleteJournal}
         />
         
-        {/* Mobile-only FAB for Add */}
-        <div className="md:hidden fixed bottom-24 right-4 z-40">
-          <Button 
-            variant="primary" 
-            onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal} 
-            className="rounded-full w-14 h-14 flex items-center justify-center "
-            aria-label={mainTab === 'applications' ? t('career_page.new_application') : 'New Journal Entry'}
-          >
-            <Plus size={24} />
-          </Button>
-        </div>
+        <Fab label={mainTab === 'applications' ? t('career_page.new_application') : t('career_page.interview_journal.new_entry')} onClick={mainTab === 'applications' ? openAddModal : openAddJournalModal} />
       </>
     </>
   );

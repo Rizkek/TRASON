@@ -67,7 +67,7 @@ export interface Transaction {
   receipt_image_url?: string;
   source?: 'manual' | 'text' | 'receipt' | 'import' | 'api';
   tags?: string[];
-  metadata?: Record<string, unknown>; // Will store decision_notes, expected_impact, timeline_event_id, etc.
+  metadata?: Record<string, unknown>; // Free-form extras such as timeline_event_id. Older rows may still hold decision_notes and expected_impact.
   original_amount?: number;
   original_currency?: string;
   exchange_rate_to_base?: number;
@@ -476,6 +476,9 @@ export interface CareerApplication {
   url?: string;
   priority: 'low' | 'medium' | 'high';
   tags?: string[];
+  /** Resume match from the last check in Resume match (0-100). Needs the ats columns migration. */
+  ats_score?: number | null;
+  ats_checked_at?: string | null;
   created_at: string;
   updated_at: string;
   deleted_at?: string;

@@ -1,161 +1,171 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { useTranslation } from '@/libs/i18n/useTranslation';
+import React, { useRef, useState } from 'react';
+import { Target, WarningCircle, CheckCircle, Lightbulb, UploadSimple, X, Copy, Check } from '@phosphor-icons/react';
 import { Button, Select } from '@/components';
-import { Target, WarningCircle, CheckCircle, Lightbulb, UploadSimple, FileText, X, Copy, Check } from '@phosphor-icons/react';
-import { extractTextFromFile } from '@/libs/fileExtractor';
-import { CareerApplication } from '@/types/database';
+import { Textarea } from '@/components/ui/Textarea';
 import { Heading, Paragraph } from '@/components/ui/typography';
+import { useTranslation } from '@/libs/i18n/useTranslation';
+import { extractTextFromFile } from '@/libs/fileExtractor';
+import { analyzeMatch, type AtsResult } from '@/libs/analytics/atsMatcher';
+import { cn } from '@/lib/utils';
+import { CareerApplication } from '@/types/database';
 
-// Comprehensive Bilingual (Indonesian & English) Stopwords
-const STOP_WORDS = new Set([
-  // English common words
-  'and', 'the', 'to', 'a', 'of', 'in', 'for', 'is', 'on', 'that', 'by', 'this', 'with', 'i', 'you', 'it', 'not', 'or', 'be', 'are', 'from', 'at', 'as', 'your', 'all', 'have', 'new', 'more', 'an', 'was', 'we', 'will', 'home', 'can', 'us', 'about', 'if', 'page', 'my', 'has', 'search', 'free', 'but', 'our', 'one', 'other', 'do', 'no', 'information', 'time', 'they', 'site', 'he', 'up', 'may', 'what', 'which', 'their', 'news', 'out', 'use', 'any', 'there', 'see', 'only', 'so', 'his', 'when', 'contact', 'here', 'business', 'who', 'web', 'also', 'now', 'help', 'get', 'pm', 'view', 'online', 'first', 'am', 'been', 'would', 'how', 'were', 'me', 'services', 'some', 'these', 'click', 'its', 'like', 'service', 'than', 'find', 'price', 'date', 'back', 'top', 'people', 'had', 'list', 'name', 'just', 'over', 'state', 'year', 'day', 'into', 'email', 'two', 'health', 'world', 'next', 'used', 'work', 'last', 'most', 'products', 'make', 'them', 'should', 'product', 'system', 'post', 'her', 'city', 'add', 'policy', 'number', 'such', 'please', 'available', 'support', 'message', 'after', 'best', 'software', 'good', 'well', 'where', 'info', 'rights', 'public', 'high', 'school', 'through', 'each', 'links', 'she', 'review', 'years', 'order', 'very', 'privacy', 'book', 'items', 'company', 'read', 'group', 'need', 'many', 'user', 'said', 'set', 'under', 'general', 'research', 'mail', 'full', 'reviews', 'program', 'life', 'must', 'able', 'ability', 'looking', 'join', 'team', 'role', 'responsibilities', 'qualifications', 'requirements', 'including', 'skills', 'experience', 'candidate', 'plus', 'minimum', 'preferred', 'strong',
-  // Indonesian common words
-  'yang', 'untuk', 'dengan', 'dan', 'dari', 'pada', 'adalah', 'sebagai', 'dalam', 'akan', 'atau', 'bisa', 'dapat', 'saya', 'kamu', 'kami', 'mereka', 'oleh', 'ke', 'di', 'ini', 'itu', 'juga', 'ada', 'karena', 'tentang', 'secara', 'harus', 'agar', 'bagi', 'sudah', 'telah', 'serta', 'saat', 'seperti', 'lebih', 'antara', 'jika', 'bila', 'ketika', 'hanya', 'saja', 'tersebut', 'setiap', 'satu', 'dua', 'banyak', 'beberapa', 'lain', 'lainnya', 'melakukan', 'menjadi', 'memiliki', 'menggunakan', 'membuat', 'melalui', 'selama', 'posisi', 'tanggung', 'jawab', 'kualifikasi', 'persyaratan', 'pengalaman', 'kemampuan', 'minimal', 'diutamakan', 'bergabung', 'tim', 'perusahaan', 'kerja', 'bekerja', 'baik', 'mampu'
-]);
+interface SourceFieldProps {
+  id: string;
+  label: string;
+  value: string;
+  placeholder: string;
+  hint: string;
+  clearLabel: string;
+  isReading: boolean;
+  onChange: (value: string) => void;
+  onFile: (file: File) => void;
+}
 
-// Well-known multi-word technical skills and industry phrases
-const TECHNICAL_PHRASES = [
-  'machine learning', 'deep learning', 'artificial intelligence', 'data science', 'data engineer', 'data analyst',
-  'frontend developer', 'backend developer', 'full stack developer', 'fullstack developer', 'mobile developer',
-  'react js', 'react native', 'next js', 'vue js', 'node js', 'express js', 'nest js', 'angular js',
-  'tailwind css', 'bootstrap css', 'styled components', 'rest api', 'restful api', 'graphql api',
-  'cloud computing', 'amazon web services', 'google cloud', 'microsoft azure',
-  'ci cd', 'continuous integration', 'continuous deployment', 'unit testing', 'integration testing',
-  'test driven development', 'object oriented', 'system design', 'clean architecture',
-  'product management', 'project management', 'agile scrum', 'scrum master', 'user experience', 'user interface',
-  'ui ux design', 'version control', 'code review', 'relational database', 'database management',
-  'search engine optimization', 'cyber security', 'information technology'
-];
+/** A text area that also accepts a dropped or uploaded file, the way its hint promises. */
+function SourceField({ id, label, value, placeholder, hint, clearLabel, isReading, onChange, onFile }: SourceFieldProps) {
+  const { t } = useTranslation();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <label htmlFor={id} className="text-xs font-semibold text-muted-foreground">
+          {label}
+        </label>
+        <div className="flex items-center gap-1">
+          <input
+            type="file"
+            ref={inputRef}
+            accept=".pdf,.txt,.md,.doc,.docx"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onFile(file);
+              e.target.value = '';
+            }}
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => inputRef.current?.click()}
+            isLoading={isReading}
+            loadingText={t('career_page.ats_matcher.reading_file')}
+            leftIcon={<UploadSimple size={14} />}
+          >
+            {t('career_page.ats_matcher.upload_file')}
+          </Button>
+          {value && (
+            <button
+              type="button"
+              onClick={() => onChange('')}
+              aria-label={clearLabel}
+              title={clearLabel}
+              className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-danger"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div
+        className={cn('rounded-lg', isDragging && 'ring-2 ring-primary')}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragging(false);
+          const file = e.dataTransfer.files?.[0];
+          if (file) onFile(file);
+        }}
+      >
+        <Textarea id={id} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} rows={10} />
+      </div>
+      <p className="text-xs text-muted-foreground">{isDragging ? t('ats_ui.drop_active') : hint}</p>
+    </div>
+  );
+}
+
+function Chip({ term, tone }: { term: string; tone: 'success' | 'danger' }) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold',
+        tone === 'success' ? 'border-success/25 bg-success/10 text-success' : 'border-danger/25 bg-danger/10 text-danger'
+      )}
+    >
+      {tone === 'success' ? <Check size={12} weight="bold" aria-hidden="true" /> : <span aria-hidden="true">+</span>}
+      {term}
+    </span>
+  );
+}
+
+// Only the role and its notes go in: the company name, place and link would count as skills to match.
+const jobDescriptionOf = (app: CareerApplication) => [app.role_title, app.notes].filter(Boolean).join('\n\n');
 
 interface Props {
   applications?: CareerApplication[];
+  /** Opens with this application already chosen, as from its card. */
+  initialApplicationId?: string;
+  /** Stores the score on the chosen application. When absent, no save button is shown. */
+  onSaveScore?: (applicationId: string, score: number) => Promise<void>;
 }
 
-export function ATSMatcher({ applications = [] }: Props) {
+export function ATSMatcher({ applications = [], initialApplicationId, onSaveScore }: Props) {
   const { t } = useTranslation();
-  const [jdText, setJdText] = useState('');
+  const initialApp = applications.find((app) => app.id === initialApplicationId);
+  const [jdText, setJdText] = useState(initialApp ? jobDescriptionOf(initialApp) : '');
   const [cvText, setCvText] = useState('');
-  const [selectedAppId, setSelectedAppId] = useState<string>('');
+  const [selectedAppId, setSelectedAppId] = useState<string>(initialApp?.id ?? '');
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [isExtractingJd, setIsExtractingJd] = useState(false);
   const [isExtractingCv, setIsExtractingCv] = useState(false);
   const [extractError, setExtractError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [result, setResult] = useState<AtsResult | null>(null);
 
-  const jdFileInputRef = useRef<HTMLInputElement>(null);
-  const cvFileInputRef = useRef<HTMLInputElement>(null);
-
-  const [result, setResult] = useState<{
-    score: number;
-    matched: string[];
-    missing: string[];
-    coreMatched: string[];
-    coreMissing: string[];
-  } | null>(null);
-
-  // Handle loading data from a saved application
   const handleSelectApplication = (appId: string) => {
     setSelectedAppId(appId);
-    if (!appId) return;
-    const app = applications.find(a => a.id === appId);
-    if (app) {
-      let content = `Role: ${app.role_title} at ${app.company_name}\n`;
-      if (app.location) content += `Location: ${app.location} (${app.work_scheme || 'WFO'})\n`;
-      if (app.notes) content += `\nJob Details / Requirements:\n${app.notes}\n`;
-      if (app.url) content += `\nPosting URL: ${app.url}`;
-      setJdText(content);
-    }
+    setSaveState('idle');
+    const app = applications.find((a) => a.id === appId);
+    if (app) setJdText(jobDescriptionOf(app));
   };
 
-  // Handle file uploads (PDF, TXT, DOCX, etc.)
-  const handleFileUpload = async (file: File, type: 'jd' | 'cv') => {
-    setExtractError(null);
-    if (type === 'jd') setIsExtractingJd(true);
-    else setIsExtractingCv(true);
+  const handleAnalyze = () => {
+    setResult(analyzeMatch(jdText, cvText));
+    setSaveState('idle');
+  };
 
+  const handleSaveScore = async () => {
+    if (!result || !selectedAppId || !onSaveScore) return;
+    setSaveState('saving');
     try {
-      const extractedText = await extractTextFromFile(file);
-      if (type === 'jd') {
-        setJdText(extractedText);
-      } else {
-        setCvText(extractedText);
-      }
-    } catch (err: any) {
-      setExtractError(err.message || 'Gagal membaca isi dokumen.');
+      await onSaveScore(selectedAppId, result.score);
+      setSaveState('saved');
+    } catch (err) {
+      console.error('Failed to save the resume match score:', err);
+      setSaveState('error');
+    }
+  };
+
+  const handleFile = async (file: File, target: 'jd' | 'cv') => {
+    setExtractError(null);
+    const setReading = target === 'jd' ? setIsExtractingJd : setIsExtractingCv;
+    const setText = target === 'jd' ? setJdText : setCvText;
+    setReading(true);
+    try {
+      setText(await extractTextFromFile(file));
+    } catch {
+      setExtractError(t('career_form.read_failed'));
     } finally {
-      if (type === 'jd') setIsExtractingJd(false);
-      else setIsExtractingCv(false);
+      setReading(false);
     }
-  };
-
-  // Advanced Tokenization with multi-word phrases and technical symbols
-  const extractTokens = (text: string) => {
-    const cleanLower = text.toLowerCase();
-    const tokens = new Set<string>();
-
-    // 1. Check known technical multi-word phrases
-    for (const phrase of TECHNICAL_PHRASES) {
-      if (cleanLower.includes(phrase)) {
-        tokens.add(phrase);
-      }
-    }
-
-    // 2. Extract technical terms with symbols (e.g. c++, c#, .net, ci/cd, node.js, ui/ux, next.js)
-    const techMatches = cleanLower.match(/\b([a-z0-9+#./-]{2,})\b/g) || [];
-    for (const token of techMatches) {
-      const cleaned = token.replace(/^[./-]+|[./-]+$/g, '');
-      if (cleaned.length >= 2 && !STOP_WORDS.has(cleaned) && !/^\d+$/.test(cleaned)) {
-        tokens.add(cleaned);
-      }
-    }
-
-    // 3. Extract standard words (length >= 3)
-    const standardWords = cleanLower.match(/\b[a-z]{3,}\b/g) || [];
-    for (const word of standardWords) {
-      if (!STOP_WORDS.has(word)) {
-        tokens.add(word);
-      }
-    }
-
-    return tokens;
-  };
-
-  const analyze = () => {
-    if (!jdText.trim() || !cvText.trim()) return;
-
-    const jdTokens = extractTokens(jdText);
-    const cvTokens = extractTokens(cvText);
-    const cvRawLower = cvText.toLowerCase();
-
-    const matched: string[] = [];
-    const missing: string[] = [];
-
-    jdTokens.forEach(token => {
-      // Direct token match or substring occurrence in CV text
-      if (cvTokens.has(token) || cvRawLower.includes(token)) {
-        matched.push(token);
-      } else {
-        missing.push(token);
-      }
-    });
-
-    // Score calculation
-    const totalJd = jdTokens.size;
-    const score = totalJd === 0 ? 0 : Math.round((matched.length / totalJd) * 100);
-
-    // Identify core technical skills (high priority)
-    const coreMatched = matched.filter(t => TECHNICAL_PHRASES.includes(t) || t.includes('.') || t.includes('+') || t.includes('#'));
-    const coreMissing = missing.filter(t => TECHNICAL_PHRASES.includes(t) || t.includes('.') || t.includes('+') || t.includes('#'));
-
-    setResult({
-      score,
-      matched: matched.sort(),
-      missing: missing.sort(),
-      coreMatched,
-      coreMissing,
-    });
   };
 
   const handleCopyMissing = () => {
@@ -165,31 +175,28 @@ export function ATSMatcher({ applications = [] }: Props) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const otherMatched = result ? result.matched.filter((term) => !result.coreMatched.includes(term)) : [];
+  const otherMissing = result ? result.missing.filter((term) => !result.coreMissing.includes(term)) : [];
+  const scoreTone = result ? (result.score >= 75 ? 'text-success' : result.score >= 45 ? 'text-warning' : 'text-danger') : '';
+
   return (
     <div className="space-y-6 animate-fade-in pb-8">
-      <div className="glass-card p-5 md:p-8 border-t-4 border-t-primary">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-4">
+      <div className="glass-card p-5 md:p-8">
+        <div className="mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-primary/10 text-primary rounded-xl shrink-0">
-              <Target size={24} weight="duotone" />
+            <div className="shrink-0 rounded-xl bg-primary/10 p-3 text-primary">
+              <Target size={24} />
             </div>
             <div>
-              <Heading as="h2" size="h2" className="text-xl font-bold text-foreground flex items-center gap-2">
+              <Heading as="h2" size="h3">
                 {t('career_page.ats_matcher.title')}
-                <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary font-bold tracking-wider uppercase">
-                  {t('career_page.ats_matcher.tag')}
-                </span>
               </Heading>
-              <Paragraph className="text-xs md:text-sm text-muted-foreground mt-1 max-w-2xl font-light">
-                {t('career_page.ats_matcher.desc')}
-              </Paragraph>
+              <Paragraph className="mt-1 max-w-2xl text-sm text-muted-foreground">{t('career_page.ats_matcher.desc')}</Paragraph>
             </div>
           </div>
 
-          {/* Quick-fill from saved applications */}
           {applications.length > 0 && (
-            <div className="w-full sm:w-64 shrink-0">
+            <div className="w-full shrink-0 sm:w-64">
               <Select
                 id="select-saved-app"
                 label={t('career_page.ats_matcher.from_saved_app')}
@@ -198,10 +205,7 @@ export function ATSMatcher({ applications = [] }: Props) {
                 placeholder={t('career_page.ats_matcher.select_app_placeholder')}
                 options={[
                   { value: '', label: t('career_page.ats_matcher.manual_entry') },
-                  ...applications.map(app => ({
-                    value: app.id,
-                    label: `${app.company_name} (${app.role_title})`,
-                  }))
+                  ...applications.map((app) => ({ value: app.id, label: `${app.company_name} (${app.role_title})` })),
                 ]}
               />
             </div>
@@ -209,156 +213,59 @@ export function ATSMatcher({ applications = [] }: Props) {
         </div>
 
         {extractError && (
-          <div className="p-4 rounded-lg bg-expense/10 border border-expense/20 text-expense text-xs flex items-center gap-2 mb-4">
-            <WarningCircle size={16} />
+          <div role="alert" className="mb-4 flex items-center gap-2 rounded-lg border border-danger/20 bg-danger/10 p-4 text-xs text-danger">
+            <WarningCircle size={16} aria-hidden="true" />
             <span>{extractError}</span>
           </div>
         )}
 
-        {/* Input Areas */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
-          {/* JD Input */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
-                {t('career_page.ats_matcher.jd_label')}
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  ref={jdFileInputRef}
-                  accept=".pdf,.txt,.md,.doc,.docx"
-                  className="hidden"
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) handleFileUpload(e.target.files[0], 'jd');
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => jdFileInputRef.current?.click()}
-                  disabled={isExtractingJd}
-                  className="px-2.5 py-1 rounded bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold text-foreground flex items-center gap-1.5 transition-all disabled:opacity-50"
-                >
-                  <UploadSimple size={12} />
-                  {isExtractingJd ? t('career_page.ats_matcher.reading_file') : t('career_page.ats_matcher.upload_file')}
-                </button>
-                {jdText && (
-                  <button
-                    type="button"
-                    onClick={() => setJdText('')}
-                    className="p-1 rounded text-muted-foreground hover:text-expense transition-colors"
-                    title={t('career_page.ats_matcher.clear_jd')}
-                  >
-                    <X size={12} />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="relative">
-              <textarea
-                value={jdText}
-                onChange={(e) => setJdText(e.target.value)}
-                placeholder={t('career_page.ats_matcher.jd_placeholder') as string}
-                rows={10}
-                className="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-4 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all resize-none font-sans"
-              />
-              {!jdText && (
-                <div 
-                  onClick={() => jdFileInputRef.current?.click()}
-                  className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-6 text-center opacity-40 hover:opacity-70 transition-opacity"
-                >
-                  <FileText size={28} className="text-muted-foreground mb-1" />
-                  <Paragraph className="text-xs text-muted-foreground">{t('career_page.ats_matcher.drag_jd_hint')}</Paragraph>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* CV Input */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
-                {t('career_page.ats_matcher.cv_label')}
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  ref={cvFileInputRef}
-                  accept=".pdf,.txt,.md,.doc,.docx"
-                  className="hidden"
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) handleFileUpload(e.target.files[0], 'cv');
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => cvFileInputRef.current?.click()}
-                  disabled={isExtractingCv}
-                  className="px-2.5 py-1 rounded bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 text-xs font-bold text-foreground flex items-center gap-1.5 transition-all disabled:opacity-50"
-                >
-                  <UploadSimple size={12} />
-                  {isExtractingCv ? t('career_page.ats_matcher.reading_file') : t('career_page.ats_matcher.upload_file')}
-                </button>
-                {cvText && (
-                  <button
-                    type="button"
-                    onClick={() => setCvText('')}
-                    className="p-1 rounded text-muted-foreground hover:text-expense transition-colors"
-                    title={t('career_page.ats_matcher.clear_cv')}
-                  >
-                    <X size={12} />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="relative">
-              <textarea
-                value={cvText}
-                onChange={(e) => setCvText(e.target.value)}
-                placeholder={t('career_page.ats_matcher.cv_placeholder') as string}
-                rows={10}
-                className="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-4 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all resize-none font-sans"
-              />
-              {!cvText && (
-                <div 
-                  onClick={() => cvFileInputRef.current?.click()}
-                  className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-6 text-center opacity-40 hover:opacity-70 transition-opacity"
-                >
-                  <FileText size={28} className="text-muted-foreground mb-1" />
-                  <Paragraph className="text-xs text-muted-foreground">{t('career_page.ats_matcher.drag_cv_hint')}</Paragraph>
-                </div>
-              )}
-            </div>
-          </div>
+        <div className="mt-4 grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <SourceField
+            id="ats-jd"
+            label={t('career_page.ats_matcher.jd_label')}
+            value={jdText}
+            placeholder={t('career_page.ats_matcher.jd_placeholder')}
+            hint={t('career_page.ats_matcher.drag_jd_hint')}
+            clearLabel={t('career_page.ats_matcher.clear_jd')}
+            isReading={isExtractingJd}
+            onChange={setJdText}
+            onFile={(file) => handleFile(file, 'jd')}
+          />
+          <SourceField
+            id="ats-cv"
+            label={t('career_page.ats_matcher.cv_label')}
+            value={cvText}
+            placeholder={t('career_page.ats_matcher.cv_placeholder')}
+            hint={t('career_page.ats_matcher.drag_cv_hint')}
+            clearLabel={t('career_page.ats_matcher.clear_cv')}
+            isReading={isExtractingCv}
+            onChange={setCvText}
+            onFile={(file) => handleFile(file, 'cv')}
+          />
         </div>
 
-        {/* Action Button */}
-        <div className="flex justify-center mt-6">
+        <div className="mt-6 flex justify-center">
           <Button
             variant="primary"
             size="lg"
-            onClick={analyze}
+            onClick={handleAnalyze}
             disabled={!jdText.trim() || !cvText.trim() || isExtractingJd || isExtractingCv}
-            className="w-full md:w-auto px-12 py-4 rounded-xl transition-all flex items-center justify-center gap-2 font-bold"
+            leftIcon={<Target size={20} />}
+            className="w-full md:w-auto"
           >
-            <Target size={20} />
             {t('career_page.ats_matcher.analyze_btn')}
           </Button>
         </div>
       </div>
 
-      {/* Results Presentation */}
       {result && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up">
-          {/* Score Card */}
-          <div className="glass-card p-5 md:p-8 flex flex-col items-center justify-center text-center">
-            <Heading as="h3" size="h3" className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
+        <div className="grid grid-cols-1 gap-6 animate-slide-up xl:grid-cols-3">
+          <div className="glass-card flex flex-col items-center justify-center p-5 text-center md:p-8">
+            <Heading as="h3" size="h6" className="mb-4 text-muted-foreground">
               {t('career_page.ats_matcher.score_title')}
             </Heading>
-            <div className="relative w-36 h-36 flex items-center justify-center">
-              <svg className="absolute w-full h-full transform -rotate-90">
+            <div className="relative flex h-36 w-36 items-center justify-center">
+              <svg className="absolute h-full w-full -rotate-90" aria-hidden="true">
                 <circle cx="72" cy="72" r="62" fill="none" stroke="currentColor" strokeWidth="10" className="text-foreground/5" />
                 <circle
                   cx="72"
@@ -369,64 +276,93 @@ export function ATSMatcher({ applications = [] }: Props) {
                   strokeWidth="10"
                   strokeDasharray={`${2 * Math.PI * 62}`}
                   strokeDashoffset={`${2 * Math.PI * 62 * (1 - result.score / 100)}`}
-                  className={result.score >= 75 ? 'text-success' : result.score >= 45 ? 'text-warning' : 'text-expense'}
+                  className={scoreTone}
                   strokeLinecap="round"
                 />
               </svg>
               <div className="absolute flex flex-col items-center">
-                <span className="text-4xl font-black tabular-nums text-foreground">{result.score}</span>
-                <span className="text-xs text-muted-foreground font-bold">%</span>
+                <span className="font-mono text-4xl font-bold tabular-nums text-foreground">{result.score}</span>
+                <span className="text-xs text-muted-foreground">%</span>
               </div>
             </div>
 
-            <div className="mt-4 text-xs text-muted-foreground flex items-center gap-1.5 font-medium">
-              <Lightbulb size={16} className="text-primary shrink-0" />
+            <div className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Lightbulb size={16} className="shrink-0 text-primary" aria-hidden="true" />
               <span>
                 {result.score >= 75
                   ? t('career_page.ats_matcher.score_high_tip')
                   : result.score >= 45
-                  ? t('career_page.ats_matcher.score_mid_tip')
-                  : t('career_page.ats_matcher.score_low_tip')}
+                    ? t('career_page.ats_matcher.score_mid_tip')
+                    : t('career_page.ats_matcher.score_low_tip')}
               </span>
             </div>
+
+            {onSaveScore && selectedAppId && (
+              <div className="mt-4 w-full space-y-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  fullWidth
+                  onClick={handleSaveScore}
+                  isLoading={saveState === 'saving'}
+                  loadingText={t('common.saving')}
+                  disabled={saveState === 'saved'}
+                >
+                  {saveState === 'saved' ? t('ats_ui.saved') : t('ats_ui.save_score')}
+                </Button>
+                {saveState === 'error' && (
+                  <p role="alert" className="text-xs text-danger">
+                    {t('ats_ui.save_failed')}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Keywords Breakdown */}
-          <div className="glass-card p-5 md:p-8 md:col-span-2 space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 h-full">
-              {/* Matched Keywords */}
-              <div className="space-y-2">
-                <Heading as="h3" size="h3" className="text-sm font-bold flex items-center gap-2 text-success">
-                  <CheckCircle size={18} weight="fill" />
-                  {t('career_page.ats_matcher.matched_keywords')} ({result.matched.length})
+          <div className="glass-card space-y-6 p-5 md:p-8 xl:col-span-2">
+            {(result.coreMatched.length > 0 || result.coreMissing.length > 0) && (
+              <section className="space-y-2">
+                <Heading as="h3" size="h6">
+                  {t('ats_ui.key_skills')}
                 </Heading>
-                <div className="flex flex-wrap gap-1.5 max-h-[220px] overflow-y-auto no-scrollbar p-1">
-                  {result.matched.length === 0 ? (
-                    <Paragraph className="text-xs text-muted-foreground italic">{t('career_page.ats_matcher.no_matched_found')}</Paragraph>
+                <Paragraph className="text-xs text-muted-foreground">{t('ats_ui.key_skills_desc')}</Paragraph>
+                <div className="flex flex-wrap gap-1.5">
+                  {result.coreMatched.map((term) => (
+                    <Chip key={term} term={term} tone="success" />
+                  ))}
+                  {result.coreMissing.map((term) => (
+                    <Chip key={term} term={term} tone="danger" />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+              <section className="space-y-2">
+                <Heading as="h3" size="h6" className="flex items-center gap-2 text-success">
+                  <CheckCircle size={18} weight="fill" aria-hidden="true" />
+                  {t('career_page.ats_matcher.matched_keywords')} ({otherMatched.length})
+                </Heading>
+                <div className="flex max-h-56 flex-wrap gap-1.5 overflow-y-auto p-1">
+                  {otherMatched.length === 0 ? (
+                    <Paragraph className="text-xs text-muted-foreground">{t('career_page.ats_matcher.no_matched_found')}</Paragraph>
                   ) : (
-                    result.matched.map(kw => (
-                      <span
-                        key={kw}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-success/10 text-success border border-success/25 rounded-md text-xs font-semibold tracking-wide"
-                      >
-                        <Check size={12} weight="bold" aria-hidden="true" />{kw}
-                      </span>
-                    ))
+                    otherMatched.map((term) => <Chip key={term} term={term} tone="success" />)
                   )}
                 </div>
-              </div>
+              </section>
 
-              {/* Missing Keywords */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Heading as="h3" size="h3" className="text-sm font-bold flex items-center gap-2 text-expense">
-                    <WarningCircle size={18} weight="fill" />
-                    {t('career_page.ats_matcher.missing_keywords')} ({result.missing.length})
+              <section className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <Heading as="h3" size="h6" className="flex items-center gap-2 text-danger">
+                    <WarningCircle size={18} weight="fill" aria-hidden="true" />
+                    {t('career_page.ats_matcher.missing_keywords')} ({otherMissing.length})
                   </Heading>
                   {result.missing.length > 0 && (
                     <button
+                      type="button"
                       onClick={handleCopyMissing}
-                      className="text-xs uppercase font-bold text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors"
+                      className="flex min-h-9 items-center gap-1 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary"
                       title={t('career_page.ats_matcher.copy_missing')}
                     >
                       {copied ? <Check size={12} className="text-success" /> : <Copy size={12} />}
@@ -434,24 +370,17 @@ export function ATSMatcher({ applications = [] }: Props) {
                     </button>
                   )}
                 </div>
-
-                <div className="flex flex-wrap gap-1.5 max-h-[220px] overflow-y-auto no-scrollbar p-1">
-                  {result.missing.length === 0 ? (
-                    <Paragraph className="text-xs text-success italic flex items-center gap-1">
-                      <CheckCircle size={14} weight="fill" /> {t('career_page.ats_matcher.all_matched')}
+                {otherMissing.length > 0 && <p className="text-xs text-muted-foreground">{t('ats_ui.sorted_hint')}</p>}
+                <div className="flex max-h-56 flex-wrap gap-1.5 overflow-y-auto p-1">
+                  {otherMissing.length === 0 ? (
+                    <Paragraph className="flex items-center gap-1 text-xs text-success">
+                      <CheckCircle size={14} weight="fill" aria-hidden="true" /> {t('career_page.ats_matcher.all_matched')}
                     </Paragraph>
                   ) : (
-                    result.missing.map(kw => (
-                      <span
-                        key={kw}
-                        className="px-2.5 py-1 bg-expense/10 text-expense border border-expense/25 rounded-md text-xs font-semibold tracking-wide"
-                      >
-                        + {kw}
-                      </span>
-                    ))
+                    otherMissing.map((term) => <Chip key={term} term={term} tone="danger" />)
                   )}
                 </div>
-              </div>
+              </section>
             </div>
           </div>
         </div>
